@@ -1,0 +1,288 @@
+{% extends 'usertemplate/base.html' %}
+
+{% load static %}
+{% block title %} Reset Password {% endblock %}
+
+{% block content %}
+<div class="container register" style="border-radius: 1rem;">
+    <div class="row">
+        <div class="col-md-3 register-left">
+            <h3>Welcome</h3>
+            <p class="text-white">You are 30 seconds away from earning money!</p>
+
+        </div>
+        <div class="col-md-9 register-right">
+
+            {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span class="message">{{message}}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+
+            <div class="tab-content" id="myTabContent">
+
+                <style>
+                    .hCJtAJ {
+                        position: absolute;
+                        right: 4px;
+                        top: 4px;
+                        height: 38px;
+                        z-index: 100;
+                        border: none;
+                    }
+
+                    .ewbxDW {
+                        padding: 8px 16px;
+                        border-radius: 8px;
+                        font-size: 13px;
+                        line-height: 20px;
+                        font-weight: 600;
+                        min-width: 96px;
+                        width: fit-content;
+                        height: 36px;
+                        cursor: pointer;
+                        outline: none;
+                        white-space: nowrap;
+
+                    }
+
+
+                    .signup-link {
+                        text-align: center;
+                     
+                    }
+                </style>
+
+                <form action="/reset-password/" method="POST">
+                    {% csrf_token %}
+
+                    <div class="row register-form text-center">
+
+                        <div class="col-md-6">
+                            <span style="color: chocolate;" class="error" id="mobileError"></span>
+                            <div class="form-group">
+
+                                <input type="text" class="form-control" placeholder="Enter Email / Mobile Number"
+                                    name="mobile_email" id="mobileEmailInput" required />
+                                <a class="ewbxDW hCJtAJ send-otp disabled" id="sendOTP">Send OTP</a>
+                            </div>
+
+
+                         <!-- Password input with show password icon -->
+                         <div class="form-group">
+                            <input type="password" class="form-control" placeholder="Enter New Password" name="password"
+                                id="Password" value="" required />
+                            <a class="ewbxDW hCJtAJ toggle-password" id="togglePasswordVisibility">
+                                <i class="far fa-eye"></i>
+                            </a>
+                        </div>
+
+
+
+
+                            <div id="otpSection" style="display: none;">
+                                <input type="number" class="form-control" placeholder="Enter OTP" name='otp' id="otpInput"
+                                    required />
+                                <a class="ewbxDW hCJtAJ " id="resendOTP" onclick="resendOtp()">Re-Send OTP</a>
+                            </div>
+
+                         
+
+                            <div class="signup-link">
+                                <p> <a href="/login-otp/" style="font-size: smaller;">Forgot Password? Login With OTP</a> /
+                                   
+                                    <a href="/login/" style="font-size: smaller; color:blue">Already to User? Login</a>
+                                </p>
+                            </div>
+
+
+                            <input type="submit" id="resendpassword" class="btnRegister" value="Reset Password" />
+
+
+                            <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                            <style>
+                                .disabled {
+                                    pointer-events: none;
+                                    opacity: 0.5;
+                                }
+                            </style>
+
+                            <script>
+
+                                function resendOtp() {
+                                    var inputVal = $('#mobileEmailInput').val().trim();
+                                    console.log(inputVal, 'inputVal');
+
+                                    // Make a POST request to your Django API endpoint for sending OTP
+                                    $.ajax({
+                                        url: '/login-re-send-otp/',
+                                        method: 'POST',
+                                        data: { input_value: inputVal, typeuser: 'CUSTOMER' },
+                                        success: function (data) {
+                                            console.log(data);
+                                            alert(data.detail);
+                                            // Hide the input section and show the OTP verification section
+                                            $('#otpSection').show();
+
+                                            $('#sendOTP').addClass('disabled');
+
+                                            $('#resendOTP').addClass('disabled');
+
+
+                                        },
+                                        error: function (xhr) {
+                                            console.error(xhr);
+                                            alert(JSON.parse(xhr.responseText).detail); // Display the error message from the server
+                                        }
+                                    });
+                                }
+
+
+
+                                $(document).ready(function () {
+                                    // Function to validate email or mobile number
+                                    function validateInput() {
+                                        var inputPattern = /^[0-9]{10}$|^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                        var inputValue = $("#mobileEmailInput").val();
+
+                                        if (!inputPattern.test(inputValue)) {
+                                            $("#mobileError").text("Invalid input. Please enter a valid email or mobile number.");
+                                        } else {
+                                            $("#mobileError").text("");
+                                        }
+                                    }
+
+                                    // Event listener for input field
+                                    $("#mobileEmailInput").on("input", validateInput);
+                                });
+
+
+                                $(document).ready(function () {
+                                    function toggleSendOTPButton() {
+                                        var inputVal = $('#mobileEmailInput').val().trim();
+                                        var sendOTPButton = $('#sendOTP');
+                                        var isValidInput = validateInput(inputVal);
+
+                                        if (inputVal !== '' && isValidInput) {
+                                            sendOTPButton.removeClass('disabled');
+                                        } else {
+                                            sendOTPButton.addClass('disabled');
+                                        }
+                                    }
+
+                                    function validateInput(inputVal) {
+                                        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                        var mobileRegex = /^\d{10}$/;
+                                        return emailRegex.test(inputVal) || mobileRegex.test(inputVal);
+                                    }
+
+                                    function sendOTP() {
+                                        var inputVal = $('#mobileEmailInput').val().trim();
+                                        console.log(inputVal, 'inputVal');
+
+                                        // Make a POST request to your Django API endpoint for sending OTP
+                                        $.ajax({
+                                            url: '/login-send-otp/',
+                                            method: 'POST',
+                                            data: { input_value: inputVal },
+                                            success: function (data) {
+                                                console.log(data);
+                                                alert(data.detail);
+                                                // Hide the input section and show the OTP verification section
+                                                $('#otpSection').show();
+
+                                                $('#sendOTP').addClass('disabled');
+
+                                                $('#resendOTP').addClass('disabled');
+                                                var sendOTPButton = $('#resendOTP');
+
+                                                var isValidInput = validateInput(inputVal);
+
+                                                var countdown = 60; // Countdown time in seconds
+
+                                                // Function to update the button text with the countdown
+                                                function updateButtonText() {
+                                                    $("#resendOTP").text("Resend OTP in " + countdown + "s");
+                                                    countdown--;
+
+                                                    if (countdown < 0) {
+                                                        // Enable the button when the countdown reaches 0
+                                                        $('#resendOTP').removeClass('disabled');
+                                                        $("#resendOTP").text("Resend OTP");
+                                                    } else {
+                                                        // Continue updating the button text every second
+                                                        setTimeout(updateButtonText, 1000); // 1000 milliseconds = 1 second
+                                                    }
+                                                }
+
+                                                // Start the countdown
+                                                updateButtonText();
+
+
+
+
+
+                                            },
+                                            error: function (xhr) {
+                                                console.error(xhr);
+                                                alert(JSON.parse(xhr.responseText).detail); // Display the error message from the server
+                                            }
+                                        });
+                                    }
+
+
+
+
+
+
+                                    // Initial check when the page loads
+                                    toggleSendOTPButton();
+
+                                    // Bind the function to the input's keyup event
+                                    $('#mobileEmailInput').on('keyup', toggleSendOTPButton);
+
+                                    // Bind the sendOTP function to the "Send OTP" button click event
+                                    $('#sendOTP').on('click', function () {
+                                        if (!$('#sendOTP').hasClass('disabled')) {
+                                            sendOTP();
+                                        }
+                                    });
+
+                                 
+
+                                    // Password visibility toggle
+                                    $('#togglePasswordVisibility').on('click', function () {
+                                        var passwordInput = $('#Password');
+                                        var button = $('#togglePasswordVisibility');
+
+                                        if (passwordInput.attr('type') === 'password') {
+                                            passwordInput.attr('type', 'text');
+                                            button.html('<i class="far fa-eye-slash"></i>');
+                                        } else {
+                                            passwordInput.attr('type', 'password');
+                                            button.html('<i class="far fa-eye"></i>');
+                                        }
+                                    });
+                                });
+                            </script>
+
+
+
+                        </div>
+                        <div class="col-md-6">
+                            <img src="{% static 'images/listing/ecommerce.png' %}" width="350" alt="Description of the image">
+                        
+                        </div>
+                        <br><br><br>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

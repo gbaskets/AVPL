@@ -1,0 +1,220 @@
+{% extends 'user_app/base.html' %}
+{% load static %}
+{% block title %}Profile{% endblock %}
+{% block main %}
+{% load crispy_forms_tags %}
+<!-- Main Content -->
+<div class="main-content">
+    <section class="section">
+        <div class="section-header">
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="section-header-breadcrumb-content">
+                        <h1>Profile</h1>
+                        <div class="section-header-breadcrumb">
+                            <div class="breadcrumb-item active"><a href="/user/"><i class="fas fa-home"></i></a></div>
+                            <div class="breadcrumb-item"><a href="/user/">Dashboard</a></div>
+                            <div class="breadcrumb-item"><a>Profile</a></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+
+                            <div class="row justify-content-center">
+                                <div class="col-lg-3 col-md-3 col-sm-3">
+
+                                    <h3 class="mt-3 profile">{{user.first_name}} {{user.last_name}}</h3>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="card-header">
+                            <h4>User Profile Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <table class="table">
+
+                                        <tbody>
+                                           
+                                            <tr>
+                                                <td> Profile Pic :</td>
+                                                {% if user.profile_pic %}
+                                               
+                                                <td><img src="{{ user.profile_pic.url}}" style="width:200px;height:150px;"></td>
+                                                    {% else %}
+                                                    <td> <img src="{{ user.profile_pic}}" style="width:200px;height:150px;"></td>
+                                                   
+                                                    {% endif %}
+
+                                               
+                                            </tr>
+                                           
+                                            <tr>
+                                                <td>  Sponsor :</td>
+                                                <td><h5>{{user.sponsor.usr.first_name}} {{user.sponsor.usr.last_name}} ({{user.sponsor}})</h5></td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td> Name :</td>
+                                                <td>{{user.first_name}} {{user.last_name}}</td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>Gender</td>
+                                                <td>{{user.gender}}</td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>Mobile No. :</td>
+                                                <td>{{user.phone}}</td>
+
+                                            </tr>
+                                            <tr>
+                                                <td> Current PV</td>
+                                                <td> {{user.pv}} PV</td>
+
+                                            </tr>
+                                            <tr>
+                                                <td> Address</td>
+                                                <td>{{user.address}}</td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td> Pincode</td>
+                                                <td>{{user.zipcode}}</td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td> PAN Card</td>
+                                                {% if payment.pan %}
+                                                <td> <img src="{{payment.pan.url}}" style="width:200px;height:150px;"></td>
+                                                {% else %}
+                                                <td> <img src="{{payment.pan}}" style="width:200px;height:150px;"></td>
+                                                {% endif %}
+                                            </tr>
+
+
+
+
+                                            <tr>
+                                                <td> Aadhar Card</td>
+                                                {% if payment.aadhar %}
+                                                <td><img src="{{payment.aadhar.url}}" style="width:200px;height:150px;"></td>
+                                                    {% else %}
+                                                    <td> <img src="{{payment.aadhar}}" style="width:200px;height:150px;"></td>
+                                                   
+                                                    {% endif %}
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>Bank Account Number</td>
+                                                <td>{{payment.account_no}}</td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td> Bank Name</td>
+                                                <td>{{payment.bank_name}}</td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>  Bank IFSC</td>
+                                                <td>{{payment.ifsc}}</td>
+
+                                            </tr>
+
+                                           
+
+
+
+                                        </tbody>
+                                    </table>
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <div class="form-group">
+                                            <a href="#"  data-pid="{{user.id}}" data-target="#UpdateHomePage"
+                                            data-toggle="modal"  class=" btn btn-primary btn-lg justify-content-right">Edit Profile</a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+<div  class="modal fade" id="UpdateHomePage" role="dialog" aria-hidden="false">
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Update</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+               
+                  <div class="modal-body">
+                  
+                    {% csrf_token %}
+                    
+                  
+                    {{updateform|crispy}}
+
+
+                    {{updateform2|crispy}}
+                   
+                   
+                   
+                    
+                  </div>
+                  <div class="form-group">
+                    <div class="alert alert-success" id="ins_success" style="display:none">
+      
+                    </div>
+                     <div class="alert alert-danger" id="ins_error" style="display:none">
+      
+                    </div>
+                </div>
+      
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Update</button>
+                       <div id="msg" class="alert alert-danger" style="display:none"></div>
+                     </div>
+    
+              </div>
+        </div>
+    </form>
+    
+</div>
+
+{% endblock %}

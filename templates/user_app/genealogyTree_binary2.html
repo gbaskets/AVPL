@@ -1,0 +1,286 @@
+{% extends 'user_app/base.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% block main %}
+<style type="text/css">
+    /*Now the CSS*/
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .tree ul {
+        padding-top: 20px;
+        position: relative;
+
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+    }
+
+    .tree li {
+        float: left;
+        text-align: center;
+        list-style-type: none;
+        position: relative;
+        padding: 20px 5px 0 5px;
+
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+    }
+
+    /*We will use ::before and ::after to draw the connectors*/
+
+    .tree li::before,
+    .tree li::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 50%;
+        border-top: 1px solid #ccc;
+        width: 50%;
+        height: 20px;
+    }
+
+    .tree li::after {
+        right: auto;
+        left: 50%;
+        border-left: 1px solid #ccc;
+    }
+
+    /*We need to remove left-right connectors from elements without 
+any siblings*/
+    .tree li:only-child::after,
+    .tree li:only-child::before {
+        display: none;
+    }
+
+    /*Remove space from the top of single children*/
+    .tree li:only-child {
+        padding-top: 0;
+    }
+
+    /*Remove left connector from first child and 
+right connector from last child*/
+    .tree li:first-child::before,
+    .tree li:last-child::after {
+        border: 0 none;
+    }
+
+    /*Adding back the vertical connector to the last nodes*/
+    .tree li:last-child::before {
+        border-right: 1px solid #ccc;
+        border-radius: 0 5px 0 0;
+        -webkit-border-radius: 0 5px 0 0;
+        -moz-border-radius: 0 5px 0 0;
+    }
+
+    .tree li:first-child::after {
+        border-radius: 5px 0 0 0;
+        -webkit-border-radius: 5px 0 0 0;
+        -moz-border-radius: 5px 0 0 0;
+    }
+
+    /*Time to add downward connectors from parents*/
+    .tree ul ul::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        border-left: 1px solid #ccc;
+        width: 0;
+        height: 20px;
+    }
+
+    .tree li a {
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        text-decoration: none;
+        color: #666;
+        font-family: arial, verdana, tahoma;
+        font-size: 11px;
+        display: inline-block;
+
+        border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+    }
+
+    /*Time for some hover effects*/
+    /*We will apply the hover effect the the lineage of the element also*/
+    .tree li a:hover,
+    .tree li a:hover+ul li a {
+        background: #c8e4f8;
+        color: #000;
+        border: 1px solid #94a0b4;
+    }
+
+    /*Connector styles on hover*/
+    .tree li a:hover+ul li::after,
+    .tree li a:hover+ul li::before,
+    .tree li a:hover+ul::before,
+    .tree li a:hover+ul ul::before {
+        border-color: #94a0b4;
+    }
+</style>
+
+<div class="main-content">
+    <section class="section">
+        <div class="section-header">
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="section-header-breadcrumb-content">
+                        <h1>Genealogy Tree</h1>
+                        <div class="section-header-breadcrumb">
+                            <div class="breadcrumb-item active"><a href="/user/"><i
+                                        class="fas fa-home"></i></a></div>
+                            <div class="breadcrumb-item"><a href="#">Genealogy Tree (Binary)</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="tree" style="margin-left:200px;">
+          
+           
+                <ul>
+                    <li>  
+
+
+
+
+
+                        <a title="Self PV: {{user.usr.pv|floatformat:2}}"   data-toggle="popover" data-trigger="hover"  data-placement="bottom"
+                        data-content="Left-PV: {{usrpv.left_pv|floatformat:2}} | Right-PV: {{usrpv.right_pv|floatformat:2}}"  href="#">
+                            <img src="/static/node.jpg" width="50" height="50" alt="">{{user}}</a> 
+                          
+                        
+                        <ul>
+                            <li  >
+                                <form method="POST" >
+                                    {% csrf_token %} 
+                                {% for x in trees %}
+                                <input type="hidden" name="user1" value="{{x.left}}">
+                                <a title="Self PV: {{x.left.usr.pv|floatformat:2}}"   data-toggle="popover" data-trigger="hover"  data-placement="bottom"
+                                data-content="Left-PV: {{usrpvl.left_pv|floatformat:2}} | Right-PV: {{usrpvl.right_pv|floatformat:2}}"  href="#">
+                                    <img src="/static/node.jpg" width="50" height="50" alt=""> <input  type="submit" value="{{x.left}}"></a>
+                                {% endfor %}
+
+                                </form>
+                                 <ul>
+                                    <li >
+                                        <form method="POST" >
+                                            {% csrf_token %} 
+                                        {% for n1 in nodes %}
+                                        <input type="hidden" name="user1" value="{{n1.left}}">
+                                        <a title="Self PV: {{n1.left.usr.pv|floatformat:2}}"   data-toggle="popover" data-trigger="hover"  data-placement="bottom"
+                                        data-content="Left-PV: {{usrpvsl.left_pv|floatformat:2}} | Right-PV: {{usrpvsr.right_pv|floatformat:2}}" href="#">
+                                            <img src="/static/node.jpg" width="50" height="50" alt=""> <input type="submit" value="{{n1.left}}"></a>
+                                        {% endfor %}
+                                        </form>
+
+                                    </li>
+                                    <li>
+                                        <form method="POST" >
+                                            {% csrf_token %} 
+                                        {% for n2 in nodes %}
+                                        <input type="hidden" name="user2" value="{{n2.right}}">
+                                        <a title="Self PV: {{n2.left.usr.pv|floatformat:2}}"   data-toggle="popover" data-trigger="hover"  data-placement="bottom"
+                                        data-content="Left-PV: {{usrpvsl.left_pv|floatformat:2}} | Right-PV: {{usrpvsr.right_pv|floatformat:2}}" href="#"><img src="/static/node.jpg" width="50" height="50" alt="">
+                                        <input type="submit" value="{{n2.right}}"></a>
+                                        {% endfor %}
+                                        </form>
+                                    </li>
+                                </ul> 
+                            
+                            </li>
+
+                            <li>
+                                <form method="POST" >
+                                    {% csrf_token %} 
+                                {% for x in trees %}
+                                <input type="hidden" name="user2" value="{{x.right}}">
+                                <a title="Self PV: {{x.left.usr.pv|floatformat:2}}"   data-toggle="popover" data-trigger="hover"  data-placement="bottom"
+                                data-content="Left-PV: {{usrpvr.left_pv|floatformat:2}} | Right-PV: {{usrpvr.right_pv|floatformat:2}}" href="#"><img src="/static/node.jpg" width="50" height="50" alt="">
+                                <input type="submit" value="{{x.right}}"></a>
+                                
+                                {% endfor %}
+
+                                </form>
+                                
+                                <ul>
+                                    <li>
+                                        <form method="POST" >
+                                            {% csrf_token %} 
+                                        {% for n3 in nodess %}
+                                        <input type="hidden" name="user1" value="{{n3.left}}">
+                                        <a title="Self PV: {{n3.left.usr.pv|floatformat:2}}"   data-toggle="popover" data-trigger="hover"  data-placement="bottom"
+                                        data-content="Left-PV: {{usrpvsl.left_pv|floatformat:2}} | Right-PV: {{usrpvsr.right_pv|floatformat:2}}" href="#"><img src="/static/node.jpg" width="50" height="50" alt="">
+                                        <input type="submit" value="{{n3.left}}"></a>
+                                        {% endfor %}
+                                        </form>
+
+                                    </li>
+                                    <li>
+                                        <form method="POST" >
+                                            {% csrf_token %} 
+                                        {% for n4 in nodess %}
+                                        <input type="hidden" name="user2" value="{{n4.right}}">
+                                        <a title="Self PV: {{n4.left.usr.pv|floatformat:2}}"   data-toggle="popover" data-trigger="hover"  data-placement="bottom"
+                                        data-content="Left-PV: {{usrpvsl.left_pv|floatformat:2}} | Right-PV: {{usrpvsr.right_pv|floatformat:2}}" href="#"> <img src="/static/node.jpg" width="50" height="50" alt="">
+                                        <input type="submit" value="{{n4.right}}"></a>
+                                        {% endfor %}
+                                        </form>
+                                    </li>
+                                </ul> 
+                                
+                             </li> 
+                        </ul>
+                    </li>
+                </ul>
+           
+            </div>
+
+
+
+
+    </section>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- CDN's required -->
+<link rel="stylesheet" href=
+"https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src=
+"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+    </script>
+    <script src=
+"https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js">
+    </script>
+
+
+
+<script>
+    $('[data-toggle="popover"]').popover();
+</script>
+
+
+
+{%endblock%}

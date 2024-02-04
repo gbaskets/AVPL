@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gbasket</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #3498db, #2c3e50);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        p {
+            font-size: 1.5em;
+            max-width: 600px;
+            margin: 20px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .countdown {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        @media screen and (max-width: 600px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            p {
+                font-size: 1.2em;
+            }
+
+            .countdown {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Exciting News Coming Soon!</h1>
+    <p>We're working hard to bring you something awesome. Stay tuned for updates!</p>
+
+    <!-- Countdown timer (replace the date with your launch date) -->
+    <div class="countdown" id="countdown"></div>
+
+    <footer>
+        &copy; 2024 Gbasket.in <br> <p>ABHIRAJ VENTURES PVT LTD</p>
+    </footer>
+
+    <script>
+        // Set the launch date for the countdown (YYYY, MM - 1, DD, HH, MM, SS)
+        const launchDate = new Date(2024, 0, 31, 12, 0, 0).getTime();
+
+        // Update the countdown every second
+        const countdown = document.getElementById('countdown');
+        setInterval(() => {
+            const now = new Date().getTime();
+            const distance = launchDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdown.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }, 1000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,297 @@
+{% extends 'user_app/base.html' %}
+{% load static %}
+{% block title %}Create Referral Link{% endblock %}
+{% block main %}
+
+<!-- Main Content -->
+<div class="main-content">
+   <section class="section">
+      <div class="section-header">
+         <div class="row">
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+               <div class="section-header-breadcrumb-content">
+                  <h1>Create Link</h1>
+                  <div class="section-header-breadcrumb">
+                     <div class="breadcrumb-item active"><a href="/user/"><i class="fas fa-home"></i></a>
+                     </div>
+                     <div class="breadcrumb-item"><a href="#">Create Link</a></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="section-body">
+
+         <div class="container">
+
+            <div class="row">
+
+               <div class="col-12">
+                  <div class="card">
+
+                     <div class="card-header">
+                        <h4>Create Registration Link to Add Users</h4>
+                     </div>
+                     <div class="card-body">
+
+                        <ul style="margin-bottom:20px;">
+                           {% for message in messages %}
+                           <li><span style="font-weight:bold;font-size:15px;color:red;">{{message}}</span></li>
+                           {% endfor %}
+                        </ul>
+
+
+                      
+                        <div class="row">
+
+                           <div class="col-lg-4 col-md-12 col-sm-12">
+                              <div class="form-group">
+                                 <label>Copy Below Link <span style="color:red;">(valid for same day
+                                       only)</span></label>
+                                 <input type="text" class="form-control" id="link">
+                              </div>
+                           </div>
+                           <div class="col-lg-6 col-md-12 col-sm-12" style="padding-top:30px;">
+                              <div class="form-group">
+
+                                 <a class="btn btn-primary btn-lg justify-content-left" onclick="get_link_left();"><i class="fa fa-link"></i>
+                                    Link(Left)</a>
+                                 <a class="btn btn-primary btn-lg justify-content-right" onclick="get_link_right();"><i class="fa fa-link"></i>
+                                    Link(Right)</a>
+
+                              </div>
+                           </div>
+
+                        </div>
+                      
+
+
+                        <div class="section-body">
+
+                           <div class="container">
+                              <div class="row">
+
+                                 <div class="col-md-6">
+
+                                    <div class="table-responsive">
+                                       <h4>Left Nodes</h4>
+                                       <span>Below are the nodes having atleast one empty child node. Links are valid
+                                          only for same day registration.</span>
+                                       <table class="table table table-hover" style="width:100%;">
+                                          <thead>
+                                             <tr>
+                                                <th>Name</th>
+                                                <!-- <th>Options</th> -->
+                                                <th>Left Link</th>
+                                                <th>Right Link</th>
+                                             </tr>
+                                          </thead>
+                                          <tbody>
+                                           
+                                             {% for x in tree.left %}
+
+                                           
+                                             <tr>
+                                                <td>{{ x.usr.first_name|safe }} {{ x.usr.left_name|safe }}</td>
+                                                <!-- <td>{{ x.node }}</td> -->
+                                                <td>
+                                                   <button class="btn-sm btn-primary btn-icon icon-left"
+                                                      onclick="get_link_2_left({{ x.id|safe }});"><i class="fa fa-link"></i>
+                                                      Link</button>
+                                                </td>
+                                                <td>
+                                                   <button class="btn-sm btn-primary btn-icon icon-right"
+                                                      onclick="get_link_2_right({{ x.id|safe }});"><i class="fa fa-link"></i>
+                                                      Link</button>
+                                                </td>
+                                                <td><input type="text" value="" id="{{ x.id|safe }}"></td>
+                                             </tr>
+                                            
+                                             {% endfor %}
+
+                                          
+                                          </tbody>
+                                       </table>
+                                    </div>
+
+
+                                 </div>
+
+
+                                 <div class="col-md-6">
+
+
+                                    <div class="table-responsive">
+                                       <h4>Right Nodes</h4>
+                                       <span>Below are the nodes having atleast one empty child node. Links are valid
+                                          only for same day registration.</span>
+                                       <table class="table table table-hover" style="width:100%;">
+                                          <thead>
+                                             <tr>
+                                                <th>Name</th>
+                                                <!-- <th>Options</th> -->
+                                                <th>Left Link</th>
+                                                <th>Right Link</th>
+                                             </tr>
+                                          </thead>
+                                          <tbody>
+                                             {% for x in tree.right %}
+                                             <tr>
+                                                <td>{{ x.usr.first_name|safe }} {{ x.usr.left_name|safe }}</td>
+                                                <!-- <td>{{ x.node }}</td> -->
+                                                <td>
+                                                   <button class="btn-sm btn-primary btn-icon icon-left"
+                                                      onclick="get_link_2_left({{ x.id|safe }});"><i class="fa fa-link"></i>
+                                                     Link</button>
+                                                </td>
+                                                <td>
+                                                   <button class="btn-sm btn-primary btn-icon icon-left"
+                                                      onclick="get_link_2_right({{ x.id|safe }});"><i class="fa fa-link"></i>
+                                                     Link</button>
+                                                </td>
+                                                <td><input type="text" value="" id="{{ x.id|safe }}"></td>
+                                             </tr>
+                                             {% endfor %}
+                                          </tbody>
+                                       </table>
+                                    </div>
+
+                                 </div>
+
+                               
+
+
+
+
+                              </div>
+
+                           </div>
+   </section>
+
+
+
+
+<!-- 
+   <div class="col-12">
+      <div class="card">
+
+         <div class="card-header">
+            <h4>Create Registration Link to Add Users</h4>
+         </div>
+         <div class="card-body">
+
+
+            <div class="container">
+               <div class="row">
+   
+
+                  <div class="col-md-12">
+
+
+                     <div class="table-responsive">
+                        <h4>Referral</h4>
+                        <span>Links are valid only for same day registration.</span>
+                        <table class="table table table-hover" style="width:100%;">
+                           <thead>
+                              <tr>
+                                 <th>Name</th>
+                                 <th>Options</th>
+                                 <th>Link</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {% for x in referal %}
+                              <tr>
+                                 <td>{{x.referrals.usr.first_name}} {{x.referrals.usr.last_name}}</td>
+                                 <td>
+                                    <button class="btn btn-primary btn-icon icon-left"
+                                       onclick="get_link_2({{ x.referrals.id|safe }});"><i class="fa fa-link"></i>
+                                       Generate Link</button>
+                                 </td>
+                                 <td><input type="text" value="" id="{{ x.referrals.id|safe }}"></td>
+                              </tr>
+                              {% endfor %}
+                           </tbody>
+                        </table>
+                     </div>
+                     </table>
+                  </div>
+
+
+
+
+               </div>
+            </div>
+         </div>
+
+      </div>
+   </div>
+
+   </section>
+ -->
+
+
+
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+
+
+
+<script type="text/javascript">
+   function get_link_left() {
+      $.ajax({
+         type: 'GET',
+         url: '/user/generatelink-left',
+         data: { user: 'user' },
+
+         success: function (data) {
+            document.getElementById('link').value = data.link;
+         }
+      });
+   }
+
+   function get_link_right() {
+      $.ajax({
+         type: 'GET',
+         url: '/user/generatelink-right',
+         data: { user: 'user' },
+
+         success: function (data) {
+            document.getElementById('link').value = data.link;
+         }
+      });
+   }
+
+
+   function get_link_2_left(user) {
+      $.ajax({
+         type: 'GET',
+         url: '/user/generatelink2-left',
+         data: { user: user },
+
+         success: function (data) {
+            document.getElementById(user).value = data.link;
+         }
+      });
+   }
+
+   function get_link_2_right(user) {
+      $.ajax({
+         type: 'GET',
+         url: '/user/generatelink2-right',
+         data: { user: user },
+
+         success: function (data) {
+            document.getElementById(user).value = data.link;
+         }
+      });
+   }
+</script>
+{% endblock %}

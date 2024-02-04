@@ -1,0 +1,243 @@
+{% extends 'staff_app/base.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% block main %}
+<style type="text/css">
+    /*Now the CSS*/
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .tree ul {
+        padding-top: 20px;
+        position: relative;
+
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+    }
+
+    .tree li {
+        float: left;
+        text-align: center;
+        list-style-type: none;
+        position: relative;
+        padding: 20px 5px 0 5px;
+
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+    }
+
+    /*We will use ::before and ::after to draw the connectors*/
+
+    .tree li::before,
+    .tree li::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 50%;
+        border-top: 1px solid #ccc;
+        width: 50%;
+        height: 20px;
+    }
+
+    .tree li::after {
+        right: auto;
+        left: 50%;
+        border-left: 1px solid #ccc;
+    }
+
+    /*We need to remove left-right connectors from elements without 
+any siblings*/
+    .tree li:only-child::after,
+    .tree li:only-child::before {
+        display: none;
+    }
+
+    /*Remove space from the top of single children*/
+    .tree li:only-child {
+        padding-top: 0;
+    }
+
+    /*Remove left connector from first child and 
+right connector from last child*/
+    .tree li:first-child::before,
+    .tree li:last-child::after {
+        border: 0 none;
+    }
+
+    /*Adding back the vertical connector to the last nodes*/
+    .tree li:last-child::before {
+        border-right: 1px solid #ccc;
+        border-radius: 0 5px 0 0;
+        -webkit-border-radius: 0 5px 0 0;
+        -moz-border-radius: 0 5px 0 0;
+    }
+
+    .tree li:first-child::after {
+        border-radius: 5px 0 0 0;
+        -webkit-border-radius: 5px 0 0 0;
+        -moz-border-radius: 5px 0 0 0;
+    }
+
+    /*Time to add downward connectors from parents*/
+    .tree ul ul::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        border-left: 1px solid #ccc;
+        width: 0;
+        height: 20px;
+    }
+
+    .tree li a {
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        text-decoration: none;
+        color: #666;
+        font-family: arial, verdana, tahoma;
+        /* font-size: 11px; */
+        display: inline-block;
+
+        border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+    }
+
+    /*Time for some hover effects*/
+    /*We will apply the hover effect the the lineage of the element also*/
+    .tree li a:hover,
+    .tree li a:hover+ul li a {
+        background: #c8e4f8;
+        color: #000;
+        border: 1px solid #94a0b4;
+    }
+
+    /*Connector styles on hover*/
+    .tree li a:hover+ul li::after,
+    .tree li a:hover+ul li::before,
+    .tree li a:hover+ul::before,
+    .tree li a:hover+ul ul::before {
+        border-color: #94a0b4;
+    }
+
+    /*Thats all. I hope you enjoyed it.
+Thanks :)*/
+</style>
+
+<div class="main-content">
+    <section class="section">
+        <div class="section-header">
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="section-header-breadcrumb-content">
+                        <h1>Genealogy Tree</h1>
+                        <div class="section-header-breadcrumb">
+                            <div class="breadcrumb-item active"><a href="/staffs/dashboard"><i
+                                        class="fas fa-home"></i></a></div>
+                            <div class="breadcrumb-item"><a href="#">Genealogy Tree (Level)</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tree" style=" text-align: center;">
+
+            <ul>
+                <li>
+
+                    <a title="Self PV: {{sponser_r.usr.pv|floatformat:2}}" data-toggle="popover" data-trigger="hover"
+                        data-placement="bottom" data-content="Level-PV: {{usrpv.level_pv|floatformat:2}}" href="#"><img
+                            src="/static/node.jpg" width="50" height="50" alt="">Admin
+                        {{sponser_r.usr.last_name}}</a>
+
+
+
+                    <ul>
+
+                        {% for r in referals %}
+
+                        <li>
+                            <form method="POST">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="userss" value="{{r.referrals.id}}">
+
+                                <a title="Self PV: {{r.referrals.usr.pv|floatformat:2}}" data-toggle="popover"
+                                    data-trigger="hover" data-placement="bottom" href="#"><img src="/static/node.jpg"
+                                        width="50" height="50" alt=""> <input type="submit"
+                                        value="{{r.referrals.usr.first_name}} {{r.referrals.usr.last_name}}"></a>
+                            </form>
+
+
+                            <ul>
+                                {% for ru in referals_user %}
+                                <li>
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="userss" value="{{ru.referrals.id}}">
+                                        <a title="Self PV: {{ru.referrals.usr.pv|floatformat:2}}" data-toggle="popover"
+                                            data-trigger="hover" data-placement="bottom" href="#"><img
+                                                src="/static/node.jpg" width="50" height="50" alt=""> <input
+                                                type="submit"
+                                                value="{{ru.referrals.usr.first_name}} {{ru.referrals.usr.last_name}} "></a>
+                                    </form>
+                                </li>
+
+                                {% endfor %}
+                                {% if referals_user %}
+                                <li><a href="/user/createlink"><img src="/static/add.png" width="50" height="50"
+                                            alt=""></a></li>
+                                {% else %}
+
+                                {% endif %}
+                            </ul>
+
+                            {% endfor %}
+                        </li>
+
+
+
+                        <li><a href="/user/createlink"><img src="/static/add.png" width="50" height="50" alt=""></a>
+                        </li>
+
+
+
+
+                    </ul>
+
+
+
+
+
+                </li>
+            </ul>
+
+        </div>
+
+
+
+
+        <!-- CDN's required -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+        </script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js">
+        </script>
+
+
+
+        <script>
+            $('[data-toggle="popover"]').popover();
+        </script>
+
+
+        {%endblock%}

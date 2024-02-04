@@ -1,0 +1,202 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Vendor Dashboard{% endblock %}
+{% block main %}
+            <!-- Main Content -->
+            <div class="main-content">
+               <section class="section">
+                  <div class="section-header">
+                     <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                           <div class="section-header-breadcrumb-content">
+                              <h1>Dashboard</h1>
+                              <div class="section-header-breadcrumb">
+                                 <div class="breadcrumb-item active"><a href="/vendor"><i class="fas fa-home"></i></a></div>
+                                 <div class="breadcrumb-item"><a href="#">Dashboard</a></div>
+                              </div>
+                             
+                           </div>
+                        </div>
+                     </div>
+                     <ul style="margin-bottom:20px;" id="msg">
+                        {% for message in messages %}
+                        <li><span style="font-weight:bold;font-size:15px;color:red;">{{message}}</span></li>
+                        {% endfor %}
+                     </ul>
+                     
+                  </div>
+
+                  <div class="section-body">
+                     <div class="row">
+                        <div class="col-12">
+                           <div class="card">
+                              <div class="card-header">
+                                 <h4>Wallet</h4>
+                              </div>
+                              <div class="card-body">
+                                 
+                                
+
+                                    <div class="row">
+
+                                       
+                                       <div class="col-lg-3 col-md-12 col-sm-12">
+                                          <h5><i class="fa fa-dashcube"></i><a href="/vendor/wallet"> Current Balance </a></h5>
+                                          <h5>( Wallet )</h5>
+                                          <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
+                                          <h5><i class="fa fa-inr"></i> {{wallet.current_balance|floatformat:2}}</h5>
+                                          
+                                       </div>
+
+                                       <div class="col-lg-3 col-md-12 col-sm-12">
+                                    
+                                          {% if business_limit.current_balance > 0 %}
+                                          <h5><i class="fa fa-dashcube"></i><a href="/vendor/businesslimit"> Current Balance </a></h5>
+                                          <h5>( Business Limit Wallet)</h5>
+                                          <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
+                                          <h5><i class="fa fa-inr"></i> {{business_limit.current_balance|floatformat:2}}</h5>
+                                          {% else %}
+                                          <h5><i class="fa fa-dashcube"></i><a href="/vendor/businesslimit"> Current Balance </a></h5> ( Business Limit Wallet) 
+                                          <span style="color:rgb(190, 4, 29);">** Not allow to order Delivered. Kindly recharge your Business Limit Wallet..</span>
+                                          <hr style="border-width:5px;border-color:rgb(190, 4, 29);border-radius:20px;margin-bottm:10px;">
+                                          <h5><i class="fa fa-inr"></i> {{business_limit.current_balance|floatformat:2}} </h5>
+                                          {% endif %}
+                                          
+                                       </div> 
+                                       {% if wallet_commission.is_active == True %}
+                                       <div class="col-lg-3 col-md-12 col-sm-12">
+                                          <h5><i class="fa fa-dashcube"></i><a href="/vendor/wallet-commission"> Current Balance </a></h5>
+                                          <h5>( Wallet-Commission)</h5>
+                                          <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
+                                          <h5><i class="fa fa-inr"></i> {{wallet_commission.current_balance|floatformat:2}}</h5>
+                                          
+                                       </div>
+                                       {% else %}
+
+                                       {% endif %}
+                                      
+                                      
+                                    
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+
+               <div>
+                  <!-- <form action="/add_product_erp" method="post" enctype="multipart/form-data">
+                     {% csrf_token %}
+                     <button class="btn btn-primary btn-icon">Sync Product</button>
+
+                  </form> -->
+               </div>
+                  <div class="section-body">
+                     <div class="row">
+                        <div class="col-12">
+                           <div class="card">
+                              <div class="card-header">
+                                 <h4>Latest Orders</h4>
+                              </div>
+                              <div class="card-body">
+                                 <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
+                                       <thead>
+                                          <tr>
+                                             <th>Order Date</th>
+                                             <th>Order ID</th>
+                                             <th>Payment Status</th>
+                                             <th>Status</th>
+                                             <th>Bulk Action</th>
+                                             <th> </th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          {% for order in orders %}
+                                          {% if order.delivery_status == 'Order Placed' %}
+                                          <tr>
+                                             {% if order.delivery_status == 'Order Placed' %}
+                                             <td><a href="/vendor/orderdetail?i={{order.id}}"><span class="badge badge-primary">NEW</span> {{order.order.order_date}}</a></td>
+                                             {% else %}
+                                             <td><a href="/vendor/orderdetail?i={{order.id}}">{{order.order.order_date}} </a></td>
+                                             {% endif %}
+                                             <td>ORD{{order.order.id}}  </td>
+                                             {% if order.order.paid == True %} 
+                                             <td><span class="badge badge-primary">Paid</span> </td>
+                                             {% else %}
+                                             <td><span class="badge badge-danger">UnPaid</span> </td>
+                                             {% endif %}
+                                             {% if order.delivery_status == 'Order Placed' %}
+                                             <td><span class="badge badge-info">{{order.delivery_status}}</span></td>
+                                             {% endif %}
+                                             {% if order.delivery_status == 'Packed' %}
+                                             <td><span class="badge badge-success">{{order.delivery_status}}</span></td>
+                                             {% endif %}
+                                             {% if order.delivery_status == 'Shipped' %}
+                                             <td><span class="badge badge-danger">{{order.delivery_status}}</span></td>
+                                             {% endif %}
+                                             
+                                    {% if order.order.paid == True %}   
+                                       <td>
+                                       <form action="{% url 'order_status_update'  %}" method="POST">
+                                         {% csrf_token %}
+                                         <input type="hidden" name="order_id" value="{{order.order.id}}">
+                                         <select name="delivery_status">
+                                             {% for i, j in allorder_status %}
+                                             <option value="{{i}}" {% if i == order.delivery_status %}selected{% endif %}>{{j}}</option>
+                                             {% endfor %}
+                                         </select>
+                                         
+                                         <button class="btn btn-info btn-sm">Update</button>
+                                         
+                                     </form>
+                                   
+             
+                                     </td>
+                                    {% else %}
+
+                                     
+                                          {% if order.order.subtotal <= business_limit.current_balance %}
+                                              
+                                             <td>
+                                                <form action="{% url 'order_status_update'  %}" method="POST">
+                                                  {% csrf_token %}
+                                                  <input type="hidden" name="order_id" value="{{order.order.id}}">
+                                                  <select name="delivery_status">
+                                                      {% for i, j in allorder_status %}
+                                                      <option value="{{i}}" {% if i == order.delivery_status %}selected{% endif %}>{{j}}</option>
+                                                      {% endfor %}
+                                                  </select>
+                                                  
+                                                  <button class="btn btn-info btn-sm">Update</button>
+                                                  
+                                              </form>
+                                            
+                      
+                                          </td>
+                                          {% else %}
+                                          <td> <h5>Current Business Limit  Balance is insufficient !</h5> </td>
+                                          {% endif %}
+                                    {% endif %}
+
+
+
+                                             <td>
+                                                <a class="btn btn-primary btn-icon icon-left" href="/vendor/orderdetail?i={{order.id}}"><i class="far fa-eye"></i>View</a>
+                                             </td>
+                                          </tr>
+                                          {% endif %}
+                                          {% endfor %}
+
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+              
+            </div>
+{% endblock %}

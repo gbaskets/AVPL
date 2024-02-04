@@ -1,0 +1,268 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Profile{% endblock %}
+{% block main %}
+<!-- Main Content -->
+<div class="main-content">
+    <section class="section">
+        <div class="section-header">
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="section-header-breadcrumb-content">
+                        <h1>Profile</h1>
+                        <div class="section-header-breadcrumb">
+                            <div class="breadcrumb-item active"><a href="#"><i class="fas fa-home"></i></a></div>
+                            <div class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></div>
+                            <div class="breadcrumb-item"><a href="javascript: (0);">Profile</a></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+
+                                <a href="/vendor/edit-profile"
+                                    style="display: inline-block;position: absolute;right: 15px;z-index: 10;"><span
+                                        class="fa fa-pencil" style="color:white;"></span></a>
+                                <div style="
+                                            border: 1px solid black;
+                                            background: url({{images.banner.url}});
+                                            background-repeat: no-repeat;
+                                            height:300px;
+                                            background-size: auto;
+                                            " class="col-lg-12 col-md-12 col-sm-12 col-12">
+                                </div>
+                            </div>
+                            <div class="row justify-content-center ">
+
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-3">
+
+                                    <img src="{{images.logo.url}}" class="img-fluid profile_img "
+                                        style="background-color:white;" />
+                                </div>
+
+                            </div>
+                            <div class="row justify-content-center">
+                                <div class="col-lg-3 col-md-3 col-sm-3">
+
+                                    <h2 class="mt-4 profile text-center">{{store.name|capfirst}}</h2>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="card-header">
+                            <h4>Vendor's Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <table class="table">
+
+                                        <tbody>
+                                            <tr>
+                                                <td>Name</td>
+                                                <td>
+                                                    <h6>{{info.first_name|capfirst}} {{info.last_name|capfirst}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Id Proof Doc Type :</td>
+                                                <td>
+                                                    <h6>{{vendoc.vendor_idproof}}</h6>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Id Proof Number :</td>
+                                                <td>
+                                                    <h6>{{vendoc.vendor_idproof}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Pan Number</td>
+                                                <td>
+                                                    <h6>{{vendoc.pancard}}</h6>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="card-header">
+                            <h4>Store's Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <table class="table">
+
+                                        <tbody>
+                                            <tr>
+                                                <td>Store Name :</td>
+                                                <td>
+                                                    <h6>{{store.name|capfirst}}</h6>
+                                                </td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>Description :</td>
+                                                <td>
+                                                    <h6>{{store.description}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Store Address</td>
+                                                <td>
+                                                    <h6>{{info.address}}</h6>
+                                                </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>Registration Number</td>
+                                                <td>
+                                                    <h6>{{store.registration_number}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>GST Number</td>
+                                                <td>
+                                                    <h6>{{vendoc.store_gst}}</h6>
+                                                </td>
+
+
+                                            </tr>
+                                            <tr>
+                                                <td>MSME Number</td>
+                                                <td>
+                                                    <h6>{{vendoc.store_msme}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Pan Number</td>
+                                                <td>
+                                                    <h6>{{vendoc.pancard}}</h6>
+                                                </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>Bank Account's Owner</td>
+                                                <td>
+                                                    <h6>{{vendoc.bank_account_number}}</h6>
+                                                </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>Bank Account Number</td>
+                                                <td>
+                                                    <h6>{{vendoc.bank_account_number}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Bank Name</td>
+                                                <td>
+                                                    <h6>{{vendoc.bank_name}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Bank IFSC</td>
+                                                <td>
+                                                    <h6>{{vendoc.bank_ifsc}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Rezorpay Id</td>
+                                                <td>
+                                                    <h6>{{vendoc.razorpay_id}}</h6>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="card-header">
+                            <h4>Other Details</h4>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <table class="table">
+
+                                        <tbody>
+                                            <tr>
+
+                                            <tr>
+                                                <td>Shipping policy</td>
+                                                <td>{{vendoc.shiping_policy}}</td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Return Policy</td>
+                                                <td>{{vendoc.return_policy}}</td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>Closing Day</td>
+                                                <td>
+                                                    <h6>{{store.closing_day}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Opening Time</td>
+                                                <td>
+                                                    <h6>{{store.opening_time}}</h6>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>Closing Time</td>
+                                                <td>
+                                                    <h6>{{store.closing_time}}</h6>
+                                                </td>
+                                                <!-- <td><input type="text" name="aadhar" value="{{vendoc.vendor_idproof}}"></td> -->
+
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'user_app/base.html' %}
+{% load static %}
+{% block title %}Profile{% endblock %}
+{% block main %}
+<!-- Main Content -->
+<div class="main-content">
+    <section class="section">
+        <div class="section-header">
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="section-header-breadcrumb-content">
+                        <h1>Profile</h1>
+                        <div class="section-header-breadcrumb">
+                            <div class="breadcrumb-item active"><a href="/"><i class="fas fa-home"></i></a></div>
+                            <div class="breadcrumb-item"><a href="/user/">Dashboard</a></div>
+                            <div class="breadcrumb-item"><a>Profile</a></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <ul style="margin-bottom:20px;">
+                                {% for message in messages %}
+                                <li><span style="font-weight:bold;font-size:15px;color:red;">{{message}}</span></li>
+                                {% endfor %}
+                             </ul>
+                            <div class="row justify-content-center">
+                                <div class="col-lg-3 col-md-3 col-sm-3">
+
+                                    <h3 class="mt-3 profile">{{user.first_name}} {{user.last_name}}</h3>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="card-header">
+                            <h4>User Profile Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <table class="table">
+                                 <form method="POST">
+                                        {% csrf_token %}
+                                        <tbody>
+                                            <tr>
+                                                <td> Profile Pic :</td>
+                                                <td>Current:{{user.profile_pic}}"
+                                                    <input  type="file"  name="profile_pic" required >
+                                                </td>
+
+
+                                            </tr>
+                                            <tr>
+                                                <td> Name :</td>
+                                                <td>
+                            <input type="text"  name="first_name" id="first_name" autocomplete="given-name"
+                                    value="{{user.first_name}}" required>  <input type="text"  name="last_name" id="last_name" autocomplete="given-name"
+                                    value="{{user.last_name}}" required>
+                                                </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>Mobile No. :</td>
+                                                <td>
+                                                    <input type="text" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" maxlength="10" pattern="[7-9]{1}[0-9]{9}"   name="phone" id="phone" autocomplete="given-name"
+                                                    value="{{user.phone}}" required> 
+                                                </td>
+
+                                            </tr>
+                                          
+                                            <tr>
+                                                <td> Address</td>
+                                                <td>
+                                                    <input type="text"  name="address" id="address" autocomplete="given-name"
+                                                    value="{{user.address}}" required> 
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td> Pincode </td>
+                                                <td>
+                                                    <input type="text"  pattern="[0-9]{6}" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" maxlength="6" name="zipcode" id="zipcode" autocomplete="given-name"
+                                                    value="{{user.zipcode}}" required> 
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td> PAN Card</td>
+                                                <td> Current:{{payment.pan}}"
+                                                    <input  type="file"  name="pan" ></td>
+                                                  
+
+                                            </tr>
+
+
+
+
+                                            <tr>
+                                                <td> Aadhar Card</td>
+                                                <td>
+                                                    Current:{{payment.aadhar}}"
+                                                    <input  type="file"  name="aadhar" >
+                                                </td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>Bank Account Number</td>
+                                                <td>
+                                                    <input type="text"  pattern="[0-9]{16}" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" maxlength="16" name="account_no" id="account_no" autocomplete="given-name"
+                                                    value="{{payment.account_no}}" required> 
+
+                                                </td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td> Bank Name</td>
+                                                <td><input type="text"  name="bank_name" id="bank_name" value="{{payment.bank_name}}" required> </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>  Bank IFSC</td>
+                                                <td><input type="text"  name="ifsc" id="ifsc" value="{{payment.ifsc}}" required> </td>
+                                              
+                                            </tr>
+
+
+
+
+
+                                        </tbody>
+                                    </table>
+                                    <button type="submit" class=" btn btn-primary btn-lg justify-content-right" value="Save changes">Save changes</button>
+                                </form>
+                                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

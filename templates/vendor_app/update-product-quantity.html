@@ -1,0 +1,126 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}{{product.name}}{% endblock %}
+{% block main %}
+{% csrf_token %} 
+
+            <!-- Main Content -->
+            <div class="main-content">
+               <section class="section">
+                  <div class="section-header">
+                     <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                           <div class="section-header-breadcrumb-content">
+                              <h1>{{product.name}}</h1>
+                              <div class="section-header-breadcrumb">
+                                 <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
+                                 <div class="breadcrumb-item"><a href="#">{{product.name}}</a></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="section-body">
+                     <div class="row">
+                        <div class="col-12">
+                           <div class="card">
+                              <div class="card-header">
+                                 <h4>{{product.name}}</h4>
+                              </div>
+                              <div class="card-body">
+                                 
+                                 <ul style="margin-bottom:20px;">
+                                    {% for message in messages %}
+                                    <li><span style="font-weight:bold;font-size:15px;color:red;">{{message}}</span></li>
+                                    {% endfor %}
+                                 </ul>
+                                 <form  method="POST" >
+                                    {% csrf_token %}
+                                    <div class="row">
+                                       
+                                       <div class="col-lg-4 col-md-12 col-sm-12">
+                                          <div class="form-group">
+                                             <label> Category *</label>
+                                             <input type="text" class="form-control" value="{{product.category.name}}" disabled>
+                                          </div>
+                                       </div>
+                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                          <div class="form-group">
+                                             <label>Sub Category </label>
+                                             <input type="text" class="form-control" value="{{product.subcategory.name}}" disabled>
+                                          </div>
+                                       </div>
+                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                          <div class="form-group">
+                                             <label>Sub Sub Category </label>
+                                             <input type="text" class="form-control" value="{{product.subsubcategory.name}}" disabled>
+                                          </div>
+                                       </div>
+                                       <div class="col-lg-4 col-md-12 col-sm-12">
+                                          <div class="form-group">
+                                             <label>Brand</label>
+                                             <input type="text" class="form-control" value="{{product.brand.name}}" disabled>
+                                          </div>
+                                       </div>
+                                      
+                                       
+                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                          <div class="form-group">
+                                             <label>Product Quantity/Current Stock</label>
+                                             <input type="number" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"  class="form-control" value="{{product.stock}}" name="stock" required>
+                                          </div>
+                                       </div>
+                                      <br>
+                                       <div class="col-lg-8 col-md-12 col-sm-12">
+                                          <div class="form-group">
+                                             <label>Click on save to make changes</label>
+                                             <input type="hidden" value="{{product.id}}" name="id">
+                                             {% comment %} <input type="submit" class="btn btn-primary btn-lg justify-content-right" value="Save222"> {% endcomment %}
+                                         
+                                             <button type="submit" class="btn btn-primary btn-lg justify-content-right" >Save</button>
+
+                                             
+                                          </div>
+                                       </div>
+
+                                    </div>
+                                 </form>
+                              </div>
+                           </div>
+                        </div>
+                        
+                     </div>
+                  </div>
+               </section>
+              
+            </div>
+<script type="text/javascript">
+   function fetch_sub_category () {
+      category_id = document.getElementById('category').value;
+      $.ajax({
+            type:'GET',
+            url:'/vendor/fetchsubcategory',
+            data:{cate:category_id},
+
+            success: function(msg){
+                $('#subcategory').html(msg);
+            }
+        });
+   }
+
+   function fetch_sub_sub_category () {
+      subcategory_id = document.getElementById('subcategory').value;
+      $.ajax({
+            type:'GET',
+            url:'/vendor/fetchsubsubcategory',
+            data:{subcate:subcategory_id},
+
+            success: function(msg){
+                $('#subsubcategory').html(msg);
+            }
+        });
+   }
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'usertemplate/base.html'%}
+{% load static%}
+{% block title %}{{len}} {% if len > 1 %}all stores{% else %}product{% endif %} found{% endblock %}
+{%block content%}{% if messages %}
+<style>
+    .fas {
+        color: gold;
+    }
+</style>
+
+
+{% for mess in messages %}
+<div class="alert alert-{{mess.tags}}" role="alert">
+    {{mess}}
+</div>
+{% endfor %}
+{% endif %}
+<div class="container">
+    <!-- ========== END HEADER ========== -->
+    <!-- breadcrumb -->
+    <div class="bg-gray-13 bg-md-transparent">
+        <div class="container">
+            <!-- breadcrumb -->
+            <div class="my-md-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-3 flex-nowrap flex-xl-wrap overflow-auto overflow-xl-visble">
+                        <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1"><a href="#">All Stores</a>
+                        </li>
+
+                        <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1 active" aria-current="page">
+                            {{product.name|safe }}</li>
+                    </ol>
+                </nav>
+            </div>
+            <!-- End breadcrumb -->
+        </div>
+    </div>
+    <!-- End breadcrumb -->
+
+
+
+
+    <div class="container">
+        <!-- Prodcut-cards-carousel -->
+        <div class="space-top-2">
+            <dv
+                class=" d-flex justify-content-between border-bottom border-color-1 flex-md-nowrap flex-wrap border-sm-bottom-0">
+                <!-- <h3 class="section-title mb-0 pb-2 font-size-22">Best Stores</h3><a href="/">View All Stores</a>  -->
+            </dv>
+            <div class="js-slick-carousel u-slick u-slick--gutters-2 overflow-hidden u-slick-overflow-visble pt-3 pb-6 slick-initialized slick-slider slick-dotted"
+                data-pagi-classes="text-center right-0 bottom-1 left-0 u-slick__pagination u-slick__pagination--long mb-0 z-index-n1 mt-4">
+                <div class="slick-list draggable">
+                    <div class="slick-track" style="opacity: 1; width: 1416px; transform: translate3d(0px, 0px, 0px);">
+                        <div class="js-slide slick-slide slick-current slick-active" data-slick-index="0"
+                            aria-hidden="false" style="width: 1400px; height: auto;" tabindex="0" role="tabpanel"
+                            id="slick-slide10" aria-describedby="slick-slide-control10">
+
+                            <div class="js-slide">
+                           
+                                <div class="d-flex">
+                                    {% for i in store_img %}
+                                
+
+                                    <div class="col-lg-4 col-sm-12 col-12 d-flex flex-column">
+
+                                        <a href="/store_details/{{i.store.id}}" class="introduce">
+
+                                            <img href="/store_details/{{i.store.id}}" style="height: 300px;"
+                                                width="600px" height="300px" class="img-fluid "
+                                                src="{{i.banner.url|safe}}" alt="Image Description">
+
+                                            <div class="new-stars-main add">
+                                                <div class="stars"><i class="fa fa-star "></i><i
+                                                        class="fa fa-star "></i><i class="fa fa-star "></i><i
+                                                        class="fa fa-star "></i><i class="fa fa-star "></i>
+                                                </div>
+                                                <div class="rating-number"></div>
+                                            </div>
+                                            <div class="flex-column-1 ">
+
+                                                <h4 href="/store_details/{{i.store.id}}"
+                                                    style="font-weight: 600; color: #231900; font-family: Montserrat;padding-left: 20px; padding-top: 15px; font-size: 22px;">
+                                                    {{i.store.name}}</h4>
+                                                <div class="row" style="margin-bottom:15px">
+                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
+                                                            title="Shakes"
+                                                            style="border-radius: 5px; margin-left: 20px; padding-top: 5px; padding-bottom: 5px;font-weight: 600; padding-right: 7px; padding-left: 7px;">Shakes</a>
+                                                    </div>
+                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
+                                                            title="Shakes"
+                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px; margin-left:7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
+                                                    </div>
+                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
+                                                            title="Shakes"
+                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left:-7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
+                                                    </div>
+                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
+                                                            title="Shakes"
+                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px; margin-left: -20px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
+                                                            title="Shakes"
+                                                            style="border-radius: 5px; margin-left: 20px;padding-top: 5px; padding-bottom: 5px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
+                                                    </div>
+                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
+                                                            title="Shakes"
+                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left:7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
+                                                    </div>
+                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
+                                                            title="Shakes"
+                                                            style="border-radius: 5px; padding-top: 5px; padding-bottom: 5px;margin-left:-7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
+                                                    </div>
+                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
+                                                            title="Shakes"
+                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left: -20px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
+                                                    </div>
+                                                </div>
+
+                                                <hr>
+                                            </div>
+
+                                            <div class="row div">
+                                                <div class="col-md-4">
+                                                    <img href="/store_details/{{store.id}}" class="img-fluid"
+                                                        src="{{i.logo.url|safe}}" alt="Image Description">
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <p style="color: #000; font-size: 16px; font-weight: 600;"><i
+                                                            class="ec ec-map-pointer mr-1"></i>{{i.store.opening_time}}
+                                                        -
+                                                        {{i.store.closing_time}}<br><i
+                                                            class="ec ec-map-pointer mr-1"></i>
+                                                        {{i.store.vendor.address}}</p>
+
+                                                </div>
+
+
+                                            </div>
+
+                                        </a>
+
+                                    </div>
+                                    {% endfor %}
+
+                                </div>
+                              
+                      
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+          
+
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+    
+
+
+    {%endblock%}

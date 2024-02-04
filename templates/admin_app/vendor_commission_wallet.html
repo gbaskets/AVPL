@@ -1,0 +1,95 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% block title %}Vendor Commission Wallet{% endblock %}
+{% block main %}
+            <!-- Main Content -->
+            <div class="main-content">
+               <section class="section">
+                  <div class="section-header">
+                     <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                           <div class="section-header-breadcrumb-content">
+                              <h1>Vendor Commission Wallet</h1>
+                              <div class="section-header-breadcrumb">
+                                 <div class="breadcrumb-item active"><a href="/admins/dashboard"><i class="fas fa-home"></i></a></div>
+                                 <div class="breadcrumb-item"><a href="#">Vendor Commission Wallet</a></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="section-body">
+                     <div class="row">
+                        <div class="col-12">
+                           <div class="card">
+                              <div class="card-header">
+                                 <h4>Vendor Commission Wallet List</h4>
+                              </div>
+                              <div class="card-body">
+                                 <ul style="margin-bottom:20px;">
+                                    {% for message in messages %}
+                                    <li><span style="font-weight:bold;font-size:15px;color:red;">{{message}}</span></li>
+                                    {% endfor %}
+                                 </ul>
+
+                                
+                                 <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
+                                       <thead>
+                                          <tr>
+                                             <th>Sr. No.</th>
+                                             <th>User Email</th>
+                                             <th>Users </th>
+                                             <th>Is AVPL Vendor</th>
+                                             <th>Current Commission Amount</th>
+                                             <th>Wallet Status</th>
+                                             <th>Wallet Status Action</th>
+                                             <th>View Commission Wallet History</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          {% for x in vendor_commission_wallet %}
+                                          <tr>
+                                             <td>{{forloop.counter}}</td>
+                                             <td>{{ x.user.email|safe }}</td>
+                                             <td>{{ x.user.vendor.first_name|safe }} {{ x.user.vendor.last_name|safe }}</td>
+                                             {% if x.user.vendor.is_AVPL_Vendor == True %}
+                                             <td><span class="badge badge-info">Active</span></td>
+                                             {% else %}
+                                             <td><span class="badge badge-danger">Deactive</span></td>
+                                             {% endif %}
+                                             <td> <i class="fa fa-inr"></i> {{x.current_balance|floatformat:2}}</td>
+                                             {% if x.is_active == True %}
+                                             <td><span class="badge badge-info">Active</span></td>
+                                             {% else %}
+                                             <td><span class="badge badge-danger">Deactive</span></td>
+                                             {% endif %}
+                                             {% if  x.is_active == True %}
+                                             <td>
+                                                <a href="/admins/deactivate_is_commission_wallet?id={{ x.id|safe }}" class="btn btn-primary btn-icon icon-left">Deactivate Commission Wallet</a>
+                                              
+                                             </td>
+                                             {% else %}
+                                             <td>
+                                                <a href="/admins/activate_is_commission_wallet?id={{ x.id|safe }}" class="btn btn-info btn-icon icon-left">Activate Commission Wallet</a>
+                                              
+                                             </td>
+                                             {% endif %}
+                                             <td> <a href="{% url 'vendor-commission-wallet' x.id %}" target="_blank" title="View Commission Wallet Details"><img src="/static/show.png"  width="30" height="30"></a> </td>
+                                          </tr>
+                                          {% endfor %}
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+
+               
+              
+            </div>
+{% endblock %}

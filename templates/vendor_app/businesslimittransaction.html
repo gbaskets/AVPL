@@ -1,0 +1,199 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Business Limit Recharge{% endblock %}
+{% block main %}
+            <!-- Main Content -->
+            <div class="main-content">
+               <section class="section">
+                  <div class="section-header">
+                     <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                           <div class="section-header-breadcrumb-content">
+                              <h1>Recharge</h1>
+                              <div class="section-header-breadcrumb">
+                                 <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
+                                 <div class="breadcrumb-item"><a href="#">Recharge</a></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="section-body">
+                     <div class="row">
+                        <div class="col-12">
+                           <div class="card">
+                              <div class="card-header">
+                                 <h4>Recharge Money <span class="badge badge-success">Current Balance : <i class="fa fa-inr"></i> {{business_limit.current_balance}}</span></h4>
+                              </div>
+                              <div class="card-body">
+                                 
+                                 <ul style="margin-bottom:20px;" id="msg">
+                                    {% for message in messages %}
+                                    <li><span style="font-weight:bold;font-size:15px;color:red;">{{message}}</span></li>
+                                    {% endfor %}
+                                 </ul>
+                                 <div class="row">
+                                    
+                                   
+                                    <div class="col-lg-4 col-md-12 col-sm-12" style="padding-top:30px;">
+                                       <div class="form-group">
+
+                                         
+
+                                          <button type="button" class="btn btn-primary btn-lg justify-content-right" data-toggle="modal" data-target="#exampleModalonline" >Recharge by Online</button>
+
+                                          <button  type="button"   class="btn btn-primary btn-lg justify-content-right" data-toggle="modal" data-target="#exampleModal" >Recharge by Wallet</button>
+
+                                       </div>
+                                    </div>
+
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  
+               </section>
+
+         <!-- Modal -->
+         <div class="modal fade" id="exampleModalonline" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+               <div class="modal-header">
+                  <h4 class="modal-title" id="walletModalLabel">Pay by Online </h4> 
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card-header">
+             
+         
+                        <input type="hidden" name="payment_type" value="Online" >
+                      
+         
+               <label>Recharge Amount</label>
+               <input type="number" name="amount" step=0.01 onkeydown="javascript: return event.keyCode == 69 ? false : true" min="100" class="form-control" placeholder="Enter Amount to Recharge" id="amount">
+         
+                      
+         
+                   
+                    </div></div>
+                       
+                <div class="modal-footer">
+                  
+         
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                   
+                  <input type="submit" class="btn btn-success" onclick="document.getElementById('loading').style.display = 'block';proceed_to_pay();" value="Pay Now">
+               
+                </div>
+              </div>
+            
+            </div>
+          </div>
+
+
+
+
+     <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="walletModalLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h4 class="modal-title" id="walletModalLabel">Pay by Wallet <span class="btn btn-primary">Current Balance : Rs. {{bal.current_balance|floatformat:2 }}</span></h4> 
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+           <div class="card-header">
+    <form method="POST" >
+               {% csrf_token%}
+
+               <input type="hidden" name="payment_type" value="usewallet" >
+               <label>Recharge Amount</label>
+
+             <input type="text" name="amount" step=0.01 onkeydown="javascript: return event.keyCode == 69 ? false : true" min="100" class="form-control" placeholder="Enter Amount to Recharge" >
+                   
+           </div>
+              
+       <div class="modal-footer">
+         
+
+         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+          
+         <input type="submit" class="btn btn-success"  value="Pay Now">
+      
+       </div>
+     </div>
+   </form>
+   </div>
+ </div>
+
+            </div>
+
+
+            
+<div class="modal p-4" id="loading" style="width:100%:height:100%;background-color:white;text-align:center;">
+    <h1>AVPL - Payments</h1>
+    <img src="{% static 'images/loading.gif' %}" style="width:400px;">
+    <h2>Please Wait....</h2>
+    <h4 style="color:red;">Do Not Press 'Refresh' or 'Back' button.</h4>
+</div>
+
+
+
+
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+function pay_online(data) {
+    amount = data['amount'];
+    var options = {
+        "key": "rzp_test_QX0qgB3jm7oD07", // Enter the Key ID generated from the Dashboard
+        "amount": amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": data['currency'],
+        "name": "AVPL - Payments",
+        "description": "Order Payment",
+        "image": "https://example.com/your_logo",
+        "order_id": data['id'], //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "callback_url": "http://127.0.0.1:8000/vendor/capturerecharge",
+        "prefill": {
+            "name": "{{cart.user.usr.first_name}} {{cart.user.usr.last_name}}",
+            "email": "{{cart.user.email}}",
+            "contact": "{{cart.user.usr.phone}}"
+        },
+        "notes": {
+            "address": "Razorpay Corporate Office"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+    //e.preventDefault();
+}
+function proceed_to_pay() {
+      document.getElementById('loading').style.display = 'block';
+      amount_val = document.getElementById('amount').value;
+      amount_val = amount_val * 100;
+      $.ajax({
+            type:'POST',
+            url:'/vendor/businesslimittransaction',
+            data:{amount:amount_val},
+            success: function(res_data){
+                 document.getElementById('loading').style.display = 'none';
+                 pay_online(res_data.data);
+                 document.getElementById('loading').style.display = 'block';
+            }
+        });
+   }
+</script>
+
+{% endblock %}
+
