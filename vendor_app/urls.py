@@ -3,11 +3,12 @@ from django.urls import path
 from vendor_app.views import *
 
 urlpatterns = [
-    path('', vendor_home),
+    path('', vendor_dashboard),
     path('order_status_update',order_status_update,name='order_status_update'),
     path('order_status_updates',order_status_updates,name='order_status_updates'),
-    path('storeinfo', store_info),
     path('verification', vendor_doc),
+    path('storeinfo', store_info),
+  
     path('addproduct', add_product),
     path('addproductimages', add_product_images),
     path('addproductvariant', add_product_variant),

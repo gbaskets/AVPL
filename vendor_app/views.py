@@ -13,6 +13,7 @@ from geopy.distance import geodesic
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
+from requests import request
 from vendor_app.models import *
 from main_app.models import *
 from admin_app.models import *
@@ -36,44 +37,49 @@ def vendor_home(request):
 
 @csrf_exempt
 def vendor_dashboard(request):
-	if check_user_authentication(request, 'Vendor'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
-		if vendor.store_created and vendor.verified and vendor.doc_submitted and vendor.is_active:
+	if check_user_authentication(request, 'VENDOR'):
+		if Vendor.objects.filter(user=request.user).exists():
+			...
+			vendor = Vendor.objects.get(user=request.user)
+			if vendor.verified and vendor.storecreated :
 
-			if not Wallet.objects.filter(user=request.user).exists():
-				Wallet.objects.create(user=request.user)
-			wallet = Wallet.objects.get(user=request.user)
-			transactions = WalletTransaction.objects.filter(wallet=wallet)
+				if not Wallet.objects.filter(user=request.user).exists():
+					Wallet.objects.create(user=request.user)
+				wallet = Wallet.objects.get(user=request.user)
+				transactions = WalletTransaction.objects.filter(wallet=wallet)
 
-			if not BusinessLimit.objects.filter(vendor=request.user.vendor).exists():
-				BusinessLimit.objects.create(vendor=request.user.vendor)
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
-			business_limit = BusinessLimit.objects.get(vendor=request.user.vendor)
-			business_limit_transactions = BusinessLimitTransaction.objects.filter(business_limit=business_limit)
+				# if not BusinessLimit.objects.filter(vendor=request.user.vendor).exists():
+				# 	BusinessLimit.objects.create(vendor=request.user.vendor)
+				# vendor = Vendor.objects.get(id=request.user.vendor.id)
+				# business_limit = BusinessLimit.objects.get(vendor=request.user.vendor)
+				# business_limit_transactions = BusinessLimitTransaction.objects.filter(business_limit=business_limit)
 
-			if not Vendor_Wallet_Commission.objects.filter(user=request.user).exists():
-				Vendor_Wallet_Commission.objects.create(user=request.user)
-			wallet_commission = Vendor_Wallet_Commission.objects.get(user=request.user)
-			
-						
-			dic = {'vendor':vendor, 'orders':OrderItems.objects.filter(store=request.user.vendor.store),
-			'notification':get_notifications(request.user),
-			'allorder_status':ORDER_STATUS_UPDATE,'wallet':wallet,'business_limit':business_limit,'wallet_commission':wallet_commission,
-			'business_limit_transactions':business_limit_transactions,
-			'transactions':transactions,
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-			}
-			return render(request, 'vendor_app/dashboard.html', dic)
+				# if not Vendor_Wallet_Commission.objects.filter(user=request.user).exists():
+				# 	Vendor_Wallet_Commission.objects.create(user=request.user)
+				# wallet_commission = Vendor_Wallet_Commission.objects.get(user=request.user)
+				
+							
+				dic = {'vendor':vendor, 'orders':OrderItems.objects.filter(store=request.user.vendor.store),
+				# 'notification':get_notifications(request.user),
+				'allorder_status':ORDER_STATUS_UPDATE,'wallet':wallet,'business_limit':business_limit,'wallet_commission':wallet_commission,
+				'business_limit_transactions':business_limit_transactions,
+				'transactions':transactions,
+				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				}
+				return render(request, 'vendor_app/dashboard.html', dic)
 
-		elif vendor.doc_submitted == False:
-			return redirect('/vendor/verification')
+			elif vendor.verified == False:
+				return redirect('/vendor/verification')
 
-		elif vendor.store_created == False:
-			return redirect('/vendor/storeinfo')
+			elif vendor.storecreated == False:
+				return redirect('/vendor/storeinfo')
 
+			else:
+				return render(request, 'vendor_app/store_message.html')
+
+     
 		else:
-			return render(request, 'vendor_app/store_message.html')
-			
+			return redirect('/vendor/verification')
 	else:
 		return redirect('/login/')
 		# return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -211,8 +217,8 @@ def order_status_updates(request):
 
 @csrf_exempt
 def store_info(request):
-	if check_user_authentication(request, 'Vendor'):
-		
+	if check_user_authentication(request, 'VENDOR'):
+     		
 		if request.method == 'POST':
 			vendor = Vendor.objects.get(user=request.user)
 			name = request.POST.get('name')
@@ -254,65 +260,129 @@ def store_info(request):
 
 @csrf_exempt
 def vendor_doc(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
+     
 		if request.method == 'POST':
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
-			aadhar = None
-			aadharfront = None
-			aadharback = None
-			#making Adhar optional
-			try:
-				aadhar = request.POST.get('aadhar')
-				aadharfront = request.FILES['aadharfront']
-				aadharback = request.FILES['aadharback']
-			except:
-				pass
-			gst = request.POST.get('gst')
-			msme = request.POST.get('msme')
-			pan = request.POST.get('pan')
-			bank_no = request.POST.get('bank_no')
-			bank_name = request.POST.get('bank')
-			panimage = request.FILES['panimage']
-			shippingpolicy = request.FILES['shippingpolicy']
-			returnpolicy = request.FILES['returnpolicy']
-			ifsc = request.POST.get('ifsc')
-			bank_passbook = request.FILES['bank_passbook']
-			razorpay_id = request.POST.get('razor')
-			VendorDocs.objects.create(
-				vendor = vendor,
-				vendor_idproof = aadhar,
-				front_idproof = aadharfront,
-				back_idproof = aadharback,
-				store_gst = gst,
-				store_msme = msme,
-				pancard = pan,
-				pancard_image = panimage,
-				shiping_policy = shippingpolicy,
-				return_policy = returnpolicy,
-				bank_account_number = bank_no,
-				bank_name = bank_name,
-				bank_ifsc = ifsc,
-				bank_passbook = bank_passbook,
-				razorpay_id = razorpay_id
-			)
-			Vendor.objects.filter(id=vendor.id).update(doc_submitted=True)
-			sub = 'AVPL - Thank You For Submitting KYC Documents'
-			msg = '''Hi there!
-We got your documents for KYC, we will verify them soon and let you know,
+    	
+			mobile = request.POST.get('mobile')
+			email = request.POST.get('email')
+			firstname= request.POST.get('firstname')
+			lastname= request.POST.get('lastname')
+			gender =  request.POST.get('gender')
+			dob= request.POST.get('dob')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			profilepic = request.FILES.get('profilepic')
 
-Thanks!'''
-			EmailMessage(sub,msg,to=[request.user.email]).send()
-			return redirect('/vendor/verification')
+			#Personal User 
+   
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			idproof= request.POST.get('idproof')
+			idno= request.POST.get('idno')
+			frontidproofdoc = request.FILES.get('frontidproofdoc')
+			backidproofdoc=request.FILES.get('backidproofdoc')
+			addressproof= request.POST.get('addressproof')
+			addressno= request.POST.get('addressno')
+			frontaddressproofdoc =request.FILES.get('frontaddressproofdoc')
+			backddressproofdoc = request.FILES.get('backddressproofdoc')
+			
+			if not Vendor.objects.filter(user=request.user).exists():
+				vendor_obj=Vendor.objects.create(user=request.user)
+			else:
+				vendor_obj=Vendor.objects.filter(user=request.user).first()
+                
+				user=User.objects.filter(id=request.user.id).first()
+		
+				if mobile:
+					vendor_obj.mobile = mobile
+					user.username=mobile
+				if email:
+					user.email=email
+				if firstname:
+					vendor_obj.firstname= firstname
+					user.first_name=firstname
+				if lastname:
+					vendor_obj.lastname= lastname
+					user.last_name=lastname
+				if gender:
+					vendor_obj.gender =  gender
+				if dob:
+					vendor_obj.dob= dob
+				if streetaddress:
+					vendor_obj.streetaddress =  streetaddress
+				if nearbyaddress:
+					vendor_obj.nearbyaddress =  nearbyaddress
+				if pincode:
+					vendor_obj.pincode = pincode
+				if city:
+					vendor_obj.city= city
+				if state:
+					vendor_obj.state= state
+				if country:
+					vendor_obj.country= country
+				if latitude:
+					vendor_obj.latitude =  latitude
+				if longitude:
+					vendor_obj.longitude =  longitude
+				if profilepic:
+					vendor_obj.profilepic =profilepic
+
+				#Personal User 
+				if profilepic:
+					vendor_obj.pancardno=pancardno
+				if profilepic:
+					vendor_obj.pancarddoc =pancarddoc
+				if profilepic:
+					vendor_obj.idproof= idproof
+				if profilepic:
+					vendor_obj.idno= idno
+				if profilepic:
+					vendor_obj.frontidproofdoc =frontidproofdoc
+				if profilepic:
+					vendor_obj.backidproofdoc=backidproofdoc
+				if profilepic:
+					vendor_obj.addressproof= addressproof
+				if profilepic:
+					vendor_obj.addressno= addressno
+				if profilepic:
+					vendor_obj.frontaddressproofdoc =frontaddressproofdoc
+				if profilepic:
+					vendor_obj.backddressproofdoc =backddressproofdoc
+				user.save()
+				vendor_obj.save()
+	
+# 			sub = 'AVPL - Thank You For Submitting KYC Documents'
+# 			msg = '''Hi there!
+# We got your documents for KYC, we will verify them soon and let you know,
+
+# Thanks!'''  
+# 			if request.user.email :
+# 				EmailMessage(sub,msg,to=[request.user.email]).send()
+
+			return redirect('/vendor/storeinfo')
 		else:
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
-			dic = {'vendor':vendor, 'flag':vendor.doc_submitted}
+			if Vendor.objects.filter(user=request.user).exists():
+				vendor_obj=Vendor.objects.filter(user=request.user).first()
+			
+				# dic = {'vendor':vendor, 'flag':vendor.doc_submitted}
+				dic={'vendor':vendor_obj}
+			else:
+				dic={'vendor':{}}
+
 			return render(request, 'vendor_app/vendor-doc.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 @csrf_exempt
 def add_product(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 
 			vendor = Vendor.objects.get(id=request.user.vendor.id)
@@ -414,7 +484,7 @@ def add_product(request):
 
 @csrf_exempt
 def add_product_images(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 			vendor = Vendor.objects.get(id=request.user.vendor.id)
 			images = request.FILES.getlist('images')
@@ -448,7 +518,7 @@ def add_product_images(request):
 
 @csrf_exempt
 def add_product_variant(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 			variant = Variant.objects.get(id=request.POST.get('variant'))
 			variant_value = VariantValue.objects.get(id=request.POST.get('variantvalue'))
@@ -510,7 +580,7 @@ def fetch_brands(request):
 
 @csrf_exempt
 def vendor_product_list(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		dic = {
 			'vendor':vendor,
@@ -523,7 +593,7 @@ def vendor_product_list(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_profile(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		vendoc = VendorDocs.objects.get(vendor__user=request.user)
 		store = Store.objects.get(vendor__user=request.user)
@@ -543,7 +613,7 @@ def vendor_profile(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def edit_vendor_profile(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		store = Store.objects.get(vendor__user=request.user)
 		images = StoreImages.objects.get(store=store)
 		vanadd = Vendor.objects.get(user=request.user)
@@ -589,7 +659,7 @@ def edit_vendor_profile(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_product(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		product = Product.objects.get(id=request.GET.get('id'))
 		dic = {
@@ -605,7 +675,7 @@ def vendor_product(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_update_product_quantity(request,id):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		product = Product.objects.get(id=id)
 
@@ -638,7 +708,7 @@ def vendor_update_product_quantity(request,id):
 
 @csrf_exempt
 def vendor_product_basic_edit(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 			vendor = Vendor.objects.get(id=request.user.vendor.id)
 			store = request.user.vendor.store
@@ -668,7 +738,7 @@ def vendor_product_basic_edit(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_delete_product_image(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'GET':
 			ProductImages.objects.filter(id=request.GET.get('i')).delete()
 			return JsonResponse({'response':'Success'})
@@ -676,7 +746,7 @@ def vendor_delete_product_image(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_delete_product_variant(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'GET':
 			ProductVariant.objects.filter(id=request.GET.get('i')).delete()
 			return JsonResponse({'response':'Success'})
@@ -684,7 +754,7 @@ def vendor_delete_product_variant(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_product_out_of_stock(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'GET':
 			Product.objects.filter(id=request.GET.get('i')).update(stock=0)
 			return JsonResponse({'response':'Success'})
@@ -692,7 +762,7 @@ def vendor_product_out_of_stock(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_orders(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		business_limit = BusinessLimit.objects.get(vendor=request.user.vendor)
 		dic = {
@@ -707,7 +777,7 @@ def vendor_orders(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_complete_orders(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		dic = {
 			'orders':OrderItems.objects.filter(store=request.user.vendor.store),
@@ -722,7 +792,7 @@ def vendor_complete_orders(request):
 
 @csrf_exempt
 def vendor_order_detail(request):	
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		order_id = request.GET.get('i')
 		dic = {
@@ -738,7 +808,7 @@ def vendor_order_detail(request):
 #changes for COD 
 @csrf_exempt
 def vendor_change_order_status(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		# admin = User.objects.get(is_superuser = True)
 		# print('admin',admin)
@@ -790,7 +860,7 @@ def vendor_change_order_status(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_return_details(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		dic = {
 			'orders':OrderItems.objects.filter(store=request.user.vendor.store),
@@ -803,7 +873,7 @@ def vendor_return_details(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt		
 def vendor_change_return_status(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		admin = User.objects.get(is_superuser = True)
 		order_id = request.GET.get('i')
@@ -826,7 +896,7 @@ def vendor_change_return_status(request):
 
 @csrf_exempt
 def vendor_brand(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 			category = ProductCategory.objects.get(id=request.POST.get('category'))
 			name = request.POST.get('name')
@@ -849,7 +919,7 @@ def vendor_brand(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_payment_transactions(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
 		dic = {
 			'vendor':vendor,
@@ -861,7 +931,7 @@ def vendor_payment_transactions(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_wallet_dash(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if not Wallet.objects.filter(user=request.user).exists():
 			Wallet.objects.create(user=request.user)
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
@@ -880,7 +950,7 @@ def vendor_wallet_dash(request):
 # Per Product commisson from Admin
 @csrf_exempt
 def vendor_wallet_commission_dash(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if not Vendor_Wallet_Commission.objects.filter(user=request.user).exists():
 			Vendor_Wallet_Commission.objects.create(user=request.user)
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
@@ -900,7 +970,7 @@ def vendor_wallet_commission_dash(request):
 #method for Business Limit 
 @csrf_exempt
 def vendor_Business_limit_dash(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if not BusinessLimit.objects.filter(vendor=request.user.vendor).exists():
 			BusinessLimit.objects.create(vendor=request.user.vendor)
 		vendor = Vendor.objects.get(id=request.user.vendor.id)
@@ -919,7 +989,7 @@ def vendor_Business_limit_dash(request):
 
 @csrf_exempt
 def vendor_withdraw(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 			amount = request.POST.get('amount')
 			if float(amount) < 500:
@@ -959,7 +1029,7 @@ def vendor_withdraw(request):
 
 @csrf_exempt
 def vendor_help(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		user=User.objects.filter(username='admin').first()
 		print(user,'UUUUUU')
 		if request.method == 'POST':
@@ -987,7 +1057,7 @@ def vendor_help(request):
 from main_app.razor import *
 @csrf_exempt
 def vendor_recharge(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 			amount = request.POST.get('amount')
 			payment_type = request.POST.get('payment_type')
@@ -1080,7 +1150,7 @@ from datetime import tzinfo, timedelta, datetime
 #function for activate User Subscription
 @csrf_exempt
 def vendor_activate_subscription(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		id_=request.GET.get('id')
 		obj = UserSubscriptionRequest.objects.get(id=id_)
 		
@@ -1121,13 +1191,13 @@ Team Online Aap Ki Apni Dukaan'''
 
 @csrf_exempt
 def vendor_billing_requests(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		dic = {'requests':Billing_Request.objects.filter(store=request.user.vendor.store, is_active=False)}
 		return render(request, 'vendor_app/billing-requests.html', dic)
 	return HttpResponse('404 Not Found')
 @csrf_exempt
 def vendor_confirm_billing_requests(request):
-	if check_user_authentication(request, 'Vendor'):
+	if check_user_authentication(request, 'VENDOR'):
 		config = None
 		if len(Billing_Config.objects.all()) > 0:
 			config = Billing_Config.objects.get()

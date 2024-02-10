@@ -1,14 +1,14 @@
-{% extends 'usertemplate/base.html' %}
+{% extends 'usertemplate/base_vendor.html' %}
 {% load static %}
 {% block title %}Vendor Verification{% endblock %}
 {% block content %}
             <div class="container register" style="border-radius: 1rem;">
                 <div class="row">
-                    <div class="col-md-3 register-left">
+                    {% comment %} <div class="col-md-3 register-left">
                         <img src="https://image.ibb.co/n7oTvU/logo_white.png" alt=""/>
                         <h3>Welcome</h3>
                         <p class="text-white">You are 30 seconds away from earning your own money!</p>
-                    </div>
+                    </div> {% endcomment %}
                     {% if flag %}
                     <div class="col-md-9 register-right">
                         <div class="tab-content" id="myTabContent">
@@ -19,73 +19,213 @@
                         </div>
                     </div>
                     {% else %}
-                    <div class="col-md-9 register-right">
+                    <div class="col-md-12 register-right">
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                <h3 class="register-heading">Vendor Verification</h3>
-                                <form action="/vendor/verification" method="POST" enctype="multipart/form-data">
+                                    <form action="/vendor/verification" method="POST" enctype="multipart/form-data">
                                     <div class="row register-form">
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>First Name *</label>
+                                                <input type="text" class="form-control" placeholder="Enter First Name *" title="Only (a-z) letters are allowed." required name="firstname" value="{{request.user.first_name|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Last Name *</label>
+                                                <input type="text" class="form-control" placeholder="Enter Last Name *" title="Only (a-z) letters are allowed." required name="lastname" value="{{request.user.last_name|default:''}}" />
+                                            </div>
+                                            
+                                          
+                                            <div class="form-group">
+                                                <label>Email *</label>
+                                                <input type="email" class="form-control" placeholder="Enter Email *" required name="email" value="{{request.user.email|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Mobile *</label>
+                                                <input type="text" minlength="10" maxlength="10" class="form-control" placeholder="Enter Mobile *" name="mobile" required value="{{request.user.username|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>DOB *</label>
+                                                <input type="date"  class="form-control" placeholder="Enter DOB *" max="2005-12-31" name="dob" required value="{{ vendor.dob|date:'Y-m-d'|default:'' }}" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                  {% if vendor.gender == Male %}
+                                                    <label class="radio inline">
+                                                        <label>Gender *</label>
+                                                        <input type="radio" name="gender"  value="Male" checked >
+                                                        <span> Male </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender"  value="Female">
+                                                        <span>Female </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender"  value="Other">
+                                                        <span>Other </span>
+                                                    </label>
+                                                    {% elif vendor.gender == Female %}
+                                                    <label class="radio inline">
+                                                        <label>Gender *</label>
+                                                        <input type="radio" name="gender"  value="Male" >
+                                                        <span> Male </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender"  value="Female" checked>
+                                                        <span>Female </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender"  value="Other" >
+                                                        <span>Other </span>
+                                                    </label>
+
+                                                    {% elif vendor.gender == Other %}
+                                                    <label class="radio inline">
+                                                        <label>Gender *</label>
+                                                        <input type="radio" name="gender"  value="Male" >
+                                                        <span> Male </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender"  value="Female">
+                                                        <span>Female </span> 
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender"  value="Other" checked>
+                                                        <span>Other </span>
+                                                    </label>
+                                                    {% else %}
+
+                                                    <label class="radio inline">
+                                                        <label>Gender *</label>
+                                                        <input type="radio" name="gender"  value="Male" checked>
+                                                        <span> Male </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender"  value="Female">
+                                                        <span>Female </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender"  value="Other">
+                                                        <span>Other </span>
+                                                    </label>
+                                                    {% endif %}
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Profile Pic * {% if vendor.profilepic %} {{vendor.profilepic.url}} {% else %} {% endif %} </label>
+                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="profilepic" />
+                                            </div>
+                                            
+                                          
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+
+                                            <div class="form-group">
+                                                <label>Street Address *</label>
+                                                <input type="text" class="form-control" placeholder="Enter Street Address *" id="address" title="Only (a-z) letters are allowed." required name="streetaddress" value="{{vendor.streetaddress|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Near by Address *</label>
+                                                <input type="text" class="form-control" placeholder="Enter Near by Address *"  id='nearbyaddress' title="Only (a-z) letters are allowed." required name="nearbyaddress" value="{{vendor.nearbyaddress|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>City *</label>
+                                                <input type="text" class="form-control" placeholder="Enter City *"  id='city' title="Only (a-z) letters are allowed." required name="city" value="{{vendor.city|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>State *</label>
+                                                <input type="text" class="form-control" placeholder="Enter State *"  id='state' title="Only (a-z) letters are allowed." required name="state" value="{{vendor.state|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Country *</label>
+                                                <input type="text" class="form-control" placeholder="Enter Country *"  id='country' title="Only (a-z) letters are allowed." required name="country" value="{{vendor.country|default:''}}" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Pincode *</label>
+                                                <input type="text" placeholder="Enter Pincode *"  id='pincode' class="form-control" minlength="6" maxlength="6" name="pincode"  value="{{vendor.pincode|default:''}}"/>
+                                            </div>
+                                          
+                                            <input type="hidden" placeholder="latitude *"  id='latitude' class="form-control"  name="latitude"  value="{{vendor.latitude|default:''}}"/>
+                                            <input type="hidden" placeholder="longitude *"  id='longitude' class="form-control" name="longitude" value="{{vendor.longitude|default:''}}"/>
+
+                                            
                                             
                                             <div class="form-group">
-                                                <input type="number" class="form-control" placeholder="Your Voter ID/DL/Adhaar Number *" pattern="[0-9]{12}" 
-                                                onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                                title="Please enter the correct adhaar number."  name="aadhar" value="" maxlength="12" />
+                                                <label>PAN Card No *</label>
+                                                <input type="text" class="form-control" placeholder="PAN Number *" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" title="Please enter the correct PAN number."  name="pancardno" value="{{vendor.pancardno|default:''}}" />
                                             </div>
+                                            
                                             <div class="form-group">
-                                                <label>ID/DL/Adhaar Front *</label>
-                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="aadharfront" />
+                                                <label>PAN Card Image * {% if vendor.pancarddoc %} {{vendor.pancarddoc.url}} {% else %} {% endif %}</label>
+                                                <input type="file" class="form-control" accept="application/pdf, image/*" name="pancarddoc" />
                                             </div>
-                                            <div class="form-group">
-                                                <label>ID/DL/Adhaar Back *</label>
-                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="aadharback" />
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" placeholder="GST Number *"  name="gst" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" placeholder="MSME Number *" name="msme" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" placeholder="PAN Number *" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" title="Please enter the correct PAN number." required name="pan" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="number" class="form-control" placeholder="Bank Account Number *" pattern="[0-9]{9,18}" name="bank_no" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"
 
-                                                title="Please enter correct bank account number." required name="bank_no" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" placeholder="Bank Name *" title="Only (a-z) letters are allowed." required name="bank" value="" />
-                                            </div>
+                                            
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
+
                                             <div class="form-group">
-                                                <label>PAN Card Image *</label>
-                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="panimage" required/>
+                                            <label for="idproof">Idproof *</label>
+                                            <select class="form-control" id="idproof" name="idproof">
+                                                {% if vendor.idproof %}
+                                                <option value="{{vendor.idproof}}" selected>{{vendor.idproof}}</option>
+                                                {% else %}
+                                                {% endif %}
+                                                <option value="" disable>-- select idproof --</option>
+                                                <option value="Aadhaar Card">Aadhaar Card</option>
+                                                <option value="DL">DL</option>
+                                                <option value="Voter ID">Voter ID</option>
+                                                <option value="Passport">Passport</option>
+                                            </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Id No *</label>
+                                                <input type="text" class="form-control" placeholder="Enter Id Number *" name="idno" value="{{vendor.idno|default:''}}"  />
                                             </div>
                                             <div class="form-group">
-                                                <label>Shipping Policy *</label>
-                                                <input type="file" class="form-control" name="shippingpolicy" accept="application/pdf, image/png, image/jpeg" required/>
+                                                <label>ID Front Image * {% if vendor.frontidproofdoc %} {{vendor.frontidproofdoc.url}} {% else %} {% endif %}</label>
+                                                <input type="file" class="form-control" accept="application/pdf, image/*" name="frontidproofdoc" />
                                             </div>
                                             <div class="form-group">
-                                                <label>Return Policy *</label>
-                                                <input type="file" class="form-control" accept="application/pdf, image/png, image/jpeg" name="returnpolicy" required/>
+                                                <label>ID Back Image * {% if vendor.backidproofdoc %} {{vendor.backidproofdoc.url}} {% else %} {% endif %}</label>
+                                                <input type="file" class="form-control" accept="application/pdf, image/*" name="backidproofdoc" />
                                             </div>
+
+                                            
                                             <div class="form-group">
-                                                <input type="text" class="form-control" placeholder="Bank IFSC Code *" pattern="[A-Z]{4}0[A-Z0-9]{6}" title="Please enter correct IFSC code." required name="ifsc" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Bank Passbook *</label>
-                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="bank_passbook" required/>
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" placeholder="Razorpay ID *" required name="razor" value="" />
-                                            </div>
-                                            {% for message in messages %}
-                                                <span class="message">{{message}}</span>
-                                            {% endfor %}
-                                            <input type="submit" class="btnRegister"  value="Proceed"/>
+                                                <label for="addressproof">Addressproof *</label>
+                                                <select class="form-control" id="addressproof" name="addressproof">
+                                                    {% if vendor.addressproof %}
+                                                    <option value="{{vendor.addressproof}}" selected>{{vendor.addressproof}}</option>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <option value="" disable>-- select addressproof --</option>
+                                                    <option value="Aadhaar Card">Aadhaar Card</option>
+                                                    <option value="DL">DL</option>
+                                                    <option value="Voter ID">Voter ID</option>
+                                                    <option value="Passport">Passport</option>
+                                                </select>
+                                                </div>
+    
+                                                <div class="form-group">
+                                                    <label>AddressproofId No *</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Address Proof No *" name="addressno" value="{{vendor.addressno|default:''}}"  />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Addressproof Front Image * {% if vendor.frontaddressproofdoc %} {{vendor.frontaddressproofdoc.url}} {% else %} {% endif %}</label>
+                                                    <input type="file" class="form-control" accept="application/pdf, image/*" name="frontaddressproofdoc" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Addressproof Back Image * {% if vendor.backddressproofdoc %} {{vendor.backddressproofdoc.url}} {% else %} {% endif %}</label>
+                                                    <input type="file" class="form-control" accept="application/pdf, image/*" name="backddressproofdoc" />
+                                                </div>
+                                          
+                                           
+                                            <input type="submit" class="btnRegister"  value="Next"/>
                                         </div>
                                     </div>
                                 </form>
@@ -96,4 +236,112 @@
                     {% endif %}
                 </div>
             </div>
+
+
+{% comment %} 
+           
+            <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&libraries=places&callback=initialize"></script>
+            <script>
+              function initialize() {
+                var input = document.getElementById('address');
+                new google.maps.places.Autocomplete(input);
+                google.maps.event.addListener('place_changed', function () {
+                });
+              }
+            
+              google.maps.event.addDomListener(window, 'load', initialize);
+            
+            </script>
+ {% endcomment %}
+
+
+
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&libraries=places&callback=initialize"></script>
+ 
+ 
+  <script>
+    function initialize() {
+      var input = document.getElementById('address');
+      var autocomplete = new google.maps.places.Autocomplete(input);
+
+      autocomplete.addListener('place_changed', function () {
+        var place = autocomplete.getPlace();
+
+        // Extract address components
+        var addressComponents = place.address_components;
+
+        // Initialize variables for pin code, state, city, country, and nearby places
+        var pincode = "";
+        var state = "";
+        var city = "";
+        var country = "";
+        var nearbyPlace = "";
+        var latitude = "";
+        var longitude = "";
+
+        // Iterate through address components to find specific details
+        for (var i = 0; i < addressComponents.length; i++) {
+          var component = addressComponents[i];
+          var types = component.types;
+
+          // Fill in pin code
+          if (types.includes('postal_code')) {
+            pincode = component.long_name;
+          }
+
+          // Fill in state
+          if (types.includes('administrative_area_level_1')) {
+            state = component.long_name;
+          }
+
+          // Fill in city
+          if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+            // Remove the word "Division" from the city
+            city = component.long_name.replace(/ Division$/, '');
+          }
+
+          // Fill in country
+          if (types.includes('country')) {
+            country = component.long_name;
+          }
+        }
+
+          // Get latitude and longitude
+          if (place.geometry && place.geometry.location) {
+            latitude = place.geometry.location.lat();
+            longitude = place.geometry.location.lng();
+          }
+  
+
+         // Get nearby place
+         if (place.geometry && place.geometry.location) {
+            var service = new google.maps.places.PlacesService(document.createElement('div'));
+            service.nearbySearch({
+              location: place.geometry.location,
+              radius: 5000, // You can adjust the radius as needed
+              type: 'point_of_interest' // You can adjust the type as needed
+            }, function (results, status) {
+              if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+                nearbyPlace = results[0].name;
+              }
+
+            
+
+            // Update input fields
+            document.getElementById('pincode').value = pincode;
+            document.getElementById('state').value = state;
+            document.getElementById('city').value = city;
+            document.getElementById('country').value = country;
+            document.getElementById('nearbyaddress').value = nearbyPlace;
+            document.getElementById('latitude').value = latitude;
+            document.getElementById('longitude').value = longitude;
+          });
+        }
+      });
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+  </script>
+
+
 {% endblock %}

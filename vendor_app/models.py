@@ -84,7 +84,7 @@ class Vendor(models.Model):
 
 	
 	def __str__(self):
-		return self.firstname+' '+self.lastname
+		return str(self.user) +' :'+ str(self.firstname)
 
 # class VendorWithdrawRequest(models.Model):
 # 	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vendor_withdraw_request')

@@ -508,37 +508,14 @@
 
                      
 
-                                <li
-                                    class="list-inline-item mr-0 u-header-topbar__nav-item u-header-topbar__nav-item-border text-light ">
-
-
-                                    {%if request.session.store_id%}
-                                    <a href="#" data-toggle="modal" data-target="#locationModal"
-                                        class="u-header-topbar__nav-link location text-light "><i
-                                            class="ec text-light  ec-map-pointer mr-1"></i><span
-                                            class="search-text">{{request.session.store_name}}</span></a>
-
-                                    {%else%}
-                                    <a href="#" data-toggle="modal" data-target="#locationModal"
-                                        class="u-header-topbar__nav-link location text-light "><i
-                                            class="ec ec-map-pointer mr-1"></i><span class="search-text">Select Your
-                                            Address</span></a>
-
-                                    {%endif%}
-
-                                </li>
-
+                              
                                 <!-- <li class="list-inline-item mr-0 u-header-topbar__nav-item u-header-topbar__nav-item-border">
                                         <a href="/order_trace" class="u-header-topbar__nav-link text-light "><i class="ec ec-transport mr-1"></i> Track Your Order</a>
                                     </li> -->
+                            
                                 <li
                                     class="list-inline-item mr-0 u-header-topbar__nav-item u-header-topbar__nav-item-border">
-                                    <a href="/user/myorder" class="u-header-topbar__nav-link text-light"><i
-                                            class="ec ec-transport mr-1"></i>Order History</a>
-                                </li>
-                                <li
-                                    class="list-inline-item mr-0 u-header-topbar__nav-item u-header-topbar__nav-item-border">
-                                    <a href="/user/" class="u-header-topbar__nav-link text-light"><i
+                                    <a href="/vendor/" class="u-header-topbar__nav-link text-light"><i
                                             class="fa fa-tachometer mr-1"></i>Dashboard</a>
                                 </li>
 
@@ -592,7 +569,7 @@
 
 
             <!-- Logo-Search-header-icons -->
-            <div class="p-1 bg-light">
+            {% comment %} <div class="p-1 bg-light">
                 <div class="container-fluid my-0dot5 ">
                     <div class="row align-items-md-center">
                         <!-- Logo-offcanvas-menu -->
@@ -660,18 +637,7 @@
                                                     <!-- End Logo -->
 
                                                     <!-- List -->
-                                                    <ul id="headerSidebarList" class="u-header-collapse__nav">
-                                                        <!-- Value of the Day -->
-                                                        {% for cate in categories %}
-                                                        <li class="">
-                                                            <a class="u-header-collapse__nav-link font-weight-bold"
-                                                                href="?key=&category={{cate.id}}">{{cate.name}}</a>
-                                                        </li>
-                                                        {%endfor%}
-                                                        <!-- End Value of the Day -->
-
-                                                        <!-- End Accessories -->
-                                                    </ul>
+                                                   
 
                                                     <!-- End List -->
                                                 </div>
@@ -687,165 +653,11 @@
                             <!-- ========== END HEADER SIDEBAR ========== -->
                         </div>
                         <!-- End Logo-offcanvas-menu -->
-                        <!-- Search Bar -->
-                        <div class="col d-none d-xl-block">
-                            <form class="js-focus-state" method="get" action="/search2/">
-                                <label class="sr-only" for="searchproduct">Search</label>
-                                <div class="input-group">
-                                    <input type="text"
-                                        class="form-control py-2 pl-5 font-size-15 border-right-0 height-40 border-width-2 rounded-left-pill border-primary"
-                                        name="key" id="key_val" name="sub_cat" s id="searchproduct-item"
-                                        placeholder="Search for Products" aria-label="Search for Products"
-                                        aria-describedby="searchProduct1">
-                                    <div class="input-group-append">
-
-                                        <!-- Select -->
-                                        <select
-                                            class="js-select selectpicker dropdown-select custom-search-categories-select"
-                                            data-style="btn height-40 text-gray-60 font-weight-normal border-top border-bottom border-left-0 rounded-0 border-primary border-width-2 pl-0 pr-5 py-2"
-                                            name="category">
-                                            <div id="search_results"></div>
-                                            <option {%if category_obj%}value="{{category_obj.id}}" {%else%}value="0"
-                                                {%endif%} selected>
-                                            {%if category_obj%}{{category_obj.category}}{%else%}All Categories{%endif%}
-                                            </option>
-
-                                            {%if category_obj%}
-                                            <option value="0">All Categories</option>
-                                            {%endif%}
-
-                                            {% for cate in categories %}
-                                            <option value="{{cate.id}}">{{cate.name}}</option>
-                                            {% endfor%}
-
-                                        </select>
-                                        <!-- End Select -->
-                                        <button class="btn btn-primary height-40 py-2 px-3 rounded-right-pill"
-                                            type="submit" id="searchProduct1">
-                                            <span class="ec ec-search font-size-24 text-light"></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <!-- End Search Bar -->
-                        <!-- Header Icons -->
-                        <div class="col col-xl-auto text-right text-xl-left pl-0 pl-xl-3 position-static">
-                            <div class="d-inline-flex">
-                                <ul class="d-flex list-unstyled mb-0 align-items-center">
-                                    <!-- Search -->
-                                    <li class="col d-xl-none px-2 px-sm-3 position-static">
-                                        <a id="searchClassicInvoker"
-                                            class="font-size-22 text-gray-90 text-lh-1 btn-text-secondary"
-                                            href="javascript:;" role="button" data-toggle="tooltip" data-placement="top"
-                                            title="Search" aria-controls="searchClassic" aria-haspopup="true"
-                                            aria-expanded="false" data-unfold-target="#searchClassic"
-                                            data-unfold-type="css-animation" data-unfold-duration="300"
-                                            data-unfold-delay="300" data-unfold-hide-on-scroll="true"
-                                            data-unfold-animation-in="slideInUp" data-unfold-animation-out="fadeOut">
-                                            <span class="ec ec-search"></span>
-                                        </a>
-
-                                        <!-- Input -->
-                                        <div id="searchClassic"
-                                            class="dropdown-menu dropdown-unfold dropdown-menu-right left-0 mx-2"
-                                            aria-labelledby="searchClassicInvoker">
-                                            <form class="js-focus-state input-group px-3">
-                                                <input class="form-control" type="search" placeholder="Search Product">
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-primary px-3" type="button"><i
-                                                            class="font-size-18 text-light ec ec-search"></i></button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <!-- End Input -->
-                                    </li>
-                                    <!-- End Search -->
-
-                                    <li class="col d-xl-none px-2 px-sm-3"><a href="user/profile" class="text-gray-90"
-                                            data-toggle="tooltip" data-placement="top" title="My Account"><i
-                                                class="font-size-22 ec ec-user"></i></a></li>
-                                    <li class="col pr-xl-0 px-2 px-sm-3 d-xl-none">
-                                        <a href="/user/cart" class="text-gray-90 position-relative d-flex "
-                                            data-placement="top" title="Cart">
-                                            <i class="font-size-22 ec ec-shopping-bag"></i>
-                                            <span
-                                                class="bg-lg-down-black width-22 height-22 bg-primary position-absolute d-flex align-items-center justify-content-center rounded-circle left-12 top-8 font-weight-bold font-size-12"><span
-                                                    class="text-light">{{cart_len}}</span></span>
-                                            <span
-                                                class="d-none d-xl-block font-weight-bold font-size-16 text-gray-90 ml-3"></span>
-                                        </a>
-
-                                    </li>
-                                    <li class="col d-none d-xl-block"><a href="/user/wishlist" class="text-gray-90"
-                                            data-toggle="tooltip" data-placement="top" title="wishlist"><i
-                                                class="font-size-22 ec ec-favorites">{{wish_len}}</i></a></li>
-
-                                    <li class="col pr-xl-0 px-2 px-sm-3 d-none d-xl-block">
-                                        <div id="" class="text-gray-90 position-relative d-flex " title="Cart">
-                                            <a style="color: #2a2d83;" href="/user/cart">
-                                                <i class="font-size-22 ec ec-shopping-bag"></i>
-                                                <span
-                                                    class="bg-lg-down-black width-22 height-22 bg-primary position-absolute d-flex align-items-center justify-content-center rounded-circle left-12 top-8 font-weight-bold font-size-12 text-light">{{cart_len}}</span>
-                                                <span
-                                                    class="d-none d-xl-block font-weight-bold font-size-16 text-gray-90 ml-3"></span>
-                                            </a>
-                                        </div>
-
-
-
-
-                                        <div id="basicDropdownHover"
-                                            class="cart-dropdown dropdown-menu dropdown-unfold border-top border-top-primary mt-3 border-width-2 border-left-0 border-right-0 border-bottom-0 left-auto right-0"
-                                            aria-labelledby="basicDropdownHoverInvoker">
-                                            <ul class="list-unstyled px-3 pt-3">linkedin_id
-                                                {%for i in products%}
-                                                <li class="border-bottom pb-3 mb-3">
-                                                    <div class="">
-                                                        <ul class="list-unstyled row mx-n2">
-                                                            <li class="px-2 col-auto">
-                                                                <a href="/single_product/{{i.item.id}}"><img
-                                                                        class="img-fluid" src="/{{i.item.image}}"
-                                                                        height="60" width="60"
-                                                                        alt="Image Description"></a>
-                                                            </li>
-                                                            <li class="px-2 col">
-                                                                <a href="/single_product/{{i.item.id}}">
-                                                                    <h5 class="text-blue font-size-14 font-weight-bold">
-                                                                        {{i.item.title}}</h5>
-                                                                </a>
-                                                                {%if request.user.is_retailer%}
-                                                                <span class="font-size-14">{{i.quantity}} ×
-                                                                    {{i.item.amount_to_pay_retailer}}</span>
-                                                                {%else%}
-                                                                <span class="font-size-14">{{i.quantity}} ×
-                                                                    {{i.item.amount_to_pay}}</span>
-
-                                                                {%endif%}
-
-                                                            </li>
-
-                                                        </ul>
-                                                    </div>
-                                                </li>
-                                                {%endfor%}
-
-                                            </ul>
-                                            <!-- <div class="flex-center-between px-4 pt-2">
-                                                    <a href="/user/cart" class="btn btn-soft-secondary mb-3 mb-md-0 font-weight-normal px-5 px-md-4 px-lg-5">View cart</a>
-                                                    {% if address_len == 0 %}
-                                                    <a href="/checkout/{{request.session.store_id}}" class="btn btn-primary-dark-w ml-md-2 px-5 px-md-4 px-lg-5 text-light">Checkout</a>
-                                                    {% endif%}
-                                                </div> -->
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <!-- End Header Icons -->
+                
+                    
                     </div>
                 </div>
-            </div>
+            </div> {% endcomment %}
             <!-- End Logo-Search-header-icons -->
 
             <!-- Vertical-and-secondary-menu -->
@@ -855,73 +667,15 @@
                     <div class="col-md-auto d-none d-xl-block">
                         <div class="max-width-270 min-width-270">
                             <!-- Basics Accordion -->
-                            <div id="basicsAccordion">
+                           
                                 <!-- Card -->
-                                <div class="card border-0">
-                                    <div class="card-header card-collapse border-0" id="basicsHeadingOne">
-                                        <button type="button"
-                                            class="btn-link btn-remove-focus btn-block d-flex card-btn py-3 text-lh-1 px-4 shadow-none btn-primary rounded-top-lg border-0 font-weight-bold text-gray-90"
-                                            data-toggle="collapse" data-target="#basicsCollapseOne" aria-expanded="true"
-                                            aria-controls="basicsCollapseOne">
-                                            <span class="ml-0 text-light mr-2">
-                                                <span class="fa fa-list-ul"></span>
-                                            </span>
-                                            <span class="pl-1 text-light">All Categories</span>
-                                        </button>
-                                    </div>
-                                    <div id="basicsCollapseOne" class="collapse vertical-menu"
-                                        aria-labelledby="basicsHeadingOne" data-parent="#basicsAccordion">
-                                        <div class="card-body p-0">
-                                            <nav
-                                                class="js-mega-menu navbar navbar-expand-xl u-header__navbar u-header__navbar--no-space hs-menu-initialized">
-                                                <div id="navBar"
-                                                    class="collapse navbar-collapse u-header__navbar-collapse">
-                                                    <ul class="navbar-nav u-header__navbar-nav">
-
-                                                        {% for cate in categories %}
-                                                        <li class="nav-item u-header__nav-item" data-event="hover"
-                                                            data-position="left">
-                                                            <a href="/search2/?key=&category={{cate.id}}"
-                                                                class="nav-link u-header__nav-link font-weight-bold">{{
-                                                                cate.name|safe }}</a>
-                                                            <!-- <a href="/storecategories/?c={{cate.id}}&sort=3" class="nav-link u-header__nav-link font-weight-bold">{{ cate.name|safe }}</a> -->
-
-
-                                                            <!-- <ul class="navbar-nav u-header__navbar-nav">
-                                                                    {% for subcate in subcategories %}
-											                        {% if subcate.category == cate %}
-                                                                    <li class="nav-item u-header__nav-item"
-                                                                    data-event="hover"
-                                                                    data-position="left">
-                                                                    <a href="/storesubcategories/?c={{subcate.id}}" class="nav-link u-header__nav-link font-weight-bold">{{ subcate.name|safe }}</a>
-                                                                    <ul class="navbar-nav u-header__navbar-nav">
-                                                                        {% for subsubcate in subsubcategories %}
-                                                                        {% if subsubcate.subcategory == subcate %}
-                                                                        <li class="nav-item u-header__nav-item"
-                                                                        data-event="hover"
-                                                                        data-position="left">
-                                                                        <a href="/storesubsubcategories/?c={{subsubcate.id}}" class="nav-link u-header__nav-link font-weight-bold">{{ subsubcate.name|safe }}</a>
-                                                                        </li>
-                                                                        {% endif %}
-                                                                        {% endfor %}
-                                                                    </ul>
-                                                                </li>
-                                                                    {% endif %}
-                                                                    {% endfor %}
-                                                                    
-                                                                </ul> -->
-
-                                                        </li>
-                                                        {% endfor %}
-                                                    </ul>
-
-                                                </div>
-                                            </nav>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End Card -->
-                            </div>
+                              
+                                   <h3> 
+                                <a  class="text-center"
+                                href="/">𝔾𝕓𝕒𝕤𝕜𝕖𝕥.𝕚𝕟 </a></h3>
+                            
+                              
+                          
                             <!-- End Basics Accordion -->
                         </div>
                     </div>
@@ -937,14 +691,7 @@
 
                                     <!-- Featured Brands -->
 
-                                    {%for i in popular_categorys|slice:"3"%}
-                                    <!-- Featured Brands -->
-                                    <li class="nav-item u-header__nav-item">
-                                        <a class="nav-link u-header__nav-link" href="/collection/{{i.id}}"
-                                            aria-haspopup="true" aria-expanded="false"
-                                            aria-labelledby="pagesSubMenu">{{i.category}}</a>
-                                    </li>
-                                    {%endfor%}
+                                
                                     <!--about-->
                                     <ul id="headerSidebarList" class="u-header-collapse__nav">
                                         <li class="nav-item u-header__nav-item">
@@ -984,11 +731,11 @@
                                     <!-- End Gift Cards -->
 
                                     <!-- Button -->
-                                    <li class="nav-item u-header__nav-last-item">
+                                    {% comment %} <li class="nav-item u-header__nav-last-item">
                                         <a class="text-gray-90">
                                             Free Shipping on Orders Above ₹500+
                                         </a>
-                                    </li>
+                                    </li> {% endcomment %}
                                     <!-- End Button -->
                                 </ul>
                             </div>
@@ -1307,32 +1054,34 @@
                                     <li><a class="list-group-item list-group-item-action" href="/blog">Blogs</a></li>
                                     <li><a class="list-group-item list-group-item-action"
                                             href="/contect-us">Contact-Us</a></li>
-                                    <li><a class="list-group-item list-group-item-action" href="/gallery">Gallery</a>
-                                    </li>
-                                    <li><a class="list-group-item list-group-item-action" href="/privacy-policy">Privacy
-                                            Policy</a></li>
-                                    <li><a class="list-group-item list-group-item-action"
-                                            href="/term-and-condition">Terms & Condition</a></li>
+                                  
 
                                 </ul>
                                 <!-- End List Group -->
                             </div>
 
                             <div class="col-12 col-md mb-4 mb-md-0">
-                                <h6 class="mb-3 font-weight-bold">Customer Care</h6>
+                                 <h6 class="mb-3 font-weight-bold">Other</h6> 
                                 <!-- List Group -->
-                                <ul
-                                    class="list-group list-group-flush list-group-borderless mb-0 list-group-transparent">
-                                    <li><a class="list-group-item list-group-item-action" href="/user/profile">My
+                              <ul class="list-group list-group-flush list-group-borderless mb-0 list-group-transparent">
+                                  
+                                <li><a class="list-group-item list-group-item-action" href="/gallery">Gallery</a>
+                                </li>
+                                <li><a class="list-group-item list-group-item-action" href="/privacy-policy">Privacy
+                                        Policy</a></li>
+                                <li><a class="list-group-item list-group-item-action"
+                                        href="/term-and-condition">Terms & Condition</a></li>
+
+                                {% comment %} <li><a class="list-group-item list-group-item-action" href="/user/profile">My
                                             Account</a></li>
                                     <li><a class="list-group-item list-group-item-action" href="/user/myorder">Order
                                             Tracking</a></li>
                                     <li><a class="list-group-item list-group-item-action"
                                             href="/user/wishlist">WishList</a></li>
                                     <li><a class="list-group-item list-group-item-action" href="/user/cart">Cart</a>
-                                    </li>
+                                    </li> {% endcomment %}
 
-                                </ul>
+                                </ul> 
                                 <!-- End List Group -->
                             </div>
                         </div>

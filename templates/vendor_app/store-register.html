@@ -1,7 +1,9 @@
-{% extends 'main_app/base.html' %}
+{% extends 'usertemplate/base_vendor.html' %}
+
 {% load static %}
-{% block title %}Register{% endblock %}
-{% block body %}
+{% block title %} Login {% endblock %}
+
+{% block content %}
             <div class="container register" style="border-radius: 1rem;">
                 <div class="row">
                     <div class="col-md-3 register-left">
@@ -9,14 +11,40 @@
                         <h3>Welcome</h3>
                         <p class="text-white">You are 30 seconds away from earning your own money!</p>
                     </div>
+
+
                     <div class="col-md-9 register-right">
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                <h3 class="register-heading">Add Store Info</h3>
+                            
                                 <form action="/vendor/storeinfo" method="POST" enctype="multipart/form-data">
                                     <div class="row register-form">
 
                                         <div class="col-md-6">
+
+                                            <div class="form-group">
+                                                <label for="businessmaincategory">Business Main Category *</label>
+                                                <select class="form-control" id="businessmaincategory" name="businessmaincategory">
+                                                    {% if store.businessmaincategory %}
+                                                    <option value="{{store.businessmaincategory}}" selected>{{store.businessmaincategory}}</option>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <option value="" disable>-- select businessmaincategory --</option>
+                                                   
+                                                </select>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="businesscategory">Business Category *</label>
+                                                    <select class="form-control" id="businesscategory" name="businesscategory">
+                                                        {% if store.businesscategory %}
+                                                        <option value="{{store.businesscategory}}" selected>{{store.businesscategory}}</option>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        <option value="" disable>-- select addressproof --</option>
+                                                       
+                                                    </select>
+                                                    </div>
                                             
                                             <div class="form-group">
                                                 <input type="text" class="form-control" placeholder="Store Name *" required name="name" value="" />
@@ -38,6 +66,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
+                                                <label for="closing_day">Closing Day *</label>
                                                 <select class="form-control" name="closing_day">
                                                     <option selected disabled>----select closing day----</option>
                                                     <option value="Monday">Monday</option>
