@@ -1144,11 +1144,14 @@ def login_view(request):
         elif res == 'M' :
             mobile=mobile_email
    
-            if User.objects.filter(username=mobile).exists():
-                chk_user = User.objects.get(username=mobile)
-            else:
+            if not User.objects.filter(username=mobile).exists():
+                
                 messages.info(request,'Incorrect Mobile No')
                 return redirect('/login/')
+        
+            else:
+                chk_user = User.objects.get(username=mobile)
+               
         else:
             pass   
 
@@ -1175,7 +1178,8 @@ def login_view(request):
             else:
                 messages.info(request,'Incorrect Password')
                 return redirect('/login/')   
-
+        else:
+            pass
     
     else:
         if request.user.is_authenticated:
