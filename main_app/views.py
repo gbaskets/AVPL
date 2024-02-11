@@ -1612,6 +1612,7 @@ def loginwith_view(request):
                 return redirect('/login-otp/')
 
         elif res == 'M' :
+            print("hhhhhhhhhhhhhh222")
             mobile=mobile_email
             
             if User.objects.filter(username=mobile).exists() and UserOTP.objects.filter(mobile=mobile).exists():
@@ -1625,8 +1626,9 @@ def loginwith_view(request):
                 messages.info(request,'Incorrect Mobile No')
                 return redirect('/login-otp/')
         else:
+            print("hhhhhhhhhhhhhh")
             pass   
-
+        print(chk_user,"chk_user...........")
         if chk_user:
             user = authenticate(request, username=chk_user.username )
             user=chk_user
@@ -1636,9 +1638,6 @@ def loginwith_view(request):
                 login(request,user)
                 
                 if check_user_authentication(request, 'VENDOR'):
-                    if Vendor.objects.filter(user = chk_user, verified = False).exists():
-                        logout(request)
-                        return send_otp(request, 'VENDOR', chk_user)
                     return redirect('/vendor/')
                 elif check_user_authentication(request, 'CUSTOMER'):
                     return redirect('/')

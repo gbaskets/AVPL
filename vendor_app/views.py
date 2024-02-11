@@ -224,12 +224,12 @@ def store_info(request):
 			name = request.POST.get('name')
 			description = request.POST.get('description')
 			reg_no = request.POST.get('reg_no')
-			logo = request.FILES['logo']
-			image = request.FILES['image']
+			logo = request.FILES.get('logo')
+			image = request.FILES.get('image')
 			closing_day = request.POST.get('closing_day')
 			closing_time = request.POST.get('closing_time')
 			opening_time = request.POST.get('opening_time')
-			banner = request.FILES['banner']
+			banner = request.FILES.get('banner')
 			if Store.objects.filter(name=name, registration_number=reg_no).exists():
 				messages.info(request, 'Store Already Exists')
 				return redirect('/vendor/storeinfo')
@@ -254,7 +254,12 @@ def store_info(request):
 				BusinessLimit.objects.create(vendor=vendor)
 				messages.info(request, 'Store Created Successfully !!!!')
 				return redirect('/vendor/')
-		return render(request, 'vendor_app/store-register.html', {})
+		businessmaincategory_obj=BusinessMainCategory.objects.filter(isactive=True)
+		businesscategory_obj=BusinessCategory.objects.filter(isactive=True)
+		dic={"businessmaincategory_obj":businessmaincategory_obj,
+				"businesscategory_obj":businesscategory_obj
+				}
+		return render(request, 'vendor_app/store-register.html',dic )
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 

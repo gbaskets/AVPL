@@ -5,9 +5,8 @@ from django.contrib import admin
 from .models import *
 from django.utils.html import format_html
 
-
-
-
+admin.site.register(BusinessMainCategory)
+admin.site.register(BusinessCategory)
 class BannerAdmin(admin.ModelAdmin):
 	list_display = ['title', 'subtitle', 'description', 'link', 'image']
 
