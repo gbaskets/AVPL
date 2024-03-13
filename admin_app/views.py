@@ -23,7 +23,6 @@ import base64
 from django.core.files.base import ContentFile
 
 
-
 @csrf_exempt
 def admin_show(request):
 #	for x in ProductCategory.objects.all():
@@ -119,7 +118,7 @@ def admin_dashboard(request):
 			# 'year_pv':Yearly_PV.objects.all(),
 			'wallettransactions':WalletTransaction.objects.all().order_by('-id'),
 			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/dashboard.html', dic)
 	else:
@@ -181,6 +180,40 @@ def sendmoneytransfer_admin(request):
 
 	return render(request,'admin_app/otpverifysendmoneytousers.html')
 
+
+
+@csrf_exempt
+def admin_bussiness_main_categories(request):
+	if check_user_authentication(request, 'ADMIN'):
+		
+		dic = {
+			'data':BusinessMainCategory.objects.all(),
+			'bussinessmaincategories':BusinessMainCategory.objects.all(),
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+@csrf_exempt
+def admin_bussiness_categories(request):
+	if check_user_authentication(request, 'ADMIN'):
+		
+		dic = {
+			'data':BusinessCategory.objects.all(),
+			'bussinesscategories':BusinessCategory.objects.all(),
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
 @csrf_exempt
 def admin_product_categories(request):
 	if check_user_authentication(request, 'ADMIN'):
@@ -200,11 +233,15 @@ def admin_product_categories(request):
 				'data':ProductCategory.objects.all(),
 				'categories':ProductCategory.objects.all(),
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
 @csrf_exempt
 def admin_edit_product_category(request):
 	if check_user_authentication(request, 'ADMIN'):
@@ -214,7 +251,7 @@ def admin_edit_product_category(request):
 			dic = {
 				'data' : ProductCategory.objects.filter(id=id_),
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/edit-product-category.html', dic)
 		if request.method == 'POST':
@@ -235,7 +272,7 @@ def admin_edit_product_category(request):
 			'data':ProductCategory.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			messages.info(request, 'Product Category Edited Successfully !!!!')
 			return redirect('/admins/productcategories')
@@ -271,7 +308,7 @@ def admin_product_sub_categories(request):
 				'categories':ProductCategory.objects.all(),
 				'data':ProductSubCategory.objects.all(),
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/product-sub-category.html', dic)
 	else:
@@ -286,7 +323,7 @@ def admin_edit_product_sub_categories(request):
 				'categories':ProductCategory.objects.all(),
 				'data': ProductSubCategory.objects.filter(id=id_),
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/edit-product-sub-category.html', dic)
 			
@@ -309,7 +346,7 @@ def admin_edit_product_sub_categories(request):
 			'data':ProductSubCategory.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			messages.info(request, 'Product Sub-Category Edited Successfully !!!!')
 			return redirect('/admins/productsubcategories')
@@ -346,7 +383,7 @@ def admin_product_sub_sub_categories(request):
 				'subcategories':ProductSubCategory.objects.all(),
 				'data':ProductSubSubCategory.objects.all(),
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/product-sub-sub-category.html', dic)
 	else:
@@ -362,7 +399,7 @@ def admin_edit_product_sub_sub_categories(request):
 				'subcategories':ProductSubCategory.objects.all(),
 				'data':ProductSubSubCategory.objects.filter(id=id_),
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/edit-product-sub-sub-category.html', dic)
 			
@@ -386,7 +423,7 @@ def admin_edit_product_sub_sub_categories(request):
 				'subcategories':ProductSubCategory.objects.all(),
 				'data':ProductSubSubCategory.objects.filter(id=id_),
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			messages.info(request, 'Product Sub-Sub-Category Edited Successfully !!!!')
 			return redirect('/admins/productsubsubcategories')
@@ -412,7 +449,7 @@ def admin_kyc_requests(request):
 			'categories':ProductCategory.objects.all(),
 			'data':Vendor.objects.filter(doc_submitted=True, is_active=False),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/kyc-requests.html', dic)
 	else:
@@ -424,7 +461,7 @@ def admin_vendor_list(request):
 			'categories':ProductCategory.objects.all(),
 			'data':Vendor.objects.filter(doc_submitted=True, is_active=True),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/vendor_list.html', dic)
 	else:
@@ -536,7 +573,7 @@ def admin_pv_wallet(request):
 			'pv':fetch_pv(request.user),
 			'transactions':fetch_pv_transactions(request.user),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/pv.html', dic)
 	else:
@@ -568,7 +605,7 @@ def admin_create_link(request):
 		dic = {
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/create-link.html', dic)
 	else:
@@ -612,7 +649,7 @@ def admin_wallet_recharge(request):
 
 		dic = {'wallet':Wallet.objects.filter(user__is_superuser=True),'categories':ProductCategory.objects.all(),
 			'wallettransactions':WalletTransaction.objects.filter(wallet__user__is_superuser=True),'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),}
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),}
 		return render(request, 'admin_app/wallet.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -647,7 +684,7 @@ def admin_under_trees(request):
 		dic = {'data':MLMAdmin.objects.all(), 'categories':ProductCategory.objects.all(),
 		'tree':fetch_user_tree(child),
 		'notification':get_notifications(request.user),
-		'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/under-trees.html', dic)
 	else:
@@ -798,7 +835,7 @@ def genealogyTree_binary(request):
 
 						'child':child,
 						'notification':get_notifications(request.user),
-						'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+						'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 							}
 				else:
 					print('None')
@@ -817,7 +854,7 @@ def genealogyTree_binary(request):
 					
 					'child':child,
 					'notification':get_notifications(request.user),
-					'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+					'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 						}
 			else:
 				print('None')
@@ -837,7 +874,7 @@ def genealogyTree_binary(request):
 					
 					'child':child,
 					'notification':get_notifications(request.user),
-					'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+					'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 						}
 			return render(request, 'admin_app/genealogyTree_binary.html',dic)
 		if node_V.left  is not None:	
@@ -889,7 +926,7 @@ def genealogyTree_level(request):
 				'referals':referals,
 				# 'sponser_r':referal_obj.referrals,
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 				'referals_user':referals_user,
 				
 			}
@@ -904,7 +941,7 @@ def genealogyTree_level(request):
 				'referals':referals,
 				# 'sponser_r':referal_obj.referrals,
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 
 		
@@ -915,7 +952,7 @@ def genealogyTree_level(request):
 				'referals':referals,'usrpvs':usrpvs,
 				# 'sponser_r':referal_obj,
 				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 		return render(request, 'admin_app/genealogyTree_level.html',dic)
 	else:
@@ -947,7 +984,7 @@ def admin_delivery_charges(request):
 			return redirect('/admins/deliverycharges')
 		dic = {'charge':DeliveryCharge.objects.all(),'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/delivery-charges.html', dic)
 	else:
@@ -960,7 +997,7 @@ def admin_payment_info(request):
 			'orders':Orders.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/payment-info.html', dic)
 	else:
@@ -972,7 +1009,7 @@ def admin_orders(request):
 			'orders':OrderItems.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/orders.html', dic)
 	else:
@@ -989,7 +1026,7 @@ def admin_pvpairvalue(request):
 			return redirect('/admins/setpvpair')
 		dic = {'data':PVPairValue.objects.all(), 'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/set-pv-pair.html', dic)
 	else:
@@ -999,7 +1036,7 @@ def admin_withdraw(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {'users':UserWithdrawRequest.objects.all(), 'vendors':VendorWithdrawRequest.objects.all(), 'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/withdraw.html', dic)
 	else:
@@ -1058,7 +1095,7 @@ def admin_query(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {'queries':Query.objects.all().order_by('-id'),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/query.html', dic)
 	else:
@@ -1068,7 +1105,7 @@ def admin_query_result(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {'query':Query.objects.get(id=request.GET.get('query_id')),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/query-result.html', dic)
 	else:
@@ -1138,7 +1175,7 @@ def admin_set_pv_conversion(request):
 			return redirect('/admins/setpvconversion')
 		dic = {'data':PVConversionValue.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/set-pv-conversion.html', dic)
 	else:
@@ -1157,7 +1194,7 @@ def admin_direct_referal(request):
 			return redirect('/admins/direct-referal')
 		dic = {'data':DirectReferalCommission.objects.all(),
 		'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-		'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/direct-referal.html', dic)
 	else:
@@ -1180,7 +1217,7 @@ def admin_leadership_bonus_set(request):
 		dic = {'data':UserLeadershipBonusCommission.objects.all(),
 		'notification':get_notifications(request.user),
 		'leadership_bonus':get_leadership_eligible_users(request),'categories':ProductCategory.objects.all(),
-		'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/leadership-bonus.html', dic)
 	else:
@@ -1202,7 +1239,7 @@ def admin_travel_fund_set(request):
 		dic = {'data':TravelFund.objects.all(),
 		'notification':get_notifications(request.user),
 		'travel_fund':get_travel_fund_eligible_users(request),'categories':ProductCategory.objects.all(),
-		'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/travel-fund.html', dic)
 	else:
@@ -1224,7 +1261,7 @@ def admin_car_fund_set(request):
 		dic = {'data':CarFund.objects.all(),
 		'notification':get_notifications(request.user),
 		'car_fund':get_car_fund_eligible_users(request),'categories':ProductCategory.objects.all(),
-		'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/car-fund.html', dic)
 	else:
@@ -1246,7 +1283,7 @@ def admin_house_fund_set(request):
 		dic = {'data':HouseFund.objects.all(),
 		'notification':get_notifications(request.user),
 		'house_fund':get_house_fund_eligible_users(request),'categories':ProductCategory.objects.all(),
-		'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/house-fund.html', dic)
 	else:
@@ -1268,7 +1305,7 @@ def admin_directorship_fund_set(request):
 		dic = {'data':DirectorshipFund.objects.all(),
 		'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
 		'directorship_fund':get_directorship_fund_eligible_users(request),
-		'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/directorship-fund.html', dic)
 	else:
@@ -1282,7 +1319,7 @@ def admin_product(request):
 			'images':ProductImages.objects.filter(product=product),
 			'variants':ProductVariant.objects.filter(product=product),'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request,'admin_app/product.html', dic)
 	else:
@@ -1303,7 +1340,7 @@ def admin_product_approval(request):
 		dic = {'data':Product.objects.filter(is_active=False, product_rejection=False),
 			'rejected_product':Product.objects.filter(is_active=False, product_rejection=True),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product-approval.html', dic)
 	else:
@@ -1315,7 +1352,7 @@ def admin_product_list(request):
 		dic = {
 			'products':Product.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product_list.html', dic)
 	else:
@@ -1454,7 +1491,7 @@ def vendor_commission(request):
 			return redirect('/admins/vendorcommission')
 		dic = {'data':Vendor_Commission.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/set-vendor-commission.html', dic)
 	else:
@@ -1471,7 +1508,7 @@ def user_vendor_commission(request):
 			return redirect('/admins/uservendorcommission')
 		dic = {'data':UserVendorCommission.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/set-user-vendor-commission.html', dic)
 	else:
@@ -1673,7 +1710,7 @@ def admin_gst_log(request):
 			'orders':OrderItems.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/gstlogs.html', dic)
 	else:
@@ -1700,7 +1737,7 @@ def admin_total_tds(request):
 
 			return redirect('/admins/total_tds')
 		dic = {'total_tds':Total_TDS.objects.all()[0], 'total_tds_transactions':Total_TDS_Pay.objects.all(),'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),}
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),}
 		return render(request, 'admin_app/total_tds.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -1713,7 +1750,7 @@ def admin_tds_withdraw(request):
 			'vendors':VendorWithdrawRequest.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/tdslogs.html', dic)
 	else:
@@ -1732,7 +1769,7 @@ def admin_tds_log_details(request, id):
 			'vendors':VendorWithdrawRequest.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		
 		}
 		return render(request, 'admin_app/tds_logs.html', dic)
@@ -1755,7 +1792,7 @@ def terms(request):
 		dic = {
 			'data':termsandcondition.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/terms-condition.html',dic)
 	else:
@@ -1775,7 +1812,7 @@ def privacy(request):
 		dic = {
 			'data':privacypolicy.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/privacy.html',dic)
 	else:
@@ -1807,7 +1844,7 @@ def contact(request):
 		dic = {
 			'data':contact_us.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		dic.update(get_cart_len(request))
 		dic.update(get_wishlist_len(request))
@@ -1835,7 +1872,7 @@ def admin_about_us(request):
 		dic = {
 			'data':AboutUs.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/about-us.html',dic)
 	else:
@@ -1859,7 +1896,7 @@ def admin_gallery(request):
 		dic = {
 			'data':Gallery.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/gallery.html',dic)
 	else:
@@ -1882,7 +1919,7 @@ def admin_blog(request):
 		dic = {
 			'data':Blog.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/blog.html',dic)
 	else:
@@ -1912,7 +1949,7 @@ def admin_banner(request):
 		dic = {
 			'data':HomeBanner.objects.all(),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/banner.html',dic)
 	else:
@@ -1943,7 +1980,7 @@ def admin_subscription_pack(request):
 			return redirect('/admins/subscription-pack')
 		dic = {'charge':SubscriptionCharge.objects.all(),'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/subscription-charges.html', dic)
 	else:
@@ -2060,7 +2097,7 @@ def admin_vendor_commission_wallet(request):
 			'vendor_commission_wallet':Vendor_Wallet_Commission.objects.all(), 
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/vendor_commission_wallet.html', dic)
 	else:
@@ -2076,7 +2113,7 @@ def admin_vendor_commission_wallet_details(request, id):
 			'vendor_commission_wallet_transaction':vendor_commission_wallet_transaction,
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		
 		}
 		return render(request, 'admin_app/wallet_commission_dash.html', dic)
@@ -2176,7 +2213,7 @@ def staff_list(request):
 			'categories':ProductCategory.objects.all(),'form':form,'form1':form1,
 			'data':Staffs_User.objects.all(),
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/staffs_list.html', dic)
 	else:
@@ -2244,7 +2281,7 @@ def admin_staff_profile(request):
 		dic = {
 			'user':user,'staff':staff,'updateform':updateform,'updateform2':updateform2,
 			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			'data':Staffs_User.objects.all(),
 			'categories':ProductCategory.objects.all()
 		}

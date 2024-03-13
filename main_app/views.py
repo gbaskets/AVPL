@@ -1153,8 +1153,9 @@ def login_view(request):
                 chk_user = User.objects.get(username=mobile)
                
         else:
-            pass   
-
+            messages.info(request,'Incorrect Mobile No / Email !')
+            return redirect('/login/')
+    
         if chk_user:
             user = authenticate(request, username=chk_user.username , password=password)
             if user is not None:

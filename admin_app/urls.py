@@ -6,6 +6,8 @@ from admin_app.utils import *
 urlpatterns = [
     path('dashboard', admin_dashboard),
     path('show', admin_show),
+    path('bussiness-main-categories', admin_bussiness_main_categories),
+    path('bussiness-categories', admin_bussiness_categories),
     path('productcategories', admin_product_categories),
     path('', admin_login),
     path('productcategories', admin_product_categories),

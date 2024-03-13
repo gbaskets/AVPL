@@ -683,7 +683,7 @@ def get_notifications(user):
 	# now_date=datetime.datetime.now() + datetime.timedelta(seconds = 60 * 3.4)
 	dic={}
 	lt=[]
-	for x in Notification.objects.filter(user=user):
+	for x in Notification.objects.filter(admin=user):
 		time = x.notification_date.time()
 		date = x.notification_date.date()
 		hour = int(str(time)[0:2])
