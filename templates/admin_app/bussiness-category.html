@@ -1,7 +1,71 @@
 {% extends 'admin_app/base.html' %}
 {% load static %}
-{% block title %}Bussiness Main Categories{% endblock %}
+{% block title %}Bussiness Categories{% endblock %}
 {% block main %}
+
+<style>
+   .switch {
+     position: relative;
+     display: inline-block;
+     width: 60px;
+     height: 34px;
+   }
+   
+   .switch input { 
+     opacity: 0;
+     width: 0;
+     height: 0;
+   }
+   
+   .slider {
+     position: absolute;
+     cursor: pointer;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: #ccc;
+     -webkit-transition: .4s;
+     transition: .4s;
+   }
+   
+   .slider:before {
+     position: absolute;
+     content: "";
+     height: 26px;
+     width: 26px;
+     left: 4px;
+     bottom: 4px;
+     background-color: white;
+     -webkit-transition: .4s;
+     transition: .4s;
+   }
+   
+   input:checked + .slider {
+     background-color: #2196F3;
+   }
+   
+   input:focus + .slider {
+     box-shadow: 0 0 1px #2196F3;
+   }
+   
+   input:checked + .slider:before {
+     -webkit-transform: translateX(26px);
+     -ms-transform: translateX(26px);
+     transform: translateX(26px);
+   }
+   
+   /* Rounded sliders */
+   .slider.round {
+     border-radius: 34px;
+   }
+   
+   .slider.round:before {
+     border-radius: 50%;
+   }
+   </style>
+
+
             <!-- Main Content -->
             <div class="main-content">
                <section class="section">
@@ -9,10 +73,10 @@
                      <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                            <div class="section-header-breadcrumb-content">
-                              <h1>Bussiness Main Categories</h1>
+                              <h1>Bussiness Categories</h1>
                               <div class="section-header-breadcrumb">
                                  <div class="breadcrumb-item active"><a href="/admins/dashboard"><i class="fas fa-home"></i></a></div>
-                                 <div class="breadcrumb-item"><a href="#">Bussiness Main Categories</a></div>
+                                 <div class="breadcrumb-item"><a href="#">Bussiness Categories</a></div>
                               </div>
                            </div>
                         </div>
@@ -24,13 +88,16 @@
                         <div class="col-12">
                            <div class="card">
                               <div class="card-header">
+                     
                                  <div class="col-8">
-                                 <h4>Bussiness Categories List</h4>
-                                 </div>
-                                 <div class="col-6">
-                                    <a href="/" >Add Bussiness Category</a>
+                                    <h4>Bussiness Categories List</h4>
                                     </div>
-                                 
+                                    <div class="col-6">
+                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddBussinessModal">Add Bussiness Category</a>
+   
+ 
+                                       </div>
+                                    
                               </div>
                               <div class="card-body">
                                  <div class="table-responsive">
@@ -38,7 +105,10 @@
                                        <thead>
                                           <tr>
                                              <th>Title</th>
+                                             <th>Bussiness Main Categories</th>
                                              <th>Status</th>
+                                             <th>Updated On</th>
+                                             <th>Updated By</th>
                                              <th>Action</th>
                                           </tr>
                                        </thead>
@@ -46,18 +116,27 @@
                                           {% for x in data %}
                                           <tr>
                                              <td>{{ x.title|safe }}</td>
+                                             <td>{{ x.businessmaincategory.title|safe }}</td>
                                              {% if x.isactive == True %}
                                              <td><span>Active</span></td>
                                              {% else %}
                                              <td><span>De-active</span></td>
                                              {% endif %}
+
+                                             <td>{{ x.updatedon| date:"Y-m-d H:i" }}</td>
+
+                                             <td>{{ x.updatedby|safe }}</td>
                                            
                                              
                                              <td>
-                                                <a href="/admins/editproductcategory?id_={{ x.id|safe }}" class="btn btn-success btn-icon icon-left"><i class="far fa-edit"></i>Edit</a>&nbsp;
-                                                <a href="/admins/deleteproductcategory?id_={{ x.id|safe }}" class="btn btn-primary btn-icon icon-left"><i class="fas fa-times"></i>Delete</a>
+                                                <a data-toggle="modal" data-target="#EditBussinessModal{{ x.id|safe }}" class="btn btn-success btn-icon icon-left"><i class="far fa-edit"></i>Edit</a>&nbsp;
+                                                
+                                                
+                                                  
+                                                <a href="/admins/delete-bussiness-categories/{{ x.id|safe }}" class="btn btn-primary btn-icon icon-left"><i class="fas fa-times"></i>Delete</a>
                                              </td>
                                           </tr>
+                                          
                                           {% endfor %}
                                        </tbody>
                                     </table>
@@ -70,4 +149,142 @@
                </section>
               
             </div>
+
+
+ {% for x in data %}
+<!-- Modal -->
+<div class="modal fade" id="EditBussinessModal{{ x.id|safe }}" tabindex="-1" role="dialog" aria-labelledby="EditMainBussinessModalLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+   <div class="modal-content">
+      <form action="/admins/edit-bussiness-categories/{{ x.id|safe }}" enctype="multipart/form-data"
+      method="POST">
+      {% csrf_token %}
+      <div class="modal-header">
+         <h5 class="modal-title" id="EditBussinessModalLabel">Edit Bussiness Categories</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+         <span aria-hidden="true">&times;</span>
+         </button>
+      </div>
+      <div class="modal-body">
+   
+      
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Bussiness Main Categories</label>
+                  <select class="form-control" required name="main_id">
+                  {% for category in bussinessmaincategories %}
+                  <option value="{{ category.id }}" {% if x.businessmaincategory.id == category.id %} selected {% endif %}>{{ category.title }}</option>
+                  {% endfor %}
+               </select>    
+
+{% comment %}                   
+            <select class="form-control" required name="main_id">
+               <option selected value="{{ x.businessmaincategory.id }}">{{ x.businessmaincategory.title }}</option>
+               {% for category in bussinessmaincategories %}
+               
+               <option value="{{ category.id }}">{{ category.title }}</option>
+               {% endfor %}
+           </select>                {% endcomment %}
+         </div>
+            </div>
+
+           
+
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Title</label>
+                  <input type="text" class="form-control" required  placeholder="Enter Bussiness Category Title" name="title" value="{{ x.title|safe }}">
+               </div>
+            </div>
+            
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Status</label>
+
+                 {% if x.isactive == True %} <label class="switch">
+                     <input type="checkbox" name="isactive" checked>
+                     <span class="slider round"></span>
+                   </label> {% else %} <label class="switch">
+                     <input type="checkbox" name="isactive"  >
+                     <span class="slider round"></span>
+                   </label> {% endif%}
+
+                 
+               </div>
+            </div>
+            
+
+         </div>
+   
+                  
+      </div>
+      <div class="modal-footer">
+         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+         <button type="submit" class="btn btn-success">Save changes</button>
+      </div>
+      </form>
+   </div>
+   </div>
+</div>
+{% endfor %}
+
+ <!-- Modal -->
+ <div class="modal fade" id="AddBussinessModal" tabindex="-1" role="dialog" aria-labelledby="AddBussinessModalLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+      <form action="/admins/add-bussiness-categories" enctype="multipart/form-data"
+      method="POST">
+      {% csrf_token %}
+       <div class="modal-header">
+         <h5 class="modal-title" id="AddBussinessModalLabel">Add Bussiness Categories</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+     
+       
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Bussiness Main Categories</label>
+                  <select class="form-control" required name="main_id" id="main_id">
+                     {% for category in bussinessmaincategories %}
+                     <option value="{{ category.id }}">{{ category.title }}</option>
+                     {% endfor %}
+                 </select>
+               </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Title</label>
+                  <input type="text" class="form-control" required  placeholder="Enter Bussiness Category Title" name="title">
+               </div>
+            </div>
+            
+
+         </div>
+   
+                    
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+         <button type="submit" class="btn btn-success">Save changes</button>
+       </div>
+      </form>
+     </div>
+   </div>
+ </div>
+
+
+
+
+
+
+
+
+
+
+
 {% endblock %}

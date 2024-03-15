@@ -186,6 +186,29 @@ def sendmoneytransfer_admin(request):
 def admin_bussiness_main_categories(request):
 	if check_user_authentication(request, 'ADMIN'):
 		
+		
+		dic = {
+			'data': BusinessMainCategory.objects.all().order_by("-id"),
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_add_bussiness_main_categories(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			title= request.POST.get('title')
+	
+			if title:
+				bussinessmaincateobj=BusinessMainCategory.objects.create(title=title)			
+				bussinessmaincateobj.updatedby=request.user
+				bussinessmaincateobj.save()
+				return redirect("/admins/bussiness-main-categories")
+		
 		dic = {
 			'data':BusinessMainCategory.objects.all(),
 			'bussinessmaincategories':BusinessMainCategory.objects.all(),
@@ -197,6 +220,60 @@ def admin_bussiness_main_categories(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 
+@csrf_exempt
+def admin_edit_bussiness_main_categories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=BusinessMainCategory.objects.filter(id=id).first()
+		if request.method == 'POST':
+			title= request.POST.get('title')
+			isactive= request.POST.get('isactive')
+			print(title,isactive,'isactiveisactiveisactiveisactive')
+			if title:
+				bussinessmaincateobj.title=title
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/bussiness-main-categories")
+			
+		dic = {
+			'data':BusinessMainCategory.objects.all(),
+			
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_bussiness_main_categories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=BusinessMainCategory.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/bussiness-main-categories")
+			
+		dic = {
+			'data':BusinessMainCategory.objects.all(),
+			
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 
 @csrf_exempt
 def admin_bussiness_categories(request):
@@ -204,13 +281,96 @@ def admin_bussiness_categories(request):
 		
 		dic = {
 			'data':BusinessCategory.objects.all(),
-			'bussinesscategories':BusinessCategory.objects.all(),
+			'bussinessmaincategories':BusinessMainCategory.objects.all(),
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+@csrf_exempt
+def admin_add_bussiness_categories(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			title= request.POST.get('title')
+			main_id= request.POST.get('main_id')
+			if title and main_id :
+				bussinessmaincateobj=BusinessCategory.objects.create(businessmaincategory=BusinessMainCategory.objects.get(id=main_id),title=title)			
+				bussinessmaincateobj.updatedby=request.user
+				bussinessmaincateobj.save()
+				return redirect("/admins/bussiness-categories")
+		
+		dic = {
+			'data':BusinessMainCategory.objects.all(),
+			'bussinessmaincategories':BusinessMainCategory.objects.all(),
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_bussiness_categories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=BusinessCategory.objects.filter(id=id).first()
+		if request.method == 'POST':
+			title= request.POST.get('title')
+			main_id= request.POST.get('main_id')
+			isactive= request.POST.get('isactive')
+			if main_id:
+				bussinessmaincateobj.businessmaincategory=BusinessMainCategory.objects.get(id=main_id)				
+			if title:
+				bussinessmaincateobj.title=title
+			if isactive:
+				
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/bussiness-categories")
+			
+		dic = {
+			'data':BusinessCategory.objects.all(),
+			
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_bussiness_categories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=BusinessCategory.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/bussiness-categories")
+			
+		dic = {
+			'data':BusinessCategory.objects.all(),
+			
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 
 
 

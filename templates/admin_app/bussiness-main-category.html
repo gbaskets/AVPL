@@ -2,6 +2,70 @@
 {% load static %}
 {% block title %}Bussiness Main Categories{% endblock %}
 {% block main %}
+
+<style>
+   .switch {
+     position: relative;
+     display: inline-block;
+     width: 60px;
+     height: 34px;
+   }
+   
+   .switch input { 
+     opacity: 0;
+     width: 0;
+     height: 0;
+   }
+   
+   .slider {
+     position: absolute;
+     cursor: pointer;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: #ccc;
+     -webkit-transition: .4s;
+     transition: .4s;
+   }
+   
+   .slider:before {
+     position: absolute;
+     content: "";
+     height: 26px;
+     width: 26px;
+     left: 4px;
+     bottom: 4px;
+     background-color: white;
+     -webkit-transition: .4s;
+     transition: .4s;
+   }
+   
+   input:checked + .slider {
+     background-color: #2196F3;
+   }
+   
+   input:focus + .slider {
+     box-shadow: 0 0 1px #2196F3;
+   }
+   
+   input:checked + .slider:before {
+     -webkit-transform: translateX(26px);
+     -ms-transform: translateX(26px);
+     transform: translateX(26px);
+   }
+   
+   /* Rounded sliders */
+   .slider.round {
+     border-radius: 34px;
+   }
+   
+   .slider.round:before {
+     border-radius: 50%;
+   }
+   </style>
+
+
             <!-- Main Content -->
             <div class="main-content">
                <section class="section">
@@ -42,6 +106,8 @@
                                           <tr>
                                              <th>Title</th>
                                              <th>Status</th>
+                                             <th>Updated On</th>
+                                             <th>Updated By</th>
                                              <th>Action</th>
                                           </tr>
                                        </thead>
@@ -54,13 +120,21 @@
                                              {% else %}
                                              <td><span>De-active</span></td>
                                              {% endif %}
+
+                                             <td>{{ x.updatedon| date:"Y-m-d H:i" }}</td>
+
+                                             <td>{{ x.updatedby|safe }}</td>
                                            
                                              
                                              <td>
-                                                <a href="/admins/editproductcategory?id_={{ x.id|safe }}" class="btn btn-success btn-icon icon-left"><i class="far fa-edit"></i>Edit</a>&nbsp;
-                                                <a href="/admins/deleteproductcategory?id_={{ x.id|safe }}" class="btn btn-primary btn-icon icon-left"><i class="fas fa-times"></i>Delete</a>
+                                                <a data-toggle="modal" data-target="#EditMainBussinessModal{{ x.id|safe }}" class="btn btn-success btn-icon icon-left"><i class="far fa-edit"></i>Edit</a>&nbsp;
+                                                
+                                                
+                                                  
+                                                <a href="/admins/delete-bussiness-main-categories/{{ x.id|safe }}" class="btn btn-primary btn-icon icon-left"><i class="fas fa-times"></i>Delete</a>
                                              </td>
                                           </tr>
+                                          
                                           {% endfor %}
                                        </tbody>
                                     </table>
@@ -75,26 +149,96 @@
             </div>
 
 
+ {% for x in data %}
+<!-- Modal -->
+<div class="modal fade" id="EditMainBussinessModal{{ x.id|safe }}" tabindex="-1" role="dialog" aria-labelledby="EditMainBussinessModalLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+   <div class="modal-content">
+      <form action="/admins/edit-bussiness-main-categories/{{ x.id|safe }}" enctype="multipart/form-data"
+      method="POST">
+      {% csrf_token %}
+      <div class="modal-header">
+         <h5 class="modal-title" id="EditMainBussinessModalLabel">Edit Bussiness Main Categories</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+         <span aria-hidden="true">&times;</span>
+         </button>
+      </div>
+      <div class="modal-body">
+   
+      
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Title</label>
+                  <input type="text" class="form-control" required  placeholder="Enter Bussiness Main Category Title" name="title" value="{{ x.title|safe }}">
+               </div>
+            </div>
+            
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Status</label>
 
+                 {% if x.isactive == True %} <label class="switch">
+                     <input type="checkbox" name="isactive" checked>
+                     <span class="slider round"></span>
+                   </label> {% else %} <label class="switch">
+                     <input type="checkbox" name="isactive"  >
+                     <span class="slider round"></span>
+                   </label> {% endif%}
 
+                 
+               </div>
+            </div>
+            
+
+         </div>
+   
+                  
+      </div>
+      <div class="modal-footer">
+         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+         <button type="submit" class="btn btn-success">Save changes</button>
+      </div>
+      </form>
+   </div>
+   </div>
+</div>
+{% endfor %}
 
  <!-- Modal -->
  <div class="modal fade" id="AddMainBussinessModal" tabindex="-1" role="dialog" aria-labelledby="AddMainBussinessModalLabel" aria-hidden="true">
    <div class="modal-dialog" role="document">
      <div class="modal-content">
+      <form action="/admins/add-bussiness-main-categories" enctype="multipart/form-data"
+      method="POST">
+      {% csrf_token %}
        <div class="modal-header">
-         <h5 class="modal-title" id="AddMainBussinessModalLabel">Modal title</h5>
+         <h5 class="modal-title" id="AddMainBussinessModalLabel">Add Bussiness Main Categories</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
          </button>
        </div>
        <div class="modal-body">
-         ...
+     
+       
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Title</label>
+                  <input type="text" class="form-control" required  placeholder="Enter Bussiness Main Category Title" name="title">
+               </div>
+            </div>
+            
+
+         </div>
+   
+                    
        </div>
        <div class="modal-footer">
          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-         <button type="button" class="btn btn-success">Save changes</button>
+         <button type="submit" class="btn btn-success">Save changes</button>
        </div>
+      </form>
      </div>
    </div>
  </div>
