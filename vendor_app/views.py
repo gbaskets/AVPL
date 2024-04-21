@@ -218,19 +218,19 @@ def order_status_updates(request):
 @csrf_exempt
 def store_info(request):
 	if check_user_authentication(request, 'VENDOR'):
-     		
+		vendor = Vendor.objects.get(user=request.user)	
 		if request.method == 'POST':
 			vendor = Vendor.objects.get(user=request.user)
 			name = request.POST.get('name')
 			description = request.POST.get('description')
-			reg_no = request.POST.get('reg_no')
+			registrationno = request.POST.get('registrationno')
 			logo = request.FILES.get('logo')
 			image = request.FILES.get('image')
 			closing_day = request.POST.get('closing_day')
 			closing_time = request.POST.get('closing_time')
 			opening_time = request.POST.get('opening_time')
 			banner = request.FILES.get('banner')
-			if Store.objects.filter(name=name, registration_number=reg_no).exists():
+			if Store.objects.filter(name=name, registration_number=registrationno).exists():
 				messages.info(request, 'Store Already Exists')
 				return redirect('/vendor/storeinfo')
 			else:
@@ -256,8 +256,14 @@ def store_info(request):
 				return redirect('/vendor/')
 		businessmaincategory_obj=BusinessMainCategory.objects.filter(isactive=True)
 		businesscategory_obj=BusinessCategory.objects.filter(isactive=True)
+        
+		if Store.objects.filter(vendor=vendor).exists():
+			storeobj = Store.objects.get(vendor=vendor)
+		else:
+			storeobj=""
 		dic={"businessmaincategory_obj":businessmaincategory_obj,
-				"businesscategory_obj":businesscategory_obj
+				"businesscategory_obj":businesscategory_obj,
+                 "storeobj":storeobj,
 				}
 		return render(request, 'vendor_app/store-register.html',dic )
 	else:
@@ -298,11 +304,13 @@ def vendor_doc(request):
 			frontaddressproofdoc =request.FILES.get('frontaddressproofdoc')
 			backddressproofdoc = request.FILES.get('backddressproofdoc')
 			
+			print(mobile,'Mobile')
+    
 			if not Vendor.objects.filter(user=request.user).exists():
 				vendor_obj=Vendor.objects.create(user=request.user)
 			else:
 				vendor_obj=Vendor.objects.filter(user=request.user).first()
-                
+				
 				user=User.objects.filter(id=request.user.id).first()
 		
 				if mobile:
@@ -361,8 +369,10 @@ def vendor_doc(request):
 				if profilepic:
 					vendor_obj.backddressproofdoc =backddressproofdoc
 				user.save()
+
 				vendor_obj.save()
-	
+				messages.info(request, 'Your data has been saved !')
+
 # 			sub = 'AVPL - Thank You For Submitting KYC Documents'
 # 			msg = '''Hi there!
 # We got your documents for KYC, we will verify them soon and let you know,
@@ -384,6 +394,20 @@ def vendor_doc(request):
 			return render(request, 'vendor_app/vendor-doc.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+def get_businesscategory(request):
+	category_id = request.GET.get('category_id')
+	businesscategory_obj=BusinessCategory.objects.filter(isactive=True,businessmaincategory__id=category_id)
+	subcategory_list = list(businesscategory_obj.values('id', 'title'))
+	return JsonResponse(subcategory_list, safe=False)
+
+
+
+
+
 
 @csrf_exempt
 def add_product(request):

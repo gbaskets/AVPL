@@ -375,79 +375,98 @@ def admin_delete_bussiness_categories(request,id):
 
 
 @csrf_exempt
-def admin_product_categories(request):
+def admin_product_categories(request):    
 	if check_user_authentication(request, 'ADMIN'):
-		if request.method == 'POST':
-			name = request.POST.get('name')
-			image = request.FILES['image']
-			if ProductCategory.objects.filter(name=name).exists():
-				messages.info(request, 'Product Category Already Exists')
-				return redirect('/admins/productcategories')
-			else:
-				ProductCategory.objects.create(name=name,  image=image)
-				PointValue.objects.create(category=ProductCategory.objects.get(name=name))
-				messages.info(request, 'Product Category Added Successfully !!!!')
-				return redirect('/admins/productcategories')
-		else:
-			dic = {
-				'data':ProductCategory.objects.all(),
-				'categories':ProductCategory.objects.all(),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-			}
-			return render(request, 'admin_app/product-category.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-
-
-
-
-@csrf_exempt
-def admin_edit_product_category(request):
-	if check_user_authentication(request, 'ADMIN'):
-		if request.method == 'GET':
-			id_ = request.GET.get('id_')
-			print('IIIIIIIIIIIIII', id_)
-			dic = {
-				'data' : ProductCategory.objects.filter(id=id_),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-			}
-			return render(request, 'admin_app/edit-product-category.html', dic)
-		if request.method == 'POST':
-			id_ = request.GET.get('id_')
-			print(id_)
-			data = ProductCategory.objects.filter(id=id_).first()
-			print(data)
-			name = request.POST.get('name')
-			image = request.FILES.get('image')
-			if name :
-				data.name = name
-			if image :
-				data.image = image
-			data.save()
-   
-			dic = {
-			# 'data' : data,
+		dic = {
 			'data':ProductCategory.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
-			messages.info(request, 'Product Category Edited Successfully !!!!')
-			return redirect('/admins/productcategories')
+		return render(request, 'admin_app/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 @csrf_exempt
-def admin_delete_product_category(request):
+def admin_add_product_categories(request):
 	if check_user_authentication(request, 'ADMIN'):
-		if request.method == 'GET':
-			id_ = request.GET.get('id_')
-			ProductCategory.objects.filter(id=id_).delete()
-			messages.info(request, 'Product Category Deleted Successfully !!!!')
-			return redirect('/admins/productcategories')
+		if request.method == 'POST':
+			title= request.POST.get('title')
+	
+			if title:
+				bussinessmaincateobj=ProductCategory.objects.create(name=title)			
+				bussinessmaincateobj.updatedby=request.user
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-categories")
+		
+		dic = {
+			'data':ProductCategory.objects.all(),
+			'productcategories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_categories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+		if request.method == 'POST':
+			title= request.POST.get('title')
+			isactive= request.POST.get('isactive')
+			print(title,isactive,'isactiveisactiveisactiveisactive')
+			if title:
+				bussinessmaincateobj.name=title
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/bussiness-main-categories")
+			
+		dic = {
+			'data':BusinessMainCategory.objects.all(),
+			
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_product_categories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=BusinessMainCategory.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/bussiness-main-categories")
+			
+		dic = {
+			'data':BusinessMainCategory.objects.all(),
+			
+			'notification':get_notifications(request.user),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/bussiness-main-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
 
 @csrf_exempt
 def admin_product_sub_categories(request):

@@ -5,7 +5,15 @@
 
 {% block content %}
             <div class="container register" style="border-radius: 1rem;">
-                <div class="row">
+                <div class="row"> 
+                    {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span class="message">{{message}}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
                 
                     <div class="col-md-12 register-right">
                         <div class="tab-content" id="myTabContent">
@@ -17,7 +25,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Store Name *</label>
-                                                <input type="text" class="form-control" placeholder="Store Name *" required name="storename" value="" />
+                                                <input type="text" class="form-control" placeholder="Store Name *" required name="storename" value="{{storeobj.storename}}" />
                                             </div>
 
                                             <div class="form-group">
@@ -43,7 +51,7 @@
                                                         <option value="{{store.businesscategory}}" selected>{{store.businesscategory.title}}</option>
                                                         {% else %}
                                                         {% endif %}
-                                                        <option value="" disable>-- select addressproof --</option>
+                                                        <option value="" disable>-- select businesscategory --</option>
                                                         {% for b in businesscategory_obj %}
                                                         <option value="{{b}}">{{b.title}}</option>
                                                         {% endfor %}
@@ -54,22 +62,116 @@
                                          
                                             <div class="form-group">
                                                 <label>Store Description *</label>
-                                                <textarea type="text" class="form-control" placeholder="Description *" required name="description" value="" /></textarea>
+                                                <textarea type="text" class="form-control" placeholder="Description *" required name="description" value="{{storeobj.description}}">{{storeobj.description}}</textarea>
+                                            </div>
+                                            {% if storeobj.registrationno %}
+                                            <div class="form-group">
+                                                <label>Registration Number *</label>
+                                                <input type="text" class="form-control" placeholder="Registration Number *"  name="registrationno" value="{{storeobj.registrationno}}"  disabled />
                                             </div>
                                             <div class="form-group">
-                                                <label>Store Name *</label>
-                                                <input type="text" class="form-control" placeholder="Registration Number *" required name="reg_no" value="" />
+                                                <label>Registration QR *</label>
+                                                {% if storeobj.registrationno %}
+                                               {{storeobj.registrationqrcode.url}}
+                                               {% else %}
+                                               {% endif %}
                                             </div>
+                                            {% else %}
+                                            {% endif %}
                                             <div class="form-group">
                                                 <label>Store Logo *</label>
-                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="logo" required/>
+                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="logo" />
                                             </div>
                                             <div class="form-group">
-                                                <label>Store Image *</label>
-                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="image" required/>
+                                                <label>Store Banner *</label>
+                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="banner" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="storeregistrationtype">Store Registration Type *</label>
+                                                <select class="form-control" name="storeregistrationtype">
+                                                    <option selected disabled>----select storeregistrationtype----</option>
+                                                    <option value="Proprietorship">Proprietorship</option>
+                                                    <option value="Partnerships">Partnerships</option>
+                                                    <option value="Private Limited">Private Limited</option>
+                                                   
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label>MSM No *</label>
+                                                <input type="text" placeholder="Enter MSM No *"  id='msmeno' class="form-control"  name="msmeno"  value="{{storeobj.msmeno|default:''}}"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>MSM No *</label>
+                                         
+                                                <input type="file"  class="form-control" accept="image/png, image/jpeg"   id='msmedoc' class="form-control"  name="msmedoc"/>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
+
+                                            <div class="form-group">
+                                                <label>Street Address *</label>
+                                                <input type="text" class="form-control" placeholder="Enter Street Address *" id="address" title="Only (a-z) letters are allowed." required name="streetaddress" value="{{storeobj.streetaddress|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Near by Address *</label>
+                                                <input type="text" class="form-control" placeholder="Enter Near by Address *"  id='nearbyaddress' title="Only (a-z) letters are allowed." required name="nearbyaddress" value="{{storeobj.nearbyaddress|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>City *</label>
+                                                <input type="text" class="form-control" placeholder="Enter City *"  id='city' title="Only (a-z) letters are allowed." required name="city" value="{{storeobj.city|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>State *</label>
+                                                <input type="text" class="form-control" placeholder="Enter State *"  id='state' title="Only (a-z) letters are allowed." required name="state" value="{{storeobj.state|default:''}}" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Country *</label>
+                                                <input type="text" class="form-control" placeholder="Enter Country *"  id='country' title="Only (a-z) letters are allowed." required name="country" value="{{storeobj.country|default:''}}" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Pincode *</label>
+                                                <input type="text" placeholder="Enter Pincode *"  id='pincode' class="form-control" minlength="6" maxlength="6" name="pincode"  value="{{storeobj.pincode|default:''}}"/>
+                                            </div>
+                                          
+                                            <input type="hidden" placeholder="latitude *"  id='latitude' class="form-control"  name="latitude"  value="{{storeobj.latitude|default:''}}"/>
+                                            <input type="hidden" placeholder="longitude *"  id='longitude' class="form-control" name="longitude" value="{{storeobj.longitude|default:''}}"/>
+
+                                            
+                                            <div class="form-group">
+                                                <label>PAN Card No *</label>
+                                                <input type="text" class="form-control" placeholder="PAN Number *" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" title="Please enter the correct PAN number."  name="pancardno" value="{{storeobj.pancardno|default:''}}" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label>PAN Card Image * {% if storeobj.pancarddoc %} {{storeobj.pancarddoc.url}} {% else %} {% endif %}</label>
+                                                <input type="file" class="form-control" accept="application/pdf, image/*" name="pancarddoc" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>GST No *</label>
+                                                <input type="text" class="form-control" placeholder="GST NO *"  title="Please enter the correct gstno number."  name="gstno" value="{{storeobj.gstno|default:''}}" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label>GST Image * {% if storeobj.gstnodoc %} {{storeobj.gstnodoc.url}} {% else %} {% endif %}</label>
+                                                <input type="file" class="form-control" accept="application/pdf, image/*" name="gstnodoc" />
+                                            </div>
+
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Store Opening Time *</label>
+                                                <input type="time" class="form-control" placeholder="Closing Time *" name="opening_time" required value="" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Store Closing Time *</label>
+                                                <input type="time" class="form-control" placeholder="Closing Time *" name="closing_time" required value="" />
+                                            </div>
+
                                             <div class="form-group">
                                                 <label for="closing_day">Closing Day *</label>
                                                 <select class="form-control" name="closing_day">
@@ -83,52 +185,29 @@
                                                     <option value="Sunday">Sunday</option>
                                                 </select>
                                             </div>
+                                          
+                                            
                                             <div class="form-group">
-                                                <label>Store Closing Time *</label>
-                                                <input type="time" class="form-control" placeholder="Closing Time *" name="closing_time" required value="" />
+                                                <label>Store Shipping Policy *</label>
+                                                <textarea type="text" class="form-control" placeholder="shippingpolicy *"  name="shippingpolicy" value="{{storeobj.shippingpolicy}}">{{storeobj.shippingpolicy}}</textarea>
                                             </div>
+                                            
+
                                             <div class="form-group">
-                                                <label>Store Opening Time *</label>
-                                                <input type="time" class="form-control" placeholder="Closing Time *" name="opening_time" required value="" />
+                                                <label>Store Replacement Policy *</label>
+                                                <textarea type="text" class="form-control" placeholder="replacementpolicy *"  name="replacementpolicy" value="{{storeobj.replacementpolicy}}">{{storeobj.replacementpolicy}}</textarea>
                                             </div>
+
                                             <div class="form-group">
-                                                <label>Store Banner *</label>
-                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="banner" required/>
+                                                <label>Store Returnand Refund Policy *</label>
+                                                <textarea type="text" class="form-control" placeholder="returnandrefundpolicy *" required name="returnandrefundpolicy" value="{{storeobj.description}}">{{storeobj.returnandrefundpolicy}}</textarea>
                                             </div>
-                                           
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="closing_day">Closing Day *</label>
-                                                <select class="form-control" name="closing_day">
-                                                    <option selected disabled>----select closing day----</option>
-                                                    <option value="Monday">Monday</option>
-                                                    <option value="Tuesday">Tuesday</option>
-                                                    <option value="Wednesday">Wednesday</option>
-                                                    <option value="Thursday">Thursday</option>
-                                                    <option value="Friday">Friday</option>
-                                                    <option value="Saturday">Saturday</option>
-                                                    <option value="Sunday">Sunday</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Store Closing Time *</label>
-                                                <input type="time" class="form-control" placeholder="Closing Time *" name="closing_time" required value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Store Opening Time *</label>
-                                                <input type="time" class="form-control" placeholder="Closing Time *" name="opening_time" required value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Store Banner *</label>
-                                                <input type="file" class="form-control" accept="image/png, image/jpeg" name="banner" required/>
-                                            </div>
-                                            {% for message in messages %}
-                                                <span class="message">{{message}}</span>
-                                            {% endfor %}
+
+
+                                            
                                             <input type="submit" class="btnRegister"  value="Proceed"/>
                                         </div>
-                                    </div>
+                                   </div>
                                 </form>
                             </div>
 
@@ -136,4 +215,123 @@
                     </div>
                 </div>
             </div>
+
+
+
+
+            <script>
+                $(document).ready(function(){
+                    $('#businessmaincategory').change(function(){
+                        var category_id = $(this).val();
+                        $.ajax({
+                            url: 'vendor/get_businesscategory/',
+                            data: {
+                                'category_id': category_id
+                            },
+                            dataType: 'json',
+                            success: function(data){
+                                var subcategorySelect = $('#businesscategory');
+                                subcategorySelect.empty();
+                                $.each(data, function(index, subcategory){
+                                    subcategorySelect.append('<option value="' + subcategory.id + '">' + subcategory.name + '</option>');
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+
+
+
+
+
+
+            <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&libraries=places&callback=initialize"></script>
+ 
+ 
+            <script>
+              function initialize() {
+                var input = document.getElementById('address');
+                var autocomplete = new google.maps.places.Autocomplete(input);
+          
+                autocomplete.addListener('place_changed', function () {
+                  var place = autocomplete.getPlace();
+          
+                  // Extract address components
+                  var addressComponents = place.address_components;
+          
+                  // Initialize variables for pin code, state, city, country, and nearby places
+                  var pincode = "";
+                  var state = "";
+                  var city = "";
+                  var country = "";
+                  var nearbyPlace = "";
+                  var latitude = "";
+                  var longitude = "";
+          
+                  // Iterate through address components to find specific details
+                  for (var i = 0; i < addressComponents.length; i++) {
+                    var component = addressComponents[i];
+                    var types = component.types;
+          
+                    // Fill in pin code
+                    if (types.includes('postal_code')) {
+                      pincode = component.long_name;
+                    }
+          
+                    // Fill in state
+                    if (types.includes('administrative_area_level_1')) {
+                      state = component.long_name;
+                    }
+          
+                    // Fill in city
+                    if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+                      // Remove the word "Division" from the city
+                      city = component.long_name.replace(/ Division$/, '');
+                    }
+          
+                    // Fill in country
+                    if (types.includes('country')) {
+                      country = component.long_name;
+                    }
+                  }
+          
+                    // Get latitude and longitude
+                    if (place.geometry && place.geometry.location) {
+                      latitude = place.geometry.location.lat();
+                      longitude = place.geometry.location.lng();
+                    }
+            
+          
+                   // Get nearby place
+                   if (place.geometry && place.geometry.location) {
+                      var service = new google.maps.places.PlacesService(document.createElement('div'));
+                      service.nearbySearch({
+                        location: place.geometry.location,
+                        radius: 5000, // You can adjust the radius as needed
+                        type: 'point_of_interest' // You can adjust the type as needed
+                      }, function (results, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+                          nearbyPlace = results[0].name;
+                        }
+          
+                      
+          
+                      // Update input fields
+                      document.getElementById('pincode').value = pincode;
+                      document.getElementById('state').value = state;
+                      document.getElementById('city').value = city;
+                      document.getElementById('country').value = country;
+                      document.getElementById('nearbyaddress').value = nearbyPlace;
+                      document.getElementById('latitude').value = latitude;
+                      document.getElementById('longitude').value = longitude;
+                    });
+                  }
+                });
+              }
+          
+              google.maps.event.addDomListener(window, 'load', initialize);
+            </script>
+          
+
 {% endblock %}

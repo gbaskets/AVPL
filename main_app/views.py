@@ -1,8 +1,9 @@
+import re
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import re
+from django.template.loader import render_to_string
 import random
 from django.contrib.auth.models import Group, User
 # Create your views here.
@@ -1134,13 +1135,12 @@ def login_view(request):
         if res == 'E':
             email=mobile_email
    
-            if User.objects.filter(email=email).exists():
-                chk_user = User.objects.get(email=email)
-                
-            else:
+            if not User.objects.filter(email=email).exists():
                 messages.info(request,'Incorrect Email Id')
-                return redirect('/login/')
-
+                return redirect('/login/')    
+            else:
+                chk_user = User.objects.get(email=email)
+               
         elif res == 'M' :
             mobile=mobile_email
    
@@ -1155,7 +1155,7 @@ def login_view(request):
         else:
             messages.info(request,'Incorrect Mobile No / Email !')
             return redirect('/login/')
-    
+       
         if chk_user:
             user = authenticate(request, username=chk_user.username , password=password)
             if user is not None:
@@ -1164,9 +1164,6 @@ def login_view(request):
                 login(request,user)
                 
                 if check_user_authentication(request, 'VENDOR'):
-                    if Vendor.objects.filter(user = chk_user, verified = False).exists():
-                        logout(request)
-                        return send_otp(request, 'VENDOR', chk_user)
                     return redirect('/vendor/')
                 elif check_user_authentication(request, 'CUSTOMER'):
                     return redirect('/')
@@ -1180,8 +1177,8 @@ def login_view(request):
                 messages.info(request,'Incorrect Password')
                 return redirect('/login/')   
         else:
-            pass
-    
+            messages.info(request,'Incorrect Mobile No / Email !')
+            return redirect('/login/')
     else:
         if request.user.is_authenticated:
             if check_user_authentication(request, 'VENDOR'):
@@ -1216,12 +1213,25 @@ def signup_send_otp_view(request):
             else:
                 if not UserOTP.objects.filter(email=email).exists():
                     userotp_obj=UserOTP.objects.create(email=email,otp=newotp,typeuser=typeuser)
+                    subject = 'Verify OTP for Account Registration ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                    message = render_to_string('email_template/send_otp_verify.html', {'email': email,'otp': newotp,'type_user':typeuser})
+                    to_email = email
+                    email = EmailMessage(subject, message, to=[to_email])
+                    email.content_subtype = "html"
+                    email.send()
+                    
                     return JsonResponse({'detail': 'OTP sent successfully'}, status=status.HTTP_200_OK)
                 else:
                     userotp_obj=UserOTP.objects.filter(email=email).first()
                     userotp_obj.otp=newotp 
                     userotp_obj.typeuser=typeuser
                     userotp_obj.save()
+                    subject = 'Verify OTP for Account Registration ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                    message = render_to_string('email_template/send_otp_verify.html', {'email': email,'otp': newotp,'type_user':typeuser})
+                    to_email = email
+                    email = EmailMessage(subject, message, to=[to_email])
+                    email.content_subtype = "html"
+                    email.send()
                     return JsonResponse({'detail': 'OTP sent successfully'}, status=status.HTTP_200_OK)
                 pass
 
@@ -1260,11 +1270,24 @@ def login_send_otp_view(request):
                 chk_user = User.objects.get(email=email)
                 if not UserOTP.objects.filter(email=email).exists():
                     userotp_obj=UserOTP.objects.create(email=email,otp=newotp)
+                    subject = 'Verify OTP for Account Login ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                    message = render_to_string('email_template/login_send_otp_verify.html', {'email': email,'otp': newotp})
+                    to_email = email
+                    email = EmailMessage(subject, message, to=[to_email])
+                    email.content_subtype = "html"
+                    email.send()
+                    
                     return JsonResponse({'detail': 'OTP sent successfully'}, status=status.HTTP_200_OK)
                 else:
                     userotp_obj=UserOTP.objects.filter(email=email).first()
                     userotp_obj.otp=newotp 
                     userotp_obj.save()
+                    subject = 'Verify OTP for Account Login ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                    message = render_to_string('email_template/login_send_otp_verify.html', {'email': email,'otp': newotp})
+                    to_email = email
+                    email = EmailMessage(subject, message, to=[to_email])
+                    email.content_subtype = "html"
+                    email.send()
                     return JsonResponse({'detail': 'OTP sent successfully'}, status=status.HTTP_200_OK)
                 pass
             
@@ -1314,12 +1337,24 @@ def signup_re_send_otp_view(request):
             else:
                 if not UserOTP.objects.filter(email=email).exists():
                     userotp_obj=UserOTP.objects.create(email=email,otp=newotp,typeuser=typeuser)
+                    subject = 'Verify OTP for Account Registration ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                    message = render_to_string('email_template/send_otp_verify.html', {'email': email,'otp': newotp,'type_user':typeuser})
+                    to_email = email
+                    email = EmailMessage(subject, message, to=[to_email])
+                    email.content_subtype = "html"
+                    email.send()
                     return JsonResponse({'detail': 'Resend OTP sent successfully'}, status=status.HTTP_200_OK)
                 else:
                     userotp_obj=UserOTP.objects.filter(email=email).first()
                     userotp_obj.otp=newotp 
                     userotp_obj.typeuser=typeuser
                     userotp_obj.save()
+                    subject = 'Verify OTP for Account Registration ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                    message = render_to_string('email_template/send_otp_verify.html', {'email': email,'otp': newotp,'type_user':typeuser})
+                    to_email = email
+                    email = EmailMessage(subject, message, to=[to_email])
+                    email.content_subtype = "html"
+                    email.send()
                     return JsonResponse({'detail': 'Resend OTP sent successfully'}, status=status.HTTP_200_OK)
                 pass
 
@@ -1365,12 +1400,24 @@ def login_re_send_otp_view(request):
             else:
                 if not UserOTP.objects.filter(email=email).exists():
                     userotp_obj=UserOTP.objects.create(email=email,otp=newotp,typeuser=typeuser)
+                    subject = 'Verify OTP for Account Login ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                    message = render_to_string('email_template/login_send_otp_verify.html', {'email': email,'otp': newotp})
+                    to_email = email
+                    email = EmailMessage(subject, message, to=[to_email])
+                    email.content_subtype = "html"
+                    email.send()
                     return JsonResponse({'detail': 'Resend OTP sent successfully'}, status=status.HTTP_200_OK)
                 else:
                     userotp_obj=UserOTP.objects.filter(email=email).first()
                     userotp_obj.otp=newotp 
                     userotp_obj.typeuser=typeuser
                     userotp_obj.save()
+                    subject = 'Verify OTP for Account Login ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                    message = render_to_string('email_template/login_send_otp_verify.html', {'email': email,'otp': newotp})
+                    to_email = email
+                    email = EmailMessage(subject, message, to=[to_email])
+                    email.content_subtype = "html"
+                    email.send()
                     return JsonResponse({'detail': 'Resend OTP sent successfully'}, status=status.HTTP_200_OK)
                 pass
 
@@ -1473,6 +1520,14 @@ def signup_view(request):
                             userobje.groups.add(groupobj)
                             userobje.save()
                             messages.info(request,'Your account is created sucessfully !')
+                            subject = 'Your account is created sucessfully ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                            message = render_to_string('email_template/welcome_signup.html', {'email': email,'password': password,'type_user':'CUSTOMER'})
+                            to_email = email
+                            email = EmailMessage(subject, message, to=[to_email])
+                            email.content_subtype = "html"
+                            email.send()
+                            
+                            
                         # elif chk_otp.typeuser=='VENDOR':
                         #     Vendor.objects.create(user=userobje)
                         #     userobje.groups.add('VENDOR')
@@ -1533,7 +1588,7 @@ def signup_vendor_view(request):
 
             if UserOTP.objects.filter(email=email).exists():
                 chk_otp = UserOTP.objects.get(email=email) 
-                if chk_otp.otp == otp :
+                if chk_otp.otp == int(otp) :
                     if not User.objects.filter(email=email).exists():
                         userobje=User.objects.create(username=email,email=email)
                         p=str(email)
@@ -1545,44 +1600,67 @@ def signup_vendor_view(request):
                             userobje.groups.add(groupobj)
                             userobje.save()
                             messages.info(request,'Your account is created sucessfully !')
-                        # elif chk_otp.typeuser=='VENDOR':
-                        #     Vendor.objects.create(user=userobje)
-                        #     userobje.groups.add('VENDOR')
-                        #     userobje.save()
-                        # else:
-                        #     pass
+                            subject = 'Your account is created sucessfully ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+                            message = render_to_string('email_template/welcome_signup.html', {'email': email,'password': password,'type_user':'VENDOR'})
+                            to_email = email
+                            email = EmailMessage(subject, message, to=[to_email])
+                            email.content_subtype = "html"
+                            email.send()
+                                                    
+                            if userobje is not None:
+                                login(request,userobje)
+                                return redirect('/vendor/')
+                            else:
+                                return redirect('/login/')
+                        else:
+                            pass
                         
                     else:
                         messages.warning(request,'Already Registered')
-                        return redirect('/signup/')
+                        return redirect('/signup-vendor/')
                  
                 else:
                     messages.warning(request,'Incorrect OTP')
-                    return redirect('/signup/')
+                    return redirect('/signup-vendor/')
                            
             else:
                 messages.warning(request,'Incorrect Email Id')
-                return redirect('/signup/')
+                return redirect('/signup-vendor/')
 
         elif res == 'M' :
             mobile=mobile_email
 
             if UserOTP.objects.filter(mobile=mobile).exists():
                 chk_otp = UserOTP.objects.get(mobile=mobile)
-                if not User.objects.filter(username=mobile).exists():
-                    userobje=User.objects.create(username=mobile)
-                    p=str(mobile)
-                    password=f"{mobile[:3]}@321"
-                    userobje.set_password(password)
-                    if chk_otp.typeuser=='VENDOR':
-                        Customer.objects.create(user=userobje)
-                        groupobj = Group.objects.get(name='VENDOR')
-                        userobje.groups.add(groupobj)
-                        userobje.save()
-                        messages.info(request,'Your account is created sucessfully !')
+                if chk_otp.otp == int(otp) :
+                    if not User.objects.filter(username=mobile).exists():
+                        userobje=User.objects.create(username=mobile)
+                        p=str(mobile)
+                        password=f"{mobile[:3]}@321"
+                        userobje.set_password(password)
+                        if chk_otp.typeuser=='VENDOR':
+                            Customer.objects.create(user=userobje)
+                            groupobj = Group.objects.get(name='VENDOR')
+                            userobje.groups.add(groupobj)
+                            userobje.save()
+                            messages.info(request,'Your account is created sucessfully !')
+                            if userobje is not None:
+                                login(request,userobje)
+                                return redirect('/vendor/')
+                            else:
+                                return redirect('/login/')
+                        else:
+                            pass
+                    else:
+                        messages.warning(request,'Already Registered')
+                        return redirect('/signup-vendor/')
+                 
+                else:
+                    messages.warning(request,'Incorrect OTP')
+                    return redirect('/signup-vendor/')                         
             else:
                 messages.warning(request,'Incorrect Mobile No')
-                return redirect('/signup/')
+                return redirect('/signup-vendor/')
         else:
             pass   
 

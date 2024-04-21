@@ -4,6 +4,7 @@ from admin_app.views import *
 from admin_app.utils import *
 
 urlpatterns = [
+    path('', admin_login),
     path('dashboard', admin_dashboard),
     path('show', admin_show),
     path('bussiness-main-categories', admin_bussiness_main_categories),
@@ -15,12 +16,12 @@ urlpatterns = [
     path('edit-bussiness-categories/<int:id>', admin_edit_bussiness_categories, name="edit-bussiness-categories"),
     path('delete-bussiness-categories/<int:id>', admin_delete_bussiness_categories, name="delete-bussiness-categories"),
 
-    path('productcategories', admin_product_categories),
-    path('', admin_login),
-    path('productcategories', admin_product_categories),
+    path('product-categories', admin_product_categories),
+    path('add-product-categories', admin_add_product_categories),
+    path('edit-product-categories/<int:id>', admin_edit_product_categories, name="edit-product-categories"),
+    path('delete-product-categories/<int:id>', admin_delete_product_categories, name="delete-product-categories"),
+    
     path('admin_pv', admin_pv_wallet),
-    path('deleteproductcategory', admin_delete_product_category),
-    path('editproductcategory', admin_edit_product_category),
     path('productsubcategories', admin_product_sub_categories),
     path('editproductsubcategory', admin_edit_product_sub_categories),
     path('deleteproductsubcategory', admin_delete_product_sub_category),

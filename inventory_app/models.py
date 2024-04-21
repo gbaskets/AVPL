@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 from django.utils.safestring import mark_safe
 from ckeditor.fields import RichTextField
-
+from admin_app.models import *
 ## Image
 import imghdr
 from io import BytesIO
@@ -31,15 +31,15 @@ def compressImage(product_img):
 
 
 class ProductCategory(models.Model):
-	name = models.CharField(max_length=255)
-	image = models.FileField(upload_to='inventory/category', null=True,blank=True)
-	isactive = models.BooleanField(default=True)
-	createdat = models.DateTimeField(auto_now_add=True)
-	updatedon = models.DateTimeField(auto_now=True)
-	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
-	
-	def __str__(self):
-		return self.name
+    name = models.CharField(max_length=255)
+    image = models.FileField(upload_to='inventory/category', null=True,blank=True)
+    isactive = models.BooleanField(default=True)
+    createdat = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+    updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+    def __str__(self):
+        return self.name
 
 class ProductSubCategory(models.Model):
 	category = models.ForeignKey(to=ProductCategory, on_delete=models.CASCADE)

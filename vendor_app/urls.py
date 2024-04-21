@@ -8,6 +8,7 @@ urlpatterns = [
     path('order_status_updates',order_status_updates,name='order_status_updates'),
     path('verification', vendor_doc),
     path('storeinfo', store_info),
+    path('get_businesscategory', get_businesscategory),
   
     path('addproduct', add_product),
     path('addproductimages', add_product_images),
