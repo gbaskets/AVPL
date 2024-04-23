@@ -39,20 +39,22 @@
                                              <th>Mobile</th>
                                              <th>Gender</th>
                                              <th>DOB</th>
-                                             <th>Address</th>
-                                             <!-- <th>Aadhar</th>
-                                             <th>Front/Back Aadhar</th> -->
-                                             <th>GST Number</th>
-                                             <th>MSME Number</th>
-                                             <th>PAN Number</th>
-                                             <th>PAN Image</th>
-                                             <th>Shipping Policy</th>
-                                             <th>Return Policy</th>
-                                             <th>Bank Account Number</th>
-                                             <th>Bank Name</th>
-                                             <th>IFSC</th>
-                                             <th>Passbook</th>
-                                             <th>Razorpay ID</th>
+                                             <th>Address Details</th>
+                                              <th>Id Proof</th>
+                                            
+                                              <th>Address Proof</th>
+                                              <th>Store Name</th>
+                                              <th>Store Details</th>
+                                             
+                                              <th>PAN</th>
+                                            
+                                             <th>GST</th>
+                                             
+                                             <th>MSME Details</th>
+                                            
+                                             <th>Policy Details</th>
+                                           
+                                             <th>Bank Details</th>
                                              <th>Request for AVPL Vendor</th>
                                              <th>Action</th>
                                           
@@ -61,38 +63,37 @@
                                        <tbody>
                                           {% for x in data %}
                                           <tr>
-                                             <td>{{ x.firstname|safe }} {{ x.lastname|safe }}</td>
-                                             <td>{{ x.mobile|safe }}</td>
-                                             <td>{{ x.gender|safe }}</td>
-                                             <td>{{ x.dob|date:"d/m/y" }}</td>
-                                             <td> <a  class="btn btn-secondary" data-toggle="modal" data-target="#AddressModal{{x.id}}">View Address</a></td>
+                                             <td>{{ x.vendor.firstname|safe }} {{ x.vendor.lastname|safe }}</td>
+                                             <td>{{ x.vendor.mobile|safe }}</td>
+                                             <td>{{ x.vendor.gender|safe }}</td>
+                                             <td>{{ x.vendor.dob|date:"d/m/y" }}</td>
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#AddressModal{{x.vendor.id}}">Address Details</a></td>
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#IdProofModal{{x.vendor.id}}">Id Proof</a></td>
    
-                                             
-                                             <td>{{ x.gstno|safe }}</td>
-                                             <td>{{ x.vendordocs.store_msme|safe }}</td>
-                                             <td>{{ x.vendordocs.pancard|safe }}</td>
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#AddressProofModal{{x.vendor.id}}">Address Proof</a></td>
+                                             <td>{{ x.storename|safe }}</td>
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#StoreDetailsModal{{x.vendor.id}}">Store Details</a></td>
+   
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#PANModal{{x.vendor.id}}">PAN</a></td>
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#GSTModal{{x.vendor.id}}">GST</a></td>
+   
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#MSMEDetailsModal{{x.vendor.id}}">MSME Details</a></td>
+   
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#PolicyDetailsModal{{x.vendor.id}}">Policy Details</a></td>
+   
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#BankDetailsModal{{x.vendor.id}}">Bank Details</a></td>
+   
+                                            
+                                            
+                                            
+                                            
+                                 
                                              <td>
-                                                <a href="{{ x.vendordocs.pancard_image.url|safe }}" class="btn btn-success btn-icon icon-left">PAN Card</a>
-                                             </td>
-                                             <td>
-                                                <a href="{{ x.vendordocs.shiping_policy.url|safe }}" class="btn btn-success btn-icon icon-left">Shipping Policy</a>
-                                             </td>
-                                             <td>
-                                                <a href="{{ x.vendordocs.return_policy.url|safe }}" class="btn btn-success btn-icon icon-left">Return Policy</a>
-                                             </td>
-                                             <td>{{ x.vendordocs.bank_account_number|safe }}</td>
-                                             <td>{{ x.vendordocs.bank_name|safe }}</td>
-                                             <td>{{ x.vendordocs.bank_ifsc|safe }}</td>
-                                             <td>
-                                                <a href="{{ x.vendordocs.bank_passbook.url|safe }}" class="btn btn-success btn-icon icon-left">Bank Passbook</a>
-                                             </td>
-                                             <td>{{ x.vendordocs.razorpay_id|safe }}</td>
-                                             <td>
-                                                <a href="/admins/activateisavplvendor?id={{ x.id|safe }}" class="btn btn-info btn-icon icon-left">Approved for AVPL Vendor</a>
+                                                <a href="/admins/activateisavplvendor?id={{ x.vendor.id|safe }}" class="btn btn-info btn-icon icon-left">Approved for AVPL Vendor</a>
                                               
                                              </td>
                                              <td>
-                                                <a href="/admins/activatevendor?id={{ x.id|safe }}" class="btn btn-primary btn-icon icon-left">Activate Vendor</a>
+                                                <a href="/admins/activatevendor?id={{ x.vendor.id|safe }}" class="btn btn-primary btn-icon icon-left">Activate Vendor</a>
                                               
                                              </td>
                                           
@@ -113,8 +114,8 @@
 
 
 {% for x in data %}
- <!-- Modal -->
- <div class="modal fade" id="AddressModal{{x.id}}" tabindex="-1" role="dialog" aria-labelledby="AddressModal{{x.id}}Label" aria-hidden="true">
+ <!-- Address Modal -->
+ <div class="modal fade" id="AddressModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="AddressModal{{x.vendor.id}}Label" aria-hidden="true">
    <div class="modal-dialog" role="document">
      <div class="modal-content">
       
@@ -142,10 +143,353 @@
        <div class="modal-footer">
          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
        </div>
-      </form>
+    
      </div>
    </div>
  </div>
+
+ <!-- Id Proof Modal -->
+ <div class="modal fade" id="IdProofModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="IdProofModal{{x.vendor.id}}Label" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+      
+       <div class="modal-header">
+         <h5 class="modal-title" id="IdProofModal{{x.vendor.id}}Label">Address of {{x.vendor.firstname}} {{x.vendor.lastname}} :</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+       
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  Id Proof Type of Vendor : {{x.vendor.idproof|default:''}} <br>
+                  Id Proof No of Vendor : {{x.vendor.idno|default:''}} <br>
+                  Id Proof Doc of Vendor : {% if x.vendor.frontidproofdoc %}   <a href="{{x.vendor.frontidproofdoc.url}}"> <img alt="image" src="{{x.vendor.frontidproofdoc.url}}"  height="250" weight="300" /></a>
+                  {% else %}  {% endif %}<br>
+                  {% if x.vendor.backidproofdoc %}   <a href="{{x.vendor.backidproofdoc.url}}"> <img alt="image" src="{{x.vendor.backidproofdoc.url}}"  height="250" weight="300" /></a>
+                  {% else %}  {% endif %}
+                  <br>
+                
+               </div>
+            </div>
+            
+
+         </div>
+   
+                    
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+       </div>
+    
+     </div>
+   </div>
+ </div>
+
+  <!-- Address Proof Modal -->
+  <div class="modal fade" id="AddressProofModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="AddressProofModal{{x.vendor.id}}Label" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+      
+       <div class="modal-header">
+         <h5 class="modal-title" id="AddressProofModal{{x.vendor.id}}Label">Address Proof of {{x.vendor.firstname}} {{x..vendor.lastname}} :</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+       
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+            
+                  Address Proof Type of Vendor : {{x.vendor.addressproof|default:''}} <br>
+                  Address Proof No of Vendor : {{x.vendor.addressno|default:''}} <br>
+                  Address Proof Doc of Vendor : {% if x.vendor.frontaddressproofdoc %}   <a href="{{x.vendor.frontaddressproofdoc.url}}"> <img alt="image" src="{{x.vendor.frontaddressproofdoc.url}}"  height="250" weight="300" /></a>
+                  {% else %}  {% endif %}<br>
+                  {% if x.vendor.backddressproofdoc %}   <a href="{{x.vendor.backddressproofdoc.url}}"> <img alt="image" src="{{x.vendor.backddressproofdoc.url}}"  height="250" weight="300" /></a>
+                  {% else %}  {% endif %}
+                  <br>
+                
+               </div>
+            </div>
+            
+
+         </div>
+   
+                    
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+       </div>
+    
+     </div>
+   </div>
+ </div>
+
+  <!-- Store Details Modal -->
+  <div class="modal fade" id="StoreDetailsModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="StoreDetailsModal{{x.vendor.id}}Label" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+      
+       <div class="modal-header">
+         <h5 class="modal-title" id="StoreDetailsModal{{x..vendor.id}}Label">Store Details of {{x.vendor.firstname}} {{x.vendor.lastname}} :</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+       
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  Store Name : {{x.storename}} <br>
+                  Store Description : {{x.description}} <br>
+                  Store Registration Type : {{x.storeregistrationtype}} <br>
+                  Registration No : {{x.registrationno}} <br>
+                  Registration QR : {% if x.registrationqrcode %}   <a href="{{x.registrationqrcode.url}}"> <img alt="image" src="{{x.registrationqrcode.url}}"  height="250" weight="300" /></a>
+                  {% else %}  {% endif %} <br>
+                  Business Main Category : {{x.businessmaincategory}} <br>
+                  Business Category :  {% if x.businesscategory %}
+                                       {% for b in x.businesscategory.all %}
+                                       {{b.title}} ,
+                                       {% endfor %}
+                                       {% else %}
+                                       {% endif %} <br>
+                  Store Closing Day : {{x.closingday}} <br>
+                  Store Closing Time : {{x.closingtime}} <br>
+                  Store Opening Time : {{x.openingtime}} <br>
+                  
+                  Store Address : {{x.streetaddress}} , {{x.nearbyaddress}} ,{{x.city}},{{x.state}},{{x.country}} - {{x.pincode}} <br>
+      
+                  Store Logo : {% if x.logo %}   <a href="{{x.logo.url}}"> <img alt="image" src="{{x.logo.url}}"  height="100" weight="150" /></a>
+                  {% else %}  {% endif %} <br>
+                  Store Banner : {% if x.banner %}   <a href="{{x.banner.url}}"> <img alt="image" src="{{x.banner.url}}"  height="250" weight="300" /></a>
+                  {% else %}  {% endif %} <br>
+                
+               </div>
+            </div>
+            
+
+         </div>
+   
+                    
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+       </div>
+    
+     </div>
+   </div>
+ </div>
+   <!-- PAN Modal -->
+   <div class="modal fade" id="PANModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="PANModal{{x.vendor.id}}Label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+         
+          <div class="modal-header">
+            <h5 class="modal-title" id="AddressModal{{x.vendor.id}}Label">PAN Details of {{x.vendor.firstname}} {{x.vendor.lastname}} - {{x.storename}} :</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+          
+            <div class="row">
+               <div class="col-lg-12 col-md-12 col-sm-12">
+                  <div class="form-group">
+                     PAN No of Vendor : {{x.vendor.pancardno|default:''}} <br>
+                     PAN Doc of Vendor : {% if x.vendor.pancarddoc %}   <a href="{{x.vendor.pancarddoc.url}}"> <img alt="image" src="{{x.vendor.pancarddoc.url}}"  height="250" weight="300" /></a>
+                     {% else %}  {% endif %}
+                     <br>
+                     <br>
+                   
+                     PAN No of Store : {{x.pancardno|default:''}} <br>
+                     PAN Doc of Store : {% if x.pancarddoc %}   <a href="{{x.pancarddoc.url}}"> <img alt="image" src="{{x.pancarddoc.url}}"  height="250" weight="300" /></a>
+                     {% else %}  {% endif %}
+                   
+                    
+                  </div>
+               </div>
+               
+   
+            </div>
+      
+                       
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+       
+        </div>
+      </div>
+   </div>
+
+    <!-- GST Modal -->
+    <div class="modal fade" id="GSTModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="GSTModal{{x.vendor.id}}Label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+         
+          <div class="modal-header">
+            <h5 class="modal-title" id="GSTModal{{x.vendor.id}}Label">GST Details of {{x.vendor.firstname}} {{x.vendor.lastname}} - {{x.storename}} :</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+          
+            <div class="row">
+               <div class="col-lg-12 col-md-12 col-sm-12">
+                  <div class="form-group">
+                     
+                     GST No of Vendor : {{x.vendor.gstno|default:''}} <br>
+                     GST Doc of Vendor : {% if x.vendor.gstnodoc %}   <a href="{{x.vendor.gstnodoc.url}}"> <img alt="image" src="{{x.vendor.gstnodoc.url}}"  height="250" weight="300" /></a>
+                     {% else %}  {% endif %}
+                     <br>
+                     <br>
+                   
+                     GST No of Store : {{x.gstno|default:''}} <br>
+                     GST Doc of Store : {% if x.gstnodoc %}   <a href="{{x.gstnodoc.url}}"> <img alt="image" src="{{x.gstnodoc.url}}"  height="250" weight="300" /></a>
+                     {% else %}  {% endif %}
+                   
+                    
+                   
+                  </div>
+               </div>
+               
+   
+            </div>
+      
+                       
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+       
+        </div>
+      </div>
+   </div>
+
+    <!-- MSME Details Modal -->
+    <div class="modal fade" id="MSMEDetailsModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="MSMEDetailsModal{{x.vendor.id}}Label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+         
+          <div class="modal-header">
+            <h5 class="modal-title" id="AddressModal{{x.vendor.id}}Label">MSME Details of {{x.storename}} :</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+          
+            <div class="row">
+               <div class="col-lg-12 col-md-12 col-sm-12">
+                  <div class="form-group">
+                     MSME No : {{x.msmeno|default:''}} <br>
+                     MSME Doc : {% if x.msmedoc %}   <a href="{{x.msmedoc.url}}"> <img alt="image" src="{{x.msmedoc.url}}"  height="250" weight="300" /></a>
+                     {% else %}  {% endif %}
+                   
+                    
+                  </div>
+               </div>
+               
+   
+            </div>
+      
+                       
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+       
+        </div>
+      </div>
+   </div>
+
+    <!-- Policy Details Modal -->
+    <div class="modal fade" id="PolicyDetailsModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="PolicyDetailsModal{{x.vendor.id}}Label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+         
+          <div class="modal-header">
+            <h5 class="modal-title" id="AddressModal{{x.vendor.id}}Label">Policy Details of {{x.storename}} :</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+          
+            <div class="row">
+               <div class="col-lg-12 col-md-12 col-sm-12">
+                  <div class="form-group">
+                     Shipping Policy : {{x.shippingpolicy|default:''}} <br>
+                     <br>
+                     Replacement Policy : {{x.replacementpolicy|default:''}} <br>
+                     <br>
+                     Returnand Refund Policy : {{x.returnandrefundpolicy|default:''}} 
+
+                   
+                  </div>
+               </div>
+               
+   
+            </div>
+      
+                       
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+       
+        </div>
+      </div>
+   </div>
+
+
+    <!-- Bank Details Modal -->
+    <div class="modal fade" id="BankDetailsModal{{x.vendor.id}}" tabindex="-1" role="dialog" aria-labelledby="BankDetailsModal{{x.vendor.id}}Label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+         
+          <div class="modal-header">
+            <h5 class="modal-title" id="BankDetailsModal{{x.vendor.id}}Label">Bank Details of {{x.firstname|default:''}} {{x.lastname|default:''}} :</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+          
+            <div class="row">
+               <div class="col-lg-12 col-md-12 col-sm-12">
+                  <div class="form-group">
+                  
+                     Bank Name : {{x.vendor.bankname|default:''}} <br>
+                     Bank IFSE Code : {{x.vendor.bankifsc|default:''}} <br>
+                     Bank Holder Name : {{x.vendor.bankholder|default:''}}<br>
+                     Bank Account No : {{x.vendor.bankaccountno|default:''}}<br>
+                     Bank Doc : {% if x.vendor.bankdoc %}   <a href="{{x.vendor.bankdoc.url}}"> <img alt="image" src="{{x.vendor.bankdoc.url}}"  height="250" weight="300" /></a>
+                     {% else %}  {% endif %}
+                   
+                  </div>
+               </div>
+               
+   
+            </div>
+      
+                       
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+       
+        </div>
+      </div>
+   </div>
+
+
 {% endfor %}
             
 {% endblock %}

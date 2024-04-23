@@ -626,7 +626,7 @@ def admin_vendor_verification(request):
 
 		dic = {
 			'categories':ProductCategory.objects.all(),
-			'data':Vendor.objects.filter(docsubmitted=True, verified=False),
+			'data':Store.objects.filter(vendor__docsubmitted=True, vendor__verified=False),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
