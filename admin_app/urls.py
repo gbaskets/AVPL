@@ -28,7 +28,7 @@ urlpatterns = [
     path('productsubsubcategories', admin_product_sub_sub_categories),
     path('editproductsubsubcategory', admin_edit_product_sub_sub_categories),
     path('deleteproductsubsubcategory', admin_delete_product_sub_sub_category),
-    path('kycrequests', admin_kyc_requests),
+    path('vendor-verification', admin_vendor_verification),
     path('activatevendor', admin_activate_vendor),
     path('activateisavplvendor', admin_activate_approved_avpl_vendor),
     path('point/', admin_point_value),

@@ -168,7 +168,7 @@ def get_dic(request):
 	}
 	if request.user.is_authenticated:
 		#print(request.user.role.level.level)
-		if request.user.role.level.level == 'User':
+		if request.user.role.level.level == 'C':
 			user = UserData.objects.get(user=request.user)
 			request.session['lat'] = user.latitude
 			request.session['lng'] = user.longitude

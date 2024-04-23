@@ -31,32 +31,37 @@
                                             <div class="form-group">
                                                 <label for="businessmaincategory">Business Main Category *</label>
                                                 <select class="form-control" id="businessmaincategory" name="businessmaincategory">
-                                                    {% if store.businessmaincategory %}
-                                                    <option value="{{store.businessmaincategory}}" selected>{{store.businessmaincategory.title}}</option>
+                                                 
+                                                    {% if storeobj.businessmaincategory %}
+                                                    <option value="{{storeobj.businessmaincategory.id}}" selected>{{storeobj.businessmaincategory.title}}</option>
                                                     {% else %}
                                                     {% endif %}
                                                    
-                                                    <option value="" disable>-- select businessmaincategory --</option>
+                                                    <option value="" disable>-- Select Business Main Category --</option>
                                                     {% for b in businessmaincategory_obj %}
-                                                    <option value="{{b}}">{{b.title}}</option>
+                                                    <option value="{{b.id}}">{{b.title}}</option>
                                                     {% endfor %}
+                                                   
                                                    
                                                 </select>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label for="businesscategory">Business Category *</label>
-                                                    <select class="form-control" id="businesscategory" name="businesscategory">
-                                                        {% if store.businesscategory %}
-                                                        <option value="{{store.businesscategory}}" selected>{{store.businesscategory.title}}</option>
+                                                    <select class="form-control" name="businesscategory" id="businesscategory_id" multiple size="2">
+                                                        
+                                                        {% if storeobj.businesscategory %}
+                                                        {% for b in storeobj.businesscategory.all %}
+                                                        <option value="{{b.id}}" selected>{{b.title}}</option>
+                                                        {% endfor %}
                                                         {% else %}
                                                         {% endif %}
-                                                        <option value="" disable>-- select businesscategory --</option>
-                                                        {% for b in businesscategory_obj %}
-                                                        <option value="{{b}}">{{b.title}}</option>
-                                                        {% endfor %}
+                                                        <option value="" disabled>Select Business Category</option>
+                                
                                                        
                                                     </select>
+                                                    
+                                                  
                                                     </div>
                                             
                                          
@@ -64,6 +69,7 @@
                                                 <label>Store Description *</label>
                                                 <textarea type="text" class="form-control" placeholder="Description *" required name="description" value="{{storeobj.description}}">{{storeobj.description}}</textarea>
                                             </div>
+                                            
                                             {% if storeobj.registrationno %}
                                             <div class="form-group">
                                                 <label>Registration Number *</label>
@@ -72,7 +78,7 @@
                                             <div class="form-group">
                                                 <label>Registration QR *</label>
                                                 {% if storeobj.registrationno %}
-                                               {{storeobj.registrationqrcode.url}}
+                                               <a href="{{storeobj.registrationqrcode.url}}"> <img alt="image" src="{{storeobj.registrationqrcode.url}}"  height="100" weight="150" /></a>
                                                {% else %}
                                                {% endif %}
                                             </div>
@@ -80,17 +86,29 @@
                                             {% endif %}
                                             <div class="form-group">
                                                 <label>Store Logo *</label>
+                                                {% if storeobj.logo %}
+                                                <a href="{{storeobj.logo.url}}"> <img alt="image" src="{{storeobj.logo.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file" class="form-control" accept="image/png, image/jpeg" name="logo" />
                                             </div>
                                             <div class="form-group">
                                                 <label>Store Banner *</label>
+                                                {% if storeobj.banner %}
+                                                <a href="{{storeobj.banner.url}}"> <img alt="image" src="{{storeobj.banner.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file" class="form-control" accept="image/png, image/jpeg" name="banner" />
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="storeregistrationtype">Store Registration Type *</label>
                                                 <select class="form-control" name="storeregistrationtype">
-                                                    <option selected disabled>----select storeregistrationtype----</option>
+                                                    {% if storeobj.storeregistrationtype %}
+                                                    <option selected value="{{storeobj.storeregistrationtype}}"> {{storeobj.storeregistrationtype}}</option>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <option  disabled>----select storeregistrationtype----</option>
                                                     <option value="Proprietorship">Proprietorship</option>
                                                     <option value="Partnerships">Partnerships</option>
                                                     <option value="Private Limited">Private Limited</option>
@@ -103,8 +121,11 @@
                                                 <input type="text" placeholder="Enter MSM No *"  id='msmeno' class="form-control"  name="msmeno"  value="{{storeobj.msmeno|default:''}}"/>
                                             </div>
                                             <div class="form-group">
-                                                <label>MSM No *</label>
-                                         
+                                                <label>MSM Doc *</label>
+                                                {% if storeobj.msmedoc %}
+                                                <a href="{{storeobj.msmedoc.url}}"> <img alt="image" src="{{storeobj.msmedoc.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file"  class="form-control" accept="image/png, image/jpeg"   id='msmedoc' class="form-control"  name="msmedoc"/>
                                             </div>
                                         </div>
@@ -146,7 +167,11 @@
                                             </div>
                                             
                                             <div class="form-group">
-                                                <label>PAN Card Image * {% if storeobj.pancarddoc %} {{storeobj.pancarddoc.url}} {% else %} {% endif %}</label>
+                                                <label>PAN Card Image *</label>
+                                                {% if storeobj.pancarddoc %}
+                                                <a href="{{storeobj.pancarddoc.url}}"> <img alt="image" src="{{storeobj.pancarddoc.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file" class="form-control" accept="application/pdf, image/*" name="pancarddoc" />
                                             </div>
 
@@ -156,7 +181,11 @@
                                             </div>
                                             
                                             <div class="form-group">
-                                                <label>GST Image * {% if storeobj.gstnodoc %} {{storeobj.gstnodoc.url}} {% else %} {% endif %}</label>
+                                                <label>GST Image *</label>
+                                                {% if storeobj.gstnodoc %}
+                                                <a href="{{storeobj.gstnodoc.url}}"> <img alt="image" src="{{storeobj.gstnodoc.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file" class="form-control" accept="application/pdf, image/*" name="gstnodoc" />
                                             </div>
 
@@ -165,17 +194,21 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Store Opening Time *</label>
-                                                <input type="time" class="form-control" placeholder="Closing Time *" name="opening_time" required value="" />
+                                                <input type="time" class="form-control" placeholder="Closing Time *" name="opening_time" required value="{{storeobj.openingtime|time:'H:i' }}" />
                                             </div>
                                             <div class="form-group">
                                                 <label>Store Closing Time *</label>
-                                                <input type="time" class="form-control" placeholder="Closing Time *" name="closing_time" required value="" />
+                                                <input type="time" class="form-control" placeholder="Closing Time *" name="closing_time" required value="{{ storeobj.closingtime|time:'H:i' }}" />
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="closing_day">Closing Day *</label>
                                                 <select class="form-control" name="closing_day">
-                                                    <option selected disabled>----select closing day----</option>
+                                                    {% if storeobj.closingday %}
+                                                    <option selected value="{{storeobj.closingday}}">{{storeobj.closingday}}</option>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <option disabled>----select closing day----</option>
                                                     <option value="Monday">Monday</option>
                                                     <option value="Tuesday">Tuesday</option>
                                                     <option value="Wednesday">Wednesday</option>
@@ -216,7 +249,7 @@
                 </div>
             </div>
 
-
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 
             <script>
@@ -224,18 +257,17 @@
                     $('#businessmaincategory').change(function(){
                         var category_id = $(this).val();
                         $.ajax({
-                            url: 'vendor/get_businesscategory/',
-                            data: {
-                                'category_id': category_id
-                            },
-                            dataType: 'json',
-                            success: function(data){
-                                var subcategorySelect = $('#businesscategory');
-                                subcategorySelect.empty();
-                                $.each(data, function(index, subcategory){
-                                    subcategorySelect.append('<option value="' + subcategory.id + '">' + subcategory.name + '</option>');
-                                });
+                            url: '/vendor/get_businesscategory',
+                            data: { 'category_id': category_id},
+                            success:function(res){
+                                //console.log(res)
+                                let html='<option  value="" disabled>Select Business Category</option>';
+                                for(i of res.data){
+                                    html +=`<option value="${i.id}">${i.title}</option>`;
+                                }
+                                document.getElementById('businesscategory_id').innerHTML=html;
                             }
+                           
                         });
                     });
                 });

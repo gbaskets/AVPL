@@ -1,7 +1,11 @@
+import os
 from django.shortcuts import render
-
+from django.conf import settings
 # Create your views here.
 import re
+import qrcode
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -221,39 +225,174 @@ def store_info(request):
 		vendor = Vendor.objects.get(user=request.user)	
 		if request.method == 'POST':
 			vendor = Vendor.objects.get(user=request.user)
-			name = request.POST.get('name')
+			storename = request.POST.get('storename')
 			description = request.POST.get('description')
-			registrationno = request.POST.get('registrationno')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			
+			
 			logo = request.FILES.get('logo')
-			image = request.FILES.get('image')
+			banner = request.FILES.get('banner')
 			closing_day = request.POST.get('closing_day')
 			closing_time = request.POST.get('closing_time')
 			opening_time = request.POST.get('opening_time')
-			banner = request.FILES.get('banner')
-			if Store.objects.filter(name=name, registration_number=registrationno).exists():
-				messages.info(request, 'Store Already Exists')
-				return redirect('/vendor/storeinfo')
+   
+            #Doc
+			storeregistrationtype=request.POST.get('storeregistrationtype')
+			msmeno=request.POST.get('msmeno')
+			msmedoc = request.FILES.get('msmedoc')
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			gstno=request.POST.get('gstno')
+			gstnodoc = request.FILES.get('gstnodoc')
+
+			#policy
+			shippingpolicy =request.POST.get('shippingpolicy')
+			replacementpolicy = request.POST.get('replacementpolicy')
+			returnandrefundpolicy = request.POST.get('returnandrefundpolicy')
+			businessmaincategory =request.POST.get('businessmaincategory')
+			businesscategory =request.POST.getlist('businesscategory')
+
+			
+			if not Store.objects.filter(vendor = vendor,storename=storename).exists():
+				storeobj=Store.objects.create(vendor = vendor,storename=storename)
+                # Generate a random registration number
+				registration_number = f'{storeobj.vendor.mobile}{storeobj.storename.replace(" ", "")}'
+
+				# Generate QR code
+				qr = qrcode.QRCode(
+					version=1,
+					error_correction=qrcode.constants.ERROR_CORRECT_L,
+					box_size=10,
+					border=4,
+				)
+				qr.add_data(str(registration_number))
+				qr.make(fit=True)
+				qr_image = qr.make_image(fill_color="black", back_color="white")
+
+				# Define the directory to save the QR code image
+				qr_image_directory = os.path.join('store', 'qrcode')  # Relative to MEDIA_ROOT
+				os.makedirs(os.path.join(settings.MEDIA_ROOT, qr_image_directory), exist_ok=True)  # Ensure directory exists
+
+				# Save QR code image
+				qr_image_path = os.path.join(qr_image_directory, f"{registration_number}.png")
+				qr_image_full_path = os.path.join(settings.MEDIA_ROOT, qr_image_path)
+				qr_image.save(qr_image_full_path)
+
+
+				# Update storeobj with registration number and QR code path
+				storeobj.registrationno = registration_number 
+				storeobj.registrationqrcode = qr_image_path
+				storeobj.save()
 			else:
-				Store.objects.create(
-					vendor = vendor,
-					name = name,
-					description = description,
-					registration_number = reg_no,
-					closing_day = closing_day,
-					opening_time = opening_time,
-					closing_time = closing_time
+				storeobj=Store.objects.filter(vendor = vendor,storename=storename).first()
+			    
+				# Generate a random registration number
+				registration_number = f'{storeobj.vendor.mobile}{storeobj.storename.replace(" ", "")}'
+
+				# Generate QR code
+				qr = qrcode.QRCode(
+					version=1,
+					error_correction=qrcode.constants.ERROR_CORRECT_L,
+					box_size=10,
+					border=4,
 				)
-				store = Store.objects.get(vendor=vendor)
-				StoreImages.objects.create(
-					store = store,
-					logo = logo,
-					banner = banner,
-					image = image
-				)
-				Vendor.objects.filter(id=vendor.id).update(store_created=True)
-				BusinessLimit.objects.create(vendor=vendor)
-				messages.info(request, 'Store Created Successfully !!!!')
-				return redirect('/vendor/')
+				qr.add_data(str(registration_number))
+				qr.make(fit=True)
+				qr_image = qr.make_image(fill_color="black", back_color="white")
+
+				# Define the directory to save the QR code image
+				qr_image_directory = os.path.join('store', 'qrcode')  # Relative to MEDIA_ROOT
+				os.makedirs(os.path.join(settings.MEDIA_ROOT, qr_image_directory), exist_ok=True)  # Ensure directory exists
+
+				# Save QR code image
+				qr_image_path = os.path.join(qr_image_directory, f"{registration_number}.png")
+				qr_image_full_path = os.path.join(settings.MEDIA_ROOT, qr_image_path)
+				qr_image.save(qr_image_full_path)
+
+
+				# Update storeobj with registration number and QR code path
+				storeobj.registrationno = registration_number 
+				storeobj.registrationqrcode = qr_image_path
+				storeobj.save()
+				
+			if businessmaincategory:
+				businessmaincategory_obj=BusinessMainCategory.objects.filter(id=businessmaincategory).first()
+				storeobj.businessmaincategory=businessmaincategory_obj
+			
+			if businesscategory:
+		
+				for category_id in businesscategory:
+					businesscategory_obj=BusinessCategory.objects.filter(id=category_id).first()
+					storeobj.businesscategory.add(businesscategory_obj)
+					storeobj.save()
+			if storeregistrationtype:
+				storeobj.storeregistrationtype=storeregistrationtype	
+		
+			if description:
+				storeobj.description = description
+    
+			if streetaddress:
+				storeobj.streetaddress = streetaddress
+			if nearbyaddress:	
+				storeobj.nearbyaddress =nearbyaddress
+			if pincode:
+				storeobj.pincode = pincode
+			if city:
+				storeobj.city=city
+			if state:
+				storeobj.state=state
+			if country:
+				storeobj.country=country
+			if latitude:
+				storeobj.latitude = latitude
+			if longitude:
+				storeobj.longitude = longitude
+			if logo:
+				storeobj.logo = logo
+			if banner:
+				storeobj.banner = banner
+
+			#Doc
+			if msmeno:
+				storeobj.msmeno=msmeno
+			if msmedoc:
+				storeobj.msmedoc = msmedoc
+			if pancardno:
+				storeobj.pancardno=pancardno
+			if pancarddoc:
+				storeobj.pancarddoc = pancarddoc
+			if gstno:
+				storeobj.gstno=gstno
+			if gstnodoc:
+				storeobj.gstnodoc = gstnodoc
+
+				#policy
+			if shippingpolicy:
+				storeobj.shippingpolicy =shippingpolicy
+			if replacementpolicy:
+				storeobj.replacementpolicy = replacementpolicy
+			if returnandrefundpolicy:
+				storeobj.returnandrefundpolicy = returnandrefundpolicy
+    
+			if returnandrefundpolicy:
+				storeobj.closingday = closing_day
+			if returnandrefundpolicy:
+				storeobj.closingtime = closing_time
+			if returnandrefundpolicy:
+				storeobj.openingtime = opening_time
+			storeobj.save()
+
+			
+			Vendor.objects.filter(id=vendor.id).update(storecreated=True,docsubmitted=True)
+			messages.info(request, 'Store Created Successfully !!!!')
+			return redirect('/vendor/')
 		businessmaincategory_obj=BusinessMainCategory.objects.filter(isactive=True)
 		businesscategory_obj=BusinessCategory.objects.filter(isactive=True)
         
@@ -385,9 +524,14 @@ def vendor_doc(request):
 		else:
 			if Vendor.objects.filter(user=request.user).exists():
 				vendor_obj=Vendor.objects.filter(user=request.user).first()
-			
+				if vendor_obj.storecreated ==True and vendor_obj.docsubmitted == True :
+					flag=vendor_obj.docsubmitted
+				else:
+					flag=""
+                    
+			     
 				# dic = {'vendor':vendor, 'flag':vendor.doc_submitted}
-				dic={'vendor':vendor_obj}
+				dic={'vendor':vendor_obj, 'flag':flag}
 			else:
 				dic={'vendor':{}}
 
@@ -401,8 +545,9 @@ def vendor_doc(request):
 def get_businesscategory(request):
 	category_id = request.GET.get('category_id')
 	businesscategory_obj=BusinessCategory.objects.filter(isactive=True,businessmaincategory__id=category_id)
-	subcategory_list = list(businesscategory_obj.values('id', 'title'))
-	return JsonResponse(subcategory_list, safe=False)
+	subcategory_list = list(businesscategory_obj.values())
+	print(subcategory_list,'subcategory_list')
+	return JsonResponse({'data':subcategory_list})
 
 
 

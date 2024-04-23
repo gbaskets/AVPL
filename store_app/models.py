@@ -18,10 +18,14 @@ class Store(models.Model):
 	vendor = models.ForeignKey("vendor_app.Vendor", on_delete=models.CASCADE,null=True,blank=True,related_name='Vendor')
 	storename = models.CharField(max_length=250,unique=True,null=True,blank=True)
 	description = models.CharField(max_length=300,null=True,blank=True)
+	closingday = models.CharField(max_length=300,null=True,blank=True)
+	closingtime = models.TimeField(max_length=300,null=True,blank=True)
+	openingtime = models.TimeField(max_length=300,null=True,blank=True)
 	registrationno= models.CharField(max_length=255,null=True,blank=True)  
 	registrationqrcode= models.ImageField(upload_to='store/qrcode',null=True, blank=True)
 	streetaddress = models.CharField(max_length=255, null=True, blank=True)
 	nearbyaddress = models.CharField(max_length=255, null=True, blank=True)
+ 
 	pincode = models.IntegerField(null=True, blank=True)
 	city=models.CharField(max_length=255, null=True, blank=True)
 	state=models.CharField(max_length=255, null=True, blank=True)
@@ -32,6 +36,7 @@ class Store(models.Model):
 	banner = models.ImageField(upload_to='store/banner',null=True, blank=True)
 
 	#Doc
+	storeregistrationtype=models.CharField(max_length=255, null=True, blank=True)
 	msmeno=models.CharField(max_length=255, null=True, blank=True)
 	msmedoc = models.FileField(upload_to='store/msmedoc',null=True, blank=True)
 	pancardno=models.CharField(max_length=10, null=True, blank=True)

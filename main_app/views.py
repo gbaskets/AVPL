@@ -419,7 +419,8 @@ def show_parent(request):
     return HttpResponse(parents)
 
 def contact(request):
-    dic = get_dic(request)
+    # dic = get_dic(request)
+    dic={}
 
     return render(request, 'usertemplate/contectus.html', dic)
 
@@ -2139,8 +2140,8 @@ def blog(request):
             'data':Blog.objects.all(),
             'categories':ProductCategory.objects.all(),
     
-            'notification':get_notifications(request.user),
-            'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+            # 'notification':get_notifications(request.user),
+            # 'notification_len':len(Notification.objects.filter(user=request.user, isread=False)),
             }
         dic.update(get_cart_len(request))
         dic.update(get_wishlist_len(request))

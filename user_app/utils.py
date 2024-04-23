@@ -7,15 +7,13 @@ from django.utils import timezone
 
 def get_cart_len(request):
 	if request.user.is_authenticated:
-		if Cart.objects.filter(user=request.user).exists():
-			cart = Cart.objects.get(user=request.user)
+		if Cart.objects.filter(customer__user=request.user).exists():
+			cart = Cart.objects.get(customer__user=request.user)
+			cart_len=len(cart)
 		else:
-			cart = None
-		l = 0
-		for x in CartItems.objects.filter(cart=cart):
-			# l = l + x.quantity
-			l = CartItems.objects.filter(cart=cart).count()
-		dic = {'cart_len':l}
+			cart_len = 0
+		
+		dic = {'cart_len':cart_len}
 		return dic
 	else:
 		dic = {'cart_len':0}
@@ -23,15 +21,13 @@ def get_cart_len(request):
 
 def get_wishlist_len(request):
 	if request.user.is_authenticated:
-		if Wishlist.objects.filter(user=request.user).exists():
-			cart = Wishlist.objects.get(user=request.user)
+		if Wishlist.objects.filter(customer__user=request.user).exists():
+			cart = Wishlist.objects.get(customer__user=request.user)
+			wish_len=len(cart)
 		else:
-			cart = None
-		l = 0
-		for x in WishlistItems.objects.filter(wishlist=cart):
-			# l = l + x.quantity
-			l = WishlistItems.objects.filter(wishlist=cart).count()
-		dic = {'wish_len':l}
+			wish_len = 0
+		
+		dic = {'wish_len':wish_len}
 		return dic
 	else:
 		dic = {'wish_len':0}

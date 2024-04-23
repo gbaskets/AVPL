@@ -18,10 +18,10 @@
 
                    
                     {% if flag %}
-                    <div class="col-md-9 register-right">
+                    <div class="col-md-12 register-right">
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                <h3 class="register-heading">We have received your documents for KYC,<br>after verifying them we will revert you back soon....!!!!</h3>
+                                <h3 >We have received your documents for KYC,<br>after verifying them we will revert you back soon....!!!!</h3>
                             </div>
 
                         </div>
@@ -121,7 +121,11 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label>Profile Pic * {% if vendor.profilepic %} {{vendor.profilepic.url}} {% else %} {% endif %} </label>
+                                                <label>Profile Pic *</label>
+                                                {% if vendor.profilepic %}
+                                                <a href="{{vendor.profilepic.url}}"> <img alt="image" src="{{vendor.profilepic.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file" class="form-control" accept="image/png, image/jpeg" name="profilepic" />
                                             </div>
                                             
@@ -167,7 +171,11 @@
                                             </div>
                                             
                                             <div class="form-group">
-                                                <label>PAN Card Image * {% if vendor.pancarddoc %} {{vendor.pancarddoc.url}} {% else %} {% endif %}</label>
+                                                <label>PAN Card Image *</label>
+                                                {% if vendor.pancarddoc %}
+                                                <a href="{{vendor.pancarddoc.url}}"> <img alt="image" src="{{vendor.pancarddoc.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file" class="form-control" accept="application/pdf, image/*" name="pancarddoc" />
                                             </div>
 
@@ -195,11 +203,19 @@
                                                 <input type="text" class="form-control" placeholder="Enter Id Number *" name="idno" value="{{vendor.idno|default:''}}"  />
                                             </div>
                                             <div class="form-group">
-                                                <label>ID Front Image * {% if vendor.frontidproofdoc %} {{vendor.frontidproofdoc.url}} {% else %} {% endif %}</label>
+                                                <label>ID Front Image *</label>
+                                                {% if vendor.frontidproofdoc %}
+                                                <a href="{{vendor.frontidproofdoc.url}}"> <img alt="image" src="{{vendor.frontidproofdoc.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file" class="form-control" accept="application/pdf, image/*" name="frontidproofdoc" />
                                             </div>
                                             <div class="form-group">
-                                                <label>ID Back Image * {% if vendor.backidproofdoc %} {{vendor.backidproofdoc.url}} {% else %} {% endif %}</label>
+                                                <label>ID Back Image *</label>
+                                                {% if vendor.backidproofdoc %}
+                                                <a href="{{vendor.backidproofdoc.url}}"> <img alt="image" src="{{vendor.backidproofdoc.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                {% endif %}
                                                 <input type="file" class="form-control" accept="application/pdf, image/*" name="backidproofdoc" />
                                             </div>
 
@@ -224,11 +240,19 @@
                                                     <input type="text" class="form-control" placeholder="Enter Address Proof No *" name="addressno" value="{{vendor.addressno|default:''}}"  />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Addressproof Front Image * {% if vendor.frontaddressproofdoc %} {{vendor.frontaddressproofdoc.url}} {% else %} {% endif %}</label>
+                                                    <label>Addressproof Front Image *</label>
+                                                    {% if vendor.frontaddressproofdoc %}
+                                                    <a href="{{vendor.frontaddressproofdoc.url}}"> <img alt="image" src="{{vendor.frontaddressproofdoc.url}}"  height="50" weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
                                                     <input type="file" class="form-control" accept="application/pdf, image/*" name="frontaddressproofdoc" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Addressproof Back Image * {% if vendor.backddressproofdoc %} {{vendor.backddressproofdoc.url}} {% else %} {% endif %}</label>
+                                                    <label>Addressproof Back Image *</label>
+                                                    {% if vendor.backddressproofdoc %}
+                                                    <a href="{{vendor.backddressproofdoc.url}}"> <img alt="image" src="{{vendor.backddressproofdoc.url}}"  height="50" weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
                                                     <input type="file" class="form-control" accept="application/pdf, image/*" name="backddressproofdoc" />
                                                 </div>
                                           

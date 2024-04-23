@@ -486,8 +486,8 @@ def admin_product_sub_categories(request):
 			dic = {
 				'categories':ProductCategory.objects.all(),
 				'data':ProductSubCategory.objects.all(),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/product-sub-category.html', dic)
 	else:
@@ -501,8 +501,8 @@ def admin_edit_product_sub_categories(request):
 			dic = {
 				'categories':ProductCategory.objects.all(),
 				'data': ProductSubCategory.objects.filter(id=id_),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/edit-product-sub-category.html', dic)
 			
@@ -561,8 +561,8 @@ def admin_product_sub_sub_categories(request):
 				'categories':ProductCategory.objects.all(),
 				'subcategories':ProductSubCategory.objects.all(),
 				'data':ProductSubSubCategory.objects.all(),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/product-sub-sub-category.html', dic)
 	else:
@@ -577,8 +577,8 @@ def admin_edit_product_sub_sub_categories(request):
 				'categories':ProductCategory.objects.all(),
 				'subcategories':ProductSubCategory.objects.all(),
 				'data':ProductSubSubCategory.objects.filter(id=id_),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			return render(request, 'admin_app/edit-product-sub-sub-category.html', dic)
 			
@@ -601,8 +601,8 @@ def admin_edit_product_sub_sub_categories(request):
 		        'categories':ProductCategory.objects.all(),
 				'subcategories':ProductSubCategory.objects.all(),
 				'data':ProductSubSubCategory.objects.filter(id=id_),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 			messages.info(request, 'Product Sub-Sub-Category Edited Successfully !!!!')
 			return redirect('/admins/productsubsubcategories')
@@ -619,18 +619,18 @@ def admin_delete_product_sub_sub_category(request):
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
-def admin_kyc_requests(request):
+def admin_vendor_verification(request):
 	if check_user_authentication(request, 'ADMIN'):
-		vendor=Vendor.objects.filter(doc_submitted=True, is_active=False)
+		vendor=Vendor.objects.filter(docsubmitted=True, verified=False)
 		print(vendor,'VVVVVVVVVVVVVvv')
 
 		dic = {
 			'categories':ProductCategory.objects.all(),
-			'data':Vendor.objects.filter(doc_submitted=True, is_active=False),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			'data':Vendor.objects.filter(docsubmitted=True, verified=False),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/kyc-requests.html', dic)
+		return render(request, 'admin_app/vendor_verification.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
@@ -638,9 +638,9 @@ def admin_vendor_list(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
 			'categories':ProductCategory.objects.all(),
-			'data':Vendor.objects.filter(doc_submitted=True, is_active=True),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			'data':Vendor.objects.filter(docsubmitted=True, verified=True),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/vendor_list.html', dic)
 	else:
@@ -652,7 +652,7 @@ def admin_is_activate_approved_avpl_vendor(request):
 		print("printing id_ here")
 		print(id_)
 		vendor = Vendor.objects.get(id=id_)
-		Vendor.objects.filter(id=id_).update(is_AVPL_Vendor=True)
+		Vendor.objects.filter(id=id_).update(isavplvendor=True)
 		sub = 'AVPL -AVPL Vendor Approved Successfully'
 		msg = '''Hi there!
 Your AVPL Vendor Approved Successfully, you can login and create your store.
@@ -660,8 +660,8 @@ Your AVPL Vendor Approved Successfully, you can login and create your store.
 Thanks!'''
 		EmailMessage(sub,msg,to=[vendor.user.email]).send()
 		messages.success(request, 'AVPL Vendor Approved Successfully !!!!')
-		notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
-		notification(vendor.user, 'AVPL Vendor Approved Successfully.')
+		# notification(request.user, 'Vendor '+vendor.firstname+' '+vendor.lastname)
+		# notification(vendor.user, 'AVPL Vendor Approved Successfully.')
 		return redirect('/admins/vendor-list')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -672,7 +672,7 @@ def admin_is_deactivate_approved_avpl_vendor(request):
 		print("printing id_ here")
 		print(id_)
 		vendor = Vendor.objects.get(id=id_)
-		Vendor.objects.filter(id=id_).update(is_AVPL_Vendor=False)
+		Vendor.objects.filter(id=id_).update(isavplvendor=False)
 		sub = 'AVPL -AVPL Vendor Deactivate Successfully'
 		msg = '''Hi there!
 Your AVPL Vendor Deactivate Successfully.
@@ -680,8 +680,8 @@ Your AVPL Vendor Deactivate Successfully.
 Thanks!'''
 		EmailMessage(sub,msg,to=[vendor.user.email]).send()
 		messages.success(request, 'AVPL Vendor Deactivate Successfully !!!!')
-		notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
-		notification(vendor.user, 'AVPL Vendor Deactivate Successfully.')
+		# notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
+		# notification(vendor.user, 'AVPL Vendor Deactivate Successfully.')
 		return redirect('/admins/vendor-list')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -711,7 +711,7 @@ def admin_activate_approved_avpl_vendor(request):
 		print("printing id_ here")
 		print(id_)
 		vendor = Vendor.objects.get(id=id_)
-		Vendor.objects.filter(id=id_).update(is_AVPL_Vendor=True)
+		Vendor.objects.filter(id=id_).update(isavplvendor=True)
 		sub = 'AVPL -AVPL Vendor Approved Successfully'
 		msg = '''Hi there!
 Your AVPL Vendor Approved Successfully, you can login and create your store.
@@ -719,8 +719,8 @@ Your AVPL Vendor Approved Successfully, you can login and create your store.
 Thanks!'''
 		EmailMessage(sub,msg,to=[vendor.user.email]).send()
 		messages.success(request, 'AVPL Vendor Approved Successfully !!!!')
-		notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
-		notification(vendor.user, 'AVPL Vendor Approved Successfully.')
+		# notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
+		# notification(vendor.user, 'AVPL Vendor Approved Successfully.')
 		return redirect('/admins/kycrequests')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -731,7 +731,7 @@ def admin_activate_vendor(request):
 		print("printing id_ here")
 		print(id_)
 		vendor = Vendor.objects.get(id=id_)
-		Vendor.objects.filter(id=id_).update(is_active=True)
+		Vendor.objects.filter(id=id_).update(verified=True)
 		sub = 'AVPL - Vendor Account Activated Successfully'
 		msg = '''Hi there!
 Your AVPL Vendor Account has been activated successfully, you can login and create your store.
@@ -739,8 +739,8 @@ Your AVPL Vendor Account has been activated successfully, you can login and crea
 Thanks!'''
 		EmailMessage(sub,msg,to=[vendor.user.email]).send()
 		messages.success(request, 'Vendor Activated Successfully !!!!')
-		notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
-		notification(vendor.user, 'Profile Activated Successfully.')
+		# notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
+		# notification(vendor.user, 'Profile Activated Successfully.')
 		return redirect('/admins/kycrequests')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -1104,8 +1104,8 @@ def genealogyTree_level(request):
 				# 'user':UserData.objects.get(user=request.user),
 				'referals':referals,
 				# 'sponser_r':referal_obj.referrals,
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 				'referals_user':referals_user,
 				
 			}
@@ -1119,8 +1119,8 @@ def genealogyTree_level(request):
 				# 'user':UserData.objects.get(user=request.user),
 				'referals':referals,
 				# 'sponser_r':referal_obj.referrals,
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 
 		
@@ -1130,8 +1130,8 @@ def genealogyTree_level(request):
 				# 'user':UserData.objects.get(user=request.user),
 				'referals':referals,'usrpvs':usrpvs,
 				# 'sponser_r':referal_obj,
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 		return render(request, 'admin_app/genealogyTree_level.html',dic)
 	else:

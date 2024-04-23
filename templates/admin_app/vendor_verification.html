@@ -1,6 +1,6 @@
 {% extends 'admin_app/base.html' %}
 {% load static %}
-{% block title %}KYC Requests{% endblock %}
+{% block title %}Vendor's Verification{% endblock %}
 {% block main %}
             <!-- Main Content -->
             <div class="main-content">
@@ -9,10 +9,10 @@
                      <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                            <div class="section-header-breadcrumb-content">
-                              <h1>KYC Requests</h1>
+                              <h1>Vendor's Verification</h1>
                               <div class="section-header-breadcrumb">
                                  <div class="breadcrumb-item active"><a href="/admins/dashboard"><i class="fas fa-home"></i></a></div>
-                                 <div class="breadcrumb-item"><a href="#">KYC Requests</a></div>
+                                 <div class="breadcrumb-item"><a href="#">Vendor's Verification</a></div>
                               </div>
                            </div>
                         </div>
@@ -23,7 +23,7 @@
                         <div class="col-12">
                            <div class="card">
                               <div class="card-header">
-                                 <h4>Vendor KYC Requests</h4>
+                                 <h4>Vendor's Verification</h4>
                               </div>
                               <div class="card-body">
                                  <ul style="margin-bottom:20px;">
@@ -37,6 +37,8 @@
                                           <tr>
                                              <th>Name</th>
                                              <th>Mobile</th>
+                                             <th>Gender</th>
+                                             <th>DOB</th>
                                              <th>Address</th>
                                              <!-- <th>Aadhar</th>
                                              <th>Front/Back Aadhar</th> -->
@@ -59,11 +61,14 @@
                                        <tbody>
                                           {% for x in data %}
                                           <tr>
-                                             <td>{{ x.first_name|safe }} {{ x.last_name|safe }}</td>
-                                             <td>{{ x.phone|safe }}</td>
-                                             <td>{{ x.address|safe }} - {{ x.zipcode|safe }}</td>
+                                             <td>{{ x.firstname|safe }} {{ x.lastname|safe }}</td>
+                                             <td>{{ x.mobile|safe }}</td>
+                                             <td>{{ x.gender|safe }}</td>
+                                             <td>{{ x.dob|date:"d/m/y" }}</td>
+                                             <td> <a  class="btn btn-secondary" data-toggle="modal" data-target="#AddressModal{{x.id}}">View Address</a></td>
+   
                                              
-                                             <td>{{ x.vendordocs.store_gst|safe }}</td>
+                                             <td>{{ x.gstno|safe }}</td>
                                              <td>{{ x.vendordocs.store_msme|safe }}</td>
                                              <td>{{ x.vendordocs.pancard|safe }}</td>
                                              <td>
@@ -104,4 +109,43 @@
                </section>
               
             </div>
+
+
+
+{% for x in data %}
+ <!-- Modal -->
+ <div class="modal fade" id="AddressModal{{x.id}}" tabindex="-1" role="dialog" aria-labelledby="AddressModal{{x.id}}Label" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+      
+       <div class="modal-header">
+         <h5 class="modal-title" id="AddressModal{{x.id}}Label">Address of {{x.firstname}} {{x.lastname}} :</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+       
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+               <div class="form-group">
+                  {{x.streetaddress}} , {{x.nearbyaddress}} ,{{x.city}},{{x.state}},{{x.country}} - {{x.pincode}}
+                
+               </div>
+            </div>
+            
+
+         </div>
+   
+                    
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+       </div>
+      </form>
+     </div>
+   </div>
+ </div>
+{% endfor %}
+            
 {% endblock %}
