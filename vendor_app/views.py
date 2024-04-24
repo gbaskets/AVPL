@@ -44,12 +44,16 @@ def vendor_dashboard(request):
 	if check_user_authentication(request, 'VENDOR'):
 		if Vendor.objects.filter(user=request.user).exists():
 			...
+			
 			vendor = Vendor.objects.get(user=request.user)
 			if vendor.verified and vendor.storecreated :
+                
+				storeobj=Store.objects.filter(vendor=vendor).first()
+       
 
-				if not Wallet.objects.filter(user=request.user).exists():
-					Wallet.objects.create(user=request.user)
-				wallet = Wallet.objects.get(user=request.user)
+				if not Wallet.objects.filter(vendor=vendor).exists():
+					Wallet.objects.create(vendor=vendor)
+				wallet = Wallet.objects.get(vendor=vendor)
 				transactions = WalletTransaction.objects.filter(wallet=wallet)
 
 				# if not BusinessLimit.objects.filter(vendor=request.user.vendor).exists():
@@ -63,10 +67,11 @@ def vendor_dashboard(request):
 				# wallet_commission = Vendor_Wallet_Commission.objects.get(user=request.user)
 				
 							
-				dic = {'vendor':vendor, 'orders':OrderItems.objects.filter(store=request.user.vendor.store),
+				dic = {'vendor':vendor, 'storeobj':storeobj,
 				# 'notification':get_notifications(request.user),
-				'allorder_status':ORDER_STATUS_UPDATE,'wallet':wallet,'business_limit':business_limit,'wallet_commission':wallet_commission,
-				'business_limit_transactions':business_limit_transactions,
+				'allorder_status':ORDER_STATUS_UPDATE,'wallet':wallet,
+                # 'business_limit':business_limit,'wallet_commission':wallet_commission,
+				# 'business_limit_transactions':business_limit_transactions,
 				'transactions':transactions,
 				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 				}

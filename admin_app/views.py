@@ -741,7 +741,7 @@ Thanks!'''
 		messages.success(request, 'Vendor Activated Successfully !!!!')
 		# notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
 		# notification(vendor.user, 'Profile Activated Successfully.')
-		return redirect('/admins/kycrequests')
+		return redirect('/admins/vendor-verification')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
