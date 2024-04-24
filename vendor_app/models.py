@@ -14,26 +14,6 @@ from ckeditor.fields import RichTextField
 
 # # # Per Product Commission 
 
-# # class Vendor_Wallet_Commission(models.Model):
-# # 	user = models.ForeignKey(User, on_delete=models.CASCADE)
-# # 	current_balance = models.FloatField(default=0.0)
-# # 	is_active = models.BooleanField(default=False)
-	
-# # 	def __str__(self):
-# # 		return 'Wallet of '+self.user.email
-
-# # class VendorWalletTransaction(models.Model):
-# # 	vendor_wallet_commission = models.ForeignKey(Vendor_Wallet_Commission, on_delete=models.CASCADE)
-# # 	transaction_date = models.DateTimeField()
-# # 	transaction_type = models.CharField(max_length=20)
-# # 	transaction_amount = models.FloatField()
-# # 	user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True, blank= True)
-# # 	previous_amount = models.FloatField()
-# # 	remaining_amount = models.FloatField()
-	
-# 	# def __str__(self):
-# 	# 	return 'Wallet Transaction ID '+str(self.id)
-
 class Vendor(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE,related_name='Vendor')
 	mobile = models.IntegerField( null=True, blank=True)
@@ -86,25 +66,10 @@ class Vendor(models.Model):
 	def __str__(self):
 		return str(self.user) +' :'+ str(self.firstname)
 
-# class VendorWithdrawRequest(models.Model):
-# 	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vendor_withdraw_request')
-# 	request_date = models.DateTimeField()
-# 	amount = models.FloatField()
-# 	is_active = models.PositiveIntegerField(default=0)
-# 	class Meta:
-# 		db_table="VendorWithdrawRequest"
-# 	def __str__(self):
-# 		return 'Withdraw Request of '+str(self.user)
 
 
-# #Model For Business Limit Model
-# class BusinessLimit(models.Model):
-# 	vendor = models.OneToOneField(Vendor, on_delete=models.CASCADE, related_name='business_limit')
-# 	current_balance = models.FloatField(default=0.0)
-# 	class Meta:
-# 		db_table="BusinessLimit"
-# 	def __str__(self):
-# 		return 'BusinessLimit '+str(self.vendor)
+#Model For Business Limit Model
+
 
 # class Recharge_Receipt(models.Model):
 # 	receipt_date = models.DateTimeField(auto_now=True)
@@ -118,20 +83,7 @@ class Vendor(models.Model):
 # 	def __str__(self):
 # 			return "Receipt ID "+str(self.id)
 
-# #Model for Admin commision amount from Business limit(like wallet) to Admin wallet in case COD 
-# class BusinessLimitTransaction(models.Model):
-# 	business_limit=models.ForeignKey(BusinessLimit,on_delete=models.CASCADE)
-# 	receipt=models.ForeignKey(Recharge_Receipt,on_delete=models.CASCADE, null=True, blank=True)
-# 	transaction_date = models.DateTimeField()
-# 	transaction_name = models.CharField(max_length=100)
-# 	transaction_type = models.CharField(max_length=20, choices=(('CREDIT', 'CREDIT'), ('DEBIT', 'DEBIT')))
-# 	transaction_amount = models.FloatField()
-# 	previous_amount = models.FloatField()
-# 	remaining_amount = models.FloatField()
-# 	class Meta:
-# 			db_table ="BusinessLimitTransaction"
-# 	def __str__(self):
-# 			return "BusinessLimitTransaction "+str(self.business_limit)
+
 
 # #model for user subscription request
 # class UserSubscriptionRequest(models.Model):

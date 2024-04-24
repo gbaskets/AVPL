@@ -118,8 +118,8 @@ urlpatterns = [
     path('activate_is_commission_wallet', admin_activate_is_commission_wallet_vendor),
     path('deactivate_is_commission_wallet', admin_deactivate_is_commission_wallet_vendor),
     path('staff_list', staff_list,),
-    path('activate_is_active', admin_activate_is_active_staff),
-    path('deactivate_is_active', admin_deactivate_is_active_staff),
+    path('activate_is_active', admin_activate_isactive_staff),
+    path('deactivate_is_active', admin_deactivate_isactive_staff),
 
     path('staffprofile', admin_staff_profile),
     path('staff_delete', admin_staff_delete),

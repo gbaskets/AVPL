@@ -106,39 +106,12 @@ class HomeFooterBanner(models.Model):
 # 		return str(self.amount)
 
 
-#Admin Wallet	
-class CommissionWallet(models.Model):
-	currentbalance = models.FloatField(default=0.00)
-	isactive = models.BooleanField(default=True)
-	createdat = models.DateTimeField(auto_now_add=True)
-	updatedon = models.DateTimeField(auto_now=True)
-	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
-
-	def __str__(self):
-		return 'Rs '+str(self.currentbalance)+'/- Admin Commission'
-
-#Admin Wallet Transactions
-class CommissionWalletTransaction(models.Model):
-	commissionwallet = models.ForeignKey(CommissionWallet, on_delete=models.CASCADE)
-	transactiondate = models.DateTimeField()
-	transactiontype = models.CharField(max_length=20)
-	transactionamount = models.FloatField()
-	previousamount = models.FloatField()
-	remainingamount = models.FloatField()
-	isverified = models.BooleanField(default=False)
-	createdat = models.DateTimeField(auto_now_add=True)
-	updatedon = models.DateTimeField(auto_now=True)
-	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
-
-	def __str__(self):
-		return str(self.transaction_date)+' Commission Transaction'
-
 
 # class Savings(models.Model):
 # 	savings = models.FloatField(default=0.00)
 
 # 	def __str__(self):
-# # 		return 'Rs '+str(self.savings)+'/- Admin Savings'
+# 		return 'Rs '+str(self.savings)+'/- Admin Savings'
 
 # class PVPairValue(models.Model):
 # 	pairvalue = models.FloatField(default=0.00)

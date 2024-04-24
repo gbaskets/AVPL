@@ -56,8 +56,8 @@
                                           <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
                                           <h5><i class="fa fa-inr"></i> {{business_limit.current_balance|floatformat:2}}</h5>
                                           {% else %}
-                                          <h5><i class="fa fa-dashcube"></i><a href="/vendor/businesslimit"> Current Balance </a></h5> ( Business Limit Wallet) 
-                                          <span style="color:rgb(190, 4, 29);">** Not allow to order Delivered. Kindly recharge your Business Limit Wallet..</span>
+                                          <h5><i class="fa fa-dashcube"></i><a href="/vendor/businesslimit"> Current Balance </a></h5> ( Business Limit Wallet) <br>
+                                          <span style="color:rgb(190, 4, 29); font-size:5">** Not allow to order Delivered.Kindly recharge your Business Limit Wallet..</span>
                                           <hr style="border-width:5px;border-color:rgb(190, 4, 29);border-radius:20px;margin-bottm:10px;">
                                           <h5><i class="fa fa-inr"></i> {{business_limit.current_balance|floatformat:2}} </h5>
                                           {% endif %}

@@ -98,6 +98,7 @@ class PaymentTransaction(models.Model):
 class Wallet(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
+	admin = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True,related_name="admin")
 	currentbalance = models.FloatField(default=0.00)
 	isactive = models.BooleanField(default=False)
 	createdat = models.DateTimeField(auto_now_add=True)
@@ -105,7 +106,7 @@ class Wallet(models.Model):
 	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
 
 	def __str__(self):
-		return 'Wallet of '+ self.customer +  self.vendor
+		return 'Wallet of '+ ' ' + str(self.customer) + ' ' +  str(self.vendor)
 
 class WalletTransaction(models.Model):
 	wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
@@ -121,6 +122,79 @@ class WalletTransaction(models.Model):
 
 	def __str__(self):
 		return 'Wallet Transaction ID '+str(self.id)
+
+
+class BusinessLimitWallet(models.Model):
+	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
+	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
+	currentbalance = models.FloatField(default=0.00)
+	isactive = models.BooleanField(default=False)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+	def __str__(self):
+		return 'BusinessLimitWallet of '+ ' ' + str(self.customer) + ' ' +  str(self.vendor)
+
+class BusinessLimitWalletTransaction(models.Model):
+	businesslimitwallet = models.ForeignKey(BusinessLimitWallet, on_delete=models.CASCADE)
+	transactiondate = models.DateTimeField()
+	transactiontype = models.CharField(max_length=20)
+	transactionamount = models.FloatField()
+	previousamount = models.FloatField()
+	remainingamount = models.FloatField()
+	isverified = models.BooleanField(default=False)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+	def __str__(self):
+		return 'Wallet Transaction ID '+str(self.id)
+
+
+
+class WithdrawRequest(models.Model):
+	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
+	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
+	requestdate = models.DateTimeField()
+	amount = models.FloatField()
+	isactive = models.PositiveIntegerField(default=0)
+	
+	def __str__(self):
+		return 'Withdraw Request of '+str(self.vendor)
+
+
+# Wallet	
+class CommissionWallet(models.Model):
+	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
+	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
+	admin = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True,related_name="adminuser")
+	currentbalance = models.FloatField(default=0.00)
+	isactive = models.BooleanField(default=True)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+	def __str__(self):
+		return 'Commission Wallet of '+ ' ' + str(self.currentbalance) + ' ' + str(self.customer) + ' ' +  str(self.vendor)
+	
+
+# Wallet Transactions
+class CommissionWalletTransaction(models.Model):
+	commissionwallet = models.ForeignKey(CommissionWallet, on_delete=models.CASCADE)
+	transactiondate = models.DateTimeField()
+	transactiontype = models.CharField(max_length=20)
+	transactionamount = models.FloatField()
+	previousamount = models.FloatField()
+	remainingamount = models.FloatField()
+	isverified = models.BooleanField(default=False)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+	def __str__(self):
+		return str(self.transactiondate)+' Commission Transaction'
+
 
 
 class TDSLogWallet(models.Model):

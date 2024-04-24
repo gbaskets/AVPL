@@ -8,6 +8,8 @@ urlpatterns = [
     path('order_status_updates',order_status_updates,name='order_status_updates'),
     path('verification', vendor_doc),
     path('storeinfo', store_info),
+    path('profile', vendor_profile),
+    path('edit-profile', edit_vendor_profile),
     path('get_businesscategory', get_businesscategory),
   
     path('addproduct', add_product),
@@ -16,8 +18,7 @@ urlpatterns = [
     path('fetchsubcategory', fetch_sub_category),
     path('fetchsubsubcategory', fetch_sub_sub_category),
     path('productlist', vendor_product_list),
-    path('profile', vendor_profile),
-    path('edit-profile', edit_vendor_profile),
+  
     path('product', vendor_product),
     path('update-product/<int:id>/', vendor_update_product_quantity,name='update-product'),
     path('productbasicedit', vendor_product_basic_edit),

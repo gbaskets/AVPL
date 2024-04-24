@@ -189,6 +189,8 @@ class Product(models.Model):
     pv = models.FloatField(default=0.00)
     admincommission = models.FloatField(default=0.00)
     frequentlyboughttogetherproduct=models.ManyToManyField('Product',blank=True,related_name="FrequentlyBoughtTogether")
+    isproductrejected=models.BooleanField(default=False,null=True,blank=True)
+    reasonforproductrejected=models.TextField(null=True,blank=True)
     isactive = models.BooleanField(default=True)
     createdat = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)

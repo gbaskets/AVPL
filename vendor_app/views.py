@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from requests import request
+from sales_app.models import SalesOrderItems
 from vendor_app.models import *
 from main_app.models import *
 from admin_app.models import *
@@ -56,11 +57,11 @@ def vendor_dashboard(request):
 				wallet = Wallet.objects.get(vendor=vendor)
 				transactions = WalletTransaction.objects.filter(wallet=wallet)
 
-				# if not BusinessLimit.objects.filter(vendor=request.user.vendor).exists():
-				# 	BusinessLimit.objects.create(vendor=request.user.vendor)
-				# vendor = Vendor.objects.get(id=request.user.vendor.id)
-				# business_limit = BusinessLimit.objects.get(vendor=request.user.vendor)
-				# business_limit_transactions = BusinessLimitTransaction.objects.filter(business_limit=business_limit)
+				# if not BusinessLimitWallet.objects.filter(vendor=request.user.vendor).exists():
+				# 	BusinessLimitWallet.objects.create(vendor=request.user.vendor)
+				# vendor = Vendor.objects.filter(user=request.user)
+				# business_limit = BusinessLimitWallet.objects.get(vendor=request.user.vendor)
+				# business_limit_transactions = BusinessLimitWalletTransaction.objects.filter(business_limit=business_limit)
 
 				# if not Vendor_Wallet_Commission.objects.filter(user=request.user).exists():
 				# 	Vendor_Wallet_Commission.objects.create(user=request.user)
@@ -97,7 +98,7 @@ def vendor_dashboard(request):
 @csrf_exempt
 def order_status_update(request):
 
-	vendor = Vendor.objects.get(id=request.user.vendor.id)
+	vendor = Vendor.objects.filter(user=request.user)
 		
 	if request.method == "POST":
 		order_id = request.POST.get('order_id')
@@ -109,7 +110,7 @@ def order_status_update(request):
 		
 		messages.success(
 			request, f"The order status of order_id ORD{order_id} has been updated ! ")
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		if delivery_status == 'Delivered':
 			OrderItems.objects.filter(order=order_id).update(delivery_status=delivery_status, delivered_on=timezone.now())
 			users = OrderItems.objects.filter(order=order_id).first()
@@ -163,7 +164,7 @@ def order_status_update(request):
 @csrf_exempt
 def order_status_updates(request):
 
-	vendor = Vendor.objects.get(id=request.user.vendor.id)
+	vendor = Vendor.objects.filter(user=request.user)
 	if request.method == "POST":
 		order_id = request.POST.get('order_id')
 		order = Orders.objects.filter(id=order_id).first()
@@ -174,7 +175,7 @@ def order_status_updates(request):
 		
 		messages.success(
 			request, f"The order status of order_id ORD{order_id} has been updated ! ")
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		if delivery_status == 'Delivered':
 			OrderItems.objects.filter(order=order_id).update(delivery_status=delivery_status, delivered_on=timezone.now())
 			users = OrderItems.objects.filter(order=order_id).first()
@@ -564,7 +565,7 @@ def add_product(request):
 	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
+			vendor = Vendor.objects.filter(user=request.user)
 			print(vendor)
 			store = Store.objects.filter(vendor=vendor).first()
 			category = ProductCategory.objects.get(id=request.POST.get('cate'))
@@ -645,7 +646,7 @@ def add_product(request):
 		else:
 			
 			
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
+			vendor = Vendor.objects.filter(user=request.user)
 			dic = {
 				'vendor':vendor,
 				'categories':ProductCategory.objects.all(),
@@ -654,8 +655,8 @@ def add_product(request):
 				'brands':Brand.objects.all(),
 				'subsubcategories':ProductSubSubCategory.objects.all(),
 				'info':True,
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 			}
 			return render(request,'vendor_app/add-product.html', dic)
 	else:
@@ -665,7 +666,7 @@ def add_product(request):
 def add_product_images(request):
 	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
+			vendor = Vendor.objects.filter(user=request.user)
 			images = request.FILES.getlist('images')
 			product = Product.objects.get(id=request.session['product'])
 			for image in images:
@@ -677,18 +678,18 @@ def add_product_images(request):
 				'variants':Variant.objects.all(),
 				'variant':True,
 				'product':product,
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 			}
 			return render(request,'vendor_app/add-product.html', dic)
 		else:
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
+			vendor = Vendor.objects.filter(user=request.user)
 			dic = {
 				'vendor':vendor,
 				'categories':ProductCategory.objects.all(),
 				'info':True,
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 			}
 			return render(request,'vendor_app/add-product.html', dic)
 	else:
@@ -711,13 +712,13 @@ def add_product_variant(request):
 				data = data + '<tr><td>'+x.variant.name+'</td><td>'+x.variant_value.value+'</td><td>'+str(x.variant_stock)+'</td></tr>'
 			return HttpResponse(data)
 		else:
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
+			vendor = Vendor.objects.filter(user=request.user)
 			dic = {
 				'vendor':vendor,
 				'categories':ProductCategory.objects.all(),
 				'info':True,
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 			}
 			messages.success(request, 'Product has been added and added successfully. Now waiting for admin approval.')
 			return render(request,'vendor_app/add-product.html', dic)
@@ -760,12 +761,12 @@ def fetch_brands(request):
 @csrf_exempt
 def vendor_product_list(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		dic = {
 			'vendor':vendor,
-			'products':Product.objects.filter(store=vendor.store),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'products':Product.objects.filter(store__vendor__user=request.user),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/product-list.html', dic)
 	else:
@@ -773,19 +774,13 @@ def vendor_product_list(request):
 @csrf_exempt
 def vendor_profile(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
-		vendoc = VendorDocs.objects.get(vendor__user=request.user)
-		store = Store.objects.get(vendor__user=request.user)
-		images = StoreImages.objects.get(store=store)
-		vanadd = Vendor.objects.get(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		store = Store.objects.filter(vendor=vendor).first()
 		dic = {
-			'vendoc':vendoc,
-			'store':store,
-			'info':vanadd,
+			'storeobj':store,
 			'vendor':vendor,
-			'images':images,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}			
 		return render(request,'vendor_app/vendor-profile.html', dic)
 	else:
@@ -793,61 +788,260 @@ def vendor_profile(request):
 @csrf_exempt
 def edit_vendor_profile(request):
 	if check_user_authentication(request, 'VENDOR'):
-		store = Store.objects.get(vendor__user=request.user)
-		images = StoreImages.objects.get(store=store)
-		vanadd = Vendor.objects.get(user=request.user)
 		if request.method == 'POST':
-			banner = request.FILES.get('banner_update')
-			logo =  request.FILES.get('logo_update')
-			store_name =  request.POST.get('store_name')
-			description =  request.POST.get('description')
-			address =  request.POST.get('address')
-			closing_day =  request.POST.get('closing_day')
-			closing_time =  request.POST.get('closing_time')
-			opening_time =  request.POST.get('opening_time')
-			print(store_name, logo)
-			if banner and logo is None:
-				images.banner = banner
-				images.save()
-			elif logo and banner is None:
-				images.logo = logo
-				images.save()
-			elif logo and banner:
-				images.banner = banner
-				images.logo = logo
-				images.save()
-			else:
-				store.name = store_name
-				store.description = description
-				store.closing_day = closing_day
-				store.closing_time = closing_time
-				store.opening_time = opening_time
-				store.save()
-				vanadd.address = address
-				vanadd.save()
-		dic = {
-			'store':store,
-			'info':vanadd,
-			'images':images,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-		}
+			mobile = request.POST.get('mobile')
+			email = request.POST.get('email')
+			firstname= request.POST.get('firstname')
+			lastname= request.POST.get('lastname')
+			gender =  request.POST.get('gender')
+			dob= request.POST.get('dob')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			profilepic = request.FILES.get('profilepic')
+
+			#Personal User 
+   
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			idproof= request.POST.get('idproof')
+			idno= request.POST.get('idno')
+			frontidproofdoc = request.FILES.get('frontidproofdoc')
+			backidproofdoc=request.FILES.get('backidproofdoc')
+			addressproof= request.POST.get('addressproof')
+			addressno= request.POST.get('addressno')
+			frontaddressproofdoc =request.FILES.get('frontaddressproofdoc')
+			backddressproofdoc = request.FILES.get('backddressproofdoc')
+   
+			storename = request.POST.get('storename')
+			description = request.POST.get('description')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
 			
-		return render(request,'vendor_app/edit-vendor.html', dic)
+			
+			logo = request.FILES.get('logo')
+			banner = request.FILES.get('banner')
+			closing_day = request.POST.get('closing_day')
+			closing_time = request.POST.get('closing_time')
+			opening_time = request.POST.get('opening_time')
+
+			#Doc
+			storeregistrationtype=request.POST.get('storeregistrationtype')
+			msmeno=request.POST.get('msmeno')
+			msmedoc = request.FILES.get('msmedoc')
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			gstno=request.POST.get('gstno')
+			gstnodoc = request.FILES.get('gstnodoc')
+
+			#policy
+			shippingpolicy =request.POST.get('shippingpolicy')
+			replacementpolicy = request.POST.get('replacementpolicy')
+			returnandrefundpolicy = request.POST.get('returnandrefundpolicy')
+			businessmaincategory =request.POST.get('businessmaincategory')
+			businesscategory =request.POST.getlist('businesscategory')
+
+				
+			
+			print(mobile,'Mobile')
+    
+			
+		
+			vendor_obj=Vendor.objects.filter(user=request.user).first()
+			
+			user=User.objects.filter(id=request.user.id).first()
+	
+			if mobile:
+				vendor_obj.mobile = mobile
+				user.username=mobile
+			if email:
+				user.email=email
+			if firstname:
+				vendor_obj.firstname= firstname
+				user.first_name=firstname
+			if lastname:
+				vendor_obj.lastname= lastname
+				user.last_name=lastname
+			if gender:
+				vendor_obj.gender =  gender
+			if dob:
+				vendor_obj.dob= dob
+			if streetaddress:
+				vendor_obj.streetaddress =  streetaddress
+			if nearbyaddress:
+				vendor_obj.nearbyaddress =  nearbyaddress
+			if pincode:
+				vendor_obj.pincode = pincode
+			if city:
+				vendor_obj.city= city
+			if state:
+				vendor_obj.state= state
+			if country:
+				vendor_obj.country= country
+			if latitude:
+				vendor_obj.latitude =  latitude
+			if longitude:
+				vendor_obj.longitude =  longitude
+			if profilepic:
+				vendor_obj.profilepic =profilepic
+
+			#Personal User 
+			if profilepic:
+				vendor_obj.pancardno=pancardno
+			if profilepic:
+				vendor_obj.pancarddoc =pancarddoc
+			if profilepic:
+				vendor_obj.idproof= idproof
+			if profilepic:
+				vendor_obj.idno= idno
+			if profilepic:
+				vendor_obj.frontidproofdoc =frontidproofdoc
+			if profilepic:
+				vendor_obj.backidproofdoc=backidproofdoc
+			if profilepic:
+				vendor_obj.addressproof= addressproof
+			if profilepic:
+				vendor_obj.addressno= addressno
+			if profilepic:
+				vendor_obj.frontaddressproofdoc =frontaddressproofdoc
+			if profilepic:
+				vendor_obj.backddressproofdoc =backddressproofdoc
+			user.save()
+
+			vendor_obj.save()
+
+
+			
+			
+			storeobj=Store.objects.filter(vendor = vendor_obj).first()
+			if storename:
+				storeobj.storename=storename
+				storeobj.save()
+
+			# Generate a random registration number
+			registration_number = f'{storeobj.vendor.mobile}{storeobj.storename.replace(" ", "")}'
+
+			# Generate QR code
+			qr = qrcode.QRCode(
+				version=1,
+				error_correction=qrcode.constants.ERROR_CORRECT_L,
+				box_size=10,
+				border=4,
+			)
+			qr.add_data(str(registration_number))
+			qr.make(fit=True)
+			qr_image = qr.make_image(fill_color="black", back_color="white")
+
+			# Define the directory to save the QR code image
+			qr_image_directory = os.path.join('store', 'qrcode')  # Relative to MEDIA_ROOT
+			os.makedirs(os.path.join(settings.MEDIA_ROOT, qr_image_directory), exist_ok=True)  # Ensure directory exists
+
+			# Save QR code image
+			qr_image_path = os.path.join(qr_image_directory, f"{registration_number}.png")
+			qr_image_full_path = os.path.join(settings.MEDIA_ROOT, qr_image_path)
+			qr_image.save(qr_image_full_path)
+
+
+			# Update storeobj with registration number and QR code path
+			storeobj.registrationno = registration_number 
+			storeobj.registrationqrcode = qr_image_path
+			storeobj.save()
+			
+			if businessmaincategory:
+				businessmaincategory_obj=BusinessMainCategory.objects.filter(id=businessmaincategory).first()
+				storeobj.businessmaincategory=businessmaincategory_obj
+			
+			if businesscategory:
+		
+				for category_id in businesscategory:
+					businesscategory_obj=BusinessCategory.objects.filter(id=category_id).first()
+					storeobj.businesscategory.add(businesscategory_obj)
+					storeobj.save()
+			if storeregistrationtype:
+				storeobj.storeregistrationtype=storeregistrationtype	
+		
+			if description:
+				storeobj.description = description
+	
+			if streetaddress:
+				storeobj.streetaddress = streetaddress
+			if nearbyaddress:	
+				storeobj.nearbyaddress =nearbyaddress
+			if pincode:
+				storeobj.pincode = pincode
+			if city:
+				storeobj.city=city
+			if state:
+				storeobj.state=state
+			if country:
+				storeobj.country=country
+			if latitude:
+				storeobj.latitude = latitude
+			if longitude:
+				storeobj.longitude = longitude
+			if logo:
+				storeobj.logo = logo
+			if banner:
+				storeobj.banner = banner
+
+			#Doc
+			if msmeno:
+				storeobj.msmeno=msmeno
+			if msmedoc:
+				storeobj.msmedoc = msmedoc
+			if pancardno:
+				storeobj.pancardno=pancardno
+			if pancarddoc:
+				storeobj.pancarddoc = pancarddoc
+			if gstno:
+				storeobj.gstno=gstno
+			if gstnodoc:
+				storeobj.gstnodoc = gstnodoc
+
+				#policy
+			if shippingpolicy:
+				storeobj.shippingpolicy =shippingpolicy
+			if replacementpolicy:
+				storeobj.replacementpolicy = replacementpolicy
+			if returnandrefundpolicy:
+				storeobj.returnandrefundpolicy = returnandrefundpolicy
+	
+			if returnandrefundpolicy:
+				storeobj.closingday = closing_day
+			if returnandrefundpolicy:
+				storeobj.closingtime = closing_time
+			if returnandrefundpolicy:
+				storeobj.openingtime = opening_time
+			storeobj.save()
+
+			messages.info(request, 'Your Profile has been updated !')
+
+		return redirect("/vendor/profile")
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_product(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		product = Product.objects.get(id=request.GET.get('id'))
 		dic = {
 			'vendor':vendor,
 			'product':product,
 			'images':ProductImages.objects.filter(product=product),
 			'variants':ProductVariant.objects.filter(product=product),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request,'vendor_app/product.html', dic)
 	else:
@@ -855,11 +1049,11 @@ def vendor_product(request):
 @csrf_exempt
 def vendor_update_product_quantity(request,id):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		product = Product.objects.get(id=id)
 
 		if request.method == 'POST':
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
+			vendor = Vendor.objects.filter(user=request.user)
 			store = request.user.vendor.store
 			stock = request.POST.get('stock')
 			
@@ -876,8 +1070,8 @@ def vendor_update_product_quantity(request,id):
 			'product':product,
 			'images':ProductImages.objects.filter(product=product),
 			'variants':ProductVariant.objects.filter(product=product),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request,'vendor_app/update-product-quantity.html', dic)
 
@@ -889,7 +1083,7 @@ def vendor_update_product_quantity(request,id):
 def vendor_product_basic_edit(request):
 	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
+			vendor = Vendor.objects.filter(user=request.user)
 			store = request.user.vendor.store
 			name = request.POST.get('name')
 			des = request.POST.get('des')
@@ -942,14 +1136,14 @@ def vendor_product_out_of_stock(request):
 @csrf_exempt
 def vendor_orders(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
-		business_limit = BusinessLimit.objects.get(vendor=request.user.vendor)
+		vendor = Vendor.objects.filter(user=request.user)
+		business_limit = BusinessLimitWallet.objects.get(vendor__user=request.user)
 		dic = {
-			'orders':OrderItems.objects.filter(store=request.user.vendor.store),
+			'orders':SalesOrderItems.objects.filter(store__vendor__user=request.user),
 			'vendor':vendor,'business_limit':business_limit,
 			'allorder_status':ORDER_STATUS_UPDATE,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/orders.html', dic)
 	else:
@@ -957,12 +1151,12 @@ def vendor_orders(request):
 @csrf_exempt
 def vendor_complete_orders(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		dic = {
-			'orders':OrderItems.objects.filter(store=request.user.vendor.store),
+			'orders':SalesOrderItems.objects.filter(store__vendor__user=request.user),
 			'vendor':vendor,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/complete-orders.html', dic)
 	else:
@@ -972,12 +1166,12 @@ def vendor_complete_orders(request):
 @csrf_exempt
 def vendor_order_detail(request):	
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		order_id = request.GET.get('i')
 		dic = {
 			'vendor':vendor,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		dic.update(get_order_details(order_id))
 		return render(request, 'vendor_app/order-detail.html', dic)
@@ -988,7 +1182,7 @@ def vendor_order_detail(request):
 @csrf_exempt
 def vendor_change_order_status(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		# admin = User.objects.get(is_superuser = True)
 		# print('admin',admin)
 		# print(admin.id)
@@ -1040,12 +1234,12 @@ def vendor_change_order_status(request):
 @csrf_exempt
 def vendor_return_details(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		dic = {
-			'orders':OrderItems.objects.filter(store=request.user.vendor.store),
+			'orders':SalesOrderItems.objects.filter(store__vendor__user=request.user),
 			'vendor':vendor,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/return-order.html', dic)
 	else:
@@ -1053,7 +1247,7 @@ def vendor_return_details(request):
 @csrf_exempt		
 def vendor_change_return_status(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		admin = User.objects.get(is_superuser = True)
 		order_id = request.GET.get('i')
 		return_status = request.GET.get('return')
@@ -1087,11 +1281,11 @@ def vendor_brand(request):
 				messages.success(request, 'Brand Added Successfully !!!!')
 				return redirect('/vendor/brand')
 		else:
-			vendor = Vendor.objects.get(id=request.user.vendor.id)
+			vendor = Vendor.objects.filter(user=request.user)
 			dic = {'vendor':vendor, 'categories':ProductCategory.objects.all(),
 				'brands':Brand.objects.all(),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 			}
 			return render(request, 'vendor_app/brand.html', dic)
 	else:
@@ -1099,11 +1293,11 @@ def vendor_brand(request):
 @csrf_exempt
 def vendor_payment_transactions(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		dic = {
 			'vendor':vendor,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/payment-transactions.html', dic)
 	else:
@@ -1111,36 +1305,38 @@ def vendor_payment_transactions(request):
 @csrf_exempt
 def vendor_wallet_dash(request):
 	if check_user_authentication(request, 'VENDOR'):
-		if not Wallet.objects.filter(user=request.user).exists():
-			Wallet.objects.create(user=request.user)
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
-		wallet = Wallet.objects.get(user=request.user)
+		vendor = Vendor.objects.get(user=request.user)
+		if not Wallet.objects.filter(vendor=vendor).exists():
+			Wallet.objects.create(vendor=vendor)
+		
+		wallet = Wallet.objects.get(vendor=vendor)
 		transactions = WalletTransaction.objects.filter(wallet=wallet)
 		dic = {
 			'vendor':vendor,
 			'wallet':wallet,
 			'transactions':transactions,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/wallet-dash.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 # Per Product commisson from Admin
 @csrf_exempt
 def vendor_wallet_commission_dash(request):
 	if check_user_authentication(request, 'VENDOR'):
 		if not Vendor_Wallet_Commission.objects.filter(user=request.user).exists():
 			Vendor_Wallet_Commission.objects.create(user=request.user)
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		wallet = Vendor_Wallet_Commission.objects.get(user=request.user)
 		transactions = VendorWalletTransaction.objects.filter(vendor_wallet_commission=wallet)
 		dic = {
 			'vendor':vendor,
 			'wallet':wallet,
 			'transactions':transactions,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/wallet_commission_dash.html', dic)
 	else:
@@ -1150,17 +1346,18 @@ def vendor_wallet_commission_dash(request):
 @csrf_exempt
 def vendor_Business_limit_dash(request):
 	if check_user_authentication(request, 'VENDOR'):
-		if not BusinessLimit.objects.filter(vendor=request.user.vendor).exists():
-			BusinessLimit.objects.create(vendor=request.user.vendor)
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
-		business_limit = BusinessLimit.objects.get(vendor=request.user.vendor)
-		business_limit_transactions = BusinessLimitTransaction.objects.filter(business_limit=business_limit)
+		vendor = Vendor.objects.get(user=request.user)
+		if not BusinessLimitWallet.objects.filter(vendor=vendor).exists():
+			BusinessLimitWallet.objects.create(vendor=vendor)
+		
+		business_limit = BusinessLimitWallet.objects.get(vendor=vendor)
+		business_limit_transactions = BusinessLimitWalletTransaction.objects.filter(businesslimitwallet=business_limit)
 		dic = {
 			'vendor':vendor,
 			'business_limit':business_limit,
 			'business_limit_transactions':business_limit_transactions,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/Business-limit-dash.html', dic)
 	else:
@@ -1190,17 +1387,17 @@ def vendor_withdraw(request):
 			else:
 				messages.success(request, 'You already have a withdrawl request pending, please wait for it to credit.')
 				return redirect('/vendor/withdraw')
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
-		if not Wallet.objects.filter(user=request.user).exists():
-			Wallet.objects.create(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user)
+		if not Wallet.objects.filter(vendor__user=request.user).exists():
+			Wallet.objects.create(vendor__user=request.user)
 		dic = {
 			'vendor':vendor,
-			'wallet':Wallet.objects.get(user=request.user),
-			'business_limit_wallet':BusinessLimit.objects.get(vendor=request.user.vendor),
-			'commission_wallet':Vendor_Wallet_Commission.objects.get(user=request.user),
-			'data':VendorWithdrawRequest.objects.filter(user=request.user),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),
+			'business_limit_wallet':BusinessLimitWallet.objects.filter(vendor__user=request.user).first(),
+			'commission_wallet':CommissionWallet.objects.filter(vendor__user=request.user).first(),
+			'data':WithdrawRequest.objects.filter(vendor__user=request.user),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/withdraw.html', dic)
 	else:
@@ -1221,12 +1418,12 @@ def vendor_help(request):
 			print(user,'UUUUUU')
 			notification(user,'New Query Received')
 			return redirect('/vendor/help')
-		vendor = Vendor.objects.get(id=request.user.vendor.id)
+		vendor = Vendor.objects.filter(user=request.user)
 		dic = {
 			'vendor':vendor,
 			'queries':Query.objects.filter(user=request.user),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/help.html', dic)
 	else:
@@ -1246,7 +1443,7 @@ def vendor_recharge(request):
 			if payment_type == 'usewallet':
 				
 				bal=Wallet.objects.filter(user=request.user).first()
-				bal_bussiness=BusinessLimit.objects.filter(vendor=request.user.vendor).first()
+				bal_bussiness=BusinessLimitWallet.objects.filter(vendor=request.user.vendor).first()
 				if float(amount) >= bal.current_balance:
 					messages.warning(request, 'Insufficent balence.')
 					return redirect('/vendor/businesslimittransaction')
@@ -1285,7 +1482,7 @@ def vendor_recharge(request):
 				return JsonResponse({'data':data})
 		
 		else:
-			dic = {'business_limit':BusinessLimit.objects.get(vendor=request.user.vendor),
+			dic = {'business_limit':BusinessLimitWallet.objects.get(vendor=request.user.vendor),
 			'bal':Wallet.objects.filter(user=request.user).first(),}
 			return render(request, 'vendor_app/businesslimittransaction.html', dic)
 	else:
@@ -1339,7 +1536,7 @@ def vendor_activate_subscription(request):
 		UserSubscription.objects.filter(user = obj.user).delete()
 		UserSubscription.objects.create(user = obj.user, months=obj.month)
 		
-		business_limit=BusinessLimit.objects.get(vendor=request.user.vendor)
+		business_limit=BusinessLimitWallet.objects.get(vendor=request.user.vendor)
 		subs_charges = SubscriptionCharge.objects.get()
 		amount = obj.amount
 		Gst = (amount/100)*18
@@ -1437,14 +1634,13 @@ import datetime
 login_required('/')
 @csrf_exempt
 def vendorbalanacetransfer(request):
-	bal = Wallet.objects.get(user=request.user).current_balance
-	userdata = UserData.objects.filter(is_active = True)
+	bal = Wallet.objects.get(vendor__user=request.user).currentbalance
 	transectiondata = WalletTransfer.objects.filter(user=request.user).order_by('-id')
 	context = {
-			'userdata':userdata,
+			
 			'transectiodetails':transectiondata,
-			'bal':bal,'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'bal':bal,# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 
 	id = WalletTransferApproval.objects.all()[0:1]

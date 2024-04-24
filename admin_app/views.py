@@ -77,16 +77,17 @@ def admin_login(request):
 @csrf_exempt
 def admin_dashboard(request):
 	if check_user_authentication(request, 'ADMIN'):
+		if len(CommissionWallet.objects.filter(admin=request.user)) == 0:
+			CommissionWallet.objects.create(admin=request.user,isactive=True)
+		if len(Wallet.objects.filter(admin=request.user)) == 0:
+			Wallet.objects.create(admin=request.user,isactive=True)
+		
 		pv = 0.0
 		# pv_year = 0.0
 		d = datetime.datetime.now()
-		# if len(Yearly_PV.objects.all()) == 0:
-		# 	Yearly_PV.objects.create()
 		# for pv_trn in PVTransactions.objects.all():
 		# 	if pv_trn.transaction_date.strftime("%m") == d.strftime("%m"):
 		# 		pv += pv_trn.pv
-		# if Current_PV.objects.all() == None:
-		# 	Current_PV.objects.create(pv = pv)
 			
 		# # for pv_trn in PVTransactions.objects.all():
 		# # 	if pv_trn.transaction_date.strftime("%Y") == d.strftime("%Y"):
@@ -94,26 +95,11 @@ def admin_dashboard(request):
 		# # Yearly_PV.objects.update(pv = pv_year)
 		# # print(pv_year<pv)
 		# pv = round(pv,2)
-
-		# if len(Commission.objects.all()) == 0 :
-		# 	Commission.objects.create()
-		# if len(Savings.objects.all()) == 0 :
-		# 	Savings.objects.create()
-        
-		# if len(Current_PV.objects.all()) == 0 :
-		# 	Current_PV.objects.create()
-
-		# if len(Yearly_PV.objects.all()) == 0 :
-		# 	Yearly_PV.objects.create()
-
-			
-		
 		dic = {
 			'categories':ProductCategory.objects.all(),
-			# 'commission':,
-			# 'savings':Savings.objects.all(),
-			'wallet':Wallet.objects.all(),
-			# 'transactions':CommissionTransaction.objects.all().order_by('-id'),
+			'commission':CommissionWallet.objects.filter(admin=request.user).first(),
+			'wallet':Wallet.objects.filter(admin=request.user).first(),
+			'commissiontransactions':CommissionWalletTransaction.objects.all().order_by('-id'),
 			# 'total_pv':Current_PV.objects.all().order_by('-id').first,
 			# 'year_pv':Yearly_PV.objects.all(),
 			'wallettransactions':WalletTransaction.objects.all().order_by('-id'),
@@ -134,10 +120,10 @@ from django.db import transaction
 def admin_send_money(request):
 	if check_user_authentication(request, 'ADMIN'):
 
-		user=WalletTransferApproval.objects.all()[0:1]
+		user=WalletTransferApprovalSettings.objects.all()[0:1]
 		print(user)
 
-		if WalletTransferApproval.objects.get(id =user).admin == 1:
+		if WalletTransferApprovalSettings.objects.get(id =user).admin == 1:
 			
 			request.session['senderotp'] = random.randint(100000,999999)
 			request.session['timer'] = str(datetime.datetime.now() + datetime.timedelta(minutes=2))
@@ -154,7 +140,8 @@ def admin_send_money(request):
 			return render(request,'admin_app/otpverifysendmoneytousers.html')
 			
 		else:
-			messages.error(request,'Payments Mode off')
+			messages.error(request,'Payments Transaction has been block by Admin,For Re-Activate your payment transaction please contact to Admin.')
+			return redirect("/admins/dashboard")
 			
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -1227,7 +1214,7 @@ def admin_change_withdraw_status(request):
 		id_ = request.GET.get('i')
 		status = request.GET.get('s')
 		if type_ == 'u':
-			UserWithdrawRequest.objects.filter(id=id_).update(is_active=status)
+			UserWithdrawRequest.objects.filter(id=id_).update(isactive=status)
 			withdraw = UserWithdrawRequest.objects.get(id=id_)
 			if status == '2':
 
@@ -1253,7 +1240,7 @@ def admin_change_withdraw_status(request):
 				notification(withdraw.user, 'Withdraw Request Status Changed.')
 
 		elif type_ == 'v':
-			VendorWithdrawRequest.objects.filter(id=id_).update(is_active=status)
+			VendorWithdrawRequest.objects.filter(id=id_).update(isactive=status)
 			withdraw = VendorWithdrawRequest.objects.get(id=id_)
 			if status == '2':
 				# make_wallet_transaction(withdraw.user, withdraw.amount, 'DEBIT')
@@ -1516,8 +1503,8 @@ def admin_product_approval(request):
 			messages.success(request, 'New Vendor Commission has been set. ! ')
 			return redirect('/admins/productapproval')
 		
-		dic = {'data':Product.objects.filter(is_active=False, product_rejection=False),
-			'rejected_product':Product.objects.filter(is_active=False, product_rejection=True),
+		dic = {'data':Product.objects.filter(isactive=False, isproductrejected=False),
+			'rejected_product':Product.objects.filter(isactive=False, isproductrejected=True),
 			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -1560,7 +1547,7 @@ def admin_product_basic_edit(request):
 				weight = weight,
 				offer = offer,
 				discount= discount
-				# is_active= False
+				# isactive= False
 			)
 			messages.success(request, 'Product Updated Successfully')
 			return redirect('/admins/product?id='+request.POST.get('id'))
@@ -1593,7 +1580,7 @@ def admin_product_out_of_stock(request):
 @csrf_exempt
 def admin_activate_product(request):
 	if check_user_authentication(request, 'ADMIN'):
-		Product.objects.filter(id=request.GET.get('p')).update(is_active=True)
+		Product.objects.filter(id=request.GET.get('p')).update(isactive=True)
 		user = Product.objects.get(id=request.GET.get('p')).store.vendor.user
 		notification(user, 'Product Activated Successfully.')
 		return redirect('/admins/productapproval')
@@ -1625,7 +1612,7 @@ def admin_taxation(request):
 @csrf_exempt
 def admin_users(request):
 	if check_user_authentication(request, 'ADMIN'):
-		users = User.objects.filter(is_active=True)
+		users = User.objects.filter(isactive=True)
 		lt = []
 		for x in users :
 			print(x,'USSSSSSSSs')
@@ -1860,7 +1847,7 @@ def admin_billing_config(request):
 def admin_reject_product(request):
 	if check_user_authentication(request, 'ADMIN'):
 		reason = request.POST.get('reason')
-		Product.objects.filter(id=request.POST.get('i')).update(product_reject_reason=reason,product_rejection=True,is_active=False)
+		Product.objects.filter(id=request.POST.get('i')).update(reasonforproductrejected=reason,isproductrejected=True,isactive=False)
 		user = Product.objects.get(id=request.POST.get('i')).store.vendor.user
 		notification(user, str('Product Rejected Beacause '+reason))
 		return JsonResponse({'response':'Success'})
@@ -2185,8 +2172,8 @@ login_required('/')
 def adminbalanacetransfer(request):
 	print(request.user.email,'OTPPP')
 	bal = Wallet.objects.get(user=request.user).current_balance
-	userdata = UserData.objects.filter(is_active = True)
-	vandordata = Vendor.objects.filter(is_active = True)
+	userdata = UserData.objects.filter(isactive = True)
+	vandordata = Vendor.objects.filter(isactive = True)
 	transectiondata = WalletTransfer.objects.filter(user=request.user).order_by('-id')
 	context = {
 			'userdata':userdata,'vendordata': vandordata,
@@ -2196,7 +2183,7 @@ def adminbalanacetransfer(request):
 			'notification_len':len(Notification.objects.filter(user=request.user, read=False))
 		}
 
-	Wallet_transefer_obj = WalletTransferApproval.objects.all()
+	Wallet_transefer_obj = WalletTransferApprovalSettings.objects.all()
 
 
 	if request.method == 'POST':
@@ -2273,7 +2260,7 @@ def transfer_amount_admin(request):
 def admin_vendor_commission_wallet(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
-			'vendor_commission_wallet':Vendor_Wallet_Commission.objects.all(), 
+			'vendor_commission_wallet':CommissionWallet.objects.filter(vendor__storecreated=True), 
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
@@ -2285,7 +2272,7 @@ def admin_vendor_commission_wallet(request):
 def admin_vendor_commission_wallet_details(request, id):
 	if check_user_authentication(request, 'ADMIN'):
 
-		vendor_commission_wallet=Vendor_Wallet_Commission.objects.filter(id=id).first()
+		vendor_commission_wallet=CommissionWallet.objects.filter(id=id).first()
 		vendor_commission_wallet_transaction = VendorWalletTransaction.objects.filter(vendor_wallet_commission=id)
 		dic = {
             'vendor_commission_wallet':vendor_commission_wallet,
@@ -2306,8 +2293,8 @@ def admin_activate_is_commission_wallet_vendor(request):
 		id_=request.GET.get('id')
 		print("printing id_ here")
 		print(id_)
-		wallet = Vendor_Wallet_Commission.objects.get(id=id_)
-		Vendor_Wallet_Commission.objects.filter(id=id_).update(is_active=True)
+		wallet = CommissionWallet.objects.get(id=id_)
+		CommissionWallet.objects.filter(id=id_).update(isactive=True)
 		sub = 'AVPL -Vendor Commission wallet activated Successfully'
 		msg = '''Hi there!
 Your AVPL Vendor Commission wallet activated Successfully, you can transaction.
@@ -2326,8 +2313,8 @@ def admin_deactivate_is_commission_wallet_vendor(request):
 		id_=request.GET.get('id')
 		print("printing id_ here")
 		print(id_)
-		wallet = Vendor_Wallet_Commission.objects.get(id=id_)
-		Vendor_Wallet_Commission.objects.filter(id=id_).update(is_active=False)
+		wallet = CommissionWallet.objects.get(id=id_)
+		CommissionWallet.objects.filter(id=id_).update(isactive=False)
 		sub = 'AVPL -AVPL Vendor Commission wallet Deactivate Successfully'
 		msg = '''Hi there!
 Your AVPL Vendor Commission wallet Deactivate Successfully.
@@ -2372,7 +2359,7 @@ def staff_list(request):
 
 				print(phone,'SSSSSSSSSS')
 				user = User.objects.create_user(username= email,first_name = first_name,last_name=last_name,
-				 email= email,password=password,is_staff=True,is_active= True)   
+				 email= email,password=password,is_staff=True,isactive= True)   
 
 				print(user,'UUUUUUUUUUUUU')
 				print(address,'AAAAAAAAa')
@@ -2401,13 +2388,13 @@ def staff_list(request):
 
 
 @csrf_exempt
-def admin_activate_is_active_staff(request):
+def admin_activate_isactive_staff(request):
 	if check_user_authentication(request, 'ADMIN'):
 		id_=request.GET.get('id')
 		print("printing id_ here")
 		print(id_)
 		staff=Staffs_User.objects.filter(id=id_).first()
-		user = User.objects.filter(id=staff.user.id).update(is_active=True)
+		user = User.objects.filter(id=staff.user.id).update(isactive=True)
 		sub = 'AVPL -Staff account activated Successfully'
 		msg = '''Hi there!
 Your AVPL Staff account activated Successfully, you can login.
@@ -2419,13 +2406,13 @@ Thanks!'''
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
-def admin_deactivate_is_active_staff(request):
+def admin_deactivate_isactive_staff(request):
 	if check_user_authentication(request, 'ADMIN'):
 		id_=request.GET.get('id')
 		print("printing id_ here")
 		print(id_)
 		staff=Staffs_User.objects.filter(id=id_).first()
-		user = User.objects.filter(id=staff.user.id).update(is_active=False)
+		user = User.objects.filter(id=staff.user.id).update(isactive=False)
 		sub = 'AVPL -AVPL Staff account Deactivate Successfully'
 		msg = '''Hi there!
 Your AVPL Staff account Deactivate Successfully.

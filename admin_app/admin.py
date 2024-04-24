@@ -44,3 +44,4 @@ admin.site.register(Blog)
 admin.site.register(Gallery)
 
 admin.site.register(HomeFooterBanner)
+admin.site.register(WalletTransferApprovalSettings)
