@@ -45,15 +45,15 @@
                                        <tbody>
                                           {% for x in data %}
                                           <tr>
-                                             <td>{{ x.first_name|safe }} {{ x.last_name|safe }}</td>
-                                             <td>{{ x.phone|safe }}</td>
-                                             {% if x.is_AVPL_Vendor == True %}
+                                             <td>{{ x.firstname|safe }} {{ x.lastname|safe }}</td>
+                                             <td>{{ x.mobile|safe }}</td>
+                                             {% if x.isavplvendor == True %}
                                              <td><span class="badge badge-info">Active</span></td>
                                              {% else %}
                                              <td><span class="badge badge-danger">Deactive</span></td>
                                              {% endif %}
                                              
-                                             {% if x.is_AVPL_Vendor == True %}
+                                             {% if x.isavplvendor == True %}
                                              <td>
                                                 <a href="/admins/deactivate_isavplvendor?id={{ x.id|safe }}" class="btn btn-primary btn-icon icon-left">Deactivate AVPL Vendor</a>
                                               

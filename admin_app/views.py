@@ -1,5 +1,8 @@
+import os
 from django.shortcuts import render
-
+from django.conf import settings
+import re
+import qrcode
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
@@ -676,21 +679,269 @@ Thanks!'''
 def admin_vendor_profile(request):
 	if check_user_authentication(request, 'ADMIN'):
 		vendor = Vendor.objects.get(id=request.GET.get('i'))
-		vendoc = VendorDocs.objects.get(vendor__user=vendor.user)
 		store = Store.objects.get(vendor=vendor)
-		images = StoreImages.objects.get(store=store)
-		vanadd = Vendor.objects.get(user=vendor.user)
+		businessmaincategory_obj=BusinessMainCategory.objects.filter(isactive=True)
+		businesscategory_obj=BusinessCategory.objects.filter(isactive=True)
+		
 		dic = {
-			'vendoc':vendoc,
-			'store':store,
-			'info':vanadd,
+			'storeobj':store,
 			'vendor':vendor,
-			'images':images,
+            "businessmaincategory_obj":businessmaincategory_obj,
+			"businesscategory_obj":businesscategory_obj,
 			'categories':ProductCategory.objects.all()
 		}
 		return render(request,'admin_app/vendor-profile.html', dic)
 	else:
 		return HttpResponse('Error 500 : Unauthorized User')
+
+
+
+@csrf_exempt
+def admin_edit_vendor_profile(request):
+	if check_user_authentication(request, 'ADMIN'):
+		id=request.GET.get('i')
+		vendor = Vendor.objects.get(id=id)
+		
+		if request.method == 'POST':
+			mobile = request.POST.get('mobile')
+			email = request.POST.get('email')
+			firstname= request.POST.get('firstname')
+			lastname= request.POST.get('lastname')
+			gender =  request.POST.get('gender')
+			dob= request.POST.get('dob')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			profilepic = request.FILES.get('profilepic')
+
+			#Personal User 
+   
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			idproof= request.POST.get('idproof')
+			idno= request.POST.get('idno')
+			frontidproofdoc = request.FILES.get('frontidproofdoc')
+			backidproofdoc=request.FILES.get('backidproofdoc')
+			addressproof= request.POST.get('addressproof')
+			addressno= request.POST.get('addressno')
+			frontaddressproofdoc =request.FILES.get('frontaddressproofdoc')
+			backddressproofdoc = request.FILES.get('backddressproofdoc')
+   
+			storename = request.POST.get('storename')
+			description = request.POST.get('description')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			
+			
+			logo = request.FILES.get('logo')
+			banner = request.FILES.get('banner')
+			closing_day = request.POST.get('closing_day')
+			closing_time = request.POST.get('closing_time')
+			opening_time = request.POST.get('opening_time')
+
+			#Doc
+			storeregistrationtype=request.POST.get('storeregistrationtype')
+			msmeno=request.POST.get('msmeno')
+			msmedoc = request.FILES.get('msmedoc')
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			gstno=request.POST.get('gstno')
+			gstnodoc = request.FILES.get('gstnodoc')
+
+			#policy
+			shippingpolicy =request.POST.get('shippingpolicy')
+			replacementpolicy = request.POST.get('replacementpolicy')
+			returnandrefundpolicy = request.POST.get('returnandrefundpolicy')
+			businessmaincategory =request.POST.get('businessmaincategory')
+			businesscategory =request.POST.getlist('businesscategory')
+
+				
+			
+			print(mobile,'Mobile')
+    
+			
+		
+			vendor_obj=vendor
+			
+			user=User.objects.filter(id=vendor_obj.user.id).first()
+	
+			if mobile:
+				vendor_obj.mobile = mobile
+				user.username=mobile
+			if email:
+				user.email=email
+			if firstname:
+				vendor_obj.firstname= firstname
+				user.first_name=firstname
+			if lastname:
+				vendor_obj.lastname= lastname
+				user.last_name=lastname
+			if gender:
+				vendor_obj.gender =  gender
+			if dob:
+				vendor_obj.dob= dob
+			if streetaddress:
+				vendor_obj.streetaddress =  streetaddress
+			if nearbyaddress:
+				vendor_obj.nearbyaddress =  nearbyaddress
+			if pincode:
+				vendor_obj.pincode = pincode
+			if city:
+				vendor_obj.city= city
+			if state:
+				vendor_obj.state= state
+			if country:
+				vendor_obj.country= country
+			if latitude:
+				vendor_obj.latitude =  latitude
+			if longitude:
+				vendor_obj.longitude =  longitude
+			if profilepic:
+				vendor_obj.profilepic =profilepic
+
+			#Personal User 
+			if profilepic:
+				vendor_obj.pancardno=pancardno
+			if profilepic:
+				vendor_obj.pancarddoc =pancarddoc
+			if profilepic:
+				vendor_obj.idproof= idproof
+			if profilepic:
+				vendor_obj.idno= idno
+			if profilepic:
+				vendor_obj.frontidproofdoc =frontidproofdoc
+			if profilepic:
+				vendor_obj.backidproofdoc=backidproofdoc
+			if profilepic:
+				vendor_obj.addressproof= addressproof
+			if profilepic:
+				vendor_obj.addressno= addressno
+			if profilepic:
+				vendor_obj.frontaddressproofdoc =frontaddressproofdoc
+			if profilepic:
+				vendor_obj.backddressproofdoc =backddressproofdoc
+			user.save()
+
+			vendor_obj.save()
+			storeobj=Store.objects.filter(vendor = vendor_obj).first()
+			if storename:
+				storeobj.storename=storename
+				storeobj.save()
+
+			# Generate a random registration number
+			registration_number = f'{storeobj.vendor.mobile}{storeobj.storename.replace(" ", "")}'
+
+			# Generate QR code
+			qr = qrcode.QRCode(
+				version=1,
+				error_correction=qrcode.constants.ERROR_CORRECT_L,
+				box_size=10,
+				border=4,
+			)
+			qr.add_data(str(registration_number))
+			qr.make(fit=True)
+			qr_image = qr.make_image(fill_color="black", back_color="white")
+
+			# Define the directory to save the QR code image
+			qr_image_directory = os.path.join('store', 'qrcode')  # Relative to MEDIA_ROOT
+			os.makedirs(os.path.join(settings.MEDIA_ROOT, qr_image_directory), exist_ok=True)  # Ensure directory exists
+
+			# Save QR code image
+			qr_image_path = os.path.join(qr_image_directory, f"{registration_number}.png")
+			qr_image_full_path = os.path.join(settings.MEDIA_ROOT, qr_image_path)
+			qr_image.save(qr_image_full_path)
+
+
+			# Update storeobj with registration number and QR code path
+			storeobj.registrationno = registration_number 
+			storeobj.registrationqrcode = qr_image_path
+			storeobj.save()
+			
+			if businessmaincategory:
+				businessmaincategory_obj=BusinessMainCategory.objects.filter(id=businessmaincategory).first()
+				storeobj.businessmaincategory=businessmaincategory_obj
+			
+			if businesscategory:
+		
+				for category_id in businesscategory:
+					businesscategory_obj=BusinessCategory.objects.filter(id=category_id).first()
+					storeobj.businesscategory.add(businesscategory_obj)
+					storeobj.save()
+			if storeregistrationtype:
+				storeobj.storeregistrationtype=storeregistrationtype	
+		
+			if description:
+				storeobj.description = description
+	
+			if streetaddress:
+				storeobj.streetaddress = streetaddress
+			if nearbyaddress:	
+				storeobj.nearbyaddress =nearbyaddress
+			if pincode:
+				storeobj.pincode = pincode
+			if city:
+				storeobj.city=city
+			if state:
+				storeobj.state=state
+			if country:
+				storeobj.country=country
+			if latitude:
+				storeobj.latitude = latitude
+			if longitude:
+				storeobj.longitude = longitude
+			if logo:
+				storeobj.logo = logo
+			if banner:
+				storeobj.banner = banner
+
+			#Doc
+			if msmeno:
+				storeobj.msmeno=msmeno
+			if msmedoc:
+				storeobj.msmedoc = msmedoc
+			if pancardno:
+				storeobj.pancardno=pancardno
+			if pancarddoc:
+				storeobj.pancarddoc = pancarddoc
+			if gstno:
+				storeobj.gstno=gstno
+			if gstnodoc:
+				storeobj.gstnodoc = gstnodoc
+
+				#policy
+			if shippingpolicy:
+				storeobj.shippingpolicy =shippingpolicy
+			if replacementpolicy:
+				storeobj.replacementpolicy = replacementpolicy
+			if returnandrefundpolicy:
+				storeobj.returnandrefundpolicy = returnandrefundpolicy
+	
+			if returnandrefundpolicy:
+				storeobj.closingday = closing_day
+			if returnandrefundpolicy:
+				storeobj.closingtime = closing_time
+			if returnandrefundpolicy:
+				storeobj.openingtime = opening_time
+			storeobj.save()
+
+			messages.info(request, 'Vendor Profile has been updated !')
+
+		return redirect(f"/admins/vendorprofile?i={id}")
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 @csrf_exempt
 def admin_activate_approved_avpl_vendor(request):
 	if check_user_authentication(request, 'ADMIN'):

@@ -2,180 +2,794 @@
 {% load static %}
 {% block title %}Vendor Profile{% endblock %}
 {% block main %}
-            <!-- Main Content -->
-            <div class="main-content">
-                <section class="section">
-                    <div class="section-header">
-                        <div class="row">
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <div class="section-header-breadcrumb-content">
-                                    <h1>Vendor Profile</h1>
-                                    <div class="section-header-breadcrumb">
-                                        <div class="breadcrumb-item active"><a href="#"><i class="fas fa-home"></i></a></div>
-                                        <div class="breadcrumb-item"><a href="javascript: (0);">Vendor Profile</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
+
+
+<!-- Main Content -->
+
+<div class="main-content">
+    <section class="section">
+        <div class="section-header">
+            <div class="row">
+               
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="section-header-breadcrumb-content">
+                        <h1>Profile</h1>
+                        <div class="section-header-breadcrumb">
+                            <div class="breadcrumb-item active"><a href="#"><i class="fas fa-home"></i></a></div>
+                            <div class="breadcrumb-item"><a href="/">Dashboard</a></div>
+                            <div class="breadcrumb-item"><a href="javascript: (0);">Profile</a></div>
                         </div>
                     </div>
-                    <div class="section-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div style="background-image:url({{images.banner.url}});height:350px;background-size:100% auto;" class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                             </div>
-                                            </div>
-                                        <div class="row justify-content-center ">
-                                            <div class="col-lg-3 col-md-3 col-sm-3 col-3">
-                                                <img src="{{images.logo.url}}" class="img-fluid profile_img " style="background-color:white;" />
-                                            </div>
-                                        </div>
-                                        <div class="row justify-content-center">
-                                            <div class="col-lg-3 col-md-3 col-sm-3">
+                </div>
 
-                                                <h3 class="mt-3 profile">{{info.first_name}} {{info.last_name}}</h3>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div class="card-header">
-                                        <h4>vendor Details</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                <div class="form-group">
-                                                    <label>Mobile Number : {{info.phone}}</label>
-
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div class="card-header">
-                                        <h4>Kyc Documents</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                                <table class="table">
-
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Voter ID/DL/Adhar Number :</td>
-                                                            <td>{{vendoc.vendor_idproof}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Gst Number</td>
-                                                            <td>{{vendoc.store_gst}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>MSME Number</td>
-                                                            <td>{{vendoc.store_msme}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Pan Number</td>
-                                                            <td>{{vendoc.pancard}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Shipping policy</td>
-                                                            <td><a href="{{vendoc.shiping_policy.url}}" class="btn btn-primary">Shipping Policy</a></td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Return Policy</td>
-                                                            <td><a href="{{vendoc.return_policy.url}}" class="btn btn-primary">Shipping Policy</a></td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Bank Account Number</td>
-                                                            <td>{{vendoc.bank_account_number}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Bank Name</td>
-                                                            <td>{{vendoc.bank_name}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Bank IFSC</td>
-                                                            <td>{{vendoc.bank_ifsc}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Rezorpay Id</td>
-                                                            <td>{{vendoc.razorpay_id}}</td>
-
-                                                        </tr>
-                                                    </tbody>
-
-                                                </table>
-                                                </div>
-                                            </div>
-                                    </div>
-                                    <div class="card-header">
-                                        <h4>Store Details</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                                <table class="table">
-
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Store Name :</td>
-                                                            <td>{{store.name}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Description :</td>
-                                                            <td>{{store.description}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Store Address</td>
-                                                            <td>{{info.address}}</td>
-
-                                                        </tr>
-                                                     
-                                                        <tr>
-                                                            <td>Store Registration Number</td>
-                                                            <td>{{store.registration_number}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Closing Day</td>
-                                                            <td>{{store.closing_day}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Opening Time</td>
-                                                            <td>{{store.opening_time}}</td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Closing Time</td>
-                                                            <td>{{store.closing_time}}</td>
-
-                                                        </tr>
-                                                     
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
             </div>
-    {% endblock %}
+        </div>
+        <div class="section-body">
+            <div class="row">
+               
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            {% for message in messages %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <span class="message">{{message}}</span>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {% endfor %}
+                            <div class="row">
+
+                                {% if storeobj.banner %}
+                                <div style="
+                                            background: url({{storeobj.banner.url}});
+                                            background-repeat: no-repeat;
+                                            height:300px;
+                                            background-size: cover;
+                                            " class="col-lg-12 col-md-12 col-sm-12 col-12">
+                                </div>
+                                {% else %}
+                                {% endif %}
+                            </div>
+                            <div class="row justify-content-center ">
+
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-3">
+                                    {% if storeobj.logo %}
+
+                                    <img src="{{storeobj.logo.url}}" class="img-fluid profile_img "
+                                        style="background-color:white;" />
+                                    {% else %}
+
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                            <div class="row justify-content-center">
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+
+                                    <h4 class="mt-4 profile text-center">{{storeobj.storename|capfirst}}</h4>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+                        <form action="/admins/editvendorprofile?i={{vendor.id}}" method="POST" enctype="multipart/form-data">
+
+                            <div class="col-md-12 register-right">
+
+                                <div class="card-header">
+                                    <h4>Vendor's Details</h4>
+                                </div>
+
+
+
+                                <div class="row register-form">
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>First Name *</label>
+                                            <input type="text" class="form-control" placeholder="Enter First Name *"
+                                                title="Only (a-z) letters are allowed." required name="firstname"
+                                                value="{{vendor.user.first_name|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Last Name *</label>
+                                            <input type="text" class="form-control" placeholder="Enter Last Name *"
+                                                title="Only (a-z) letters are allowed." required name="lastname"
+                                                value="{{vendor.user.last_name|default:''}}" />
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label>Email *</label>
+                                            <input type="email" class="form-control" placeholder="Enter Email *"
+                                                required name="email" value="{{vendor.user.email|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Mobile *</label>
+                                            <input type="text" minlength="10" maxlength="10" class="form-control"
+                                                placeholder="Enter Mobile *" name="mobile" required
+                                                value="{{ vendor.mobile|default:'' }}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>DOB *</label>
+                                            <input type="date" class="form-control" placeholder="Enter DOB *"
+                                                max="2005-12-31" name="dob" required
+                                                value="{{ vendor.dob|date:'Y-m-d'|default:'' }}" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            {% if vendor.gender == Male %}
+                                            <label class="radio inline">
+                                                <label>Gender *</label>
+                                                <input type="radio" name="gender" value="Male" checked>
+                                                <span> Male </span>
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="gender" value="Female">
+                                                <span>Female </span>
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="gender" value="Other">
+                                                <span>Other </span>
+                                            </label>
+                                            {% elif vendor.gender == Female %}
+                                            <label class="radio inline">
+                                                <label>Gender *</label>
+                                                <input type="radio" name="gender" value="Male">
+                                                <span> Male </span>
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="gender" value="Female" checked>
+                                                <span>Female </span>
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="gender" value="Other">
+                                                <span>Other </span>
+                                            </label>
+
+                                            {% elif vendor.gender == Other %}
+                                            <label class="radio inline">
+                                                <label>Gender *</label>
+                                                <input type="radio" name="gender" value="Male">
+                                                <span> Male </span>
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="gender" value="Female">
+                                                <span>Female </span>
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="gender" value="Other" checked>
+                                                <span>Other </span>
+                                            </label>
+                                            {% else %}
+
+                                            <label class="radio inline">
+                                                <label>Gender *</label>
+                                                <input type="radio" name="gender" value="Male" checked>
+                                                <span> Male </span>
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="gender" value="Female">
+                                                <span>Female </span>
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="gender" value="Other">
+                                                <span>Other </span>
+                                            </label>
+                                            {% endif %}
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Profile Pic *</label>
+                                            {% if vendor.profilepic %}
+                                            <a href="{{vendor.profilepic.url}}"> <img alt="image"
+                                                    src="{{vendor.profilepic.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="image/png, image/jpeg"
+                                                name="profilepic" />
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="col-md-4">
+
+                                        <div class="form-group">
+                                            <label>Street Address *</label>
+                                            <input type="text" class="form-control" placeholder="Enter Street Address *"
+                                                id="address" title="Only (a-z) letters are allowed." required
+                                                name="streetaddress" value="{{vendor.streetaddress|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Near by Address *</label>
+                                            <input type="text" class="form-control"
+                                                placeholder="Enter Near by Address *" id='nearbyaddress'
+                                                title="Only (a-z) letters are allowed." required name="nearbyaddress"
+                                                value="{{vendor.nearbyaddress|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>City *</label>
+                                            <input type="text" class="form-control" placeholder="Enter City *" id='city'
+                                                title="Only (a-z) letters are allowed." required name="city"
+                                                value="{{vendor.city|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>State *</label>
+                                            <input type="text" class="form-control" placeholder="Enter State *"
+                                                id='state' title="Only (a-z) letters are allowed." required name="state"
+                                                value="{{vendor.state|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Country *</label>
+                                            <input type="text" class="form-control" placeholder="Enter Country *"
+                                                id='country' title="Only (a-z) letters are allowed." required
+                                                name="country" value="{{vendor.country|default:''}}" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Pincode *</label>
+                                            <input type="text" placeholder="Enter Pincode *" id='pincode'
+                                                class="form-control" minlength="6" maxlength="6" name="pincode"
+                                                value="{{vendor.pincode|default:''}}" />
+                                        </div>
+
+                                        <input type="hidden" placeholder="latitude *" id='latitude' class="form-control"
+                                            name="latitude" value="{{vendor.latitude|default:''}}" />
+                                        <input type="hidden" placeholder="longitude *" id='longitude'
+                                            class="form-control" name="longitude"
+                                            value="{{vendor.longitude|default:''}}" />
+
+
+
+                                        <div class="form-group">
+                                            <label>PAN Card No *</label>
+                                            <input type="text" class="form-control" placeholder="PAN Number *"
+                                                pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                                                title="Please enter the correct PAN number." name="pancardno"
+                                                value="{{vendor.pancardno|default:''}}" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>PAN Card Image *</label>
+                                            {% if vendor.pancarddoc %}
+                                            <a href="{{vendor.pancarddoc.url}}"> <img alt="image"
+                                                    src="{{vendor.pancarddoc.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                name="pancarddoc" />
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <div class="form-group">
+                                            <label for="idproof">Idproof *</label>
+                                            <select class="form-control" id="idproof" name="idproof">
+                                                {% if vendor.idproof %}
+                                                <option value="{{vendor.idproof}}" selected>{{vendor.idproof}}</option>
+                                                {% else %}
+                                                {% endif %}
+                                                <option value="" disable>-- select idproof --</option>
+                                                <option value="Aadhaar Card">Aadhaar Card</option>
+                                                <option value="DL">DL</option>
+                                                <option value="Voter ID">Voter ID</option>
+                                                <option value="Passport">Passport</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Id No *</label>
+                                            <input type="text" class="form-control" placeholder="Enter Id Number *"
+                                                name="idno" value="{{vendor.idno|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>ID Front Image *</label>
+                                            {% if vendor.frontidproofdoc %}
+                                            <a href="{{vendor.frontidproofdoc.url}}"> <img alt="image"
+                                                    src="{{vendor.frontidproofdoc.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                name="frontidproofdoc" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>ID Back Image *</label>
+                                            {% if vendor.backidproofdoc %}
+                                            <a href="{{vendor.backidproofdoc.url}}"> <img alt="image"
+                                                    src="{{vendor.backidproofdoc.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                name="backidproofdoc" />
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label for="addressproof">Addressproof *</label>
+                                            <select class="form-control" id="addressproof" name="addressproof">
+                                                {% if vendor.addressproof %}
+                                                <option value="{{vendor.addressproof}}" selected>{{vendor.addressproof}}
+                                                </option>
+                                                {% else %}
+                                                {% endif %}
+                                                <option value="" disable>-- select addressproof --</option>
+                                                <option value="Aadhaar Card">Aadhaar Card</option>
+                                                <option value="DL">DL</option>
+                                                <option value="Voter ID">Voter ID</option>
+                                                <option value="Passport">Passport</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>AddressproofId No *</label>
+                                            <input type="text" class="form-control"
+                                                placeholder="Enter Address Proof No *" name="addressno"
+                                                value="{{vendor.addressno|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Addressproof Front Image *</label>
+                                            {% if vendor.frontaddressproofdoc %}
+                                            <a href="{{vendor.frontaddressproofdoc.url}}"> <img alt="image"
+                                                    src="{{vendor.frontaddressproofdoc.url}}" height="50"
+                                                    weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                name="frontaddressproofdoc" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Addressproof Back Image *</label>
+                                            {% if vendor.backddressproofdoc %}
+                                            <a href="{{vendor.backddressproofdoc.url}}"> <img alt="image"
+                                                    src="{{vendor.backddressproofdoc.url}}" height="50"
+                                                    weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                name="backddressproofdoc" />
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+
+
+
+
+                                <div class="card-header">
+                                    <h4>Store's Details</h4>
+                                </div>
+
+
+                                <div class="row register-form">
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Store Name *</label>
+                                            <input type="text" class="form-control" placeholder="Store Name *" required
+                                                name="storename" value="{{storeobj.storename}}" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="businessmaincategory">Business Main Category *</label>
+                                            <select class="form-control" id="businessmaincategory"
+                                                name="businessmaincategory">
+
+                                                {% if storeobj.businessmaincategory %}
+                                                <option value="{{storeobj.businessmaincategory.id}}" selected>
+                                                    {{storeobj.businessmaincategory.title}}</option>
+                                                {% else %}
+                                                {% endif %}
+
+                                                <option value="" disable>-- Select Business Main Category --</option>
+                                                {% for b in businessmaincategory_obj %}
+                                                <option value="{{b.id}}">{{b.title}}</option>
+                                                {% endfor %}
+
+
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="businesscategory">Business Category *</label>
+                                            <select class="form-control" name="businesscategory"
+                                                id="businesscategory_id" multiple size="5">
+
+                                                {% if storeobj.businesscategory %}
+                                                {% for b in storeobj.businesscategory.all %}
+                                                <option value="{{b.id}}" selected>{{b.title}}</option>
+                                                {% endfor %}
+                                                {% else %}
+                                                {% endif %}
+                                                <option value="" disabled>Select Business Category</option>
+
+
+                                            </select>
+
+
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label>Store Description *</label>
+                                            <textarea type="text" class="form-control" placeholder="Description *"
+                                                required name="description"
+                                                value="{{storeobj.description}}">{{storeobj.description}}</textarea>
+                                        </div>
+
+                                        {% if storeobj.registrationno %}
+                                        <div class="form-group">
+                                            <label>Registration Number *</label>
+                                            <input type="text" class="form-control" placeholder="Registration Number *"
+                                                name="registrationno" value="{{storeobj.registrationno}}" disabled />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Registration QR *</label>
+                                            {% if storeobj.registrationno %}
+                                            <a href="{{storeobj.registrationqrcode.url}}"> <img alt="image"
+                                                    src="{{storeobj.registrationqrcode.url}}" height="100"
+                                                    weight="150" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                        </div>
+                                        {% else %}
+                                        {% endif %}
+                                        <div class="form-group">
+                                            <label>Store Logo *</label>
+                                            {% if storeobj.logo %}
+                                            <a href="{{storeobj.logo.url}}"> <img alt="image"
+                                                    src="{{storeobj.logo.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="image/png, image/jpeg"
+                                                name="logo" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Store Banner *</label>
+                                            {% if storeobj.banner %}
+                                            <a href="{{storeobj.banner.url}}"> <img alt="image"
+                                                    src="{{storeobj.banner.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="image/png, image/jpeg"
+                                                name="banner" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="storeregistrationtype">Store Registration Type *</label>
+                                            <select class="form-control" name="storeregistrationtype">
+                                                {% if storeobj.storeregistrationtype %}
+                                                <option selected value="{{storeobj.storeregistrationtype}}">
+                                                    {{storeobj.storeregistrationtype}}</option>
+                                                {% else %}
+                                                {% endif %}
+                                                <option disabled>----select storeregistrationtype----</option>
+                                                <option value="Proprietorship">Proprietorship</option>
+                                                <option value="Partnerships">Partnerships</option>
+                                                <option value="Private Limited">Private Limited</option>
+
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>MSM No *</label>
+                                            <input type="text" placeholder="Enter MSM No *" id='msmeno'
+                                                class="form-control" name="msmeno"
+                                                value="{{storeobj.msmeno|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>MSM Doc *</label>
+                                            {% if storeobj.msmedoc %}
+                                            <a href="{{storeobj.msmedoc.url}}"> <img alt="image"
+                                                    src="{{storeobj.msmedoc.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="image/png, image/jpeg"
+                                                id='msmedoc' class="form-control" name="msmedoc" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <div class="form-group">
+                                            <label>Street Address *</label>
+                                            <input type="text" class="form-control" placeholder="Enter Street Address *"
+                                                id="address" title="Only (a-z) letters are allowed." required
+                                                name="streetaddress" value="{{storeobj.streetaddress|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Near by Address *</label>
+                                            <input type="text" class="form-control"
+                                                placeholder="Enter Near by Address *" id='nearbyaddress'
+                                                title="Only (a-z) letters are allowed." required name="nearbyaddress"
+                                                value="{{storeobj.nearbyaddress|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>City *</label>
+                                            <input type="text" class="form-control" placeholder="Enter City *" id='city'
+                                                title="Only (a-z) letters are allowed." required name="city"
+                                                value="{{storeobj.city|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>State *</label>
+                                            <input type="text" class="form-control" placeholder="Enter State *"
+                                                id='state' title="Only (a-z) letters are allowed." required name="state"
+                                                value="{{storeobj.state|default:''}}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Country *</label>
+                                            <input type="text" class="form-control" placeholder="Enter Country *"
+                                                id='country' title="Only (a-z) letters are allowed." required
+                                                name="country" value="{{storeobj.country|default:''}}" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Pincode *</label>
+                                            <input type="text" placeholder="Enter Pincode *" id='pincode'
+                                                class="form-control" minlength="6" maxlength="6" name="pincode"
+                                                value="{{storeobj.pincode|default:''}}" />
+                                        </div>
+
+                                        <input type="hidden" placeholder="latitude *" id='latitude' class="form-control"
+                                            name="latitude" value="{{storeobj.latitude|default:''}}" />
+                                        <input type="hidden" placeholder="longitude *" id='longitude'
+                                            class="form-control" name="longitude"
+                                            value="{{storeobj.longitude|default:''}}" />
+
+
+                                        <div class="form-group">
+                                            <label>PAN Card No *</label>
+                                            <input type="text" class="form-control" placeholder="PAN Number *"
+                                                pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                                                title="Please enter the correct PAN number." name="pancardno"
+                                                value="{{storeobj.pancardno|default:''}}" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>PAN Card Image *</label>
+                                            {% if storeobj.pancarddoc %}
+                                            <a href="{{storeobj.pancarddoc.url}}"> <img alt="image"
+                                                    src="{{storeobj.pancarddoc.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                name="pancarddoc" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>GST No *</label>
+                                            <input type="text" class="form-control" placeholder="GST NO *"
+                                                title="Please enter the correct gstno number." name="gstno"
+                                                value="{{storeobj.gstno|default:''}}" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>GST Image *</label>
+                                            {% if storeobj.gstnodoc %}
+                                            <a href="{{storeobj.gstnodoc.url}}"> <img alt="image"
+                                                    src="{{storeobj.gstnodoc.url}}" height="50" weight="50" /></a>
+                                            {% else %}
+                                            {% endif %}
+                                            <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                name="gstnodoc" />
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Store Opening Time *</label>
+                                            <input type="time" class="form-control" placeholder="Closing Time *"
+                                                name="opening_time" required
+                                                value="{{storeobj.openingtime|time:'H:i' }}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Store Closing Time *</label>
+                                            <input type="time" class="form-control" placeholder="Closing Time *"
+                                                name="closing_time" required
+                                                value="{{ storeobj.closingtime|time:'H:i' }}" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="closing_day">Closing Day *</label>
+                                            <select class="form-control" name="closing_day">
+                                                {% if storeobj.closingday %}
+                                                <option selected value="{{storeobj.closingday}}">{{storeobj.closingday}}
+                                                </option>
+                                                {% else %}
+                                                {% endif %}
+                                                <option disabled>----select closing day----</option>
+                                                <option value="Monday">Monday</option>
+                                                <option value="Tuesday">Tuesday</option>
+                                                <option value="Wednesday">Wednesday</option>
+                                                <option value="Thursday">Thursday</option>
+                                                <option value="Friday">Friday</option>
+                                                <option value="Saturday">Saturday</option>
+                                                <option value="Sunday">Sunday</option>
+                                            </select>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label>Store Shipping Policy *</label>
+                                            <textarea type="text" class="form-control" placeholder="shippingpolicy *"
+                                                name="shippingpolicy"
+                                                value="{{storeobj.shippingpolicy}}">{{storeobj.shippingpolicy|safe}}</textarea>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label>Store Replacement Policy *</label>
+                                            <textarea type="text" class="form-control" placeholder="replacementpolicy *"
+                                                name="replacementpolicy"
+                                                value="{{storeobj.replacementpolicy}}">{{storeobj.replacementpolicy|safe}}</textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Store Returnand Refund Policy *</label>
+                                            <textarea type="text" class="form-control"
+                                                placeholder="returnandrefundpolicy *" required
+                                                name="returnandrefundpolicy"
+                                                value="{{storeobj.description}}">{{storeobj.returnandrefundpolicy|safe}}</textarea>
+                                        </div>
+
+
+
+                                       
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                           
+                            <div class="col-md-12">
+                            
+                                <input type="submit" class="btn btn-success form-control" value="Save" />
+                                </div>
+                               
+                        </form>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#businessmaincategory').change(function () {
+            var category_id = $(this).val();
+            $.ajax({
+                url: '/vendor/get_businesscategory',
+                data: { 'category_id': category_id },
+                success: function (res) {
+                    //console.log(res)
+                    let html = '<option  value="" disabled>Select Business Category</option>';
+                    for (i of res.data) {
+                        html += `<option value="${i.id}">${i.title}</option>`;
+                    }
+                    document.getElementById('businesscategory_id').innerHTML = html;
+                }
+
+            });
+        });
+    });
+</script>
+
+
+
+
+
+<script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&libraries=places&callback=initialize"></script>
+
+
+<script>
+    function initialize() {
+        var input = document.getElementById('address');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        autocomplete.addListener('place_changed', function () {
+            var place = autocomplete.getPlace();
+
+            // Extract address components
+            var addressComponents = place.address_components;
+
+            // Initialize variables for pin code, state, city, country, and nearby places
+            var pincode = "";
+            var state = "";
+            var city = "";
+            var country = "";
+            var nearbyPlace = "";
+            var latitude = "";
+            var longitude = "";
+
+            // Iterate through address components to find specific details
+            for (var i = 0; i < addressComponents.length; i++) {
+                var component = addressComponents[i];
+                var types = component.types;
+
+                // Fill in pin code
+                if (types.includes('postal_code')) {
+                    pincode = component.long_name;
+                }
+
+                // Fill in state
+                if (types.includes('administrative_area_level_1')) {
+                    state = component.long_name;
+                }
+
+                // Fill in city
+                if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+                    // Remove the word "Division" from the city
+                    city = component.long_name.replace(/ Division$/, '');
+                }
+
+                // Fill in country
+                if (types.includes('country')) {
+                    country = component.long_name;
+                }
+            }
+
+            // Get latitude and longitude
+            if (place.geometry && place.geometry.location) {
+                latitude = place.geometry.location.lat();
+                longitude = place.geometry.location.lng();
+            }
+
+
+            // Get nearby place
+            if (place.geometry && place.geometry.location) {
+                var service = new google.maps.places.PlacesService(document.createElement('div'));
+                service.nearbySearch({
+                    location: place.geometry.location,
+                    radius: 5000, // You can adjust the radius as needed
+                    type: 'point_of_interest' // You can adjust the type as needed
+                }, function (results, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+                        nearbyPlace = results[0].name;
+                    }
+
+
+
+                    // Update input fields
+                    document.getElementById('pincode').value = pincode;
+                    document.getElementById('state').value = state;
+                    document.getElementById('city').value = city;
+                    document.getElementById('country').value = country;
+                    document.getElementById('nearbyaddress').value = nearbyPlace;
+                    document.getElementById('latitude').value = latitude;
+                    document.getElementById('longitude').value = longitude;
+                });
+            }
+        });
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+
+
+
+
+{% endblock %}
+

@@ -45,6 +45,8 @@ urlpatterns = [
     path('deactivate_isavplvendor', admin_is_deactivate_approved_avpl_vendor),
 
     path('vendorprofile', admin_vendor_profile),
+    path('editvendorprofile', admin_edit_vendor_profile),
+    
     path('paymentinfo', admin_payment_info),
     path('orders', admin_orders),
     path('setpvpair', admin_pvpairvalue),

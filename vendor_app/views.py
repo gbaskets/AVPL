@@ -776,9 +776,16 @@ def vendor_profile(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
 		store = Store.objects.filter(vendor=vendor).first()
+		businessmaincategory_obj=BusinessMainCategory.objects.filter(isactive=True)
+		businesscategory_obj=BusinessCategory.objects.filter(isactive=True)
+		
+		
+	
 		dic = {
 			'storeobj':store,
 			'vendor':vendor,
+            "businessmaincategory_obj":businessmaincategory_obj,
+			"businesscategory_obj":businesscategory_obj,
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}			
