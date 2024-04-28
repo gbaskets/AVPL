@@ -114,9 +114,9 @@
                                        <tbody>
                                           {% for x in data %}
                                           <tr>
-                                             <td>{{ x.title|safe }}</td>
+                                             <td>{{ x.name|safe }}</td>
                                              {% if x.isactive == True %}
-                                             <td><span>Active</span></td>
+                                             <td><span >Active</span></td>
                                              {% else %}
                                              <td><span>De-active</span></td>
                                              {% endif %}
@@ -127,7 +127,7 @@
                                            
                                              
                                              <td>
-                                                <a data-toggle="modal" data-target="#EditMainBussinessModal{{ x.id|safe }}" class="btn btn-success btn-icon icon-left"><i class="far fa-edit"></i>Edit</a>&nbsp;
+                                                <a data-toggle="modal" data-target="#EditProductCategoryModal{{ x.id|safe }}" class="btn btn-success btn-icon icon-left"><i class="far fa-edit"></i>Edit</a>&nbsp;
                                                 
                                                 
                                                   
@@ -151,14 +151,14 @@
 
  {% for x in data %}
 <!-- Modal -->
-<div class="modal fade" id="EditMainBussinessModal{{ x.id|safe }}" tabindex="-1" role="dialog" aria-labelledby="EditMainBussinessModalLabel" aria-hidden="true">
+<div class="modal fade" id="EditProductCategoryModal{{ x.id|safe }}" tabindex="-1" role="dialog" aria-labelledby="EditProductCategoryModalLabel" aria-hidden="true">
    <div class="modal-dialog" role="document">
    <div class="modal-content">
       <form action="/admins/edit-product-categories/{{ x.id|safe }}" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
       <div class="modal-header">
-         <h5 class="modal-title" id="EditMainBussinessModalLabel">Edit Product Categories</h5>
+         <h5 class="modal-title" id="EditProductCategoryModalLabel">Edit Product Categories</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
          <span aria-hidden="true">&times;</span>
          </button>
@@ -170,7 +170,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Title</label>
-                  <input type="text" class="form-control" required  placeholder="Enter Product Category Title" name="title" value="{{ x.title|safe }}">
+                  <input type="text" class="form-control" required  placeholder="Enter Product Category Title" name="title" value="{{ x.name|safe }}">
                </div>
             </div>
             

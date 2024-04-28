@@ -182,7 +182,7 @@ def admin_bussiness_main_categories(request):
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -205,7 +205,7 @@ def admin_add_bussiness_main_categories(request):
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -241,7 +241,7 @@ def admin_edit_bussiness_main_categories(request,id):
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -260,7 +260,7 @@ def admin_delete_bussiness_main_categories(request,id):
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -275,7 +275,7 @@ def admin_bussiness_categories(request):
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-category.html', dic)
+		return render(request, 'admin_app/bussiness/bussiness-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -299,7 +299,7 @@ def admin_add_bussiness_categories(request):
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -337,7 +337,7 @@ def admin_edit_bussiness_categories(request,id):
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -356,7 +356,7 @@ def admin_delete_bussiness_categories(request,id):
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -369,11 +369,10 @@ def admin_product_categories(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
 			'data':ProductCategory.objects.all(),
-			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
-		return render(request, 'admin_app/product-category.html', dic)
+		return render(request, 'admin_app/product/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -392,11 +391,10 @@ def admin_add_product_categories(request):
 		
 		dic = {
 			'data':ProductCategory.objects.all(),
-			'productcategories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/product-category.html', dic)
+		return render(request, 'admin_app/product/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -424,15 +422,15 @@ def admin_edit_product_categories(request,id):
              
 			bussinessmaincateobj.updatedby=request.user
 			bussinessmaincateobj.save()
-			return redirect("/admins/bussiness-main-categories")
+			return redirect("/admins/product-categories")
 			
 		dic = {
-			'data':BusinessMainCategory.objects.all(),
+			'data':ProductCategory.objects.all(),
 			
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/product/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -441,17 +439,16 @@ def admin_edit_product_categories(request,id):
 def admin_delete_product_categories(request,id):
 	if check_user_authentication(request, 'ADMIN'):
 		if id :
-			bussinessmaincateobj=BusinessMainCategory.objects.filter(id=id).first()
+			bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
 			bussinessmaincateobj.delete()
-			return redirect("/admins/bussiness-main-categories")
+			return redirect("/admins/product-categories")
 			
 		dic = {
-			'data':BusinessMainCategory.objects.all(),
-			
+			'data':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/bussiness-main-category.html', dic)
+		return render(request, 'admin_app/product/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 

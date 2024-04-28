@@ -18,6 +18,7 @@ from user_app.utils import *
 from admin_app.models import *
 from django.utils import timezone
 from .models import *
+import datetime
 import timeago
 
 def generate_link(user,for_,type_):
@@ -678,26 +679,19 @@ def variant_filter(variant_values, products):
 def notification(user, text):
 	Notification.objects.create(user=user, notification_date = datetime.datetime.now().replace(tzinfo=None), text=text)
 
+
+
 def get_notifications(user):
-	now_date=datetime.datetime.now() 
-	# now_date=datetime.datetime.now() + datetime.timedelta(seconds = 60 * 3.4)
-	dic={}
-	lt=[]
-	for x in Notification.objects.filter(admin=user):
-		time = x.notification_date.time()
-		date = x.notification_date.date()
-		hour = int(str(time)[0:2])
-		minute = int(str(time)[3:5])
-		year = str(x.notification_date.date())[0:4]
-		month = str(x.notification_date.date())[5:7]
-		day = str(x.notification_date.date())[8:10]
-		new = datetime.datetime(int(year), int(month), int(day), hour, minute, 0, 0, tzinfo=None)
-		dic={
-			'text':x.text,
-			'time':timeago.format(new, now_date.replace(tzinfo=None))
-		}
-		lt.append(dic)
-	return list(reversed(lt))
+    now_date = datetime.datetime.now() 
+    notifications = Notification.objects.filter(admin=user)
+    lt = [{
+        'subject': x.subject,
+        'message': x.message,
+        'time': timeago.format(x.createdat, now_date, locale='en_short')
+    } for x in notifications]
+    return list(reversed(lt))
+
+
 
 def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)
