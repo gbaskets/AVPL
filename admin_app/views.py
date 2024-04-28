@@ -387,9 +387,8 @@ def admin_add_product_categories(request):
 			if title:
 				bussinessmaincateobj=ProductCategory.objects.create(name=title)			
 				bussinessmaincateobj.updatedby=request.user
-                
 			if image:
-				bussinessmaincateobj.updatedby=request.user
+				bussinessmaincateobj.image=image
 			if title:
 				bussinessmaincateobj.save()
 				return redirect("/admins/product-categories")
