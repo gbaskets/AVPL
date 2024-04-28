@@ -106,7 +106,7 @@ def admin_dashboard(request):
 			# 'total_pv':Current_PV.objects.all().order_by('-id').first,
 			# 'year_pv':Yearly_PV.objects.all(),
 			'wallettransactions':WalletTransaction.objects.all().order_by('-id'),
-			# 'notification':get_notifications(request.user),
+			# 'notification':get_notifications(request.user,'ADMIN'),
 			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/dashboard.html', dic)
@@ -179,7 +179,7 @@ def admin_bussiness_main_categories(request):
 		
 		dic = {
 			'data': BusinessMainCategory.objects.all().order_by("-id"),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
@@ -202,7 +202,7 @@ def admin_add_bussiness_main_categories(request):
 		dic = {
 			'data':BusinessMainCategory.objects.all(),
 			'bussinessmaincategories':BusinessMainCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
@@ -238,7 +238,7 @@ def admin_edit_bussiness_main_categories(request,id):
 		dic = {
 			'data':BusinessMainCategory.objects.all(),
 			
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
@@ -257,7 +257,7 @@ def admin_delete_bussiness_main_categories(request,id):
 		dic = {
 			'data':BusinessMainCategory.objects.all(),
 			
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
@@ -272,7 +272,7 @@ def admin_bussiness_categories(request):
 		dic = {
 			'data':BusinessCategory.objects.all(),
 			'bussinessmaincategories':BusinessMainCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness/bussiness-category.html', dic)
@@ -296,7 +296,7 @@ def admin_add_bussiness_categories(request):
 		dic = {
 			'data':BusinessMainCategory.objects.all(),
 			'bussinessmaincategories':BusinessMainCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
@@ -334,7 +334,7 @@ def admin_edit_bussiness_categories(request,id):
 		dic = {
 			'data':BusinessCategory.objects.all(),
 			
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
@@ -353,7 +353,7 @@ def admin_delete_bussiness_categories(request,id):
 		dic = {
 			'data':BusinessCategory.objects.all(),
 			
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/bussiness/bussiness-main-category.html', dic)
@@ -369,7 +369,7 @@ def admin_product_categories(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
 			'data':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 		return render(request, 'admin_app/product/product-category.html', dic)
@@ -382,16 +382,21 @@ def admin_add_product_categories(request):
 	if check_user_authentication(request, 'ADMIN'):
 		if request.method == 'POST':
 			title= request.POST.get('title')
-	
+			image=request.FILES.get('image')
+
 			if title:
 				bussinessmaincateobj=ProductCategory.objects.create(name=title)			
 				bussinessmaincateobj.updatedby=request.user
+                
+			if image:
+				bussinessmaincateobj.updatedby=request.user
+			if title:
 				bussinessmaincateobj.save()
 				return redirect("/admins/product-categories")
-		
+			
 		dic = {
 			'data':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product/product-category.html', dic)
@@ -427,7 +432,7 @@ def admin_edit_product_categories(request,id):
 		dic = {
 			'data':ProductCategory.objects.all(),
 			
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product/product-category.html', dic)
@@ -445,7 +450,8 @@ def admin_delete_product_categories(request,id):
 			
 		dic = {
 			'data':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
+   
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product/product-category.html', dic)
@@ -455,156 +461,194 @@ def admin_delete_product_categories(request,id):
 
 
 
-@csrf_exempt
-def admin_product_sub_categories(request):
-	if check_user_authentication(request, 'ADMIN'):
-		if request.method == 'POST':
-			name = request.POST.get('name')
-			image = request.FILES['image']
-			category = request.POST.get('category')
-			if ProductSubCategory.objects.filter(name=name).exists():
-				messages.info(request, 'Product Sub Category Already Exists')
-				return redirect('/admins/productsubcategories')
-			else:
-				ProductSubCategory.objects.create(category=ProductCategory.objects.get(id=category),name=name, image=image)
-				messages.info(request, 'Product Sub Category Added Successfully !!!!')
-				return redirect('/admins/productsubcategories')
-		else:
-			dic = {
-				'categories':ProductCategory.objects.all(),
-				'data':ProductSubCategory.objects.all(),
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-			}
-			return render(request, 'admin_app/product-sub-category.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def admin_edit_product_sub_categories(request):
-	if check_user_authentication(request, 'ADMIN'):
-		if request.method == 'GET':
-			id_ = request.GET.get('id_')
-			print('IIIIIIIIIIIIII', id_)
-			dic = {
-				'categories':ProductCategory.objects.all(),
-				'data': ProductSubCategory.objects.filter(id=id_),
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-			}
-			return render(request, 'admin_app/edit-product-sub-category.html', dic)
-			
-		if request.method == 'POST':
-			id_ = request.GET.get('id_')
-			print(id_)
-			data = ProductSubCategory.objects.filter(id=id_).first()
-			print(data)
-			name = request.POST.get('name')
-			category = request.POST.get('category')
-			print('KKKKKKKKKKKKKKKK',name, category)
-			image = request.FILES.get('image')
-			data.name = name
-			data.category=ProductCategory.objects.get(id=category)
-			data.image = image
-			data.save()
 
-			dic = {
-			# 'data' : data,
-			'data':ProductSubCategory.objects.all(),
-			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+@csrf_exempt
+def admin_product_subcategories(request):    
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+            'data':ProductSubCategory.objects.all(),
+			'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
-			messages.info(request, 'Product Sub-Category Edited Successfully !!!!')
-			return redirect('/admins/productsubcategories')
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def admin_delete_product_sub_category(request):
-	if check_user_authentication(request, 'ADMIN'):
-		if request.method == 'GET':
-			id_ = request.GET.get('id_')
-			ProductSubCategory.objects.filter(id=id_).delete()
-			messages.info(request, 'Product Sub Category Deleted Successfully !!!!')
-			return redirect('/admins/productsubcategories')
+		return render(request, 'admin_app/product/product-subcategory.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
+
 @csrf_exempt
-def admin_product_sub_sub_categories(request):
+def admin_add_product_subcategories(request):
 	if check_user_authentication(request, 'ADMIN'):
 		if request.method == 'POST':
-			name = request.POST.get('name')
-			image = request.FILES['image']
-			subcategory = request.POST.get('subcategory')
-			if ProductSubSubCategory.objects.filter(name=name).exists():
-				messages.info(request, 'Product Sub Sub Category Already Exists')
-				return redirect('/admins/productsubsubcategories')
+			title= request.POST.get('title')
+	
+			if title:
+				bussinessmaincateobj=ProductCategory.objects.create(name=title)			
+				bussinessmaincateobj.updatedby=request.user
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-categories")
+		
+		dic = {
+			'data':ProductSubCategory.objects.all(),
+			'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_subcategories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+		if request.method == 'POST':
+			title= request.POST.get('title')
+			isactive= request.POST.get('isactive')
+			print(title,isactive,'isactiveisactiveisactiveisactive')
+			if title:
+				bussinessmaincateobj.name=title
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
 			else:
-				ProductSubSubCategory.objects.create(subcategory=ProductSubCategory.objects.get(id=subcategory),name=name, image=image)
-				messages.info(request, 'Product Sub Sub Category Added Successfully !!!!')
-				return redirect('/admins/productsubsubcategories')
-		else:
-			dic = {
-				'categories':ProductCategory.objects.all(),
-				'subcategories':ProductSubCategory.objects.all(),
-				'data':ProductSubSubCategory.objects.all(),
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-			}
-			return render(request, 'admin_app/product-sub-sub-category.html', dic)
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/product-categories")
+			
+		dic = {
+			'data':ProductSubCategory.objects.all(),
+			'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def admin_edit_product_sub_sub_categories(request):
-	if check_user_authentication(request, 'ADMIN'):
-		if request.method == 'GET':
-			id_ = request.GET.get('id_')
-			print('IIIIIIIIIIIIII', id_)
-			dic = {
-				'categories':ProductCategory.objects.all(),
-				'subcategories':ProductSubCategory.objects.all(),
-				'data':ProductSubSubCategory.objects.filter(id=id_),
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-			}
-			return render(request, 'admin_app/edit-product-sub-sub-category.html', dic)
-			
-		if request.method == 'POST':
-			id_ = request.GET.get('id_')
-			print(id_)
-			data = ProductSubSubCategory.objects.filter(id=id_).first()
-			print(data)
-			name = request.POST.get('name')
-			subcategory = request.POST.get('subcategory')
-			
-			image = request.FILES.get('image')
-			data.name = name
-			data.subcategory=ProductSubCategory.objects.get(id=subcategory)
-			data.image = image
-			data.save()
 
-			dic = {
-			# 'data' : data,
-		        'categories':ProductCategory.objects.all(),
-				'subcategories':ProductSubCategory.objects.all(),
-				'data':ProductSubSubCategory.objects.filter(id=id_),
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-			}
-			messages.info(request, 'Product Sub-Sub-Category Edited Successfully !!!!')
-			return redirect('/admins/productsubsubcategories')
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 @csrf_exempt
-def admin_delete_product_sub_sub_category(request):
+def admin_delete_product_subcategories(request,id):
 	if check_user_authentication(request, 'ADMIN'):
-		if request.method == 'GET':
-			id_ = request.GET.get('id_')
-			ProductSubSubCategory.objects.filter(id=id_).delete()
-			messages.info(request, 'Product Sub Sub Category Deleted Successfully !!!!')
-			return redirect('/admins/productsubsubcategories')
+		if id :
+			bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/product-categories")
+			
+		dic = {
+			'data':ProductSubCategory.objects.all(),
+			'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-category.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+@csrf_exempt
+def admin_product_subsubcategories(request):    
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'data':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			}
+		return render(request, 'admin_app/product/product-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_add_product_subsubcategories(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			title= request.POST.get('title')
+	
+			if title:
+				bussinessmaincateobj=ProductCategory.objects.create(name=title)			
+				bussinessmaincateobj.updatedby=request.user
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-categories")
+		
+		dic = {
+			'data':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_subsubcategories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+		if request.method == 'POST':
+			title= request.POST.get('title')
+			isactive= request.POST.get('isactive')
+			print(title,isactive,'isactiveisactiveisactiveisactive')
+			if title:
+				bussinessmaincateobj.name=title
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/product-categories")
+			
+		dic = {
+			'data':ProductCategory.objects.all(),
+			
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_product_subsubcategories(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/product-categories")
+			
+		dic = {
+			'data':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+   
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-category.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+
+
 @csrf_exempt
 def admin_vendor_verification(request):
 	if check_user_authentication(request, 'ADMIN'):
@@ -614,7 +658,7 @@ def admin_vendor_verification(request):
 		dic = {
 			'categories':ProductCategory.objects.all(),
 			'data':Store.objects.filter(vendor__docsubmitted=True, vendor__verified=False),
-			# 'notification':get_notifications(request.user),
+			# 'notification':get_notifications(request.user,'ADMIN'),
 			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/vendor_verification.html', dic)
@@ -626,7 +670,7 @@ def admin_vendor_list(request):
 		dic = {
 			'categories':ProductCategory.objects.all(),
 			'data':Vendor.objects.filter(docsubmitted=True, verified=True),
-			# 'notification':get_notifications(request.user),
+			# 'notification':get_notifications(request.user,'ADMIN'),
 			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/vendor_list.html', dic)
@@ -986,7 +1030,7 @@ def admin_pv_wallet(request):
 		dic = {'user':UserData.objects.get(user=request.user),
 			'pv':fetch_pv(request.user),
 			'transactions':fetch_pv_transactions(request.user),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/pv.html', dic)
@@ -1018,7 +1062,7 @@ def admin_create_link(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
 			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/create-link.html', dic)
@@ -1031,7 +1075,7 @@ def wallet_details(request):
 			'wallet':Wallet.objects.filter(user__is_superuser=True),'categories':ProductCategory.objects.all(),
 			'wallettransactions':WalletTransaction.objects.filter(wallet__user__is_superuser=True),
 			# 'wallettransactions':WalletTransaction.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(user=request.user, read=False))
 	    	}
 		return render(request, 'admin_app/wallet.html', dic)
@@ -1062,7 +1106,7 @@ def admin_wallet_recharge(request):
 			return redirect('/admins/wallet_details')
 
 		dic = {'wallet':Wallet.objects.filter(user__is_superuser=True),'categories':ProductCategory.objects.all(),
-			'wallettransactions':WalletTransaction.objects.filter(wallet__user__is_superuser=True),'notification':get_notifications(request.user),
+			'wallettransactions':WalletTransaction.objects.filter(wallet__user__is_superuser=True),'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),}
 		return render(request, 'admin_app/wallet.html', dic)
 	else:
@@ -1097,7 +1141,7 @@ def admin_under_trees(request):
 
 		dic = {'data':MLMAdmin.objects.all(), 'categories':ProductCategory.objects.all(),
 		'tree':fetch_user_tree(child),
-		'notification':get_notifications(request.user),
+		'notification':get_notifications(request.user,'ADMIN'),
 		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/under-trees.html', dic)
@@ -1248,7 +1292,7 @@ def genealogyTree_binary(request):
 						'usrpvsr4':usrpvsr4,
 
 						'child':child,
-						'notification':get_notifications(request.user),
+						'notification':get_notifications(request.user,'ADMIN'),
 						'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 							}
 				else:
@@ -1267,7 +1311,7 @@ def genealogyTree_binary(request):
 					
 					
 					'child':child,
-					'notification':get_notifications(request.user),
+					'notification':get_notifications(request.user,'ADMIN'),
 					'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 						}
 			else:
@@ -1287,7 +1331,7 @@ def genealogyTree_binary(request):
 					
 					
 					'child':child,
-					'notification':get_notifications(request.user),
+					'notification':get_notifications(request.user,'ADMIN'),
 					'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 						}
 			return render(request, 'admin_app/genealogyTree_binary.html',dic)
@@ -1339,7 +1383,7 @@ def genealogyTree_level(request):
 				# 'user':UserData.objects.get(user=request.user),
 				'referals':referals,
 				# 'sponser_r':referal_obj.referrals,
-				# 'notification':get_notifications(request.user),
+				# 'notification':get_notifications(request.user,'ADMIN'),
 				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 				'referals_user':referals_user,
 				
@@ -1354,7 +1398,7 @@ def genealogyTree_level(request):
 				# 'user':UserData.objects.get(user=request.user),
 				'referals':referals,
 				# 'sponser_r':referal_obj.referrals,
-				# 'notification':get_notifications(request.user),
+				# 'notification':get_notifications(request.user,'ADMIN'),
 				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 
@@ -1365,7 +1409,7 @@ def genealogyTree_level(request):
 				# 'user':UserData.objects.get(user=request.user),
 				'referals':referals,'usrpvs':usrpvs,
 				# 'sponser_r':referal_obj,
-				# 'notification':get_notifications(request.user),
+				# 'notification':get_notifications(request.user,'ADMIN'),
 				# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 		return render(request, 'admin_app/genealogyTree_level.html',dic)
@@ -1397,7 +1441,7 @@ def admin_delivery_charges(request):
 			notification(request.user, 'Delivery Charges Changed.')
 			return redirect('/admins/deliverycharges')
 		dic = {'charge':DeliveryCharge.objects.all(),'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/delivery-charges.html', dic)
@@ -1410,7 +1454,7 @@ def admin_payment_info(request):
 		dic = {
 			'orders':Orders.objects.all(),
 			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/payment-info.html', dic)
@@ -1422,7 +1466,7 @@ def admin_orders(request):
 		dic = {
 			'orders':OrderItems.objects.all(),
 			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/orders.html', dic)
@@ -1439,7 +1483,7 @@ def admin_pvpairvalue(request):
 			notification(request.user, 'PV Pair Value Changed')
 			return redirect('/admins/setpvpair')
 		dic = {'data':PVPairValue.objects.all(), 'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/set-pv-pair.html', dic)
@@ -1449,7 +1493,7 @@ def admin_pvpairvalue(request):
 def admin_withdraw(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {'users':UserWithdrawRequest.objects.all(), 'vendors':VendorWithdrawRequest.objects.all(), 'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/withdraw.html', dic)
@@ -1508,7 +1552,7 @@ def admin_change_withdraw_status(request):
 def admin_query(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {'queries':Query.objects.all().order_by('-id'),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/query.html', dic)
@@ -1518,7 +1562,7 @@ def admin_query(request):
 def admin_query_result(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {'query':Query.objects.get(id=request.GET.get('query_id')),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/query-result.html', dic)
@@ -1588,7 +1632,7 @@ def admin_set_pv_conversion(request):
 			notification(request.user, 'User Share Percent Changed.')
 			return redirect('/admins/setpvconversion')
 		dic = {'data':PVConversionValue.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/set-pv-conversion.html', dic)
@@ -1607,7 +1651,7 @@ def admin_direct_referal(request):
 			notification(request.user,'Direct Referal Commission Precent Changed.')
 			return redirect('/admins/direct-referal')
 		dic = {'data':DirectReferalCommission.objects.all(),
-		'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+		'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/direct-referal.html', dic)
@@ -1629,7 +1673,7 @@ def admin_leadership_bonus_set(request):
 			notification(request.user,'Leadership Bonus Precent Changed.')
 			return redirect('/admins/leadershipbonus')
 		dic = {'data':UserLeadershipBonusCommission.objects.all(),
-		'notification':get_notifications(request.user),
+		'notification':get_notifications(request.user,'ADMIN'),
 		'leadership_bonus':get_leadership_eligible_users(request),'categories':ProductCategory.objects.all(),
 		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -1651,7 +1695,7 @@ def admin_travel_fund_set(request):
 			notification(request.user,'Leadership Bonus Precent Changed.')
 			return redirect('/admins/travelfund')
 		dic = {'data':TravelFund.objects.all(),
-		'notification':get_notifications(request.user),
+		'notification':get_notifications(request.user,'ADMIN'),
 		'travel_fund':get_travel_fund_eligible_users(request),'categories':ProductCategory.objects.all(),
 		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -1673,7 +1717,7 @@ def admin_car_fund_set(request):
 			notification(request.user,'Leadership Bonus Precent Changed.')
 			return redirect('/admins/carfund')
 		dic = {'data':CarFund.objects.all(),
-		'notification':get_notifications(request.user),
+		'notification':get_notifications(request.user,'ADMIN'),
 		'car_fund':get_car_fund_eligible_users(request),'categories':ProductCategory.objects.all(),
 		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -1695,7 +1739,7 @@ def admin_house_fund_set(request):
 			notification(request.user,'Leadership Bonus Precent Changed.')
 			return redirect('/admins/housefund')
 		dic = {'data':HouseFund.objects.all(),
-		'notification':get_notifications(request.user),
+		'notification':get_notifications(request.user,'ADMIN'),
 		'house_fund':get_house_fund_eligible_users(request),'categories':ProductCategory.objects.all(),
 		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -1717,7 +1761,7 @@ def admin_directorship_fund_set(request):
 			notification(request.user,'Leadership Bonus Precent Changed.')
 			return redirect('/admins/directorshipfund')
 		dic = {'data':DirectorshipFund.objects.all(),
-		'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+		'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 		'directorship_fund':get_directorship_fund_eligible_users(request),
 		'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -1732,7 +1776,7 @@ def admin_product(request):
 			'product':product,
 			'images':ProductImages.objects.filter(product=product),
 			'variants':ProductVariant.objects.filter(product=product),'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request,'admin_app/product.html', dic)
@@ -1753,7 +1797,7 @@ def admin_product_approval(request):
 		
 		dic = {'data':Product.objects.filter(isactive=False, isproductrejected=False),
 			'rejected_product':Product.objects.filter(isactive=False, isproductrejected=True),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product-approval.html', dic)
@@ -1765,7 +1809,7 @@ def admin_product_list(request):
 		
 		dic = {
 			'products':Product.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product_list.html', dic)
@@ -1904,7 +1948,7 @@ def vendor_commission(request):
 			notification(request.user, 'Vendor Commission Changed')
 			return redirect('/admins/vendorcommission')
 		dic = {'data':Vendor_Commission.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/set-vendor-commission.html', dic)
@@ -1921,7 +1965,7 @@ def user_vendor_commission(request):
 			notification(request.user, 'User Vendor Commission Changed')
 			return redirect('/admins/uservendorcommission')
 		dic = {'data':UserVendorCommission.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/set-user-vendor-commission.html', dic)
@@ -2123,7 +2167,7 @@ def admin_gst_log(request):
 			'order':GST_Log.objects.all().order_by('-id'),
 			'orders':OrderItems.objects.all(),
 			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/gstlogs.html', dic)
@@ -2150,7 +2194,7 @@ def admin_total_tds(request):
 					TDS_Log_Wallet.objects.filter(user=x.user).update(current_balance = round(x.current_balance, 2) - round(x.current_balance, 2))
 
 			return redirect('/admins/total_tds')
-		dic = {'total_tds':Total_TDS.objects.all()[0], 'total_tds_transactions':Total_TDS_Pay.objects.all(),'notification':get_notifications(request.user),
+		dic = {'total_tds':Total_TDS.objects.all()[0], 'total_tds_transactions':Total_TDS_Pay.objects.all(),'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),}
 		return render(request, 'admin_app/total_tds.html', dic)
 	else:
@@ -2163,7 +2207,7 @@ def admin_tds_withdraw(request):
 			'users':UserWithdrawRequest.objects.all(),'tds_wallet':TDS_Log_Wallet.objects.all(),
 			'vendors':VendorWithdrawRequest.objects.all(),
 			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/tdslogs.html', dic)
@@ -2182,7 +2226,7 @@ def admin_tds_log_details(request, id):
 			'users':UserWithdrawRequest.objects.all(),
 			'vendors':VendorWithdrawRequest.objects.all(),
 			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		
 		}
@@ -2205,7 +2249,7 @@ def terms(request):
 			)
 		dic = {
 			'data':termsandcondition.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/terms-condition.html',dic)
@@ -2225,7 +2269,7 @@ def privacy(request):
 			)
 		dic = {
 			'data':privacypolicy.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/privacy.html',dic)
@@ -2257,7 +2301,7 @@ def contact(request):
 			print(contact_us)
 		dic = {
 			'data':contact_us.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		dic.update(get_cart_len(request))
@@ -2285,7 +2329,7 @@ def admin_about_us(request):
 			)
 		dic = {
 			'data':AboutUs.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/about-us.html',dic)
@@ -2309,7 +2353,7 @@ def admin_gallery(request):
 				
 		dic = {
 			'data':Gallery.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/gallery.html',dic)
@@ -2332,7 +2376,7 @@ def admin_blog(request):
 			)
 		dic = {
 			'data':Blog.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/blog.html',dic)
@@ -2362,7 +2406,7 @@ def admin_banner(request):
 			)
 		dic = {
 			'data':HomeBanner.objects.all(),
-			'notification':get_notifications(request.user),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/banner.html',dic)
@@ -2393,7 +2437,7 @@ def admin_subscription_pack(request):
 			notification(request.user, 'Subscription Charges Changed.')
 			return redirect('/admins/subscription-pack')
 		dic = {'charge':SubscriptionCharge.objects.all(),'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/subscription-charges.html', dic)
@@ -2427,7 +2471,7 @@ def adminbalanacetransfer(request):
 			'userdata':userdata,'vendordata': vandordata,
 			'transectiodetails':transectiondata,
 			'bal':bal,
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(user=request.user, read=False))
 		}
 
@@ -2510,7 +2554,7 @@ def admin_vendor_commission_wallet(request):
 		dic = {
 			'vendor_commission_wallet':CommissionWallet.objects.filter(vendor__storecreated=True), 
 			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/vendor_commission_wallet.html', dic)
@@ -2526,7 +2570,7 @@ def admin_vendor_commission_wallet_details(request, id):
             'vendor_commission_wallet':vendor_commission_wallet,
 			'vendor_commission_wallet_transaction':vendor_commission_wallet_transaction,
 			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		
 		}
@@ -2626,7 +2670,7 @@ def staff_list(request):
 		dic = {
 			'categories':ProductCategory.objects.all(),'form':form,'form1':form1,
 			'data':Staffs_User.objects.all(),
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/staffs_list.html', dic)
@@ -2694,7 +2738,7 @@ def admin_staff_profile(request):
 		
 		dic = {
 			'user':user,'staff':staff,'updateform':updateform,'updateform2':updateform2,
-			'notification':get_notifications(request.user),
+			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			'data':Staffs_User.objects.all(),
 			'categories':ProductCategory.objects.all()

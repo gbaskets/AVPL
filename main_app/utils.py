@@ -681,15 +681,29 @@ def notification(user, text):
 
 
 
-def get_notifications(user):
-    now_date = datetime.datetime.now() 
-    notifications = Notification.objects.filter(admin=user)
-    lt = [{
-        'subject': x.subject,
-        'message': x.message,
-        'time': timeago.format(x.createdat, now_date, locale='en_short')
-    } for x in notifications]
-    return list(reversed(lt))
+def get_notifications(user,usertype):
+	now_date = datetime.datetime.now() 
+	if usertype == "ADMIN" :
+		notifications = Notification.objects.filter(admin=user)
+	elif usertype == "ADMIN-STAFF" :
+		notifications = Notification.objects.filter(admin=user)
+	elif usertype == "CUSTOMER" :
+		notifications = Notification.objects.filter(customer__user=user)
+	elif usertype == "VENDOR" :
+		notifications = Notification.objects.filter(vendor__user=user)
+	elif usertype == "VENDOR-STAFF" :
+		notifications = Notification.objects.filter(admin=user)
+	else:
+		pass
+
+	lt = [{
+		'subject': x.subject,
+		'message': x.message,
+        'isread': x.isread,
+        'isreadby': x.isreadby,
+		'time': timeago.format(x.createdat, now_date, locale='en_short')
+	} for x in notifications]
+	return list(reversed(lt))
 
 
 

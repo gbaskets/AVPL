@@ -1,6 +1,6 @@
 {% extends 'admin_app/base.html' %}
 {% load static %}
-{% block title %}Bussiness Categories{% endblock %}
+{% block title %}Product Sub-Categories{% endblock %}
 {% block main %}
 
 <style>
@@ -73,10 +73,10 @@
                      <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                            <div class="section-header-breadcrumb-content">
-                              <h1>Bussiness Categories</h1>
+                              <h1>Product Sub-Categories</h1>
                               <div class="section-header-breadcrumb">
                                  <div class="breadcrumb-item active"><a href="/admins/dashboard"><i class="fas fa-home"></i></a></div>
-                                 <div class="breadcrumb-item"><a href="#">Bussiness Categories</a></div>
+                                 <div class="breadcrumb-item"><a href="#">Product Sub-Categories</a></div>
                               </div>
                            </div>
                         </div>
@@ -90,10 +90,10 @@
                               <div class="card-header">
                      
                                  <div class="col-8">
-                                    <h4>Bussiness Categories List</h4>
+                                    <h4>Product Sub-Categories List</h4>
                                     </div>
                                     <div class="col-6">
-                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddBussinessModal">Add Bussiness Category</a>
+                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddBussinessModal">Add Product Sub-Category</a>
    
  
                                        </div>
@@ -105,7 +105,7 @@
                                        <thead>
                                           <tr>
                                              <th>Title</th>
-                                             <th>Bussiness Main Categories</th>
+                                             <th>Product Categories</th>
                                              <th>Status</th>
                                              <th>Updated On</th>
                                              <th>Updated By</th>
@@ -160,7 +160,7 @@
       method="POST">
       {% csrf_token %}
       <div class="modal-header">
-         <h5 class="modal-title" id="EditBussinessModalLabel">Edit Bussiness Categories</h5>
+         <h5 class="modal-title" id="EditBussinessModalLabel">Edit Product Sub-Categories</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
          <span aria-hidden="true">&times;</span>
          </button>
@@ -171,7 +171,7 @@
          <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
                <div class="form-group">
-                  <label>Bussiness Main Categories</label>
+                  <label>Product Categories</label>
                   <select class="form-control" required name="main_id">
                   {% for category in bussinessmaincategories %}
                   <option value="{{ category.id }}" {% if x.businessmaincategory.id == category.id %} selected {% endif %}>{{ category.title }}</option>
@@ -194,7 +194,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Title</label>
-                  <input type="text" class="form-control" required  placeholder="Enter Bussiness Category Title" name="title" value="{{ x.title|safe }}">
+                  <input type="text" class="form-control" required  placeholder="Enter Bussiness Category Title" name="title" value="{{ x.name|safe }}">
                </div>
             </div>
             
@@ -237,7 +237,7 @@
       method="POST">
       {% csrf_token %}
        <div class="modal-header">
-         <h5 class="modal-title" id="AddBussinessModalLabel">Add Bussiness Categories</h5>
+         <h5 class="modal-title" id="AddBussinessModalLabel">Add Product Sub-Categories</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
          </button>
@@ -248,7 +248,7 @@
          <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
                <div class="form-group">
-                  <label>Bussiness Main Categories</label>
+                  <label>Product Categories</label>
                   <select class="form-control" required name="main_id" id="main_id">
                      {% for category in bussinessmaincategories %}
                      <option value="{{ category.id }}">{{ category.title }}</option>
@@ -259,7 +259,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Title</label>
-                  <input type="text" class="form-control" required  placeholder="Enter Bussiness Category Title" name="title">
+                  <input type="text" class="form-control" required  placeholder="Enter Product Sub Category Title" name="title">
                </div>
             </div>
             

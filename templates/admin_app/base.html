@@ -44,7 +44,7 @@
                </div>
                <ul class="navbar-nav navbar-right">
                   <li class="dropdown dropdown-list-toggle">
-                     <a href="#" onclick="mark_notification_read();" data-toggle="dropdown"
+                     <a href="#"  data-toggle="dropdown"
                         class="nav-link notification-toggle nav-link-lg"><i class="far fa-bell"></i>{% if notification_len != 0 %}<span class="notification-count bg-green" id="notification_len">{{notification_len}}</span>{% endif %}</a>
                      <div class="dropdown-menu dropdown-list dropdown-menu-right">
                         <div class="dropdown-header">
@@ -60,8 +60,10 @@
                            <i class="fa fa-bell"></i>
                            </span>
                            <span class="dropdown-item-desc">
-                           {{ x.text|safe }}
+                              {{ x.subject|safe }} - {{ x.message|safe }}
                            <span class="time">{{ x.time|safe }}</span>
+                           <span class="time">{{ x.isreadby|default:"" }}</span>
+                           
                            </span>
                            </a>
                            {% endfor %}

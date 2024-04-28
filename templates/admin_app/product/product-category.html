@@ -105,6 +105,7 @@
                                        <thead>
                                           <tr>
                                              <th>Title</th>
+                                             <th>Image</th>
                                              <th>Status</th>
                                              <th>Updated On</th>
                                              <th>Updated By</th>
@@ -115,6 +116,13 @@
                                           {% for x in data %}
                                           <tr>
                                              <td>{{ x.name|safe }}</td>
+                                             <td>
+                                                {% if x.image %}
+                                                <a href="{{x.image.url}}"> <img alt="image" src="{{x.image.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                --
+                                                {% endif %}
+                                             </td>
                                              {% if x.isactive == True %}
                                              <td><span >Active</span></td>
                                              {% else %}
@@ -172,6 +180,14 @@
                   <label>Title</label>
                   <input type="text" class="form-control" required  placeholder="Enter Product Category Title" name="title" value="{{ x.name|safe }}">
                </div>
+               <div class="form-group">
+                  <label>Image *</label>
+                  {% if vendor.image %}
+                  <a href="{{vendor.image.url}}"> <img alt="image" src="{{vendor.image.url}}"  height="50" weight="50" /></a>
+                  {% else %}
+                  {% endif %}
+                  <input type="file" class="form-control" accept="image/png, image/jpeg" name="image" />
+              </div>
             </div>
             
             <div class="col-lg-12 col-md-12 col-sm-12">
@@ -227,6 +243,10 @@
                   <label>Title</label>
                   <input type="text" class="form-control" required  placeholder="Enter Product Category Title" name="title">
                </div>
+               <div class="form-group">
+                  <label>Image *</label>
+                  <input type="file" class="form-control" accept="image/png, image/jpeg" name="image" />
+              </div>
             </div>
             
 

@@ -2044,7 +2044,7 @@ def change_password(request):
         return render(request, 'main_app/change-password.html')
 
 def mark_notification_read(request):
-    Notification.objects.filter(user=request.user).update(read=True)
+    Notification.objects.filter(admin=request.user).update(isread=True)
     return JsonResponse({'response':'Success'})
 
 def userpv(request):

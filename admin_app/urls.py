@@ -21,13 +21,20 @@ urlpatterns = [
     path('edit-product-categories/<int:id>', admin_edit_product_categories, name="edit-product-categories"),
     path('delete-product-categories/<int:id>', admin_delete_product_categories, name="delete-product-categories"),
     
+    path('product-subcategories', admin_product_subcategories),
+    path('add-product-subcategories', admin_add_product_subcategories),
+    path('edit-product-subcategories/<int:id>', admin_edit_product_subcategories, name="edit-product-subcategories"),
+    path('delete-product-subcategories/<int:id>', admin_delete_product_subcategories, name="delete-product-subcategories"),
+    
+    path('product-sub-subcategories', admin_product_subsubcategories),
+    path('add-product-sub-subcategories', admin_add_product_subsubcategories),
+    path('edit-product-sub-subcategories/<int:id>', admin_edit_product_subsubcategories, name="edit-product-sub-subcategories"),
+    path('delete-product-sub-subcategories/<int:id>', admin_delete_product_subsubcategories, name="delete-product-sub-subcategories"),
+    
+    
+    
     path('admin_pv', admin_pv_wallet),
-    path('productsubcategories', admin_product_sub_categories),
-    path('editproductsubcategory', admin_edit_product_sub_categories),
-    path('deleteproductsubcategory', admin_delete_product_sub_category),
-    path('productsubsubcategories', admin_product_sub_sub_categories),
-    path('editproductsubsubcategory', admin_edit_product_sub_sub_categories),
-    path('deleteproductsubsubcategory', admin_delete_product_sub_sub_category),
+   
     path('vendor-verification', admin_vendor_verification),
     path('activatevendor', admin_activate_vendor),
     path('activateisavplvendor', admin_activate_approved_avpl_vendor),
