@@ -410,9 +410,14 @@ def admin_edit_product_categories(request,id):
 		if request.method == 'POST':
 			title= request.POST.get('title')
 			isactive= request.POST.get('isactive')
+			image=request.FILES.get('image')
+
 			print(title,isactive,'isactiveisactiveisactiveisactive')
 			if title:
 				bussinessmaincateobj.name=title
+			if image:
+				bussinessmaincateobj.image=image
+                
 			if isactive:
 				print(isactive,type(isactive),'isactive')
 				if isactive == 'on':
@@ -480,12 +485,18 @@ def admin_add_product_subcategories(request):
 	if check_user_authentication(request, 'ADMIN'):
 		if request.method == 'POST':
 			title= request.POST.get('title')
-	
-			if title:
-				bussinessmaincateobj=ProductCategory.objects.create(name=title)			
+			category_id= request.POST.get('category_id')
+			image=request.FILES.get('image')
+			
+			if title and category_id:
+				productobj=ProductCategory.objects.filter(id=category_id).first()	
+				bussinessmaincateobj=ProductSubCategory.objects.create(name=title,category=productobj)			
+			if image:
+				bussinessmaincateobj.image=image
+			if title and category_id:
 				bussinessmaincateobj.updatedby=request.user
 				bussinessmaincateobj.save()
-				return redirect("/admins/product-categories")
+				return redirect("/admins/product-subcategories")
 		
 		dic = {
 			'data':ProductSubCategory.objects.all(),
@@ -501,11 +512,20 @@ def admin_add_product_subcategories(request):
 @csrf_exempt
 def admin_edit_product_subcategories(request,id):
 	if check_user_authentication(request, 'ADMIN'):
-		bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+		bussinessmaincateobj=ProductSubCategory.objects.filter(id=id).first()
 		if request.method == 'POST':
 			title= request.POST.get('title')
 			isactive= request.POST.get('isactive')
 			print(title,isactive,'isactiveisactiveisactiveisactive')
+			category_id= request.POST.get('category_id')
+			image=request.FILES.get('image')
+			
+			if category_id:
+				productobj=ProductCategory.objects.filter(id=category_id).first()	
+				bussinessmaincateobj.category=productobj		
+			if image:
+				bussinessmaincateobj.image=image
+            
 			if title:
 				bussinessmaincateobj.name=title
 			if isactive:
@@ -521,7 +541,7 @@ def admin_edit_product_subcategories(request,id):
              
 			bussinessmaincateobj.updatedby=request.user
 			bussinessmaincateobj.save()
-			return redirect("/admins/product-categories")
+			return redirect("/admins/product-subcategories")
 			
 		dic = {
 			'data':ProductSubCategory.objects.all(),
@@ -538,7 +558,7 @@ def admin_edit_product_subcategories(request,id):
 def admin_delete_product_subcategories(request,id):
 	if check_user_authentication(request, 'ADMIN'):
 		if id :
-			bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+			bussinessmaincateobj=ProductSubCategory.objects.filter(id=id).first()
 			bussinessmaincateobj.delete()
 			return redirect("/admins/product-categories")
 			
@@ -558,11 +578,12 @@ def admin_delete_product_subcategories(request,id):
 def admin_product_subsubcategories(request):    
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
-			'data':ProductCategory.objects.all(),
+			'data': ProductSubSubCategory.objects.all(),
+			'productcategory':ProductSubCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
-		return render(request, 'admin_app/product/product-category.html', dic)
+		return render(request, 'admin_app/product/product-sub-subcategory.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -572,19 +593,26 @@ def admin_add_product_subsubcategories(request):
 	if check_user_authentication(request, 'ADMIN'):
 		if request.method == 'POST':
 			title= request.POST.get('title')
-	
-			if title:
-				bussinessmaincateobj=ProductCategory.objects.create(name=title)			
+			category_id= request.POST.get('category_id')
+			image=request.FILES.get('image')
+			
+			if title and category_id:
+				productobj=ProductSubCategory.objects.filter(id=category_id).first()	
+				bussinessmaincateobj=ProductSubSubCategory.objects.create(name=title,subcategory=productobj)			
+			if image:
+				bussinessmaincateobj.image=image
+			if title and category_id:		
 				bussinessmaincateobj.updatedby=request.user
 				bussinessmaincateobj.save()
-				return redirect("/admins/product-categories")
+				return redirect("/admins/product-sub-subcategories")
 		
 		dic = {
-			'data':ProductCategory.objects.all(),
+			'data': ProductSubSubCategory.objects.all(),
+			'productcategory':ProductSubCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/product/product-category.html', dic)
+		return render(request, 'admin_app/product/product-sub-subcategory.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -592,11 +620,19 @@ def admin_add_product_subsubcategories(request):
 @csrf_exempt
 def admin_edit_product_subsubcategories(request,id):
 	if check_user_authentication(request, 'ADMIN'):
-		bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+		bussinessmaincateobj=ProductSubSubCategory.objects.filter(id=id).first()
 		if request.method == 'POST':
 			title= request.POST.get('title')
 			isactive= request.POST.get('isactive')
-			print(title,isactive,'isactiveisactiveisactiveisactive')
+			category_id= request.POST.get('category_id')
+			image=request.FILES.get('image')
+			
+			if category_id:
+				productobj=ProductSubCategory.objects.filter(id=category_id).first()	
+				bussinessmaincateobj.subcategory=productobj	
+			if image:
+				bussinessmaincateobj.image=image
+
 			if title:
 				bussinessmaincateobj.name=title
 			if isactive:
@@ -612,15 +648,15 @@ def admin_edit_product_subsubcategories(request,id):
              
 			bussinessmaincateobj.updatedby=request.user
 			bussinessmaincateobj.save()
-			return redirect("/admins/product-categories")
+			return redirect("/admins/product-sub-subcategories")
 			
 		dic = {
-			'data':ProductCategory.objects.all(),
-			
+			'data': ProductSubSubCategory.objects.all(),
+			'productcategory':ProductSubCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/product/product-category.html', dic)
+		return render(request, 'admin_app/product/product-sub-subcategory.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -634,12 +670,12 @@ def admin_delete_product_subsubcategories(request,id):
 			return redirect("/admins/product-categories")
 			
 		dic = {
-			'data':ProductCategory.objects.all(),
+			'data': ProductSubSubCategory.objects.all(),
+			'productcategory':ProductSubCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
-   
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/product/product-category.html', dic)
+		return render(request, 'admin_app/product/product-sub-subcategory.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 

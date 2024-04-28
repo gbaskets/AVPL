@@ -1,6 +1,6 @@
 {% extends 'admin_app/base.html' %}
 {% load static %}
-{% block title %}Product Sub-Categories{% endblock %}
+{% block title %}Product SubCategories{% endblock %}
 {% block main %}
 
 <style>
@@ -73,10 +73,10 @@
                      <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                            <div class="section-header-breadcrumb-content">
-                              <h1>Product Sub-Categories</h1>
+                              <h1>Product SubCategories</h1>
                               <div class="section-header-breadcrumb">
                                  <div class="breadcrumb-item active"><a href="/admins/dashboard"><i class="fas fa-home"></i></a></div>
-                                 <div class="breadcrumb-item"><a href="#">Product Sub-Categories</a></div>
+                                 <div class="breadcrumb-item"><a href="#">Product SubCategories</a></div>
                               </div>
                            </div>
                         </div>
@@ -90,7 +90,7 @@
                               <div class="card-header">
                      
                                  <div class="col-8">
-                                    <h4>Product Sub-Categories List</h4>
+                                    <h4>Product SubCategories List</h4>
                                     </div>
                                     <div class="col-6">
                                        <a  class="btn btn-primary" data-toggle="modal" data-target="#AddBussinessModal">Add Product Sub-Category</a>
@@ -105,6 +105,7 @@
                                        <thead>
                                           <tr>
                                              <th>Title</th>
+                                             <th>Image</th>
                                              <th>Product Categories</th>
                                              <th>Status</th>
                                              <th>Updated On</th>
@@ -115,8 +116,15 @@
                                        <tbody>
                                           {% for x in data %}
                                           <tr>
-                                             <td>{{ x.title|safe }}</td>
-                                             <td>{{ x.businessmaincategory.title|safe }}</td>
+                                             <td>{{ x.name|safe }}</td>
+                                             <td>
+                                                {% if x.image %}
+                                                <a href="{{x.image.url}}"> <img alt="image" src="{{x.image.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                --
+                                                {% endif %}
+                                             </td>
+                                             <td>{{ x.category.name|safe }}</td>
                                              {% if x.isactive == True %}
                                              <td><span>Active</span></td>
                                              {% else %}
@@ -133,7 +141,7 @@
                                                 
                                                 
                                                   
-                                                <a href="/admins/delete-bussiness-categories/{{ x.id|safe }}" class="btn btn-primary btn-icon icon-left"><i class="fas fa-times"></i>Delete</a>
+                                                <a href="/admins/delete-product-subcategories/{{ x.id|safe }}" class="btn btn-primary btn-icon icon-left"><i class="fas fa-times"></i>Delete</a>
                                              </td>
                                           </tr>
                                           
@@ -156,11 +164,11 @@
 <div class="modal fade" id="EditBussinessModal{{ x.id|safe }}" tabindex="-1" role="dialog" aria-labelledby="EditMainBussinessModalLabel" aria-hidden="true">
    <div class="modal-dialog" role="document">
    <div class="modal-content">
-      <form action="/admins/edit-bussiness-categories/{{ x.id|safe }}" enctype="multipart/form-data"
+      <form action="/admins/edit-product-subcategories/{{ x.id|safe }}" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
       <div class="modal-header">
-         <h5 class="modal-title" id="EditBussinessModalLabel">Edit Product Sub-Categories</h5>
+         <h5 class="modal-title" id="EditBussinessModalLabel">Edit Product SubCategories</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
          <span aria-hidden="true">&times;</span>
          </button>
@@ -173,19 +181,11 @@
                <div class="form-group">
                   <label>Product Categories</label>
                   <select class="form-control" required name="main_id">
-                  {% for category in bussinessmaincategories %}
-                  <option value="{{ category.id }}" {% if x.businessmaincategory.id == category.id %} selected {% endif %}>{{ category.title }}</option>
+                  {% for category in productcategory %}
+                  <option value="{{ category.id }}" {% if x.category.id == category.id %} selected {% endif %}>{{ category.name }}</option>
                   {% endfor %}
                </select>    
 
-{% comment %}                   
-            <select class="form-control" required name="main_id">
-               <option selected value="{{ x.businessmaincategory.id }}">{{ x.businessmaincategory.title }}</option>
-               {% for category in bussinessmaincategories %}
-               
-               <option value="{{ category.id }}">{{ category.title }}</option>
-               {% endfor %}
-           </select>                {% endcomment %}
          </div>
             </div>
 
@@ -196,6 +196,14 @@
                   <label>Title</label>
                   <input type="text" class="form-control" required  placeholder="Enter Bussiness Category Title" name="title" value="{{ x.name|safe }}">
                </div>
+               <div class="form-group">
+                  <label>Image *</label>
+                  {% if x.image %}
+                  <a href="{{x.image.url}}"> <img alt="image" src="{{x.image.url}}"  height="50" weight="50" /></a>
+                  {% else %}
+                  {% endif %}
+                  <input type="file" class="form-control" accept="image/png, image/jpeg" name="image" />
+              </div>
             </div>
             
             <div class="col-lg-12 col-md-12 col-sm-12">
@@ -233,11 +241,11 @@
  <div class="modal fade" id="AddBussinessModal" tabindex="-1" role="dialog" aria-labelledby="AddBussinessModalLabel" aria-hidden="true">
    <div class="modal-dialog" role="document">
      <div class="modal-content">
-      <form action="/admins/add-bussiness-categories" enctype="multipart/form-data"
+      <form action="/admins/add-product-subcategories" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
        <div class="modal-header">
-         <h5 class="modal-title" id="AddBussinessModalLabel">Add Product Sub-Categories</h5>
+         <h5 class="modal-title" id="AddBussinessModalLabel">Add Product SubCategories</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
          </button>
@@ -249,9 +257,9 @@
             <div class="col-lg-12 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product Categories</label>
-                  <select class="form-control" required name="main_id" id="main_id">
-                     {% for category in bussinessmaincategories %}
-                     <option value="{{ category.id }}">{{ category.title }}</option>
+                  <select class="form-control" required name="category_id" id="main_id">
+                     {% for category in productcategory %}
+                     <option value="{{ category.id }}">{{ category.name }}</option>
                      {% endfor %}
                  </select>
                </div>
@@ -262,6 +270,12 @@
                   <input type="text" class="form-control" required  placeholder="Enter Product Sub Category Title" name="title">
                </div>
             </div>
+
+            <div class="form-group">
+               <label>Image *</label>
+         
+               <input type="file" class="form-control" accept="image/png, image/jpeg" name="image" />
+           </div>
             
 
          </div>
