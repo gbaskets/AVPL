@@ -42,33 +42,32 @@
                                        
                                        <div class="col-lg-3 col-md-12 col-sm-12">
                                           <h5><i class="fa fa-dashcube"></i><a href="/vendor/wallet"> Current Balance </a></h5>
-                                          <h5>( Wallet )</h5>
+                                          <h5>( Current )</h5>
                                           <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
-                                          <h5><i class="fa fa-inr"></i> {{wallet.current_balance|floatformat:2}}</h5>
+                                          <h5><i class="fa fa-inr"></i> {{wallet.currentbalance|floatformat:2}}</h5>
                                           
                                        </div>
 
                                        <div class="col-lg-3 col-md-12 col-sm-12">
                                     
-                                          {% if business_limit.current_balance > 0 %}
+                                          {% if business_limit.currentbalance > 0 %}
                                           <h5><i class="fa fa-dashcube"></i><a href="/vendor/businesslimit"> Current Balance </a></h5>
-                                          <h5>( Business Limit Wallet)</h5>
+                                          <h5>( Business Limit )</h5>
                                           <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
-                                          <h5><i class="fa fa-inr"></i> {{business_limit.current_balance|floatformat:2}}</h5>
+                                          <h5><i class="fa fa-inr"></i> {{business_limit.currentbalance|floatformat:2}}</h5>
                                           {% else %}
-                                          <h5><i class="fa fa-dashcube"></i><a href="/vendor/businesslimit"> Current Balance </a></h5> ( Business Limit Wallet) <br>
-                                          <span style="color:rgb(190, 4, 29); font-size:5">** Not allow to order Delivered.Kindly recharge your Business Limit Wallet..</span>
+                                          <h5><i class="fa fa-dashcube"></i><a href="/vendor/businesslimit"> Current Balance </a></h5><span data-toggle="tooltip" data-placement="right" title="** Not allow to order Delivered.Kindly recharge your Business Limit Wallet.."><h5>( Business Limit )</h5></span>
                                           <hr style="border-width:5px;border-color:rgb(190, 4, 29);border-radius:20px;margin-bottm:10px;">
-                                          <h5><i class="fa fa-inr"></i> {{business_limit.current_balance|floatformat:2}} </h5>
+                                          <h5><i class="fa fa-inr"></i> {{business_limit.currentbalance|floatformat:2}} </h5>
                                           {% endif %}
                                           
                                        </div> 
-                                       {% if wallet_commission.is_active == True %}
+                                       {% if wallet_commission.isactive == True %}
                                        <div class="col-lg-3 col-md-12 col-sm-12">
                                           <h5><i class="fa fa-dashcube"></i><a href="/vendor/wallet-commission"> Current Balance </a></h5>
-                                          <h5>( Wallet-Commission)</h5>
+                                          <h5>( Commission )</h5>
                                           <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
-                                          <h5><i class="fa fa-inr"></i> {{wallet_commission.current_balance|floatformat:2}}</h5>
+                                          <h5><i class="fa fa-inr"></i> {{wallet_commission.currentbalance|floatformat:2}}</h5>
                                           
                                        </div>
                                        {% else %}

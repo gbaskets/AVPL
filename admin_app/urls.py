@@ -16,6 +16,12 @@ urlpatterns = [
     path('edit-bussiness-categories/<int:id>', admin_edit_bussiness_categories, name="edit-bussiness-categories"),
     path('delete-bussiness-categories/<int:id>', admin_delete_bussiness_categories, name="delete-bussiness-categories"),
 
+    path('product-brands', admin_product_brands),
+    path('add-product-brands', admin_add_product_brands),
+    path('edit-product-brands/<int:id>', admin_edit_product_brands, name="edit-product-brands"),
+    path('delete-product-brands/<int:id>', admin_delete_product_brands, name="delete-product-brands"),
+    
+    
     path('product-categories', admin_product_categories),
     path('add-product-categories', admin_add_product_categories),
     path('edit-product-categories/<int:id>', admin_edit_product_categories, name="edit-product-categories"),
@@ -31,7 +37,9 @@ urlpatterns = [
     path('edit-product-sub-subcategories/<int:id>', admin_edit_product_subsubcategories, name="edit-product-sub-subcategories"),
     path('delete-product-sub-subcategories/<int:id>', admin_delete_product_subsubcategories, name="delete-product-sub-subcategories"),
     
-    
+    path('product', admin_product),
+    path('productapproval', admin_product_approval),
+    path('all-products', admin_product_list),
     
     path('admin_pv', admin_pv_wallet),
    
@@ -72,9 +80,7 @@ urlpatterns = [
     path('changequerystatus', admin_change_query_status),
     path('setpvconversion', admin_set_pv_conversion),
     
-    path('product', admin_product),
-    path('productapproval', admin_product_approval),
-    path('all-products', admin_product_list),
+   
     path('productbasicedit', admin_product_basic_edit),
     path('deleteproductimage', admin_delete_product_image),
     path('deleteproductvariant', admin_delete_product_variant),

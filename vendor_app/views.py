@@ -57,24 +57,23 @@ def vendor_dashboard(request):
 				wallet = Wallet.objects.get(vendor=vendor)
 				transactions = WalletTransaction.objects.filter(wallet=wallet)
 
-				# if not BusinessLimitWallet.objects.filter(vendor=request.user.vendor).exists():
-				# 	BusinessLimitWallet.objects.create(vendor=request.user.vendor)
-				# vendor = Vendor.objects.filter(user=request.user)
-				# business_limit = BusinessLimitWallet.objects.get(vendor=request.user.vendor)
-				# business_limit_transactions = BusinessLimitWalletTransaction.objects.filter(business_limit=business_limit)
+				if not BusinessLimitWallet.objects.filter(vendor=vendor).exists():
+					BusinessLimitWallet.objects.create(vendor=vendor,isactive=True)
+				business_limit = BusinessLimitWallet.objects.filter(vendor=vendor,isactive=True).first()
+				business_limit_transactions = BusinessLimitWalletTransaction.objects.filter(businesslimitwallet=business_limit)
 
-				# if not Vendor_Wallet_Commission.objects.filter(user=request.user).exists():
-				# 	Vendor_Wallet_Commission.objects.create(user=request.user)
-				# wallet_commission = Vendor_Wallet_Commission.objects.get(user=request.user)
+				if not CommissionWallet.objects.filter(vendor=vendor).exists():
+					CommissionWallet.objects.create(vendor=vendor,isactive=True)
+				wallet_commission = CommissionWallet.objects.filter(vendor=vendor,isactive=True).first()
 				
 							
 				dic = {'vendor':vendor, 'storeobj':storeobj,
-				# 'notification':get_notifications(request.user),
 				'allorder_status':ORDER_STATUS_UPDATE,'wallet':wallet,
-                # 'business_limit':business_limit,'wallet_commission':wallet_commission,
-				# 'business_limit_transactions':business_limit_transactions,
+                'business_limit':business_limit,
+                'wallet_commission':wallet_commission,
+				'business_limit_transactions':business_limit_transactions,
 				'transactions':transactions,
-				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
 				}
 				return render(request, 'vendor_app/dashboard.html', dic)
 
@@ -598,14 +597,13 @@ def add_product(request):
 					pro.subcategory = subcategory
 					pro.subsubcategory = subsubcategory
 					pro.brand = brand
-					pro.name = name
+					pro.productname = name
 					pro.description = des
-					pro.mrp = mrp_price
-					pro.price = price
-					pro.stock = stock
-					pro.weight = weight or 0
-					pro.offer=offer
-					pro.discount = discount or 0
+					pro.hsn= hsn
+					pro.tax= tax
+					pro.pv =pv
+					pro.admincommission =admincommission
+					pro.updatedby= request.user
 					pro.save()
 					messages.success(request, 'Product Added Successfully')
 				else:
@@ -761,14 +759,18 @@ def fetch_brands(request):
 @csrf_exempt
 def vendor_product_list(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
 		dic = {
 			'vendor':vendor,
+			'categories':ProductCategory.objects.all(),
+			'subcategories':ProductSubCategory.objects.all(),
+			'subsubcategories':ProductSubSubCategory.objects.all(),
+			'brands':Brand.objects.all(),
 			'products':Product.objects.filter(store__vendor__user=request.user),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
-		return render(request, 'vendor_app/product-list.html', dic)
+		return render(request, 'vendor_app/product/product-list.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
@@ -1037,6 +1039,7 @@ def edit_vendor_profile(request):
 		return redirect("/vendor/profile")
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 @csrf_exempt
 def vendor_product(request):
 	if check_user_authentication(request, 'VENDOR'):
@@ -1050,7 +1053,7 @@ def vendor_product(request):
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
-		return render(request,'vendor_app/product.html', dic)
+		return render(request,'vendor_app/product/product.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
@@ -1333,14 +1336,15 @@ def vendor_wallet_dash(request):
 @csrf_exempt
 def vendor_wallet_commission_dash(request):
 	if check_user_authentication(request, 'VENDOR'):
-		if not Vendor_Wallet_Commission.objects.filter(user=request.user).exists():
-			Vendor_Wallet_Commission.objects.create(user=request.user)
-		vendor = Vendor.objects.filter(user=request.user)
-		wallet = Vendor_Wallet_Commission.objects.get(user=request.user)
-		transactions = VendorWalletTransaction.objects.filter(vendor_wallet_commission=wallet)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		if not CommissionWallet.objects.filter(vendor=vendor).exists():
+			CommissionWallet.objects.create(vendor=vendor,isactive=True)
+		wallet_commission = CommissionWallet.objects.filter(vendor=vendor,isactive=True).first()
+		
+		transactions = CommissionWalletTransaction.objects.filter(commissionwallet=wallet_commission)
 		dic = {
 			'vendor':vendor,
-			'wallet':wallet,
+			'wallet':wallet_commission,
 			'transactions':transactions,
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),

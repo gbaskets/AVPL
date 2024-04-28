@@ -365,6 +365,107 @@ def admin_delete_bussiness_categories(request,id):
 
 
 @csrf_exempt
+def admin_product_brands(request):    
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'data':Brand.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			}
+		return render(request, 'admin_app/product/product-brands.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_add_product_brands(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			title= request.POST.get('title')
+			image=request.FILES.get('image')
+
+			if title:
+				bussinessmaincateobj=Brand.objects.create(name=title)			
+				bussinessmaincateobj.updatedby=request.user
+			if image:
+				bussinessmaincateobj.image=image
+			if title:
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-brands")
+			
+		dic = {
+			'data':Brand.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-brands.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_brands(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=Brand.objects.filter(id=id).first()
+		if request.method == 'POST':
+			title= request.POST.get('title')
+			isactive= request.POST.get('isactive')
+			image=request.FILES.get('image')
+
+			print(title,isactive,'isactiveisactiveisactiveisactive')
+			if title:
+				bussinessmaincateobj.name=title
+			if image:
+				bussinessmaincateobj.image=image
+                
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/product-brands")
+			
+		dic = {
+			'data':Brand.objects.all(),
+			
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-brands.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_product_brands(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=Brand.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/product-brands")
+			
+		dic = {
+			'data':Brand.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+   
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-brands.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+@csrf_exempt
 def admin_product_categories(request):    
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
@@ -665,9 +766,9 @@ def admin_edit_product_subsubcategories(request,id):
 def admin_delete_product_subsubcategories(request,id):
 	if check_user_authentication(request, 'ADMIN'):
 		if id :
-			bussinessmaincateobj=ProductCategory.objects.filter(id=id).first()
+			bussinessmaincateobj=ProductSubSubCategory.objects.filter(id=id).first()
 			bussinessmaincateobj.delete()
-			return redirect("/admins/product-categories")
+			return redirect("/admins/product-sub-subcategories")
 			
 		dic = {
 			'data': ProductSubSubCategory.objects.all(),
@@ -676,6 +777,58 @@ def admin_delete_product_subsubcategories(request,id):
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product/product-sub-subcategory.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+@csrf_exempt
+def admin_product(request):
+	if check_user_authentication(request, 'ADMIN'):
+		product = Product.objects.get(id=request.GET.get('id'))
+		dic = {
+			'product':product,
+			'images':ProductImages.objects.filter(product=product),
+			'variants':ProductVariant.objects.filter(product=product),'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request,'admin_app/product/product.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+@csrf_exempt
+def admin_product_approval(request):
+	if check_user_authentication(request, 'ADMIN'):
+		
+		if request.method == 'POST':
+			id = request.POST.get('id')
+			vendor_commission = request.POST.get('vendor_commission')
+			prod=Product.objects.filter(id=id).first()
+			prod.vendor_commission = vendor_commission
+			prod.save()
+			messages.success(request, 'New Vendor Commission has been set. ! ')
+			return redirect('/admins/productapproval')
+		
+		dic = {'data':Product.objects.filter(isactive=False, isproductrejected=False),
+			'rejected_product':Product.objects.filter(isactive=False, isproductrejected=True),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-approval.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+@csrf_exempt
+def admin_product_list(request):
+	if check_user_authentication(request, 'ADMIN'):
+		
+		dic = {
+			'products':Product.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product_list.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -1803,53 +1956,7 @@ def admin_directorship_fund_set(request):
 		return render(request, 'admin_app/directorship-fund.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def admin_product(request):
-	if check_user_authentication(request, 'ADMIN'):
-		product = Product.objects.get(id=request.GET.get('id'))
-		dic = {
-			'product':product,
-			'images':ProductImages.objects.filter(product=product),
-			'variants':ProductVariant.objects.filter(product=product),'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user,'ADMIN'),
-			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-		}
-		return render(request,'admin_app/product.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def admin_product_approval(request):
-	if check_user_authentication(request, 'ADMIN'):
-		
-		if request.method == 'POST':
-			id = request.POST.get('id')
-			vendor_commission = request.POST.get('vendor_commission')
-			prod=Product.objects.filter(id=id).first()
-			prod.vendor_commission = vendor_commission
-			prod.save()
-			messages.success(request, 'New Vendor Commission has been set. ! ')
-			return redirect('/admins/productapproval')
-		
-		dic = {'data':Product.objects.filter(isactive=False, isproductrejected=False),
-			'rejected_product':Product.objects.filter(isactive=False, isproductrejected=True),
-			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-		}
-		return render(request, 'admin_app/product-approval.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def admin_product_list(request):
-	if check_user_authentication(request, 'ADMIN'):
-		
-		dic = {
-			'products':Product.objects.all(),
-			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
-			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-		}
-		return render(request, 'admin_app/product_list.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 
 @csrf_exempt
 def admin_product_basic_edit(request):

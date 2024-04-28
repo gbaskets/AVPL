@@ -46,3 +46,5 @@ admin.site.register(TDSLogWallet)
 admin.site.register(TDSLogWalletTransaction)
 admin.site.register(Notification)
 admin.site.register(WalletBalanceTransfer)
+admin.site.register(BusinessLimitWallet)
+
