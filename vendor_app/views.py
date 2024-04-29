@@ -1011,8 +1011,8 @@ def vendor_product(request):
 		dic = {
 			'vendor':vendor,
 			'product':product,
-			'images':ProductImages.objects.filter(product=product),
-			'variants':ProductVariant.objects.filter(product=product),
+			
+
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}

@@ -34,12 +34,10 @@
                      
                                  <div class="col-8">
                                     <h4>Product List</h4>
-                                    </div>
+                                 </div>
                                     <div class="col-6">
                                        <a  class="btn btn-primary" data-toggle="modal" data-target="#AddProductModal">Add Product</a>
-   
- 
-                                       </div>
+                                    </div>
                                     
                               </div>
                               <div class="card-body">
@@ -48,11 +46,11 @@
                                        <thead>
                                           <tr>
                                              <th>Product Id</th>
+                                             <th>Name/Title</th>
                                              <th>Category</th>
                                              <th>Subcategory</th>
                                              <th>Brand</th>
-                                             <th>Name/Title</th>
-                                             <th>Quantity/Current Stock</th>
+                                             <th>Product-Variants</th>
                                              <th>Status</th>
                                              <th>Options</th>
                                           </tr>
@@ -60,21 +58,21 @@
                                        <tbody>
                                           {% for product in products %}
                                           <tr>
-                                             <td><a href="/vendor/product?id={{product.id}}">{{ product.category.name|safe }}->{{ product.subcategory.name|safe }}->{{ product.subsubcategory.name|safe }}</a></td>
-                                              
-                                             <td>{{ product.name|safe }} </td>
-                                             <td>{{ product.name|safe }} </td>
+                                             <td><a  data-toggle="modal" data-target="#AddProductModal">{{product.id}}</a></td>
+                              
+                                             <td> <a data-toggle="modal" data-target="#AddProductModal">{{product.productname|safe }}</a> </td>
+                                             <td>{{ product.category.name|safe }} </td>
+                                             <td>{{ product.subcategory.name|safe }} </td>
+                                             <td>{{ product.brand|safe }} </td>
+
+                                             <td> <a  class="btn btn-success" data-toggle="modal" data-target="#AddProductModal">Add</a>
+                                                <a  class="btn btn-secondary" data-toggle="modal" data-target="#AddProductModal">View</a>    
+                                             </td>
                                              
-                                             {% if product.stock == 0 %}
-                                             <td>{{product.stock}} <span id="{{product.id}}" class="badge badge-danger">Out of Stock</span></td>
-                                             {% else %}
-                                             <td>{{product.stock}} <span id="{{product.id}}" class="badge badge-danger" style="display:none;">Out of Stock</span></td>
-                                             {% endif %}
 
-
-                                             {% if product.is_active %}
+                                             {% if product.isactive %}
                                              <td><span class="badge badge-success">Approved</span></td>
-                                             {% elif product.product_rejection %}
+                                             {% elif product.productrejection %}
                                              <td><span class="badge badge-danger">Rejected</span></td>
                                              {%else%}
                                              <td><span class="badge badge-warning">Under Process</span></td>
