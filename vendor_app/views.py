@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from requests import request
+from inventory_app.models import *
 from sales_app.models import SalesOrderItems
 from vendor_app.models import *
 from main_app.models import *
@@ -557,6 +558,24 @@ def get_businesscategory(request):
 
 
 
+@csrf_exempt
+def vendor_product_list(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		dic = {
+			'vendor':vendor,
+			'categories':ProductCategory.objects.all(),
+			'subcategories':ProductSubCategory.objects.all(),
+			'subsubcategories':ProductSubSubCategory.objects.all(),
+			'brands':Brand.objects.all(),
+			'products':Product.objects.filter(store__vendor__user=request.user),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/product/product-list.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 
 
 @csrf_exempt
@@ -564,102 +583,63 @@ def add_product(request):
 	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 
-			vendor = Vendor.objects.filter(user=request.user)
-			print(vendor)
+			vendor = Vendor.objects.filter(user=request.user).first()
 			store = Store.objects.filter(vendor=vendor).first()
-			category = ProductCategory.objects.get(id=request.POST.get('cate'))
-			# try:
-			subcategory = ProductSubCategory.objects.get(id=request.POST.get('subcate'))
-			# except ProductSubCategory:
-			if request.POST.get('subsubcate') is not None:
-				subsubcategory = ProductSubSubCategory.objects.get(id=request.POST.get('subsubcate'))
+			category_id=request.POST.get('category_id') 
+			subcategory_id=request.POST.get('subcategory_id') 
+			subsubcategory_id=request.POST.get('subsubcategory_id') 
+			brand_id=request.POST.get('brand_id') 
+			productname=request.POST.get('productname') 
+			description=request.POST.get('description') 
+			hsn=request.POST.get('hsn') 
+			tax=request.POST.get('tax') 
+			pv=request.POST.get('pv') 
+			admincommission=request.POST.get('admincommission') 
+	
+			if Product.objects.filter(store=store, productname=productname).exists():
+				messages.info(request, f'Product: {productname} is already exits !')
+				return redirect('/vendor/product-list')
 			else:
-				print('None')
-			brand = Brand.objects.get(id=request.POST.get('brand'))
+				if productname and category_id :				
+					pro = Product.objects.create(store = store,productname = productname,description = description)
+					if category_id:
+						pro.category = ProductCategory.objects.get(id=category_id)
+					if subcategory_id:
+						pro.subcategory = ProductSubCategory.objects.get(id=subcategory_id)
+					if subsubcategory_id:
+						pro.subsubcategory = ProductSubSubCategory.objects.get(id=subsubcategory_id)
+					if brand_id:
+						pro.brand = Brand.objects.get(id=brand_id)
+					if hsn:
+						pro.hsn= hsn
+					if hsn:
+						pro.tax= tax
+					if hsn:
+						pro.pv =pv
+					if hsn:
+						pro.admincommission =admincommission
 
-			name = request.POST.get('name')
-			des = request.POST.get('description')
-			print(des)
-			mrp_price = request.POST.get('mrp_price')
-			price = request.POST.get('price')
-			stock = request.POST.get('stock')
-			weight = request.POST.get('weight')
-			offer = request.POST.get('offer')
-			discount = request.POST.get('discount')
-			if Product.objects.filter(store=store, name=name).exists():
-				messages.info(request, 'Product Already Exists')
-				return redirect('/vendor/addproduct')
-			else:
-				if request.POST.get('subsubcate') is not None:
-					pro = Product()
-					pro.store = store
-					pro.category = category
-					pro.subcategory = subcategory
-					pro.subsubcategory = subsubcategory
-					pro.brand = brand
-					pro.productname = name
-					pro.description = des
-					pro.hsn= hsn
-					pro.tax= tax
-					pro.pv =pv
-					pro.admincommission =admincommission
 					pro.updatedby= request.user
 					pro.save()
-					messages.success(request, 'Product Added Successfully')
+					messages.success(request,f'Product {productname} is Added Successfully')
 				else:
-						
-					pro = Product()
-					pro.store = store
-					pro.category = category
-					pro.subcategory = subcategory
-				
-					pro.brand = brand
-					pro.name = name
-					pro.description = des
-					pro.mrp = mrp_price
-					pro.price = price
-					pro.stock = stock
-					pro.weight = weight or 0
-					pro.offer=offer
-					pro.discount = discount or 0
-					pro.save()
-					messages.success(request, 'Product Added Successfully')
-
-				
-
-
-				dic = {
-					'vendor':vendor,
-					'categories':ProductCategory.objects.all(),
-					'subcategories':ProductSubCategory.objects.all(),
-					'subsubcategories':ProductSubSubCategory.objects.all(),
-					'brands':Brand.objects.all(),
-					'images':True,
-					'product':pro,
-					'notification':get_notifications(request.user),
-					'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-				}
-				request.session['product'] = Product.objects.get(store=store, name=name).id
-				return render(request,'vendor_app/add-product.html', dic)
-		else:
-			
-			
-			vendor = Vendor.objects.filter(user=request.user)
-			dic = {
-				'vendor':vendor,
-				'categories':ProductCategory.objects.all(),
-				'categories':ProductCategory.objects.all(),
-				'subcategories':ProductSubCategory.objects.all(),
-				'brands':Brand.objects.all(),
-				'subsubcategories':ProductSubSubCategory.objects.all(),
-				'info':True,
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-			}
-			return render(request,'vendor_app/add-product.html', dic)
+					messages.info(request, f'Please fill all detials such as productname and category !')
+					return redirect('/vendor/product-list')
+		dic = {
+			'categories':ProductCategory.objects.all(),
+			'subcategories':ProductSubCategory.objects.all(),
+			'subsubcategories':ProductSubSubCategory.objects.all(),
+			'brands':Brand.objects.all(),
+			'products':Product.objects.filter(store__vendor__user=request.user),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/product/product-list.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
+		
+		
 @csrf_exempt
 def add_product_images(request):
 	if check_user_authentication(request, 'VENDOR'):
@@ -756,23 +736,6 @@ def fetch_brands(request):
 
 
 
-@csrf_exempt
-def vendor_product_list(request):
-	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user).first()
-		dic = {
-			'vendor':vendor,
-			'categories':ProductCategory.objects.all(),
-			'subcategories':ProductSubCategory.objects.all(),
-			'subsubcategories':ProductSubSubCategory.objects.all(),
-			'brands':Brand.objects.all(),
-			'products':Product.objects.filter(store__vendor__user=request.user),
-			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-		}
-		return render(request, 'vendor_app/product/product-list.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_profile(request):
 	if check_user_authentication(request, 'VENDOR'):

@@ -13,12 +13,13 @@ urlpatterns = [
     path('edit-profile', edit_vendor_profile),
     path('get_businesscategory', get_businesscategory),
   
+    path('product-list', vendor_product_list),
     path('add-product', add_product),
     path('addproductimages', add_product_images),
     path('addproductvariant', add_product_variant),
     path('fetchsubcategory', fetch_sub_category),
     path('fetchsubsubcategory', fetch_sub_sub_category),
-    path('product-list', vendor_product_list),
+
   
     path('product', vendor_product),
     path('update-product/<int:id>/', vendor_update_product_quantity,name='update-product'),
