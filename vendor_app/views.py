@@ -622,9 +622,74 @@ def add_product(request):
 					pro.updatedby= request.user
 					pro.save()
 					messages.success(request,f'Product {productname} is Added Successfully')
+					return redirect('/vendor/product-list')
 				else:
 					messages.info(request, f'Please fill all detials such as productname and category !')
 					return redirect('/vendor/product-list')
+		dic = {
+			'categories':ProductCategory.objects.all(),
+			'subcategories':ProductSubCategory.objects.all(),
+			'subsubcategories':ProductSubSubCategory.objects.all(),
+			'brands':Brand.objects.all(),
+			'products':Product.objects.filter(store__vendor__user=request.user),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/product/product-list.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def edit_product(request,id):
+	if check_user_authentication(request, 'VENDOR'):
+		if request.method == 'POST':
+
+			vendor = Vendor.objects.filter(user=request.user).first()
+			store = Store.objects.filter(vendor=vendor).first()
+			category_id=request.POST.get('category_id') 
+			subcategory_id=request.POST.get('subcategory_id') 
+			subsubcategory_id=request.POST.get('subsubcategory_id') 
+			brand_id=request.POST.get('brand_id') 
+			productname=request.POST.get('productname') 
+			description=request.POST.get('description') 
+			hsn=request.POST.get('hsn') 
+			tax=request.POST.get('tax') 
+			pv=request.POST.get('pv') 
+			admincommission=request.POST.get('admincommission') 
+	
+			if Product.objects.filter(id=id).exists():
+				pro=Product.objects.filter(id=id).first()
+				
+				if productname :
+					productname = productname
+				if description:
+					description = description
+					
+				if category_id:
+					pro.category = ProductCategory.objects.get(id=category_id)
+				if subcategory_id:
+					pro.subcategory = ProductSubCategory.objects.get(id=subcategory_id)
+				if subsubcategory_id:
+					pro.subsubcategory = ProductSubSubCategory.objects.get(id=subsubcategory_id)
+				if brand_id:
+					pro.brand = Brand.objects.get(id=brand_id)
+				if hsn:
+					pro.hsn= hsn
+				if hsn:
+					pro.tax= tax
+				if hsn:
+					pro.pv =pv
+				if hsn:
+					pro.admincommission =admincommission
+
+				pro.updatedby= request.user
+				pro.save()
+				messages.success(request,f'Product {productname} is updated Successfully')
+				return redirect('/vendor/product-list')
+			else:
+				messages.info(request, f'Please fill all detials such as productname and category !')
+				return redirect('/vendor/product-list')
 		dic = {
 			'categories':ProductCategory.objects.all(),
 			'subcategories':ProductSubCategory.objects.all(),

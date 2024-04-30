@@ -15,6 +15,7 @@ urlpatterns = [
   
     path('product-list', vendor_product_list),
     path('add-product', add_product),
+    path('edit-product/<int:id>', edit_product),
     path('addproductimages', add_product_images),
     path('addproductvariant', add_product_variant),
     path('fetchsubcategory', fetch_sub_category),
