@@ -1,2 +1,5 @@
 source GbasketsIndia/bin/activate
 python manage.py runserver 8081
+
+
+zip -r templates.zip /workspaces/AVPL/templates
