@@ -783,6 +783,7 @@ def admin_product_secondvariant(request):
 		dic = {
 			'data':SecondVariant.objects.all(),
    	        'productcategory':ProductCategory.objects.all(),
+            'sencondchocice':Sencondchocice,
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
@@ -800,7 +801,7 @@ def admin_add_product_secondvariant(request):
 			print(category_id,name,'hhghgjjgjgjjh')
 
 			if name and category_id:
-				productobj=ProductCategory.objects.filter(id=category_id).second()	
+				productobj=ProductCategory.objects.filter(id=category_id).first()	
 				bussinessmaincateobj=SecondVariant.objects.create(name=name,category=productobj)			
 				bussinessmaincateobj.updatedby=request.user
 			
@@ -822,7 +823,7 @@ def admin_add_product_secondvariant(request):
 @csrf_exempt
 def admin_edit_product_secondvariant(request,id):
 	if check_user_authentication(request, 'ADMIN'):
-		bussinessmaincateobj=SecondVariant.objects.filter(id=id).second()
+		bussinessmaincateobj=SecondVariant.objects.filter(id=id).first()
 		if request.method == 'POST':
 			name= request.POST.get('name')
 			category_id= request.POST.get('category_id')			
@@ -831,7 +832,7 @@ def admin_edit_product_secondvariant(request,id):
 			if name:
 				bussinessmaincateobj.name=name
 			if category_id:
-				productobj=ProductCategory.objects.filter(id=category_id).second()	
+				productobj=ProductCategory.objects.filter(id=category_id).first()	
 				bussinessmaincateobj.category=productobj
 				
 			if isactive:
@@ -979,14 +980,216 @@ def admin_delete_product_secondvariantvalue(request,id):
    
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
+		return render(request, 'admin_app/product/product-secondvariantvalue.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_product_thirdvariant(request):    
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'data':ThirdVariant.objects.all(),
+   	        'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			}
+		return render(request, 'admin_app/product/product-thirdvariant.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_add_product_thirdvariant(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			name= request.POST.get('name')
+			category_id= request.POST.get('category_id')
+			print(category_id,name,'hhghgjjgjgjjh')
+
+			if name and category_id:
+				productobj=ProductCategory.objects.filter(id=category_id).first()	
+				bussinessmaincateobj=ThirdVariant.objects.create(name=name,category=productobj)			
+				bussinessmaincateobj.updatedby=request.user
+			
+			if name and category_id:
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-thirdvariant")
+			
+		dic = {
+			'data':ThirdVariant.objects.all(),
+            'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-thirdvariant.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_thirdvariant(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=ThirdVariant.objects.filter(id=id).first()
+		if request.method == 'POST':
+			name= request.POST.get('name')
+			category_id= request.POST.get('category_id')			
+			isactive= request.POST.get('isactive')
+			
+			if name:
+				bussinessmaincateobj.name=name
+			if category_id:
+				productobj=ProductCategory.objects.filter(id=category_id).first()	
+				bussinessmaincateobj.category=productobj
+				
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/product-thirdvariant")
+			
+		dic = {
+			'data':ThirdVariant.objects.all(),
+		    'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-thirdvariant.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_product_thirdvariant(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=ThirdVariant.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/product-thirdvariant")
+			
+		dic = {
+			'data':ThirdVariant.objects.all(),
+   	        'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+   
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
 		return render(request, 'admin_app/product/product-units.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 
+@csrf_exempt
+def admin_product_thirdvariantvalue(request):    
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'data':ThirdVariantValue.objects.all(),
+            'thirdvariantobj':ThirdVariant.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			}
+		return render(request, 'admin_app/product/product-thirdvariantvalue.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 
+@csrf_exempt
+def admin_add_product_thirdvariantvalue(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			thirdvariant_id= request.POST.get('thirdvariant_id')
+			value=request.POST.get('value')
 
+			if thirdvariant_id and value:
+				thirdvariantobj =ThirdVariant.objects.filter(id=thirdvariant_id).first()			
+				bussinessmaincateobj=ThirdVariantValue.objects.create(thirdvariant=thirdvariantobj,value=value)			
+				bussinessmaincateobj.updatedby=request.user
+
+			if thirdvariant_id and value:
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-thirdvariantvalue")
+			
+		dic = {
+			'data':ThirdVariantValue.objects.all(),
+            'thirdvariantobj':ThirdVariant.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-thirdvariantvalue.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_thirdvariantvalue(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=ThirdVariantValue.objects.filter(id=id).first()
+		if request.method == 'POST':
+			thirdvariant_id= request.POST.get('thirdvariant_id')
+			value=request.POST.get('value')
+			isactive= request.POST.get('isactive')
+   
+			if thirdvariant_id:
+				thirdvariantobj =ThirdVariant.objects.filter(id=thirdvariant_id).first()			
+				bussinessmaincateobj.thirdvariant=thirdvariantobj	
+				bussinessmaincateobj.updatedby=request.user
+		
+			if value:
+				bussinessmaincateobj.value=value
+			
+				
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/product-thirdvariantvalue")
+			
+		dic = {
+			'data':ThirdVariantValue.objects.all(),
+			'thirdvariantobj':ThirdVariant.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-thirdvariantvalue.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_product_thirdvariantvalue(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=ThirdVariantValue.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/product-thirdvariantvalue")
+			
+		dic = {
+			'data':ThirdVariantValue.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+   
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-thirdvariantvalue.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 
 @csrf_exempt

@@ -107,8 +107,8 @@ class FirstVariantValue(models.Model):
 		return str(self.value)
 	
 #### Storage 
-class SecondVariant(models.Model):
-	CHOICES=(
+
+Sencondchocice=[
         ('Storage','Storage'),
         ('Size','Size'),
         ('Capacity','Capacity'),
@@ -119,9 +119,11 @@ class SecondVariant(models.Model):
         ('Dimension','Dimension'),
         ('Power Consumption','Power Consumption')
         
-    )
+]
+class SecondVariant(models.Model):
+	
 	category = models.ForeignKey(to=ProductCategory, on_delete=models.CASCADE)
-	name = models.CharField(max_length=255,choices=CHOICES)
+	name = models.CharField(max_length=255,choices=Sencondchocice)
 	store = models.ManyToManyField(Store, blank=True)
 	isactive = models.BooleanField(default=True)
 	createdat = models.DateTimeField(auto_now_add=True)

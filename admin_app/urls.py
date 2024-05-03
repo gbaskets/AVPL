@@ -47,6 +47,16 @@ urlpatterns = [
     path('edit-product-secondvariantvalue/<int:id>', admin_edit_product_secondvariantvalue, name="edit-product-secondvariantvalue"),
     path('delete-product-secondvariantvalue/<int:id>', admin_delete_product_secondvariantvalue, name="delete-product-secondvariantvalue"),
     
+    path('product-thirdvariant', admin_product_thirdvariant),
+    path('add-product-thirdvariant', admin_add_product_thirdvariant),
+    path('edit-product-thirdvariant/<int:id>', admin_edit_product_thirdvariant, name="edit-product-thirdvariant"),
+    path('delete-product-thirdvariant/<int:id>', admin_delete_product_thirdvariant, name="delete-product-thirdvariant"),
+    
+    path('product-thirdvariantvalue', admin_product_thirdvariantvalue),
+    path('add-product-thirdvariantvalue', admin_add_product_thirdvariantvalue),
+    path('edit-product-thirdvariantvalue/<int:id>', admin_edit_product_thirdvariantvalue, name="edit-product-thirdvariantvalue"),
+    path('delete-product-thirdvariantvalue/<int:id>', admin_delete_product_thirdvariantvalue, name="delete-product-thirdvariantvalue"),
+    
     
     
     
