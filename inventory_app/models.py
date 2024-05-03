@@ -175,6 +175,15 @@ class ThirdVariantValue(models.Model):
 	def __str__(self):
 		return str(self.value)
 
+class Unit(models.Model):
+    name = models.CharField(max_length=250,null=True, blank=True)
+    symbol = models.CharField(max_length=250,null=True, blank=True)
+    isactive = models.BooleanField(default=True)
+    createdat = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+    updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+
 
 class Product(models.Model):
     store = models.ForeignKey(Store,on_delete=models.CASCADE,null=True, blank=True)
@@ -182,7 +191,8 @@ class Product(models.Model):
     subcategory = models.ForeignKey(ProductSubCategory,on_delete=models.CASCADE,null=True, blank=True)
     subsubcategory = models.ForeignKey(ProductSubSubCategory,on_delete=models.CASCADE,null=True, blank=True)
     brand = models.ForeignKey(Brand,on_delete=models.CASCADE, null=True, blank=True)
-    productname = models.CharField(max_length=200,null=True, blank=True)
+    productname = models.CharField(max_length=250,null=True, blank=True)
+    unit = models.ForeignKey(Unit,on_delete=models.CASCADE,null=True, blank=True)
     description =RichTextField(null=True, blank=True)
     hsn= models.IntegerField(blank=True, null=True)
     tax= models.FloatField(default=0.00,null=True)

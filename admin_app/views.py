@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.views.decorators import csrf
 from admin_app.models import *
+from inventory_app.models import *
 from main_app.models import *
 from vendor_app.models import *
 from django.views.decorators.csrf import csrf_exempt
@@ -461,6 +462,314 @@ def admin_delete_product_brands(request,id):
 		return render(request, 'admin_app/product/product-brands.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+
+@csrf_exempt
+def admin_product_units(request):    
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'data':Unit.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			}
+		return render(request, 'admin_app/product/product-units.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_add_product_units(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			name= request.POST.get('name')
+			symbol=request.POST.get('symbol')
+
+			if name:
+				bussinessmaincateobj=Unit.objects.create(name=name)			
+				bussinessmaincateobj.updatedby=request.user
+			if symbol:
+				bussinessmaincateobj.symbol=symbol
+			if name:
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-units")
+			
+		dic = {
+			'data':Unit.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-units.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_units(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=Unit.objects.filter(id=id).first()
+		if request.method == 'POST':
+			name= request.POST.get('name')
+			symbol= request.POST.get('symbol')
+			isactive= request.POST.get('isactive')
+			print(symbol,isactive,'isactiveisactiveisactiveisactive')
+			if name:
+				bussinessmaincateobj.name=name
+			if symbol:
+				bussinessmaincateobj.symbol=symbol
+				
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/product-units")
+			
+		dic = {
+			'data':Unit.objects.all(),
+			
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-units.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_product_units(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=Unit.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/product-units")
+			
+		dic = {
+			'data':Unit.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+   
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-units.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+@csrf_exempt
+def admin_product_firstvariant(request):    
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'data':FirstVariant.objects.all(),
+   	        'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			}
+		return render(request, 'admin_app/product/product-firstvariant.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_add_product_firstvariant(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			name= request.POST.get('name')
+			category_id= request.POST.get('category_id')
+			print(category_id,name,'hhghgjjgjgjjh')
+
+			if name and category_id:
+				productobj=ProductCategory.objects.filter(id=category_id).first()	
+				bussinessmaincateobj=FirstVariant.objects.create(name=name,category=productobj)			
+				bussinessmaincateobj.updatedby=request.user
+			
+			if name and category_id:
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-firstvariant")
+			
+		dic = {
+			'data':FirstVariant.objects.all(),
+            'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-firstvariant.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_firstvariant(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=FirstVariant.objects.filter(id=id).first()
+		if request.method == 'POST':
+			name= request.POST.get('name')
+			category_id= request.POST.get('category_id')			
+			isactive= request.POST.get('isactive')
+			
+			if name:
+				bussinessmaincateobj.name=name
+			if category_id:
+				productobj=ProductCategory.objects.filter(id=category_id).first()	
+				bussinessmaincateobj.category=productobj
+				
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/product-firstvariant")
+			
+		dic = {
+			'data':FirstVariant.objects.all(),
+		    'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-firstvariant.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_product_firstvariant(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=FirstVariant.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/product-firstvariant")
+			
+		dic = {
+			'data':FirstVariant.objects.all(),
+   	        'productcategory':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+   
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-units.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_product_firstvariantvalue(request):    
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'data':FirstVariantValue.objects.all(),
+            'firstvariantobj':FirstVariant.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			}
+		return render(request, 'admin_app/product/product-firstvariantvalue.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_add_product_firstvariantvalue(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			firstvariant_id= request.POST.get('firstvariant_id')
+			value=request.POST.get('value')
+
+			if firstvariant_id and value:
+				firstvariantobj =FirstVariant.objects.filter(id=firstvariant_id).first()			
+				bussinessmaincateobj=FirstVariantValue.objects.create(firstvariant=firstvariantobj,value=value)			
+				bussinessmaincateobj.updatedby=request.user
+
+			if firstvariant_id and value:
+				bussinessmaincateobj.save()
+				return redirect("/admins/product-firstvariantvalue")
+			
+		dic = {
+			'data':FirstVariantValue.objects.all(),
+            'firstvariantobj':FirstVariant.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-firstvariantvalue.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_firstvariantvalue(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		bussinessmaincateobj=FirstVariantValue.objects.filter(id=id).first()
+		if request.method == 'POST':
+			name= request.POST.get('name')
+			symbol= request.POST.get('symbol')
+			isactive= request.POST.get('isactive')
+			print(symbol,isactive,'isactiveisactiveisactiveisactive')
+			if name:
+				bussinessmaincateobj.name=name
+			if symbol:
+				bussinessmaincateobj.symbol=symbol
+				
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				bussinessmaincateobj.isactive=isactive
+			else:
+				isactive=False	
+				bussinessmaincateobj.isactive=isactive
+             
+			bussinessmaincateobj.updatedby=request.user
+			bussinessmaincateobj.save()
+			return redirect("/admins/product-firstvariantvalue")
+			
+		dic = {
+			'data':FirstVariantValue.objects.all(),
+			
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-firstvariantvalue.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_product_firstvariantvalue(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			bussinessmaincateobj=FirstVariantValue.objects.filter(id=id).first()
+			bussinessmaincateobj.delete()
+			return redirect("/admins/product-firstvariantvalue")
+			
+		dic = {
+			'data':FirstVariant.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+   
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/product/product-units.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 
 
 

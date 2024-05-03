@@ -21,6 +21,24 @@ urlpatterns = [
     path('edit-product-brands/<int:id>', admin_edit_product_brands, name="edit-product-brands"),
     path('delete-product-brands/<int:id>', admin_delete_product_brands, name="delete-product-brands"),
     
+    path('product-units', admin_product_units),
+    path('add-product-units', admin_add_product_units),
+    path('edit-product-units/<int:id>', admin_edit_product_units, name="edit-product-units"),
+    path('delete-product-units/<int:id>', admin_delete_product_units, name="delete-product-units"),
+    
+    path('product-firstvariant', admin_product_firstvariant),
+    path('add-product-firstvariant', admin_add_product_firstvariant),
+    path('edit-product-firstvariant/<int:id>', admin_edit_product_firstvariant, name="edit-product-firstvariant"),
+    path('delete-product-firstvariant/<int:id>', admin_delete_product_firstvariant, name="delete-product-firstvariant"),
+    
+    path('product-firstvariantvalue', admin_product_firstvariantvalue),
+    path('add-product-firstvariantvalue', admin_add_product_firstvariantvalue),
+    path('edit-product-firstvariantvalue/<int:id>', admin_edit_product_firstvariantvalue, name="edit-product-firstvariantvalue"),
+    path('delete-product-firstvariantvalue/<int:id>', admin_delete_product_firstvariantvalue, name="delete-product-firstvariantvalue"),
+    
+    
+    
+    
     
     path('product-categories', admin_product_categories),
     path('add-product-categories', admin_add_product_categories),
