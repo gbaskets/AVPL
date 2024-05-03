@@ -1,6 +1,6 @@
 {% extends 'admin_app/base.html' %}
 {% load static %}
-{% block title %}Product FirstVariantValue{% endblock %}
+{% block title %}Product SecondVariant{% endblock %}
 {% block main %}
 
 <style>
@@ -73,10 +73,10 @@
                      <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                            <div class="section-header-breadcrumb-content">
-                              <h1>Product FirstVariantValue</h1>
+                              <h1>Product SecondVariant</h1>
                               <div class="section-header-breadcrumb">
                                  <div class="breadcrumb-item active"><a href="/admins/dashboard"><i class="fas fa-home"></i></a></div>
-                                 <div class="breadcrumb-item"><a href="#">Product FirstVariantValue</a></div>
+                                 <div class="breadcrumb-item"><a href="#">Product SecondVariant</a></div>
                               </div>
                            </div>
                         </div>
@@ -90,10 +90,10 @@
                               <div class="card-header">
                      
                                  <div class="col-8">
-                                    <h4>Product FirstVariantValue List</h4>
+                                    <h4>Product SecondVariant List</h4>
                                     </div>
                                     <div class="col-6">
-                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddProductModal">Add Product FirstVariantValue</a>
+                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddProductModal">Add Product SecondVariant</a>
    
  
                                        </div>
@@ -104,8 +104,7 @@
                                     <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
                                        <thead>
                                           <tr>
-                                             <th>Value</th>
-                                             <th>FirstVariant</th>
+                                             <th>Name</th>
                                              <th>Product Categories</th>
                                              <th>Status</th>
                                              <th>Updated On</th>
@@ -116,12 +115,9 @@
                                        <tbody>
                                           {% for x in data %}
                                           <tr>
-                                             <td>
-                                                {{x.value|safe}}
-                                              </td>
-                                             <td>{{ x.firstvariant.name|safe }}</td>
-                                             <td>{{ x.firstvariant.category.name|safe }}</td>
-                                           
+                                             <td>{{ x.name|safe }}</td>
+                                             <td>{{ x.category.name|safe }}</td>
+                                       
                                              {% if x.isactive == True %}
                                              <td><span >Active</span></td>
                                              {% else %}
@@ -134,11 +130,11 @@
                                            
                                              
                                              <td>
-                                                <a data-toggle="modal" data-target="#EditProductFirstVariantValueModal{{ x.id|safe }}" class="btn btn-success btn-icon icon-left"><i class="far fa-edit"></i>Edit</a>&nbsp;
+                                                <a data-toggle="modal" data-target="#EditProductSecondVariantModal{{ x.id|safe }}" class="btn btn-success btn-icon icon-left"><i class="far fa-edit"></i>Edit</a>&nbsp;
                                                 
                                                 
                                                   
-                                                <a href="/admins/delete-product-firstvariantvalue/{{ x.id|safe }}" class="btn btn-primary btn-icon icon-left"><i class="fas fa-times"></i>Delete</a>
+                                                <a href="/admins/delete-product-Secondvariant/{{ x.id|safe }}" class="btn btn-primary btn-icon icon-left"><i class="fas fa-times"></i>Delete</a>
                                              </td>
                                           </tr>
                                           
@@ -158,14 +154,14 @@
 
  {% for x in data %}
 <!-- Modal -->
-<div class="modal fade" id="EditProductFirstVariantValueModal{{ x.id|safe }}" tabindex="-1" role="dialog" aria-labelledby="EditProductFirstVariantValueModalLabel" aria-hidden="true">
+<div class="modal fade" id="EditProductSecondVariantModal{{ x.id|safe }}" tabindex="-1" role="dialog" aria-labelledby="EditProductSecondVariantModalLabel" aria-hidden="true">
    <div class="modal-dialog" role="document">
    <div class="modal-content">
-      <form action="/admins/edit-product-firstvariantvalue/{{ x.id|safe }}" enctype="multipart/form-data"
+      <form action="/admins/edit-product-Secondvariant/{{ x.id|safe }}" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
       <div class="modal-header">
-         <h5 class="modal-title" id="EditProductFirstVariantValueModalLabel">Edit Product FirstVariantValue</h5>
+         <h5 class="modal-title" id="EditProductSecondVariantModalLabel">Edit Product SecondVariant</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
          <span aria-hidden="true">&times;</span>
          </button>
@@ -176,20 +172,22 @@
          <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
                <div class="form-group">
-                  <label>Product FirstVariant</label>
-                  <select class="form-control" required name="firstvariant_id">
-                  {% for category in firstvariantobj %}
-                  <option value="{{ category.id }}" {% if x.category.id == category.id %} selected {% endif %}>{{ category.category.name }}| {{ category.name }}</option>
+                  <label>Product Categories</label>
+                  <select class="form-control" required name="category_id">
+                  {% for category in productcategory %}
+                  <option value="{{ category.id }}" {% if x.category.id == category.id %} selected {% endif %}>{{ category.name }}</option>
                   {% endfor %}
                </select>    
 
               </div>
-
                <div class="form-group">
-                  <label>Value</label>
-                  <input type="text" class="form-control" required  placeholder="Enter Product FirstVariantValue " name="value" value="{{x.value}}" >
+                  <label>Name</label>
+                  <select class="form-control" required name="name">
+                     
+                     <option value="Color" >Color</option>
+                  </select>    
                </div>
-
+               
               
             </div>
             
@@ -228,11 +226,11 @@
  <div class="modal fade" id="AddProductModal" tabindex="-1" role="dialog" aria-labelledby="AddProductModalLabel" aria-hidden="true">
    <div class="modal-dialog" role="document">
      <div class="modal-content">
-      <form action="/admins/add-product-firstvariantvalue" enctype="multipart/form-data"
+      <form action="/admins/add-product-Secondvariant" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
        <div class="modal-header">
-         <h5 class="modal-title" id="AddProductModalLabel">Add Product FirstVariantValue</h5>
+         <h5 class="modal-title" id="AddProductModalLabel">Add Product SecondVariant</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
          </button>
@@ -242,25 +240,25 @@
        
          <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-
                <div class="form-group">
-                  <label>Product FirstVariant</label>
-                  <select class="form-control" required name="firstvariant_id">
-                  {% for category in firstvariantobj %}
-                  <option value="{{ category.id }}" {% if x.category.id == category.id %} selected {% endif %}>{{ category.category.name }}| {{ category.name }}</option>
+                  <label>Product Categories</label>
+                  <select class="form-control" required name="category_id">
+                  {% for category in productcategory %}
+                  
+                  <option value="{{ category.id }}" {% if x.category.id == category.id %} selected {% endif %}>{{ category.name }}</option>
                   {% endfor %}
                </select>    
 
               </div>
-
                <div class="form-group">
-                  <label>Value</label>
-                  <input type="text" class="form-control" required  placeholder="Enter Product FirstVariantValue " name="value" >
-               </div>
+                  <label>Name</label>
 
-              
+                  <select class="form-control" required name="name">
+                     
+                     <option value="Color" >Color</option>
+                  </select>    
+                  </div>
                
-              
             </div>
             
 
