@@ -67,7 +67,7 @@
                                              <td>{{ product.brand|safe }} </td>
 
                                              <td> 
-                                                <a href="/product-Variants-list/{{product.id}}"  class="btn btn-success" >Add/View</a>
+                                                <a href="/product-variants-list/{{product.id}}"  class="btn btn-success" >Add/View</a>
                                                   
                                              </td>
                                              
@@ -211,6 +211,23 @@
                      <option value="18">18%</option>
                      <option value="28">28%</option>
                    
+                  </select>
+               </div>
+            </div>
+
+
+            <div class="col-lg-4 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Unit *</label>
+                  <select class="form-control text-center" name="unit" id="unit" required>
+                     {% if product.unit %}
+                     <option selected value="{{product.unit.id}}">{{product.unit}}%</option>
+                     {% else %}
+                     {% endif %}
+                     <option  value="">----select tax----</option>
+                     {% for u in units %}
+                     <option value="{{u.id}}">{{u.name}}</option>
+                    {% endfor %}
                   </select>
                </div>
             </div>
@@ -477,6 +494,23 @@
                   </select>
                </div>
             </div>
+
+            <div class="col-lg-4 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Unit *</label>
+                  <select class="form-control text-center" name="unit" id="unit" required>
+                     {% if product.unit %}
+                     <option selected value="{{product.unit.id}}">{{product.unit}}%</option>
+                     {% else %}
+                     {% endif %}
+                     <option  value="">----select tax----</option>
+                     {% for u in units %}
+                     <option value="{{u.id}}">{{u.name}}</option>
+                    {% endfor %}
+                  </select>
+               </div>
+            </div>
+
 
             
 

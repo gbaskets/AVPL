@@ -567,6 +567,7 @@ def vendor_product_list(request):
 			'categories':ProductCategory.objects.all(),
 			'subcategories':ProductSubCategory.objects.all(),
 			'subsubcategories':ProductSubSubCategory.objects.all(),
+            'units':Unit.objects.all(),
 			'brands':Brand.objects.all(),
 			'products':Product.objects.filter(store__vendor__user=request.user),
 			# 'notification':get_notifications(request.user),
