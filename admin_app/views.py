@@ -1576,7 +1576,7 @@ def admin_vendor_verification(request):
 			# 'notification':get_notifications(request.user,'ADMIN'),
 			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/vendor_verification.html', dic)
+		return render(request, 'admin_app/store/vendor_verification.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
@@ -1588,7 +1588,7 @@ def admin_vendor_list(request):
 			# 'notification':get_notifications(request.user,'ADMIN'),
 			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/vendor_list.html', dic)
+		return render(request, 'admin_app/store/vendor_list.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
@@ -1608,7 +1608,7 @@ Thanks!'''
 		messages.success(request, 'AVPL Vendor Approved Successfully !!!!')
 		# notification(request.user, 'Vendor '+vendor.firstname+' '+vendor.lastname)
 		# notification(vendor.user, 'AVPL Vendor Approved Successfully.')
-		return redirect('/admins/vendor-list')
+		return redirect('/admins/store/vendor-list')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
@@ -1628,9 +1628,10 @@ Thanks!'''
 		messages.success(request, 'AVPL Vendor Deactivate Successfully !!!!')
 		# notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
 		# notification(vendor.user, 'AVPL Vendor Deactivate Successfully.')
-		return redirect('/admins/vendor-list')
+		return redirect('/admins/store/vendor-list')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 @csrf_exempt
 def admin_vendor_profile(request):
 	if check_user_authentication(request, 'ADMIN'):
@@ -1646,7 +1647,7 @@ def admin_vendor_profile(request):
 			"businesscategory_obj":businesscategory_obj,
 			'categories':ProductCategory.objects.all()
 		}
-		return render(request,'admin_app/vendor-profile.html', dic)
+		return render(request,'admin_app/store/vendor-profile.html', dic)
 	else:
 		return HttpResponse('Error 500 : Unauthorized User')
 
@@ -1915,7 +1916,7 @@ Thanks!'''
 		messages.success(request, 'AVPL Vendor Approved Successfully !!!!')
 		# notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
 		# notification(vendor.user, 'AVPL Vendor Approved Successfully.')
-		return redirect('/admins/kycrequests')
+		return redirect('/admins/store/kycrequests')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
@@ -1935,9 +1936,95 @@ Thanks!'''
 		messages.success(request, 'Vendor Activated Successfully !!!!')
 		# notification(request.user, 'Vendor '+vendor.first_name+' '+vendor.last_name)
 		# notification(vendor.user, 'Profile Activated Successfully.')
-		return redirect('/admins/vendor-verification')
+		return redirect('/admins/store/vendor-verification')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+
+
+@csrf_exempt
+def admin_vendor_commission_wallet(request):
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'vendor_commission_wallet':CommissionWallet.objects.filter(vendor__storecreated=True), 
+			'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/store/vendor_commission_wallet.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+@csrf_exempt
+def admin_vendor_commission_wallet_details(request, id):
+	if check_user_authentication(request, 'ADMIN'):
+
+		vendor_commission_wallet=CommissionWallet.objects.filter(id=id).first()
+		vendor_commission_wallet_transaction = CommissionWalletTransaction.objects.filter(commissionwallet=vendor_commission_wallet)
+		dic = {
+            'vendor_commission_wallet':vendor_commission_wallet,
+			'vendor_commission_wallet_transaction':vendor_commission_wallet_transaction,
+			'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		
+		}
+		return render(request, 'admin_app/store/wallet_commission_dash.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_activate_is_commission_wallet_vendor(request):
+	if check_user_authentication(request, 'ADMIN'):
+		id_=request.GET.get('id')
+		print("printing id_ here")
+		print(id_)
+		wallet = CommissionWallet.objects.get(id=id_)
+		CommissionWallet.objects.filter(id=id_).update(isactive=True)
+		sub = 'AVPL -Vendor Commission wallet activated Successfully'
+		msg = '''Hi there!
+Your AVPL Vendor Commission wallet activated Successfully, you can transaction.
+
+Thanks!'''
+		EmailMessage(sub,msg,to=[wallet.vendor.user.email]).send()
+		messages.success(request, 'AVPL Vendor Commission wallet activated Successfully !!!!')
+		# notification(request.user, 'Vendor '+wallet.vendor.firstname+' '+wallet.vendor.lastname)
+		# notification(wallet.user, 'AVPL Vendor Commission wallet activated Successfully.')
+		return redirect('/admins/vendor-commission-wallet')
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+@csrf_exempt
+def admin_deactivate_is_commission_wallet_vendor(request):
+	if check_user_authentication(request, 'ADMIN'):
+		id_=request.GET.get('id')
+		print("printing id_ here")
+		print(id_)
+		wallet = CommissionWallet.objects.get(id=id_)
+		CommissionWallet.objects.filter(id=id_).update(isactive=False)
+		sub = 'AVPL -AVPL Vendor Commission wallet Deactivate Successfully'
+		msg = '''Hi there!
+Your AVPL Vendor Commission wallet Deactivate Successfully.
+
+Thanks!'''
+		EmailMessage(sub,msg,to=[wallet.vendor.user.email]).send()
+		messages.success(request, 'AVPLVendor Commission wallet Deactivate Successfully !!!!')
+		# notification(request.user, 'Vendor '+wallet.vendor.firstname+' '+wallet.vendor.lastname)
+		# notification(wallet.user, 'AVPL Vendor Commission wallet Deactivate Successfully.')
+		return redirect('/admins/vendor-commission-wallet')
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+
+
+
+
+
 @csrf_exempt
 def admin_pv_wallet(request):
 	if check_user_authentication(request, 'ADMIN'):
@@ -3415,79 +3502,6 @@ def transfer_amount_admin(request):
 	# return redirect('balanacetransfers')
 	return render(request,'admin_app/otpverify.html')
 
-
-
-@csrf_exempt
-def admin_vendor_commission_wallet(request):
-	if check_user_authentication(request, 'ADMIN'):
-		dic = {
-			'vendor_commission_wallet':CommissionWallet.objects.filter(vendor__storecreated=True), 
-			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user,'ADMIN'),
-			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-		}
-		return render(request, 'admin_app/vendor_commission_wallet.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def admin_vendor_commission_wallet_details(request, id):
-	if check_user_authentication(request, 'ADMIN'):
-
-		vendor_commission_wallet=CommissionWallet.objects.filter(id=id).first()
-		vendor_commission_wallet_transaction = VendorWalletTransaction.objects.filter(vendor_wallet_commission=id)
-		dic = {
-            'vendor_commission_wallet':vendor_commission_wallet,
-			'vendor_commission_wallet_transaction':vendor_commission_wallet_transaction,
-			'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user,'ADMIN'),
-			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
-		
-		}
-		return render(request, 'admin_app/wallet_commission_dash.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-
-
-@csrf_exempt
-def admin_activate_is_commission_wallet_vendor(request):
-	if check_user_authentication(request, 'ADMIN'):
-		id_=request.GET.get('id')
-		print("printing id_ here")
-		print(id_)
-		wallet = CommissionWallet.objects.get(id=id_)
-		CommissionWallet.objects.filter(id=id_).update(isactive=True)
-		sub = 'AVPL -Vendor Commission wallet activated Successfully'
-		msg = '''Hi there!
-Your AVPL Vendor Commission wallet activated Successfully, you can transaction.
-
-Thanks!'''
-		EmailMessage(sub,msg,to=[wallet.user.email]).send()
-		messages.success(request, 'AVPL Vendor Commission wallet activated Successfully !!!!')
-		notification(request.user, 'Vendor '+wallet.user.vendor.first_name+' '+wallet.user.vendor.last_name)
-		notification(wallet.user, 'AVPL Vendor Commission wallet activated Successfully.')
-		return redirect('/admins/vendor-commission-wallet')
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def admin_deactivate_is_commission_wallet_vendor(request):
-	if check_user_authentication(request, 'ADMIN'):
-		id_=request.GET.get('id')
-		print("printing id_ here")
-		print(id_)
-		wallet = CommissionWallet.objects.get(id=id_)
-		CommissionWallet.objects.filter(id=id_).update(isactive=False)
-		sub = 'AVPL -AVPL Vendor Commission wallet Deactivate Successfully'
-		msg = '''Hi there!
-Your AVPL Vendor Commission wallet Deactivate Successfully.
-
-Thanks!'''
-		EmailMessage(sub,msg,to=[wallet.user.email]).send()
-		messages.success(request, 'AVPLVendor Commission wallet Deactivate Successfully !!!!')
-		notification(request.user, 'Vendor '+wallet.user.vendor.first_name+' '+wallet.user.vendor.last_name)
-		notification(wallet.user, 'AVPL Vendor Commission wallet Deactivate Successfully.')
-		return redirect('/admins/vendor-commission-wallet')
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 
 

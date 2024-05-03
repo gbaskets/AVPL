@@ -7,7 +7,7 @@
                <section class="section">
                   <div class="section-header">
                      <div class="row">
-                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                            <div class="section-header-breadcrumb-content">
                               <h1>Vendor Commission Wallet</h1>
                               <div class="section-header-breadcrumb">
@@ -52,20 +52,20 @@
                                           {% for x in vendor_commission_wallet %}
                                           <tr>
                                              <td>{{forloop.counter}}</td>
-                                             <td>{{ x.user.email|safe }}</td>
-                                             <td>{{ x.user.vendor.first_name|safe }} {{ x.user.vendor.last_name|safe }}</td>
-                                             {% if x.user.vendor.is_AVPL_Vendor == True %}
+                                             <td>{{ x.vendor.user.email|safe }}</td>
+                                             <td>{{ x.vendor.firstname|safe }} {{ x.vendor.lastname|safe }}</td>
+                                             {% if x.vendor.isavplvendor == True %}
                                              <td><span class="badge badge-info">Active</span></td>
                                              {% else %}
                                              <td><span class="badge badge-danger">Deactive</span></td>
                                              {% endif %}
-                                             <td> <i class="fa fa-inr"></i> {{x.current_balance|floatformat:2}}</td>
-                                             {% if x.is_active == True %}
+                                             <td> <i class="fa fa-inr"></i> {{x.currentbalance|floatformat:2}}</td>
+                                             {% if x.isactive == True %}
                                              <td><span class="badge badge-info">Active</span></td>
                                              {% else %}
                                              <td><span class="badge badge-danger">Deactive</span></td>
                                              {% endif %}
-                                             {% if  x.is_active == True %}
+                                             {% if  x.isactive == True %}
                                              <td>
                                                 <a href="/admins/deactivate_is_commission_wallet?id={{ x.id|safe }}" class="btn btn-primary btn-icon icon-left">Deactivate Commission Wallet</a>
                                               
@@ -76,7 +76,7 @@
                                               
                                              </td>
                                              {% endif %}
-                                             <td> <a href="{% url 'vendor-commission-wallet' x.id %}" target="_blank" title="View Commission Wallet Details"><img src="/static/show.png"  width="30" height="30"></a> </td>
+                                             <td> <a href="{% url 'vendor-commission-wallet' x.id %}" target="_blank" title="View Commission Wallet Details">View</a> </td>
                                           </tr>
                                           {% endfor %}
                                        </tbody>

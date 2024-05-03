@@ -57,10 +57,6 @@ urlpatterns = [
     path('edit-product-thirdvariantvalue/<int:id>', admin_edit_product_thirdvariantvalue, name="edit-product-thirdvariantvalue"),
     path('delete-product-thirdvariantvalue/<int:id>', admin_delete_product_thirdvariantvalue, name="delete-product-thirdvariantvalue"),
     
-    
-    
-    
-    
     path('product-categories', admin_product_categories),
     path('add-product-categories', admin_add_product_categories),
     path('edit-product-categories/<int:id>', admin_edit_product_categories, name="edit-product-categories"),
@@ -80,6 +76,18 @@ urlpatterns = [
     path('productapproval', admin_product_approval),
     path('all-products', admin_product_list),
     
+    
+    path('vendorprofile', admin_vendor_profile),
+    path('editvendorprofile', admin_edit_vendor_profile),
+
+    path('vendor-commission-wallet', admin_vendor_commission_wallet),
+    path('vendor-commission-wallet/<int:id>',admin_vendor_commission_wallet_details, name='vendor-commission-wallet'),
+    path('activate_is_commission_wallet', admin_activate_is_commission_wallet_vendor),
+    path('deactivate_is_commission_wallet', admin_deactivate_is_commission_wallet_vendor),
+
+
+
+
     path('admin_pv', admin_pv_wallet),
    
     path('vendor-verification', admin_vendor_verification),
@@ -98,8 +106,6 @@ urlpatterns = [
     path('activate_isavplvendor', admin_is_activate_approved_avpl_vendor),
     path('deactivate_isavplvendor', admin_is_deactivate_approved_avpl_vendor),
 
-    path('vendorprofile', admin_vendor_profile),
-    path('editvendorprofile', admin_edit_vendor_profile),
     
     path('paymentinfo', admin_payment_info),
     path('orders', admin_orders),
@@ -167,10 +173,6 @@ urlpatterns = [
     path('balanacetransfers', adminbalanacetransfer, name='balanacetransfers'),
     path('otpvalidations', transfer_amount_admin, name='otpvalidations'),
 
-    path('vendor-commission-wallet', admin_vendor_commission_wallet),
-    path('vendor-commission-wallet/<int:id>',admin_vendor_commission_wallet_details, name='vendor-commission-wallet'),
-    path('activate_is_commission_wallet', admin_activate_is_commission_wallet_vendor),
-    path('deactivate_is_commission_wallet', admin_deactivate_is_commission_wallet_vendor),
     path('staff_list', staff_list,),
     path('activate_is_active', admin_activate_isactive_staff),
     path('deactivate_is_active', admin_deactivate_isactive_staff),

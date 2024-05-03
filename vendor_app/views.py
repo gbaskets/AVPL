@@ -410,7 +410,7 @@ def store_info(request):
 				"businesscategory_obj":businesscategory_obj,
                  "storeobj":storeobj,
 				}
-		return render(request, 'vendor_app/store-register.html',dic )
+		return render(request, 'vendor_app/store/store-register.html',dic )
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -541,7 +541,7 @@ def vendor_doc(request):
 			else:
 				dic={'vendor':{}}
 
-			return render(request, 'vendor_app/vendor-doc.html', dic)
+			return render(request, 'vendor_app/store/vendor-doc.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -819,7 +819,7 @@ def vendor_profile(request):
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}			
-		return render(request,'vendor_app/vendor-profile.html', dic)
+		return render(request,'vendor_app/store/vendor-profile.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
