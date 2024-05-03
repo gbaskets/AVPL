@@ -586,6 +586,7 @@ def add_product(request):
 
 			vendor = Vendor.objects.filter(user=request.user).first()
 			store = Store.objects.filter(vendor=vendor).first()
+			unit_id=request.POST.get('unit_id') 
 			category_id=request.POST.get('category_id') 
 			subcategory_id=request.POST.get('subcategory_id') 
 			subsubcategory_id=request.POST.get('subsubcategory_id') 
@@ -611,6 +612,9 @@ def add_product(request):
 						pro.subsubcategory = ProductSubSubCategory.objects.get(id=subsubcategory_id)
 					if brand_id:
 						pro.brand = Brand.objects.get(id=brand_id)
+					if unit_id:
+						pro.unit = Unit.objects.get(id=unit_id)
+      
 					if hsn:
 						pro.hsn= hsn
 					if hsn:
@@ -652,6 +656,7 @@ def edit_product(request,id):
 			subcategory_id=request.POST.get('subcategory_id') 
 			subsubcategory_id=request.POST.get('subsubcategory_id') 
 			brand_id=request.POST.get('brand_id') 
+			unit_id=request.POST.get('unit_id') 
 			productname=request.POST.get('productname') 
 			description=request.POST.get('description') 
 			hsn=request.POST.get('hsn') 
@@ -675,6 +680,8 @@ def edit_product(request,id):
 					pro.subsubcategory = ProductSubSubCategory.objects.get(id=subsubcategory_id)
 				if brand_id:
 					pro.brand = Brand.objects.get(id=brand_id)
+				if unit_id:
+					pro.unit = Unit.objects.get(id=unit_id)
 				if hsn:
 					pro.hsn= hsn
 				if hsn:
@@ -705,100 +712,28 @@ def edit_product(request,id):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 		
-		
-@csrf_exempt
-def add_product_images(request):
-	if check_user_authentication(request, 'VENDOR'):
-		if request.method == 'POST':
-			vendor = Vendor.objects.filter(user=request.user)
-			images = request.FILES.getlist('images')
-			product = Product.objects.get(id=request.session['product'])
-			for image in images:
-				ProductImages.objects.create(product=product,image=image)
-			messages.success(request, 'Product Images Added Successfully')
-			dic = {
-				'vendor':vendor,
-				'categories':ProductCategory.objects.all(),
-				'variants':Variant.objects.all(),
-				'variant':True,
-				'product':product,
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-			}
-			return render(request,'vendor_app/add-product.html', dic)
-		else:
-			vendor = Vendor.objects.filter(user=request.user)
-			dic = {
-				'vendor':vendor,
-				'categories':ProductCategory.objects.all(),
-				'info':True,
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-			}
-			return render(request,'vendor_app/add-product.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 
 
 @csrf_exempt
-def add_product_variant(request):
+def vendor_product_variants_list(request,id):
 	if check_user_authentication(request, 'VENDOR'):
-		if request.method == 'POST':
-			variant = Variant.objects.get(id=request.POST.get('variant'))
-			variant_value = VariantValue.objects.get(id=request.POST.get('variantvalue'))
-			variant_stock = request.POST.get('variantstock')
-			product = Product.objects.get(id=request.session['product'])
-			if ProductVariant.objects.filter(product=product, variant=variant, variant_value=variant_value).exists():
-				return JsonResponse({'response':'failed'})
-			ProductVariant.objects.create(product=product, variant=variant, variant_value=variant_value, variant_stock=variant_stock)
-			data = ''
-			for x in ProductVariant.objects.filter(product=product):
-				data = data + '<tr><td>'+x.variant.name+'</td><td>'+x.variant_value.value+'</td><td>'+str(x.variant_stock)+'</td></tr>'
-			return HttpResponse(data)
-		else:
-			vendor = Vendor.objects.filter(user=request.user)
-			dic = {
-				'vendor':vendor,
-				'categories':ProductCategory.objects.all(),
-				'info':True,
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-			}
-			messages.success(request, 'Product has been added and added successfully. Now waiting for admin approval.')
-			return render(request,'vendor_app/add-product.html', dic)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		dic = {
+			'vendor':vendor,
+			'categories':ProductCategory.objects.all(),
+			'subcategories':ProductSubCategory.objects.all(),
+			'subsubcategories':ProductSubSubCategory.objects.all(),
+            'units':Unit.objects.all(),
+			'brands':Brand.objects.all(),
+			'products':Product.objects.filter(store__vendor__user=request.user),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/product/product-variants-list.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def fetch_sub_category(request):
-	category = ProductCategory.objects.get(id=request.GET.get('cate'))
-	subcategory = ProductSubCategory.objects.filter(category = category)
-	data = '<option selected disabled>----select product sub category----</option>'
-	for x in subcategory:
-		data = data + '<option value="'+str(x.id)+'">'+x.name+'</option>'
-	return HttpResponse(data)
-@csrf_exempt
-def fetch_variant_value(request):
-	variant = Variant.objects.get(id=request.GET.get('variant'))
-	data = ''
-	for x in VariantValue.objects.filter(variant=variant):
-		data = data + '<option value="'+str(x.id)+'">'+x.value+'</option>'
-	return HttpResponse(data)
-@csrf_exempt
-def fetch_sub_sub_category(request):
-	subcategory = ProductSubCategory.objects.get(id=request.GET.get('subcate'))
-	subsubcategory = ProductSubSubCategory.objects.filter(subcategory = subcategory)
-	data = '<option selected disabled>----select product sub sub category----</option>'
-	for x in subsubcategory:
-		data = data + '<option value="'+str(x.id)+'">'+x.name+'</option>'
-	return HttpResponse(data)
-@csrf_exempt
-def fetch_brands(request):
-	category = ProductCategory.objects.get(id = request.GET.get('cate'))
-	brands = Brand.objects.filter(category=category)
-	data = '<option selected disabled>----select product brand----</option>'
-	for x in brands:
-		data = data + '<option value="'+str(x.id)+'">'+x.name+'</option>'
-	return HttpResponse(data)
+
 
 
 

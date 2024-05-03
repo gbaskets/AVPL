@@ -16,16 +16,16 @@ urlpatterns = [
     path('product-list', vendor_product_list),
     path('add-product', add_product),
     path('edit-product/<int:id>', edit_product),
-    path('addproductimages', add_product_images),
-    path('addproductvariant', add_product_variant),
-    path('fetchsubcategory', fetch_sub_category),
-    path('fetchsubsubcategory', fetch_sub_sub_category),
-
+    
+    path('product-variants-list/<int:id>', vendor_product_variants_list),
+    path('add-product', add_product),
+    path('edit-product/<int:id>', edit_product),
+    
+    
   
     path('product', vendor_product),
     path('update-product/<int:id>/', vendor_update_product_quantity,name='update-product'),
     path('productbasicedit', vendor_product_basic_edit),
-    path('fetchvariantvalue', fetch_variant_value),
     path('orders', vendor_orders),
     path('orderdetail', vendor_order_detail),
     path('returndetail', vendor_return_details),
@@ -37,7 +37,6 @@ urlpatterns = [
     # path('returnorders', vendor_return_orders),
     
     path('brand', vendor_brand),
-    path('fetchbrands', fetch_brands),
     path('deleteproductimage', vendor_delete_product_image),
     path('deleteproductvariant', vendor_delete_product_variant),
     path('outofstock', vendor_product_out_of_stock),

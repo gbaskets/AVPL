@@ -1,6 +1,6 @@
 {% extends 'vendor_app/base.html' %}
 {% load static %}
-{% block title %}Product List{% endblock %}
+{% block title %}Product Variants List{% endblock %}
 {% block main %}
 
 {% csrf_token %} 
@@ -10,12 +10,12 @@
                <section class="section">
                   <div class="section-header">
                      <div class="row">
-                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                            <div class="section-header-breadcrumb-content">
-                              <h1>Products</h1>
+                              <h1>Products Variants List</h1>
                               <div class="section-header-breadcrumb">
                                  <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
-                                 <div class="breadcrumb-item"><a href="#">Products</a></div>
+                                 <div class="breadcrumb-item"><a href="#">Products Variants List</a></div>
                               </div>
                            </div>
                         </div>
@@ -33,10 +33,10 @@
                               <div class="card-header">
                      
                                  <div class="col-8">
-                                    <h4>Product List</h4>
+                                    <h4>Product Variants List</h4>
                                  </div>
                                     <div class="col-6">
-                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddProductModal">Add Product</a>
+                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddProductModal">Add Product Variants</a>
                                     </div>
                                     
                               </div>
@@ -67,7 +67,7 @@
                                              <td>{{ product.brand|safe }} </td>
 
                                              <td> 
-                                                <a href="/vendor/product-variants-list/{{product.id}}"  class="btn btn-success" >Add/View</a>
+                                                <a href="/product-variants-list/{{product.id}}"  class="btn btn-success" >Add/View</a>
                                                   
                                              </td>
                                              
