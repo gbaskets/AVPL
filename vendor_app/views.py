@@ -713,6 +713,26 @@ def edit_product(request,id):
 
 		
 
+@csrf_exempt
+def vendor_product_variants_all_list(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		dic = {
+			'vendor':vendor,
+			'categories':ProductCategory.objects.filter(),
+			'subcategories':ProductSubCategory.objects.filter(),
+			'subsubcategories':ProductSubSubCategory.objects.filter(),
+            'units':Unit.objects.filter(),
+			'brands':Brand.objects.filter(),
+            'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/product/product-variants-all-list.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 
 
 @csrf_exempt
@@ -721,12 +741,16 @@ def vendor_product_variants_list(request,id):
 		vendor = Vendor.objects.filter(user=request.user).first()
 		dic = {
 			'vendor':vendor,
-			'categories':ProductCategory.objects.all(),
-			'subcategories':ProductSubCategory.objects.all(),
-			'subsubcategories':ProductSubSubCategory.objects.all(),
-            'units':Unit.objects.all(),
-			'brands':Brand.objects.all(),
-			'products':Product.objects.filter(store__vendor__user=request.user),
+			'categories':ProductCategory.objects.filter(),
+			'subcategories':ProductSubCategory.objects.filter(),
+			'subsubcategories':ProductSubSubCategory.objects.filter(),
+            'units':Unit.objects.filter(),
+			'brands':Brand.objects.filter(),
+			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=id),
+			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=id),
+			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=id),
+			'products':Product.objects.filter(store__vendor__user=request.user,id=id).first(),
+            'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user,product__id=id),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
