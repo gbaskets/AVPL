@@ -36,7 +36,7 @@
                                     <h4>Product Variants List</h4>
                                  </div>
                                     <div class="col-6">
-                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddProductModal">Add Product Variants</a>
+                                       <a href="/vendor/product-list" class="btn btn-primary">Add Product Variants</a>
                                     </div>
                                     
                               </div>
@@ -229,129 +229,6 @@
 
 
    {% endfor %}
-
-
- <!-- Modal -->
- <div class="modal fade" id="AddProductModal" tabindex="-1" role="dialog" aria-labelledby="AddProductModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-xl" role="document">
-     <div class="modal-content">
-      <form action="/vendor/add-product-variants" enctype="multipart/form-data"
-      method="POST">
-      {% csrf_token %}
-       <div class="modal-header">
-         <h5 class="modal-title" id="AddProductModalLabel">Add Product Variants </h5>
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-           <span aria-hidden="true">&times;</span>
-         </button>
-       </div>
-       <div class="modal-body">
-     
-         <div class="row">
-                                       
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label> Product *</label>
-                  <select class="form-control text-center" name="product_id" id="product_id" required>
-                     <option  disabled value="">----select product----</option>
-                  
-                     <option selected value="{{ products.id|safe }}">{{ products.productname|safe }}</option>
-                  
-                  </select>
-               </div>
-            </div>
-             <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>First Variant Color *</label>
-                  <select class="form-control text-center" name="first_variant_id" id="first_variant_id">
-                     <option selected disabled value="">----select color ----</option>
-                     {% for cate in firstvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
-                     {% endfor %}
-                  </select>
-               </div>
-            </div>
-             <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Second Variant</label>
-                  <select class="form-control text-center" id="second_variant_id" name="second_variant_id" >
-                     <option selected disabled value="">----select second variant----</option>
-                     {% for cate in secondvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
-                     {% endfor %}
-                  </select>
-               </div>
-            </div>
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Third Variant</label>
-                  <select class="form-control text-center" id="third_variant_id" name="third_variant_id" required>
-                     <option selected disabled value="">----select third variant----</option>
-                     {% for cate in thirdvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
-                     {% endfor %}
-                  </select>
-               </div>
-            </div>
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Product Variant Name *</label>
-                  <input type="text" class="form-control" placeholder="Enter Product Variant Name" name="productvariantname" required>
-               </div>
-            </div>
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Product Image *</label>
-            
-                     {% if x.productimage %}
-                     <a href="{{x.productimage.url}}"> <img alt="image" src="{{x.productimage.url}}"  height="50" weight="50" /></a>
-                     {% else %}
-                     {% endif %}
-                     <input type="file" class="form-control" accept="image/png, image/jpeg" name="productimage" />
-               </div>
-            </div>
-
-           
-
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Product Quantity *</label>
-                  <input type="text" class="form-control" placeholder="Enter Product Quantity" name="quantity" required>
-               </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Product MRP *</label>
-                  <input type="text" class="form-control" placeholder="Enter Product Variant MRP" name="mrp" required>
-               </div>
-            </div>
-
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Product Purchase Price *</label>
-                  <input type="text" class="form-control" placeholder="Enter Product Purchase Price" name="purchaseprice" required>
-               </div>
-            </div>
-
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Product Sale Price *</label>
-                  <input type="text" class="form-control" placeholder="Enter Product Sale Price" name="price" required>
-               </div>
-            </div>
-           
-         </div>
-   
-                    
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-         <button type="submit" class="btn btn-success">Save changes</button>
-       </div>
-      </form>
-     </div>
-   </div>
- </div>
 
 
 
