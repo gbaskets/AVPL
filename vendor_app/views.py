@@ -762,6 +762,82 @@ def vendor_product_variants_list(request,id):
 
 
 @csrf_exempt
+def add_product_variants(request,id):
+	if check_user_authentication(request, 'VENDOR'):
+		if request.method == 'POST':
+			vendor = Vendor.objects.filter(user=request.user).first()
+			store = Store.objects.filter(vendor=vendor).first()
+			product_id=id 
+			firstvariantvalue_id=request.POST.get('firstvariantvalue_id') 
+			secondvariantvalue_id=request.POST.get('secondvariantvalue_id') 
+			thirdvariantvalue_id=request.POST.get('thirdvariantvalue_id') 
+			productvariantname=request.POST.get('productvariantname') 
+			productimage=request.FILES.get('productimage') 
+			quantity=request.POST.get('quantity') 
+			mrp=request.POST.get('mrp') 
+			purchaseprice=request.POST.get('purchaseprice') 
+			price=request.POST.get('price') 
+	
+			if ProductVariants.objects.filter(store=store, productvariantname=productvariantname).exists():
+				messages.info(request, f'Product Variant: {productvariantname} is already exits !')
+				return redirect(f'/vendor/product-variants-list/{product_id}')
+			else:
+				if product_id  and productvariantname and productimage:
+					product = Product.objects.filter(store=store, id=id).first()
+					productvariantsobj=ProductVariants.objects.create(store=store,product=product, productvariantname=productvariantname,productimage=productimage)        
+					productvariantsobj.sku=generate_code(product.id,[product.productname,product.category.name,product.brand.name])
+					productvariantsobj.upc=generate_bracode("")[1]
+					productvariantsobj.barcodeimage.save(f'barcode_unique_no.png',generate_bracode("")[0])
+				
+					if firstvariantvalue_id:
+						productvariantsobj.firstvariantvalue = FirstVariantValue.objects.get(id=firstvariantvalue_id)
+					if secondvariantvalue_id:
+						productvariantsobj.secondvariantvalue = SecondVariantValue.objects.get(id=secondvariantvalue_id)
+					if thirdvariantvalue_id:
+						productvariantsobj.thirdvariantvalue = ThirdVariantValue.objects.get(id=thirdvariantvalue_id)
+					
+					if quantity:
+						productvariantsobj.quantity = int(quantity)
+      
+					if mrp:
+						productvariantsobj.mrp= float(mrp)
+					if purchaseprice:
+						productvariantsobj.purchaseprice= float(purchaseprice)
+					if price:
+						productvariantsobj.price =float(price)
+					
+					productvariantsobj.updatedby= request.user
+					productvariantsobj.save()
+					messages.success(request,f'Product Variants {productvariantname} is Added Successfully')
+					return redirect(f'/vendor/product-variants-list/{product_id}')
+				else:
+					messages.info(request, f'Please fill all detials such as productvariantname and price !')
+					return redirect(f'/vendor/product-variants-list/{product_id}')
+          
+		dic = {
+			'vendor':vendor,
+			'categories':ProductCategory.objects.filter(),
+			'subcategories':ProductSubCategory.objects.filter(),
+			'subsubcategories':ProductSubSubCategory.objects.filter(),
+			'units':Unit.objects.filter(),
+			'brands':Brand.objects.filter(),
+			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=id),
+			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=id),
+			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=id),
+			'products':Product.objects.filter(store__vendor__user=request.user,id=id).first(),
+			'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user,product__id=id),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/product/product-variants-list.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+
+@csrf_exempt
 def vendor_profile(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
@@ -782,6 +858,7 @@ def vendor_profile(request):
 		return render(request,'vendor_app/store/vendor-profile.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 @csrf_exempt
 def edit_vendor_profile(request):
 	if check_user_authentication(request, 'VENDOR'):

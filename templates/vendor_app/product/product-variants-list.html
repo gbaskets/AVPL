@@ -45,12 +45,16 @@
                                     <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
                                        <thead>
                                           <tr>
-                                             <th>Product Id</th>
-                                             <th>Name/Title</th>
-                                             <th>Category</th>
-                                             <th>Subcategory</th>
-                                             <th>Brand</th>
-                                             <th>Product-Variants</th>
+                                             <th>Product Variant Id</th>
+                                             <th>Product Variant Name</th>
+                                             <th>SKU</th>
+                                             <th>UPC</th>
+                                             <th>Product</th>
+                                             <th>Quantity</th>
+                                             <th>Purchase Price</th>
+                                             <th>MRP</th>
+                                             <th>Sales Price</th>
+ 
                                              <th>Status</th>
                               
                                              <th>Options</th>
@@ -235,7 +239,7 @@
  <div class="modal fade" id="AddProductModal" tabindex="-1" role="dialog" aria-labelledby="AddProductModalLabel" aria-hidden="true">
    <div class="modal-dialog modal-xl" role="document">
      <div class="modal-content">
-      <form action="/vendor/add-product-variants" enctype="multipart/form-data"
+      <form action="/vendor/add-product-variants/{{products.id}}" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
        <div class="modal-header">
@@ -284,7 +288,7 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Third Variant</label>
-                  <select class="form-control text-center" id="third_variant_id" name="third_variant_id" required>
+                  <select class="form-control text-center" id="third_variant_id" name="third_variant_id">
                      <option selected disabled value="">----select third variant----</option>
                      {% for cate in thirdvariantvalue %}
                      <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>

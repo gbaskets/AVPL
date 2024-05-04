@@ -215,8 +215,9 @@ class Product(models.Model):
 class ProductVariants(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True)
     store = models.ForeignKey(Store,on_delete=models.CASCADE,null=True, blank=True)
-    sku=models.CharField(max_length=50,null=True,blank=True)
-    upc=models.CharField(max_length=255,null=True,blank=True)
+    sku=models.CharField(max_length=255,null=True,blank=True,unique=True)
+    upc=models.CharField(max_length=255,null=True,blank=True,unique=True)
+    barcodeimage=models.ImageField(upload_to='inventory/productvariant/barcodeimage',null=True, blank=True)
     firstvariantvalue = models.ForeignKey(FirstVariantValue,on_delete=models.CASCADE, null=True, blank=True)
     secondvariantvalue = models.ForeignKey(SecondVariantValue,on_delete=models.CASCADE, null=True, blank=True)
     thirdvariantvalue = models.ForeignKey(ThirdVariantValue,on_delete=models.CASCADE, null=True, blank=True)
