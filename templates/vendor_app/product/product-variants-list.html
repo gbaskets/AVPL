@@ -61,36 +61,30 @@
                                           </tr>
                                        </thead>
                                        <tbody>
-                                          {% for product in product_variants %}
+                                          {% for pro in product_variants %}
                                           <tr>
-                                             <td><a  data-toggle="modal" data-target="#EditProductModal{{product.id}}">{{product.id}}</a></td>
+                                             <td><a  data-toggle="modal" data-target="#EditProductModal{{pro.id}}">{{pro.id}}</a></td>
                               
-                                             <td> <a data-toggle="modal" data-target="#EditProductModal{{product.id}}">{{product.productname|safe }}</a> </td>
-                                             <td>{{ product.category.name|safe }} </td>
-                                             <td>{{ product.subcategory.name|safe }} </td>
-                                             <td>{{ product.brand|safe }} </td>
+                                             <td> <a data-toggle="modal" data-target="#EditProductModal{{pro.id}}">{{pro.productvariantname|safe }}</a> </td>
+                                             <td>{{ pro.sku|safe }} </td>
+                                             <td><a href="{{ pro.barcodeimage.url|safe }}" target="_blank">{{ pro.upc|safe }} </a></td>
+                                             <td>{{ pro.product|safe }} </td>
+                                             <td>{{ pro.quantity|safe }} </td>
+                                             <td>{{ pro.purchaseprice|safe }} </td>
+                                             <td>{{ pro.mrp|safe }} </td>
+                                             <td>{{ pro.price|safe }} </td>                                             
 
-                                             <td> 
-                                                <a href="/product-variants-list/{{product.id}}"  class="btn btn-success" >Add/View</a>
-                                                  
-                                             </td>
-                                             
-
-                                             {% if product.isactive %}
+                                             {% if pro.isactive %}
                                              <td><span class="badge badge-success">Approved</span></td>
-                                             {% elif product.productrejection %}
+                                             {% elif pro.product.productrejection %}
                                              <td><span class="badge badge-danger">Rejected</span></td>
                                              {%else%}
                                              <td><span class="badge badge-warning">Under Process</span></td>
                                              {% endif %}
 
-                                             <td ><a class="btn btn-success btn-icon icon-left" data-toggle="modal" data-target="#EditProductModal{{product.id}}"><i class="far fa-edit"></i>Edit Product</a></td>
+                                             <td ><a class="btn btn-success btn-icon icon-left" data-toggle="modal" data-target="#EditProductModal{{pro.id}}"><i class="far fa-edit"></i>Edit</a></td>
                                        
-                                             {% comment %} <td>
-                                               <a class="btn btn-success btn-icon icon-left" href="/vendor/update-product/{{product.id}}"><i class="far fa-edit"></i>Update Quantity</a>&nbsp;
-                                                <button class="btn btn-primary btn-icon icon-left" onclick="make_out_of_stock({{product.id}});"><i class="fas fa-times"></i>Make Out of Stock</button>
-                                             </td> {% endcomment %}
-
+                                       
                               
                                              
                                           </tr>
@@ -108,17 +102,17 @@
             </div>
 
 
-            {% for product in product_variants %}
+            {% for pro in product_variants %}
 
  <!-- Modal -->
- <div class="modal fade" id="EditProductModal{{product.id}}" tabindex="-1" role="dialog" aria-labelledby="EditProductModalLabel{{product.id}}" aria-hidden="true">
+ <div class="modal fade" id="EditProductModal{{pro.id}}" tabindex="-1" role="dialog" aria-labelledby="EditProductModalLabel{{pro.id}}" aria-hidden="true">
    <div class="modal-dialog modal-xl" role="document">
      <div class="modal-content">
-      <form action="/vendor/edit-product/{{product.id}}" enctype="multipart/form-data"
+      <form action="/vendor/edit-product/{{pro.id}}" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
        <div class="modal-header">
-         <h5 class="modal-title" id="EditProductModalLabel{{product.id}}">Edit Product - {{product.id}}</h5>
+         <h5 class="modal-title" id="EditProductModalLabel{{pro.id}}">Edit Product - {{pro.id}}</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
          </button>
@@ -133,7 +127,7 @@
                   <select class="form-control text-center" name="product_id" id="product_id" required>
                      <option  disabled value="">----select product----</option>
                   
-                     <option selected value="{{ products.id|safe }}">{{ products.productname|safe }}</option>
+                     <option selected value="{{ pro.product.id|safe }}">{{ pro.product.productname|safe }}</option>
                   
                   </select>
                </div>
@@ -141,10 +135,10 @@
              <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>First Variant Color *</label>
-                  <select class="form-control text-center" name="first_variant_id" id="first_variant_id">
+                  <select class="form-control text-center" name="firstvariantvalue_id" id="firstvariantvalue_id">
                      <option selected disabled value="">----select color ----</option>
                      {% for cate in firstvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }}" {% if pro.firstvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -152,10 +146,10 @@
              <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Second Variant</label>
-                  <select class="form-control text-center" id="second_variant_id" name="second_variant_id" >
+                  <select class="form-control text-center" id="secondvariantvalue_id" name="secondvariantvalue_id" >
                      <option selected disabled value="">----select second variant----</option>
                      {% for cate in secondvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }}" {% if pro.secondvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -163,10 +157,10 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Third Variant</label>
-                  <select class="form-control text-center" id="third_variant_id" name="third_variant_id" required>
+                  <select class="form-control text-center" id="thirdvariantvalue_id" name="thirdvariantvalue_id">
                      <option selected disabled value="">----select third variant----</option>
                      {% for cate in thirdvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }}" {% if pro.thirdvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -174,15 +168,15 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product Variant Name *</label>
-                  <input type="text" class="form-control" placeholder="Enter Product Variant Name" name="productvariantname" required>
+                  <input type="text" class="form-control" placeholder="Enter Product Variant Name" name="productvariantname" value="{{pro.productvariantname}}" required>
                </div>
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product Image *</label>
             
-                     {% if x.productimage %}
-                     <a href="{{x.productimage.url}}"> <img alt="image" src="{{x.productimage.url}}"  height="50" weight="50" /></a>
+                     {% if pro.productimage %}
+                     <a href="{{pro.productimage.url}}"> <img alt="image" src="{{pro.productimage.url}}"  height="50" weight="50" /></a>
                      {% else %}
                      {% endif %}
                      <input type="file" class="form-control" accept="image/png, image/jpeg" name="productimage" />
@@ -194,14 +188,14 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product Quantity *</label>
-                  <input type="number" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" class="form-control" placeholder="Enter Product Quantity" name="quantity" required>
+                  <input type="number" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" class="form-control" placeholder="Enter Product Quantity" name="quantity" value="{{pro.quantity}}" required>
                </div>
             </div>
             
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product MRP *</label>
-                  <input  type="number"  step=0.01 onkeydown="javascript: return event.keyCode == 69 ? false : true"  class="form-control" placeholder="Enter Product Variant MRP" name="mrp" required>
+                  <input  type="number"  step=0.01 onkeydown="javascript: return event.keyCode == 69 ? false : true"  value="{{pro.mrp}}"  class="form-control" placeholder="Enter Product Variant MRP" name="mrp" required>
                </div>
             </div>
 
@@ -362,20 +356,6 @@
 
 
 
-
-<script type="text/javascript">
-function make_out_of_stock (product) {
-      $.ajax({
-            type:'GET',
-            url:'/vendor/outofstock',
-            data:{i:product},
-
-            success: function(msg){
-                document.getElementById(product).style.display = 'block';
-            }
-        });
-   }
-</script>
 
 
 

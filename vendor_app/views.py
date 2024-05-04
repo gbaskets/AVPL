@@ -787,7 +787,7 @@ def add_product_variants(request,id):
 					productvariantsobj=ProductVariants.objects.create(store=store,product=product, productvariantname=productvariantname,productimage=productimage)        
 					productvariantsobj.sku=generate_code(product.id,[product.productname,product.category.name,product.brand.name])
 					productvariantsobj.upc=generate_bracode("")[1]
-					productvariantsobj.barcodeimage.save(f'barcode_unique_no.png',generate_bracode("")[0])
+					productvariantsobj.barcodeimage.save(f'{productvariantname}.png',generate_bracode("")[0])
 				
 					if firstvariantvalue_id:
 						productvariantsobj.firstvariantvalue = FirstVariantValue.objects.get(id=firstvariantvalue_id)
@@ -1143,8 +1143,8 @@ def vendor_update_product_quantity(request,id):
 		dic = {
 			'vendor':vendor,
 			'product':product,
-			'images':ProductImages.objects.filter(product=product),
-			'variants':ProductVariant.objects.filter(product=product),
+			'images':ProductImages.objects.filter(productvariants__product=product),
+			'variants':ProductVariants.objects.filter(product=product),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
