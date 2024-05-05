@@ -73,7 +73,7 @@ urlpatterns = [
     path('delete-product-sub-subcategories/<int:id>', admin_delete_product_subsubcategories, name="delete-product-sub-subcategories"),
     
     path('product', admin_product),
-    path('productapproval', admin_product_approval),
+    path('product-approval', admin_product_approval),
     path('all-products', admin_product_list),
     
     path('edit-product/<int:id>', admin_edit_product),

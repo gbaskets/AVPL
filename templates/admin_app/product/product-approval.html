@@ -38,11 +38,11 @@
                                        <tbody>
                                           {% for x in data %}
                                           <tr>
-                                             <td><a href="/productpage/?p={{x.id}}">{{ x.name|safe }}</a></td>
-                                             {% if x.store.vendor.is_AVPL_Vendor == True %}
-                                             <td>{{ x.store.name|safe }} - <span class="badge badge-info">AVPL Store</span></td>
+                                             <td>{{ x.productvariantname|safe }}</td>
+                                             {% if x.store.vendor.isavplvendor == True %}
+                                             <td>{{ x.store.storename|safe }} - <span class="badge badge-info">AVPL Store</span></td>
                                              {% else %}
-                                             <td>{{ x.store.name|safe }} </td>
+                                             <td>{{ x.store.storename|safe }} </td>
                                              {% endif %}
                                              <td>
                                                

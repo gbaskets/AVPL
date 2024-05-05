@@ -1516,7 +1516,7 @@ def admin_product(request):
 		dic = {
 			'product':product,
 			'images':ProductImages.objects.filter(product=product),
-			'variants':ProductVariant.objects.filter(product=product),'categories':ProductCategory.objects.all(),
+			'variants':ProductVariants.objects.filter(product=product),'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -1528,23 +1528,26 @@ def admin_product(request):
 def admin_product_approval(request):
 	if check_user_authentication(request, 'ADMIN'):
 		
-		if request.method == 'POST':
-			id = request.POST.get('id')
-			vendor_commission = request.POST.get('vendor_commission')
-			prod=Product.objects.filter(id=id).first()
-			prod.vendor_commission = vendor_commission
-			prod.save()
-			messages.success(request, 'New Vendor Commission has been set. ! ')
-			return redirect('/admins/productapproval')
+		# if request.method == 'POST':
+		# 	id = request.POST.get('id')
+		# 	vendor_commission = request.POST.get('vendor_commission')
+		# 	prod=Product.objects.filter(id=id).first()
+		# 	prod.vendor_commission = vendor_commission
+		# 	prod.save()
+		# 	messages.success(request, 'New Vendor Commission has been set. ! ')
+		# 	return redirect('/admins/product-approval')
 		
-		dic = {'data':Product.objects.filter(isactive=False, isproductrejected=False),
-			'rejected_product':Product.objects.filter(isactive=False, isproductrejected=True),
+		dic = {'data':ProductVariants.objects.filter(isactive=False, product__isproductrejected=False),
+			'rejected_product':ProductVariants.objects.filter(isactive=False, product__isproductrejected=True),
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/product/product-approval.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
 
 @csrf_exempt
 def admin_product_list(request):
