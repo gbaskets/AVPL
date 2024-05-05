@@ -1562,6 +1562,136 @@ def admin_product_list(request):
 
 
 
+@csrf_exempt
+def admin_edit_product(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			category_id=request.POST.get('category_id') 
+			subcategory_id=request.POST.get('subcategory_id') 
+			subsubcategory_id=request.POST.get('subsubcategory_id') 
+			brand_id=request.POST.get('brand_id') 
+			unit_id=request.POST.get('unit_id') 
+			productname=request.POST.get('productname') 
+			description=request.POST.get('description') 
+			hsn=request.POST.get('hsn') 
+			tax=request.POST.get('tax') 
+			pv=request.POST.get('pv') 
+			admincommission=request.POST.get('admincommission') 
+	
+			if Product.objects.filter(id=id).exists():
+				pro=Product.objects.filter(id=id).first()
+				
+				if productname :
+					productname = productname
+				if description:
+					description = description
+					
+				if category_id:
+					pro.category = ProductCategory.objects.get(id=category_id)
+				if subcategory_id:
+					pro.subcategory = ProductSubCategory.objects.get(id=subcategory_id)
+				if subsubcategory_id:
+					pro.subsubcategory = ProductSubSubCategory.objects.get(id=subsubcategory_id)
+				if brand_id:
+					pro.brand = Brand.objects.get(id=brand_id)
+				if unit_id:
+					pro.unit = Unit.objects.get(id=unit_id)
+				if hsn:
+					pro.hsn= hsn
+				if hsn:
+					pro.tax= tax
+				if hsn:
+					pro.pv =pv
+				if hsn:
+					pro.admincommission =admincommission
+
+				pro.save()
+				messages.success(request,f'Product {productname} is updated Successfully')
+				return redirect('/admins/all-products')
+			else:
+				messages.info(request, f'Please fill all detials such as productname and category !')
+				return redirect('/admins/all-products')
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+	
+
+@csrf_exempt
+def admin_product_variants_list(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+	
+		dic = {
+			'categories':ProductCategory.objects.filter(),
+			'subcategories':ProductSubCategory.objects.filter(),
+			'subsubcategories':ProductSubSubCategory.objects.filter(),
+            'units':Unit.objects.filter(),
+			'brands':Brand.objects.filter(),
+			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=id),
+			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=id),
+			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=id),
+			'products':Product.objects.filter(id=id).first(),
+            'product_variants':ProductVariants.objects.filter(product__id=id),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'admin_app/product/product-variants-list.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_product_variants(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			
+			firstvariantvalue_id=request.POST.get('firstvariantvalue_id') 
+			secondvariantvalue_id=request.POST.get('secondvariantvalue_id') 
+			thirdvariantvalue_id=request.POST.get('thirdvariantvalue_id') 
+			productvariantname=request.POST.get('productvariantname') 
+			productimage=request.FILES.get('productimage') 
+			quantity=request.POST.get('quantity') 
+			mrp=request.POST.get('mrp') 
+			purchaseprice=request.POST.get('purchaseprice') 
+			price=request.POST.get('price') 
+	
+			if ProductVariants.objects.filter(id=id).exists():
+				productvariantsobj=ProductVariants.objects.filter(id=id).first()
+	
+				if productvariantname :
+					productvariantsobj.productvariantname=productvariantname
+	    
+				if productimage:
+					productvariantsobj.productimage=productimage
+					
+				if firstvariantvalue_id:
+					productvariantsobj.firstvariantvalue = FirstVariantValue.objects.get(id=firstvariantvalue_id.split(",")[0])
+				if secondvariantvalue_id:
+					productvariantsobj.secondvariantvalue = SecondVariantValue.objects.get(id=secondvariantvalue_id.split(",")[0])
+				if thirdvariantvalue_id:
+					productvariantsobj.thirdvariantvalue = ThirdVariantValue.objects.get(id=thirdvariantvalue_id.split(",")[0])
+				
+				if quantity:
+					productvariantsobj.quantity = int(quantity)
+	
+				if mrp:
+					productvariantsobj.mrp= float(mrp)
+				if purchaseprice:
+					productvariantsobj.purchaseprice= float(purchaseprice)
+				if price:
+					productvariantsobj.price =float(price)
+				
+				productvariantsobj.save()
+				messages.success(request,f'Product Variants {productvariantname} is updated Successfully')
+				return redirect(f'/admins/product-variants-list/{productvariantsobj.product.id}')
+			else:
+				pass
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+
 
 
 @csrf_exempt
