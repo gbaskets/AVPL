@@ -49,9 +49,9 @@
                                              <th>Product Variant Name</th>
                                              <th>SKU</th>
                                              <th>UPC</th>
+                                             <th>Image</th>
                                              <th>Product</th>
                                              <th>Quantity</th>
-                                             <th>Purchase Price</th>
                                              <th>MRP</th>
                                              <th>Sales Price</th>
  
@@ -67,10 +67,21 @@
                               
                                              <td> <a data-toggle="modal" data-target="#EditProductModal{{pro.id}}">{{pro.productvariantname|safe }}</a> </td>
                                              <td>{{ pro.sku|safe }} </td>
+                                             {% if pro.barcodeimage %}
                                              <td><a href="{{ pro.barcodeimage.url|safe }}" target="_blank">{{ pro.upc|safe }} </a></td>
+                                             {% else %}
+                                             <td><a href="{{ pro.barcodeimage|safe }}" target="_blank">{{ pro.upc|safe }} </a></td>
+                                             {% endif %}
+
+                                             <td>
+                                                {% if pro.productimage %}
+                                                <a href="{{pro.productimage.url}}"> <img alt="image" src="{{pro.productimage.url}}"  height="50" weight="50" /></a>
+                                                {% else %}
+                                                --
+                                                {% endif %}
+                                             </td>
                                              <td>{{ pro.product|safe }} </td>
                                              <td>{{ pro.quantity|safe }} </td>
-                                             <td>{{ pro.purchaseprice|safe }} </td>
                                              <td>{{ pro.mrp|safe }} </td>
                                              <td>{{ pro.price|safe }} </td>                                             
 
@@ -82,8 +93,9 @@
                                              <td><span class="badge badge-warning">Under Process</span></td>
                                              {% endif %}
 
-                                             <td ><a class="btn btn-success btn-icon icon-left" data-toggle="modal" data-target="#EditProductModal{{pro.id}}"><i class="far fa-edit"></i>Edit</a></td>
+                                             <td ><a class="btn btn-success btn-icon icon-left" data-toggle="modal" data-target="#EditProductModal{{pro.id}}"><i class="far fa-edit"></i>Edit</a>
                                        
+                                             <a href="/vendor/delete-product-variants/{{pro.product.id}}/{{pro.id}}"  class="btn btn-danger btn-icon icon-left" ><i class="far fa-delete"></i>Delete</a></td>
                                        
                               
                                              
@@ -108,11 +120,12 @@
  <div class="modal fade" id="EditProductModal{{pro.id}}" tabindex="-1" role="dialog" aria-labelledby="EditProductModalLabel{{pro.id}}" aria-hidden="true">
    <div class="modal-dialog modal-xl" role="document">
      <div class="modal-content">
-      <form action="/vendor/edit-product/{{pro.id}}" enctype="multipart/form-data"
+      <form action="/vendor/edit-product-variants/{{pro.id}}" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
        <div class="modal-header">
          <h5 class="modal-title" id="EditProductModalLabel{{pro.id}}">Edit Product - {{pro.id}}</h5>
+         <input type="hidden" value="{{pro.product.productname}}" id="product__name">
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
          </button>
@@ -134,33 +147,36 @@
             </div>
              <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
+                  <input type="hidden" class="variant_combs_value">
                   <label>First Variant Color *</label>
                   <select class="form-control text-center" name="firstvariantvalue_id" id="firstvariantvalue_id">
                      <option selected disabled value="">----select color ----</option>
                      {% for cate in firstvariantvalue %}
-                     <option value="{{ cate.id|safe }}" {% if pro.firstvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.firstvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
             </div>
              <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
+                  <input type="hidden" class="variant_combs_value">
                   <label>Second Variant</label>
                   <select class="form-control text-center" id="secondvariantvalue_id" name="secondvariantvalue_id" >
                      <option selected disabled value="">----select second variant----</option>
                      {% for cate in secondvariantvalue %}
-                     <option value="{{ cate.id|safe }}" {% if pro.secondvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.secondvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
+                  <input type="hidden" class="variant_combs_value">
                   <label>Third Variant</label>
                   <select class="form-control text-center" id="thirdvariantvalue_id" name="thirdvariantvalue_id">
                      <option selected disabled value="">----select third variant----</option>
                      {% for cate in thirdvariantvalue %}
-                     <option value="{{ cate.id|safe }}" {% if pro.thirdvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.thirdvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -168,7 +184,7 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product Variant Name *</label>
-                  <input type="text" class="form-control" placeholder="Enter Product Variant Name" name="productvariantname" value="{{pro.productvariantname}}" required>
+                  <input type="text" class="form-control" placeholder="Enter Product Variant Name" name="productvariantname" id="productvariantname" value="{{pro.productvariantname}}" required>
                </div>
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12">
@@ -202,14 +218,14 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product Purchase Price *</label>
-                  <input  type="number"  step=0.01 onkeydown="javascript: return event.keyCode == 69 ? false : true" class="form-control" placeholder="Enter Product Purchase Price" name="purchaseprice" required>
+                  <input  type="number"  step=0.01 onkeydown="javascript: return event.keyCode == 69 ? false : true" class="form-control" placeholder="Enter Product Purchase Price" name="purchaseprice" value="{{pro.purchaseprice}}" required>
                </div>
             </div>
 
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product Sale Price *</label>
-                  <input  type="number"  step=0.01 onkeydown="javascript: return event.keyCode == 69 ? false : true"  class="form-control" placeholder="Enter Product Sale Price" name="price" required>
+                  <input  type="number"  step=0.01 onkeydown="javascript: return event.keyCode == 69 ? false : true"  class="form-control" placeholder="Enter Product Sale Price" name="price" value="{{pro.price}}" required>
                </div>
             </div>
            
@@ -226,6 +242,60 @@
  </div>
 
 
+ <script>
+   let variant_length, count = 0;
+   let product_name = document.getElementById('product__name').value;
+   let colect_name = '';
+
+   window.addEventListener('load', function () {
+       let name = document.getElementsByClassName('variant_combs_value');
+       variant_length = name.length;
+
+       // Add event listeners to each variant select element
+       document.getElementById('firstvariantvalue_id').addEventListener('change', function() {
+           variantNameCombination(this.value);
+       });
+
+       document.getElementById('secondvariantvalue_id').addEventListener('change', function() {
+           variantNameCombination(this.value);
+       });
+
+       document.getElementById('thirdvariantvalue_id').addEventListener('change', function() {
+           variantNameCombination(this.value);
+       });
+
+       // Add event listener to reset the count and colect_name when the modal is closed
+       $('#EditProductModal{{pro.id}}').on('hidden.bs.modal', function () {
+           count = 0;
+           colect_name = '';
+       });
+   });
+
+   function variantNameCombination(value) {
+       let variant_name = '';
+
+       colect_name += value.split(",")[1] + " ";
+       count += 1;
+
+       if (count > variant_length) {
+           count = 0;
+           colect_name = '';
+           console.log(colect_name, "colect_name");
+
+           document.getElementById('firstvariantvalue_id').value = '';
+           document.getElementById('secondvariantvalue_id').value = '';
+           document.getElementById('thirdvariantvalue_id').value = '';
+       } else {
+           variant_name = product_name + " " + colect_name.trim();
+           console.log(variant_name, "variant_name")
+           document.getElementById('productvariantname').value = variant_name;
+       }
+   }
+</script>
+
+
+
+
    {% endfor %}
 
 
@@ -237,6 +307,7 @@
       method="POST">
       {% csrf_token %}
        <div class="modal-header">
+         <input type="hidden" value="{{products.productname}}" id="product__nameadd">
          <h5 class="modal-title" id="AddProductModalLabel">Add Product Variants </h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
@@ -259,33 +330,36 @@
             </div>
              <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
+                  <input type="hidden" class="variant_combs_valueadd">
                   <label>First Variant Color *</label>
-                  <select class="form-control text-center" name="first_variant_id" id="first_variant_id">
+                  <select class="form-control text-center" name="firstvariantvalue_id" id="firstvariantvalue_idadd">
                      <option selected disabled value="">----select color ----</option>
                      {% for cate in firstvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
             </div>
              <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
+                  <input type="hidden" class="variant_combs_valueadd">
                   <label>Second Variant</label>
-                  <select class="form-control text-center" id="second_variant_id" name="second_variant_id" >
+                  <select class="form-control text-center" id="secondvariantvalue_idadd" name="secondvariantvalue_id" >
                      <option selected disabled value="">----select second variant----</option>
                      {% for cate in secondvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
+                  <input type="hidden" class="variant_combs_valueadd">
                   <label>Third Variant</label>
-                  <select class="form-control text-center" id="third_variant_id" name="third_variant_id">
+                  <select class="form-control text-center" id="thirdvariantvalue_idadd" name="thirdvariantvalue_id">
                      <option selected disabled value="">----select third variant----</option>
                      {% for cate in thirdvariantvalue %}
-                     <option value="{{ cate.id|safe }}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -293,7 +367,7 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Product Variant Name *</label>
-                  <input type="text" class="form-control" placeholder="Enter Product Variant Name" name="productvariantname" required>
+                  <input type="text" class="form-control" placeholder="Enter Product Variant Name" name="productvariantname" id="productvariantnameadd" required>
                </div>
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12">
@@ -353,11 +427,56 @@
 
 
 
+ <script>
+   let variant_lengthadd, countadd = 0;
+   let product_nameadd = document.getElementById('product__nameadd').value;
+   let colect_nameadd = '';
 
+   window.addEventListener('load', function () {
+       let name = document.getElementsByClassName('variant_combs_valueadd');
+       variant_lengthadd = name.length;
 
+       // Add event listeners to each variant select element
+       document.getElementById('firstvariantvalue_idadd').addEventListener('change', function() {
+           variantNameCombination(this.value);
+       });
 
+       document.getElementById('secondvariantvalue_idadd').addEventListener('change', function() {
+           variantNameCombination(this.value);
+       });
 
+       document.getElementById('thirdvariantvalue_idadd').addEventListener('change', function() {
+           variantNameCombination(this.value);
+       });
 
+       // Add event listener to reset the countadd and colect_nameadd when the modal is closed
+       $('#AddProductModal').on('hidden.bs.modal', function () {
+           countadd = 0;
+           colect_nameadd = '';
+       });
+   });
+
+   function variantNameCombination(value) {
+       let variant_nameadd = '';
+
+       colect_nameadd += value.split(",")[1] + " ";
+       countadd += 1;
+
+       if (countadd > variant_lengthadd) {
+           countadd = 0;
+           colect_nameadd = '';
+           console.log(colect_nameadd, "colect_name");
+         
+           document.getElementById('firstvariantvalue_idadd').value = '';
+           document.getElementById('secondvariantvalue_idadd').value = '';
+           document.getElementById('thirdvariantvalue_idadd').value = '';
+       } else {
+           variant_nameadd = product_nameadd + " " + colect_nameadd.trim();
+           console.log(variant_nameadd, "variant_nameadd")
+           document.getElementById('productvariantnameadd').value = variant_nameadd;
+       }
+   }
+</script>
 
 
 {% endblock %}

@@ -785,16 +785,16 @@ def add_product_variants(request,id):
 				if product_id  and productvariantname and productimage:
 					product = Product.objects.filter(store=store, id=id).first()
 					productvariantsobj=ProductVariants.objects.create(store=store,product=product, productvariantname=productvariantname,productimage=productimage)        
-					productvariantsobj.sku=generate_code(product.id,[product.productname,product.category.name,product.brand.name])
+					productvariantsobj.sku=generate_code(productvariantsobj.id,[product.productname,product.category.name,product.brand.name])
 					productvariantsobj.upc=generate_bracode("")[1]
 					productvariantsobj.barcodeimage.save(f'{productvariantname}.png',generate_bracode("")[0])
 				
 					if firstvariantvalue_id:
-						productvariantsobj.firstvariantvalue = FirstVariantValue.objects.get(id=firstvariantvalue_id)
+						productvariantsobj.firstvariantvalue = FirstVariantValue.objects.get(id=firstvariantvalue_id.split(",")[0])
 					if secondvariantvalue_id:
-						productvariantsobj.secondvariantvalue = SecondVariantValue.objects.get(id=secondvariantvalue_id)
+						productvariantsobj.secondvariantvalue = SecondVariantValue.objects.get(id=secondvariantvalue_id.split(",")[0])
 					if thirdvariantvalue_id:
-						productvariantsobj.thirdvariantvalue = ThirdVariantValue.objects.get(id=thirdvariantvalue_id)
+						productvariantsobj.thirdvariantvalue = ThirdVariantValue.objects.get(id=thirdvariantvalue_id.split(",")[0])
 					
 					if quantity:
 						productvariantsobj.quantity = int(quantity)
@@ -830,6 +830,88 @@ def add_product_variants(request,id):
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/product/product-variants-list.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def edit_product_variants(request,id):
+	if check_user_authentication(request, 'VENDOR'):
+		if request.method == 'POST':
+			vendor = Vendor.objects.filter(user=request.user).first()
+			store = Store.objects.filter(vendor=vendor).first()
+			firstvariantvalue_id=request.POST.get('firstvariantvalue_id') 
+			secondvariantvalue_id=request.POST.get('secondvariantvalue_id') 
+			thirdvariantvalue_id=request.POST.get('thirdvariantvalue_id') 
+			productvariantname=request.POST.get('productvariantname') 
+			productimage=request.FILES.get('productimage') 
+			quantity=request.POST.get('quantity') 
+			mrp=request.POST.get('mrp') 
+			purchaseprice=request.POST.get('purchaseprice') 
+			price=request.POST.get('price') 
+	
+			if ProductVariants.objects.filter(store=store,id=id).exists():
+				productvariantsobj=ProductVariants.objects.filter(store=store,id=id).first()
+	
+				if productvariantname :
+					productvariantsobj.productvariantname=productvariantname
+	    
+				if productimage:
+					productvariantsobj.productimage=productimage
+					
+				if firstvariantvalue_id:
+					productvariantsobj.firstvariantvalue = FirstVariantValue.objects.get(id=firstvariantvalue_id.split(",")[0])
+				if secondvariantvalue_id:
+					productvariantsobj.secondvariantvalue = SecondVariantValue.objects.get(id=secondvariantvalue_id.split(",")[0])
+				if thirdvariantvalue_id:
+					productvariantsobj.thirdvariantvalue = ThirdVariantValue.objects.get(id=thirdvariantvalue_id.split(",")[0])
+				
+				if quantity:
+					productvariantsobj.quantity = int(quantity)
+	
+				if mrp:
+					productvariantsobj.mrp= float(mrp)
+				if purchaseprice:
+					productvariantsobj.purchaseprice= float(purchaseprice)
+				if price:
+					productvariantsobj.price =float(price)
+				
+				productvariantsobj.updatedby= request.user
+				productvariantsobj.save()
+				messages.success(request,f'Product Variants {productvariantname} is updated Successfully')
+				return redirect(f'/vendor/product-variants-list/{productvariantsobj.product.id}')
+			else:
+				pass
+		
+		dic = {
+			'vendor':vendor,
+			'categories':ProductCategory.objects.filter(),
+			'subcategories':ProductSubCategory.objects.filter(),
+			'subsubcategories':ProductSubSubCategory.objects.filter(),
+			'units':Unit.objects.filter(),
+			'brands':Brand.objects.filter(),
+			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=id),
+			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=id),
+			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=id),
+			'products':Product.objects.filter(store__vendor__user=request.user,id=id).first(),
+			'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user,product__id=id),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/product/product-variants-list.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+@csrf_exempt
+def delete_product_variants(request,pk,id):
+	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		productvariantsobj=ProductVariants.objects.filter(store__vendor__user=request.user,id=id).delete()
+		messages.success(request,f'Product Variants is deleted Successfully')
+		return redirect(f'/vendor/product-variants-list/{pk}')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 

@@ -21,7 +21,8 @@ urlpatterns = [
     path('product-variants-all-list/', vendor_product_variants_all_list),
     path('product-variants-list/<int:id>', vendor_product_variants_list),
     path('add-product-variants/<int:id>', add_product_variants),
-    path('edit-product-variants/<int:id>', edit_product),
+    path('edit-product-variants/<int:id>', edit_product_variants),
+    path('delete-product-variants/<int:pk>/<int:id>', delete_product_variants),
     
   
     path('product', vendor_product),
