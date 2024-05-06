@@ -114,18 +114,53 @@
                <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
                   <thead>
                      <tr>
-                        <th>Product</th>
-                        <th>Store</th>
-                        <th>Options</th>
+                        <th>Product Variant</th>
+                                             <th>Store</th>
+                                             <th>SKU</th>
+                                             <th>UPC</th>
+                                             <th>Image</th>
+                                           
+                                             <th>Quantity</th>
+                                             <th>MRP</th>
+                                             <th>Sales Price</th>
+                                             <th>Purchase Price</th>
+ 
+                                             <th>Options</th>
+
                      </tr>
                   </thead>
                   <tbody>
-                     {% for x in rejected_product %}
+                     {% for pro in rejected_product %}
                      <tr>
-                        <td><a href="/productpage/?p={{x.id}}">{{ x.name|safe }}</a></td>
-                        <td>{{ x.store.name|safe }}</td>
+                        <td> <a data-toggle="modal" data-target="#EditProductModal{{pro.id}}">{{pro.productvariantname|safe }}</a> </td>
+                              
+                        {% if pro.store.vendor.isavplvendor == True %}
+                        <td>{{ pro.store.storename|safe }} - <span class="badge badge-info">AVPL Store</span></td>
+                        {% else %}
+                        <td>{{ pro.store.storename|safe }} </td>
+                        {% endif %}
+
+                        <td>{{ pro.sku|safe }} </td>
+                        {% if pro.barcodeimage %}
+                        <td><a href="{{ pro.barcodeimage.url|safe }}" target="_blank">{{ pro.upc|safe }} </a></td>
+                        {% else %}
+                        <td><a href="{{ pro.barcodeimage|safe }}" target="_blank">{{ pro.upc|safe }} </a></td>
+                        {% endif %}
+
                         <td>
-                           <button type="button" onclick="confirm('{{x.product_reject_reason}}');"><span class="badge badge-danger">reject</span></button>
+                           {% if pro.productimage %}
+                           <a href="{{pro.productimage.url}}"> <img alt="image" src="{{pro.productimage.url}}"  height="50" weight="50" /></a>
+                           {% else %}
+                           --
+                           {% endif %}
+                        </td>
+                    
+                        <td>{{ pro.quantity|safe }} </td>
+                        <td>{{ pro.mrp|safe }} </td>
+                        <td>{{ pro.price|safe }} </td>                                             
+                        <td>{{ pro.purchaseprice|safe }} </td>                                             
+                        <td>
+                           <button type="button" onclick="confirm('{{pro.product.reasonforproductrejected}}');"><span class="badge badge-danger">Reject</span></button>
                         </td>
                      </tr>
                      {% endfor %}

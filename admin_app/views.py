@@ -2961,10 +2961,14 @@ def admin_product_out_of_stock(request):
 @csrf_exempt
 def admin_activate_product(request):
 	if check_user_authentication(request, 'ADMIN'):
-		Product.objects.filter(id=request.GET.get('p')).update(isactive=True)
-		user = Product.objects.get(id=request.GET.get('p')).store.vendor.user
-		notification(user, 'Product Activated Successfully.')
-		return redirect('/admins/productapproval')
+		productvarinatobj=ProductVariants.objects.filter(id=request.GET.get('p')).first()
+		productvarinatobj.isactive=True
+		productvarinatobj.save()
+		proobj=Product.objects.filter(id=productvarinatobj.product.id).first()
+		proobj.isactive=True
+		proobj.save()
+		# notification(vendor, 'Product Activated Successfully.')
+		return redirect('/admins/product-approval')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -3228,9 +3232,16 @@ def admin_billing_config(request):
 def admin_reject_product(request):
 	if check_user_authentication(request, 'ADMIN'):
 		reason = request.POST.get('reason')
-		Product.objects.filter(id=request.POST.get('i')).update(reasonforproductrejected=reason,isproductrejected=True,isactive=False)
-		user = Product.objects.get(id=request.POST.get('i')).store.vendor.user
-		notification(user, str('Product Rejected Beacause '+reason))
+		productvarinats=ProductVariants.objects.filter(id=request.POST.get('i')).first()
+		proobj=Product.objects.filter(id=productvarinats.product.id).first()
+		proobj.reasonforproductrejected=reason
+		proobj.isproductrejected=True
+		proobj.isactive=False
+		productvarinats.isactive=False
+		productvarinats.save()
+		proobj.save()
+		# user = Product.objects.get(id=request.POST.get('i')).store.vendor.user
+		# notification(user, str('Product Rejected Beacause '+reason))
 		return JsonResponse({'response':'Success'})
 		#return redirect('/admins/productapproval')
 	else:
