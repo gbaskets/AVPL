@@ -73,7 +73,7 @@ def create_user(request):
 			return send_otp(request, 'User', user)
 @csrf_exempt
 def user_dashboard(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if not Wallet.objects.filter(user=request.user).exists():
 			Wallet.objects.create(user=request.user)
 		referal_obj = Level_Plan_Referrals.objects.filter(referrals__id=request.user.id).first()
@@ -94,7 +94,7 @@ def user_dashboard(request):
 		# return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def user_create_link(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		referal_obj = Level_Plan_Referrals.objects.filter(referrals__id=request.user.id).first()
 		referals = Level_Plan_Referrals.objects.filter(level_plan_referral=referal_obj)
 		flag = False
@@ -124,21 +124,21 @@ def user_create_link(request):
 
 @csrf_exempt
 def user_generate_link_left(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		data = {'link':generate_link(request.user, 'User','left')}
 		return JsonResponse(data)
 	else:
 		return JsonResponse({'response':'Error'})
 @csrf_exempt
 def user_generate_link_right(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		data = {'link':generate_link(request.user, 'User','right')}
 		return JsonResponse(data)
 	else:
 		return JsonResponse({'response':'Error'})
 @csrf_exempt
 def user_generate_link_2_left(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		user = User.objects.get(id=request.GET.get('user'))
 		data = {'link':generate_link(user, 'User','left')}
 		return JsonResponse(data)
@@ -146,7 +146,7 @@ def user_generate_link_2_left(request):
 		return JsonResponse({'response':'Error'})
 @csrf_exempt
 def user_generate_link_2_right(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		user = User.objects.get(id=request.GET.get('user'))
 		data = {'link':generate_link(user, 'User','right')}
 		return JsonResponse(data)
@@ -156,7 +156,7 @@ def user_generate_link_2_right(request):
 
 @csrf_exempt
 def direct_referal(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		flag = False
 		referal_pv = 0
 		mlm = MLM.objects.filter(parent=request.user)
@@ -186,7 +186,7 @@ def direct_referal(request):
 
 @csrf_exempt
 def referal_transaction(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		flag = False
 		referal_pv = 0
 		mlm = MLM.objects.filter(parent=request.user)
@@ -224,7 +224,7 @@ def referal_transaction(request):
 @csrf_exempt
 def user_add_to_cart(request):
 	print('=====user')
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		print(request.user)
 		variants = request.POST.getlist('variants[]')
 		quantity = request.POST.get('quantity')
@@ -354,7 +354,7 @@ def user_add_to_cart(request):
 # wishlist
 @csrf_exempt
 def add_to_wishlist(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		variants = request.POST.getlist('variants[]')
 		quantity = request.POST.get('quantity')
 		product = Product.objects.get(id=request.POST.get('product'))
@@ -470,7 +470,7 @@ def add_to_wishlist(request):
 		return render(request, '403.html')
 @csrf_exempt
 def user_wishlist(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		categories = ProductCategory.objects.all()
 		if Wishlist.objects.filter(user=request.user).exists():
 			dic = get_wishlist_items(request)
@@ -510,7 +510,7 @@ def user_wishlist(request):
 
 @csrf_exempt
 def user_cart(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		categories = ProductCategory.objects.all()
 		if Cart.objects.filter(user=request.user).exists():
 			dic = get_cart_items(request)
@@ -636,7 +636,7 @@ def remove_wishlist_item(request):
 
 @csrf_exempt
 def my_address(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
 			location = request.POST.get('location')
 			name = request.POST.get('name')
@@ -690,7 +690,7 @@ def my_address(request):
 		return render(request, '403.html')
 @csrf_exempt
 def user_set_default_address(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'GET':
 			id_ = request.GET.get('id')
 			Address.objects.filter(user=request.user).update(default=False)
@@ -703,7 +703,7 @@ def user_set_default_address(request):
 
 @csrf_exempt
 def add_new_address(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
 			location = request.POST.get('location')
 			name = request.POST.get('name')
@@ -743,7 +743,7 @@ def add_new_address(request):
 		return render(request, '403.html')
 @csrf_exempt
 def my_order(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		store_id = request.GET.get('store')
 		orders = []
 		if store_id:
@@ -772,7 +772,7 @@ def enable_self_pickup(request):
 
 @csrf_exempt
 def save_location(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		address = request.GET.get('location')
 		gmaps = googlemaps.Client(key='AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA')
 		if address:
@@ -786,7 +786,7 @@ def save_location(request):
 		return JsonResponse({'response':'success'})
 @csrf_exempt
 def user_wallet(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if not Wallet.objects.filter(user=request.user).exists():
 			Wallet.objects.create(user=request.user)
 		dic = {'user':UserData.objects.get(user=request.user),
@@ -800,7 +800,7 @@ def user_wallet(request):
 		return render(request, '403.html')
 @csrf_exempt
 def user_pv_wallet(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		print(UserData.objects.get(user=request.user).pv,'PPPPPPPPPPPPPP')
 		dic = {'user':UserData.objects.get(user=request.user),
 			'pv':fetch_pv(request.user),
@@ -813,7 +813,7 @@ def user_pv_wallet(request):
 		return render(request, '403.html')
 @csrf_exempt
 def genealogyTree_binary(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		tree=fetch_user_tree(request.user)
 		treesss=fetch_empty_nodes(request.user)
 		print(treesss,'TTTT')
@@ -996,7 +996,7 @@ def genealogyTree_binary(request):
 
 @csrf_exempt
 def genealogyTree_level(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		sponser =Level_Plan_Sponsors.objects.all()
 		referal_obj = Level_Plan_Referrals.objects.filter(referrals__id=request.user.id).first()
 		if referal_obj is not None:
@@ -1062,7 +1062,7 @@ def genealogyTree_level(request):
 		return render(request, '403.html')
 @csrf_exempt
 def user_tree(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 	
 		dic = {
 			'user':UserData.objects.get(user=request.user),
@@ -1076,7 +1076,7 @@ def user_tree(request):
 
 @csrf_exempt
 def user_save_product_rating(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
 			product = Product.objects.get(id=request.POST.get('product'))
 			rating = request.POST.get('rating')
@@ -1094,7 +1094,7 @@ def user_save_product_rating(request):
 
 @csrf_exempt
 def user_withdraw(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
 			amount = float(request.POST.get('amount'))
 			print(amount,'AAAAAAAAAAAA')
@@ -1152,7 +1152,7 @@ def user_withdraw(request):
 
 @csrf_exempt
 def user_save_paymentinfo(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
 			pan = request.FILES['pan']
 			aadhar = request.FILES['aadhar']
@@ -1175,7 +1175,7 @@ def user_save_paymentinfo(request):
 
 @csrf_exempt
 def user_help(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		user=User.objects.filter(username='admin').first()
 		print(user,'UUUUUU')
 		if request.method == 'POST':
@@ -1208,7 +1208,7 @@ def user_help(request):
 
 @csrf_exempt
 def user_product_query(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		order = OrderItems.objects.get(id=request.GET.get('order'))
 		dic = {
 			'order':order,
@@ -1221,7 +1221,7 @@ def user_product_query(request):
 		# return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def user_cancel_order(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		order = OrderItems.objects.get(id=request.GET.get('order'))
 		# reason = OrderItems.objects.get(reason)
 		dic = {
@@ -1236,7 +1236,7 @@ def user_cancel_order(request):
 
 @csrf_exempt
 def cancel_confirm(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
 			order_id = request.POST.get('order_id')
 			print(order_id)
@@ -1276,7 +1276,7 @@ def cancel_confirm(request):
 
 @csrf_exempt
 def user_generate_invoice(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		order = OrderItems.objects.get(id=request.GET.get('i'))
 		dic = {
 			'order':order
@@ -1287,7 +1287,7 @@ def user_generate_invoice(request):
 		# return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def create_vendor_link(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if UserVendorRelation.objects.filter(user=request.user).exists():
 			dic = {
 			'user':UserData.objects.get(user=request.user),
@@ -1308,7 +1308,7 @@ def create_vendor_link(request):
 		return HttpResponse('404 Not Found')
 @csrf_exempt
 def user_vendor_generate_link(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		data = {'link':generate_link(request.user, 'Vendor','left')}
 		return JsonResponse(data)
 	else:
@@ -1316,7 +1316,7 @@ def user_vendor_generate_link(request):
 
 @csrf_exempt
 def subscription_amount(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
 			amount = request.POST.get('amount')
 			amt = float(amount) / 100
@@ -1381,7 +1381,7 @@ Thanks!'''
 
 @csrf_exempt
 def vendor_list(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'GET':
 			vendors = User.objects.all()
 			return render(request, 'user_app/vendor-list.html', {'vendors':vendors})
@@ -1390,7 +1390,7 @@ def vendor_list(request):
 		# return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def subscriptionRequest(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == "POST":
 			if not UserSubscriptionRequest.objects.filter(user=request.user, is_active=False).exists():
 				vendor_id = request.POST.get('key')
@@ -1413,7 +1413,7 @@ def subscriptionRequest(request):
 
 @csrf_exempt
 def user_billing_request(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
 			store = Store.objects.get(id=request.POST.get('store_id'))
 			amount = request.POST.get('amount')
@@ -1432,7 +1432,7 @@ def user_billing_request(request):
 	# return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def user_tds_withdraw(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if not TDS_Log_Wallet.objects.filter(user=request.user).exists():
 			TDS_Log_Wallet.objects.create(user=request.user)
 
@@ -1573,7 +1573,7 @@ def transfer_amount(request):
 
 @csrf_exempt
 def user_profile(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		user = UserData.objects.get(id=request.user.usr.id)
 		payment=PaymentInfo.objects.get(user=request.user)
 		print(user.profile_pic,'UUUUUUUUUUUUUUUUU')
@@ -1602,7 +1602,7 @@ def user_profile(request):
 
 @csrf_exempt
 def creditedmoney_user_wallet(request):
-	if check_user_authentication(request, 'User'):
+	if check_user_authentication(request, 'CUSTOMER'):
 		if not CreditedMoney.objects.filter(user=request.user).exists():
 			CreditedMoney.objects.create(user=request.user)
 		dic = {'user':UserData.objects.get(user=request.user),
