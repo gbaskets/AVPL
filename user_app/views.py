@@ -74,18 +74,18 @@ def create_user(request):
 @csrf_exempt
 def user_dashboard(request):
 	if check_user_authentication(request, 'CUSTOMER'):
-		if not Wallet.objects.filter(user=request.user).exists():
-			Wallet.objects.create(user=request.user)
-		referal_obj = Level_Plan_Referrals.objects.filter(referrals__id=request.user.id).first()
-		referals = Level_Plan_Referrals.objects.filter(level_plan_referral=referal_obj)
+		customer_obj=Customer.objects.filter(user=request.user).first()
+		if not Wallet.objects.filter(customer=customer_obj).exists():
+			Wallet.objects.create(customer=customer_obj)
+	
 		dic = {
-			'user':UserData.objects.get(user=request.user),
-			'tree':fetch_empty_nodes(request.user),
-			'referrals':referals,
-			'pv':fetch_pv(request.user),
-			'wallet':Wallet.objects.filter(user=request.user).first(),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			
+			# 'tree':fetch_empty_nodes(request.user),
+			# 'referrals':referals,
+			# 'pv':fetch_pv(request.user),
+			'wallet':Wallet.objects.filter(customer=customer_obj).first(),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/dashboard.html', dic)
 	else:
@@ -106,7 +106,7 @@ def user_create_link(request):
 		except MLM.DoesNotExist:
 			user = None
 		dic = {
-			'user':UserData.objects.get(user=request.user),
+			
 			'flag':flag,
 			'referal':referals,
 			'tree':fetch_empty_nodess(request.user),
@@ -646,7 +646,7 @@ def my_address(request):
 			pincode = request.POST.get('pincode')
 			state = request.POST.get('state')
 			contact = request.POST.get('contact')
-			if len(Address.objects.filter(user=request.user)) == 0:
+			if len(Address.objects.filter(customer__user=request.user)) == 0:
 				default = True
 			else:
 				default = False
@@ -657,8 +657,9 @@ def my_address(request):
 				# lng = add_lat_long[0]['geometry']['location']['lng']
 				lat = 28.7983
 				lng = 79.0220
+				customer_obj=Customer.objects.filter(user=request.user).first()
 				Address.objects.create(
-					user = request.user,
+					customer = customer_obj,
 					latitude = lat,
 					longitude = lng,
 					name = name,
@@ -672,7 +673,7 @@ def my_address(request):
 				)
 				messages.success(request, 'Address Added Successfully !!!!')
 			code = ''
-			for x in Address.objects.filter(user=request.user):
+			for x in Address.objects.filter(customer__user=request.user):
 				code = code + '<tr>'
 				code = code + '<td>'+x.name+'</td>'
 				code = code + '<td>'+x.home_no+'</td>'
@@ -685,7 +686,7 @@ def my_address(request):
 			dic = {'data':code, 'msg':'Address Added Successfully !!!!'}
 			
 			# return JsonResponse(dic)
-		return render(request, 'user_app/my-address.html', {'user':UserData.objects.get(user=request.user), 'data':Address.objects.filter(user=request.user)})
+		return render(request, 'user_app/my-address.html', {"customer_obj":Customer.objects.filter(user=request.user).first() ,'data':Address.objects.filter(customer__user=request.user)})
 	else:
 		return render(request, '403.html')
 @csrf_exempt
@@ -693,7 +694,7 @@ def user_set_default_address(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'GET':
 			id_ = request.GET.get('id')
-			Address.objects.filter(user=request.user).update(default=False)
+			Address.objects.filter(customer__user=request.user).update(default=False)
 			Address.objects.filter(id=id_).update(default=True)
 			address = Address.objects.get(id=id_)
 			code = address.name+'<span id="span" style="background-color:green;color:white;padding-right:5px;padding-left:5px;border-radius:50px;">DEFAULT</span>'
@@ -738,7 +739,7 @@ def add_new_address(request):
 					default = default
 				)
 			return redirect('/selectaddress/?cart='+request.session['cart_id'])
-		return render(request, 'user_app/my-address.html', {'user':UserData.objects.get(user=request.user), 'data':Address.objects.filter(user=request.user)})
+		return render(request, 'user_app/my-address.html', {"customer_obj":Customer.objects.filter(user=request.user).first(), 'data':Address.objects.filter(user=request.user)})
 	else:
 		return render(request, '403.html')
 @csrf_exempt
@@ -748,14 +749,14 @@ def my_order(request):
 		orders = []
 		if store_id:
 			store = Store.objects.get(id=store_id)
-			orders = get_my_orders(request.user, store)
-		else:
-			orders = get_my_orders(request.user)
+		# 	orders = get_my_orders(request.user, store)
+		# else:
+		# 	orders = get_my_orders(request.user)
 		dic = {
-			'user':UserData.objects.get(user=request.user),
-			'orders':orders,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			"customer_obj":Customer.objects.filter(user=request.user).first(),
+			# 'orders':orders,
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/my_order.html', dic)
 	else:
@@ -787,13 +788,14 @@ def save_location(request):
 @csrf_exempt
 def user_wallet(request):
 	if check_user_authentication(request, 'CUSTOMER'):
-		if not Wallet.objects.filter(user=request.user).exists():
-			Wallet.objects.create(user=request.user)
-		dic = {'user':UserData.objects.get(user=request.user),
-			'wallet':Wallet.objects.filter(user=request.user).first(),
-			'wallet_transactions':WalletTransaction.objects.filter(wallet=Wallet.objects.filter(user=request.user).first()).order_by('-transaction_date'),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		customer_obj=Customer.objects.filter(user=request.user).first()
+		if not Wallet.objects.filter(customer=customer_obj).exists():
+			Wallet.objects.create(customer=customer_obj)
+		dic = {"customer_obj":Customer.objects.filter(user=request.user).first(),
+			'wallet':Wallet.objects.filter(customer=customer_obj).first(),
+			'wallet_transactions':WalletTransaction.objects.filter(wallet=Wallet.objects.filter(customer=customer_obj).first()).order_by('-transactiondate'),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/wallet-dash.html', dic)
 	else:
@@ -802,11 +804,11 @@ def user_wallet(request):
 def user_pv_wallet(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		print(UserData.objects.get(user=request.user).pv,'PPPPPPPPPPPPPP')
-		dic = {'user':UserData.objects.get(user=request.user),
+		dic = {"customer_obj":Customer.objects.filter(user=request.user).first(),
 			'pv':fetch_pv(request.user),
 			'transactions':fetch_pv_transactions(request.user),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/pv.html', dic)
 	else:
@@ -919,7 +921,7 @@ def genealogyTree_binary(request):
 			if nodes_v1 and nodes_v2 and nodes_v3 and nodes_v4 is not None:
 				if nodes_v1.left and nodes_v1.right or  nodes_v2.left and nodes_v2.right or  nodes_v3.left and nodes_v3.right or  nodes_v4.left and nodes_v4.right  is not None:
 					dic = {
-						'user':UserData.objects.get(user=request.user),
+						"customer_obj":Customer.objects.filter(user=request.user).first(),
 						'tree':fetch_user_tree(request.user),
 						'nodel':nodel,
 						'noder':noder,
@@ -944,7 +946,7 @@ def genealogyTree_binary(request):
 				else:
 					print('None')
 					dic = {
-					'user':UserData.objects.get(user=request.user),
+					 "customer_obj":Customer.objects.filter(user=request.user).first(),
 					'tree':fetch_user_tree(request.user),
 					'nodel':nodel,
 					'noder':noder,
@@ -963,7 +965,7 @@ def genealogyTree_binary(request):
 			else:
 				print('None')
 				dic = {
-					'user':UserData.objects.get(user=request.user),
+					 "customer_obj":Customer.objects.filter(user=request.user).first(),
 					'tree':fetch_user_tree(request.user),
 					'nodel':nodel,
 					'noder':noder,
@@ -1025,7 +1027,7 @@ def genealogyTree_level(request):
 			print(referal_user,referals_user,'RRRRUUUUUUUUUU')
 		    
 			dic = {
-				'user':UserData.objects.get(user=request.user),
+				"customer_obj":Customer.objects.filter(user=request.user).first(),
 				'referals':referals,'usrpv':usrpv,
 				'sponser_r':referal_obj.referrals,
 				'notification':get_notifications(request.user),
@@ -1040,7 +1042,7 @@ def genealogyTree_level(request):
 			
 		
 			dic = {
-				'user':UserData.objects.get(user=request.user),
+				"customer_obj":Customer.objects.filter(user=request.user).first(),
 				'referals':referals,'usrpv':usrpv,
 				'sponser_r':referal_obj.referrals,
 				'notification':get_notifications(request.user),
@@ -1051,7 +1053,7 @@ def genealogyTree_level(request):
 		else:
 			print('none')
 			dic = {
-				'user':UserData.objects.get(user=request.user),
+				"customer_obj":Customer.objects.filter(user=request.user).first(),
 				'referals':referals,'usrpvs':usrpvs,
 				'sponser_r':referal_obj,
 				'notification':get_notifications(request.user),
@@ -1065,10 +1067,10 @@ def user_tree(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 	
 		dic = {
-			'user':UserData.objects.get(user=request.user),
+			"customer_obj":Customer.objects.filter(user=request.user).first(),
 			'tree':fetch_user_tree(request.user),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/tree.html', dic)
 	else:
@@ -1142,8 +1144,8 @@ def user_withdraw(request):
 			'wallet':Wallet.objects.filter(user=request.user).first(),
 			'data':UserWithdrawRequest.objects.filter(user=request.user),
 			'creditedlimit':CreditedMoney.objects.filter(user=request.user).first(),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/withdraw.html', dic)
 	else:
@@ -1185,20 +1187,20 @@ def user_help(request):
 				image = request.FILES['image']
 			else:
 				image=''
-			query_obj=Query.objects.create(user=request.user, query_date=timezone.now(), subject=subject, message=message)
-			if image:
-				query_obj.image=image
-			query_obj.save()
+			# query_obj=Query.objects.create(user=request.user, query_date=timezone.now(), subject=subject, message=message)
+			# if image:
+			# 	query_obj.image=image
+			# query_obj.save()
 			messages.success(request, 'Query Received')
 			user=User.objects.filter(username='admin').first()
 			print(user,'UUUUUU')
 			notification(user,'New Query Received')
 			return redirect('/user/help')
 		dic = {
-			'user':UserData.objects.get(user=request.user),
-			'queries':Query.objects.filter(user=request.user),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			"customer_obj":Customer.objects.filter(user=request.user).first(),
+			# 'queries':Query.objects.filter(user=request.user),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/help.html', dic)
 	else:
@@ -1212,8 +1214,8 @@ def user_product_query(request):
 		order = OrderItems.objects.get(id=request.GET.get('order'))
 		dic = {
 			'order':order,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/product-query.html', dic)
 	else:
@@ -1226,8 +1228,8 @@ def user_cancel_order(request):
 		# reason = OrderItems.objects.get(reason)
 		dic = {
 			'order':order,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/cancel-order.html', dic)
 	else:
@@ -1251,7 +1253,7 @@ def cancel_confirm(request):
 				print(obj)
 				messages.success(request, 'Order Cancelled!')
 				dic = {
-					'user':UserData.objects.get(user=request.user),
+					"customer_obj":Customer.objects.filter(user=request.user).first(),
 					'notification':get_notifications(request.user),
 					'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 					}
@@ -1260,7 +1262,7 @@ def cancel_confirm(request):
 			else:
 				print('hello')
 				dic = {
-					'user':UserData.objects.get(user=request.user),
+					"customer_obj":Customer.objects.filter(user=request.user).first(),
 					'notification':get_notifications(request.user),
 					'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 					}
@@ -1290,14 +1292,14 @@ def create_vendor_link(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		if UserVendorRelation.objects.filter(user=request.user).exists():
 			dic = {
-			'user':UserData.objects.get(user=request.user),
+			"customer_obj":Customer.objects.filter(user=request.user).first(),
 			'vendor_user':UserVendorRelation.objects.filter(user=request.user),
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(user=request.user, read=True))
 		}
 		else:
 			dic = {
-			'user':UserData.objects.get(user=request.user),
+			"customer_obj":Customer.objects.filter(user=request.user).first(),
 			'notification':get_notifications(request.user),
 			'notification_len':len(Notification.objects.filter(user=request.user, read=True))
 		}
@@ -1433,14 +1435,16 @@ def user_billing_request(request):
 @csrf_exempt
 def user_tds_withdraw(request):
 	if check_user_authentication(request, 'CUSTOMER'):
-		if not TDS_Log_Wallet.objects.filter(user=request.user).exists():
-			TDS_Log_Wallet.objects.create(user=request.user)
+		customer_obj=Customer.objects.filter(user=request.user).first()
+		if not TDSLogWallet.objects.filter(customer=customer_obj).exists():
+			TDSLogWallet.objects.create(customer=customer_obj)
 
 		dic = {
-			'tds_log':TDS_Log.objects.filter(user=request.user),
-			'users':UserWithdrawRequest.objects.all(), 'vendors':VendorWithdrawRequest.objects.all(), 'categories':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user),'tds_wallet':TDS_Log_Wallet.objects.filter(user=request.user).first(),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'tds_log':TDSLogWallet.objects.filter(customer=customer_obj),
+			'users':WithdrawRequest.objects.all(), 'vendors':WithdrawRequest.objects.all(), 'categories':ProductCategory.objects.all(),
+			'tds_wallet':TDSLogWallet.objects.filter(customer=customer_obj).first(),
+            # 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/tdslog.html', dic)
 	else:
@@ -1477,8 +1481,8 @@ def wallet_transfer_vendor(request):
 	context = {
 			'vendordata': vandordata,
 			'transectiodetails':transectiondata,
-			'bal':bal,'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+			'bal':bal,# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 
 	user=WalletTransferApproval.objects.all()[0:1]
@@ -1574,42 +1578,152 @@ def transfer_amount(request):
 @csrf_exempt
 def user_profile(request):
 	if check_user_authentication(request, 'CUSTOMER'):
-		user = UserData.objects.get(id=request.user.usr.id)
-		payment=PaymentInfo.objects.get(user=request.user)
-		print(user.profile_pic,'UUUUUUUUUUUUUUUUU')
-		updateform = UserData_Form( instance=user)
-		updateform2  = PaymentInfo_Form(instance=payment)
-		if request.method == 'POST':
-
-			updateform = UserData_Form(request.POST,request.FILES, instance=user)
+     
+		customerobj=Customer.objects.filter(user=request.user).first()
 		
-			if updateform.is_valid():
-				updateform.save()
-
-			updateform2 = PaymentInfo_Form(request.POST,request.FILES, instance=payment)
-		
-			if updateform2.is_valid():
-				updateform2.save()
-
 		dic = {
-			'user':user,'payment':payment,'updateform':updateform,'updateform2':updateform2,
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		    "customer":customerobj,
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}			
 		return render(request,'user_app/user-profile.html', dic)
 	else:
 		return render(request, '403.html')
 
+
+
+@csrf_exempt
+def edit_customer_profile(request):
+	if check_user_authentication(request, 'CUSTOMER'):
+		if request.method == 'POST':
+			mobile = request.POST.get('mobile')
+			email = request.POST.get('email')
+			firstname= request.POST.get('firstname')
+			lastname= request.POST.get('lastname')
+			gender =  request.POST.get('gender')
+			dob= request.POST.get('dob')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			profilepic = request.FILES.get('profilepic')
+
+			#Personal User 
+   
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			idproof= request.POST.get('idproof')
+			idno= request.POST.get('idno')
+			frontidproofdoc = request.FILES.get('frontidproofdoc')
+			backidproofdoc=request.FILES.get('backidproofdoc')
+			addressproof= request.POST.get('addressproof')
+			addressno= request.POST.get('addressno')
+			frontaddressproofdoc =request.FILES.get('frontaddressproofdoc')
+			backddressproofdoc = request.FILES.get('backddressproofdoc')
+   
+			gstno=request.POST.get('gstno')
+			gstnodoc = request.FILES.get('gstnodoc')
+
+		
+				
+			
+			print(mobile,'Mobile')
+    
+			
+		
+			customer_obj=Customer.objects.filter(user=request.user).first()
+			
+			user=User.objects.filter(id=request.user.id).first()
+	
+			if mobile:
+				customer_obj.mobile = mobile
+				user.username=mobile
+			if email:
+				user.email=email
+			if firstname:
+				customer_obj.firstname= firstname
+				user.first_name=firstname
+			if lastname:
+				customer_obj.lastname= lastname
+				user.last_name=lastname
+			if gender:
+				customer_obj.gender =  gender
+			if dob:
+				customer_obj.dob= dob
+			if streetaddress:
+				customer_obj.streetaddress =  streetaddress
+			if nearbyaddress:
+				customer_obj.nearbyaddress =  nearbyaddress
+			if pincode:
+				customer_obj.pincode = pincode
+			if city:
+				customer_obj.city= city
+			if state:
+				customer_obj.state= state
+			if country:
+				customer_obj.country= country
+			if latitude:
+				customer_obj.latitude =  latitude
+			if longitude:
+				customer_obj.longitude =  longitude
+			if profilepic:
+				customer_obj.profilepic =profilepic
+
+			#Personal User 
+			if pancardno:
+				customer_obj.pancardno=pancardno
+			if pancarddoc:
+				customer_obj.pancarddoc =pancarddoc
+			if idproof:
+				customer_obj.idproof= idproof
+			if idno:
+				customer_obj.idno= idno
+			if frontidproofdoc:
+				customer_obj.frontidproofdoc =frontidproofdoc
+			if backidproofdoc:
+				customer_obj.backidproofdoc=backidproofdoc
+			if addressproof:
+				customer_obj.addressproof= addressproof
+			if addressno:
+				customer_obj.addressno= addressno
+			if frontaddressproofdoc:
+				customer_obj.frontaddressproofdoc =frontaddressproofdoc
+			if backddressproofdoc:
+				customer_obj.backddressproofdoc =backddressproofdoc
+			
+			if gstno:
+				customer_obj.gstno=gstno
+			if gstnodoc:
+				customer_obj.gstnodoc = gstnodoc
+
+   
+			user.save()
+
+			customer_obj.save()
+
+
+			
+			
+			messages.info(request, 'Your Profile has been updated !')
+
+		return redirect("/user/profile")
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
 @csrf_exempt
 def creditedmoney_user_wallet(request):
 	if check_user_authentication(request, 'CUSTOMER'):
-		if not CreditedMoney.objects.filter(user=request.user).exists():
-			CreditedMoney.objects.create(user=request.user)
-		dic = {'user':UserData.objects.get(user=request.user),
-			'creditedmoney':CreditedMoney.objects.get(user=request.user),
-			'creditedmoney_transactions':CreditedMoneyTransaction.objects.filter(creditedmoney=CreditedMoney.objects.get(user=request.user)).order_by('-transaction_date'),
-			'notification':get_notifications(request.user),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		# if not CreditedMoney.objects.filter(user=request.user).exists():
+		# 	CreditedMoney.objects.create(user=request.user)
+		dic = {"customer_obj":Customer.objects.filter(user=request.user).first(),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'user_app/creditedmoney_wallet-dash.html', dic)
 	else:

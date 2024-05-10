@@ -54,6 +54,7 @@ urlpatterns = [
     path('vendor-wallet-transfer/',wallet_transfer_vendor,name='vendor-wallet-transfer'),
     path('otp-verification/',transfer_amount,name='otp-verification'),
     path('profile', user_profile),
+    path('edit-profile', edit_customer_profile),
     path('creditedmoney', creditedmoney_user_wallet),
  
 

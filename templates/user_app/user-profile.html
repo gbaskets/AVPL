@@ -2,219 +2,383 @@
 {% load static %}
 {% block title %}Profile{% endblock %}
 {% block main %}
-{% load crispy_forms_tags %}
+
 <!-- Main Content -->
-<div class="main-content">
-    <section class="section">
-        <div class="section-header">
-            <div class="row">
-                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                    <div class="section-header-breadcrumb-content">
-                        <h1>Profile</h1>
-                        <div class="section-header-breadcrumb">
-                            <div class="breadcrumb-item active"><a href="/user/"><i class="fas fa-home"></i></a></div>
-                            <div class="breadcrumb-item"><a href="/user/">Dashboard</a></div>
-                            <div class="breadcrumb-item"><a>Profile</a></div>
-                        </div>
-                    </div>
-                </div>
 
-            </div>
-        </div>
-        <div class="section-body">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
 
-                            <div class="row justify-content-center">
-                                <div class="col-lg-3 col-md-3 col-sm-3">
-
-                                    <h3 class="mt-3 profile">{{user.first_name}} {{user.last_name}}</h3>
-
+        <div class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <div class="row">
+                       
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                            <div class="section-header-breadcrumb-content">
+                                <h1>Profile</h1>
+                                <div class="section-header-breadcrumb">
+                                    <div class="breadcrumb-item active"><a href="/user/"><i class="fas fa-home"></i></a></div>
+                                    <div class="breadcrumb-item"><a href="/user/">Dashboard</a></div>
+                                    <div class="breadcrumb-item"><a>Profile</a></div>
                                 </div>
                             </div>
-
                         </div>
-
-
-                        <div class="card-header">
-                            <h4>User Profile Details</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12">
-                                    <table class="table">
-
-                                        <tbody>
-                                           
-                                            <tr>
-                                                <td> Profile Pic :</td>
-                                                {% if user.profile_pic %}
-                                               
-                                                <td><img src="{{ user.profile_pic.url}}" style="width:200px;height:150px;"></td>
-                                                    {% else %}
-                                                    <td> <img src="{{ user.profile_pic}}" style="width:200px;height:150px;"></td>
-                                                   
-                                                    {% endif %}
-
-                                               
-                                            </tr>
-                                           
-                                            <tr>
-                                                <td>  Sponsor :</td>
-                                                <td><h5>{{user.sponsor.usr.first_name}} {{user.sponsor.usr.last_name}} ({{user.sponsor}})</h5></td>
-
-                                            </tr>
-
-                                            <tr>
-                                                <td> Name :</td>
-                                                <td>{{user.first_name}} {{user.last_name}}</td>
-
-                                            </tr>
-
-                                            <tr>
-                                                <td>Gender</td>
-                                                <td>{{user.gender}}</td>
-
-                                            </tr>
-
-                                            <tr>
-                                                <td>Mobile No. :</td>
-                                                <td>{{user.phone}}</td>
-
-                                            </tr>
-                                            <tr>
-                                                <td> Current PV</td>
-                                                <td> {{user.pv}} PV</td>
-
-                                            </tr>
-                                            <tr>
-                                                <td> Address</td>
-                                                <td>{{user.address}}</td>
-
-                                            </tr>
-
-                                            <tr>
-                                                <td> Pincode</td>
-                                                <td>{{user.zipcode}}</td>
-
-                                            </tr>
-
-
-                                            <tr>
-                                                <td> PAN Card</td>
-                                                {% if payment.pan %}
-                                                <td> <img src="{{payment.pan.url}}" style="width:200px;height:150px;"></td>
-                                                {% else %}
-                                                <td> <img src="{{payment.pan}}" style="width:200px;height:150px;"></td>
-                                                {% endif %}
-                                            </tr>
-
-
-
-
-                                            <tr>
-                                                <td> Aadhar Card</td>
-                                                {% if payment.aadhar %}
-                                                <td><img src="{{payment.aadhar.url}}" style="width:200px;height:150px;"></td>
-                                                    {% else %}
-                                                    <td> <img src="{{payment.aadhar}}" style="width:200px;height:150px;"></td>
-                                                   
-                                                    {% endif %}
-
-                                            </tr>
-
-
-                                            <tr>
-                                                <td>Bank Account Number</td>
-                                                <td>{{payment.account_no}}</td>
-
-                                            </tr>
-
-
-                                            <tr>
-                                                <td> Bank Name</td>
-                                                <td>{{payment.bank_name}}</td>
-
-                                            </tr>
-
-                                            <tr>
-                                                <td>  Bank IFSC</td>
-                                                <td>{{payment.ifsc}}</td>
-
-                                            </tr>
-
-                                           
-
-
-
-                                        </tbody>
-                                    </table>
-                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                        <div class="form-group">
-                                            <a href="#"  data-pid="{{user.id}}" data-target="#UpdateHomePage"
-                                            data-toggle="modal"  class=" btn btn-primary btn-lg justify-content-right">Edit Profile</a>
-
-                                        </div>
+        
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="row">
+                       
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    {% for message in messages %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <span class="message">{{message}}</span>
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
                                     </div>
+                                    {% endfor %}
+                                   
+                                    <div class="row justify-content-center ">
+        
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-3">
+                                            {% if customer.profilepic %}
+        
+                                            <img src="{{customer.profilepic.url}}" class="img-fluid profile_img " width="150"
+                                                style="background-color:white;" />
+                                            {% else %}
+        
+                                            {% endif %}
+                                        </div>
+        
+                                    </div>
+                                    
+        
                                 </div>
+        
+        
+        
+                                <form action="/user/edit-profile" method="POST" enctype="multipart/form-data">
+        
+                                    <div class="col-md-12 register-right">
+        
+                                       
+        
+        
+                                        <div class="row register-form">
+        
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>First Name *</label>
+                                                    <input type="text" class="form-control" placeholder="Enter First Name *"
+                                                        title="Only (a-z) letters are allowed."  name="firstname"
+                                                        value="{{request.user.first_name|default:''}}" required/>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Last Name *</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Last Name *"
+                                                        title="Only (a-z) letters are allowed."  name="lastname"
+                                                        value="{{request.user.last_name|default:''}}" />
+                                                </div>
+        
+        
+                                                <div class="form-group">
+                                                    <label>Email *</label>
+                                                    <input type="email" class="form-control" placeholder="Enter Email *"
+                                                         name="email" value="{{request.user.email|default:''}}"required />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Mobile *</label>
+                                                    <input type="text" minlength="10" maxlength="10" class="form-control"
+                                                        placeholder="Enter Mobile *" name="mobile" 
+                                                        value="{{ customer.mobile|default:'' }}"required />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>DOB *</label>
+                                                    <input type="date" class="form-control" placeholder="Enter DOB *"
+                                                        max="2005-12-31" name="dob" 
+                                                        value="{{ customer.dob|date:'Y-m-d'|default:'' }}" required/>
+                                                </div>
+        
+                                                <div class="form-group">
+                                                    {% if customer.gender == Male %}
+                                                    <label class="radio inline">
+                                                        <label>Gender *</label>
+                                                        <input type="radio" name="gender" value="Male" checked>
+                                                        <span> Male </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender" value="Female">
+                                                        <span>Female </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender" value="Other">
+                                                        <span>Other </span>
+                                                    </label>
+                                                    {% elif customer.gender == Female %}
+                                                    <label class="radio inline">
+                                                        <label>Gender *</label>
+                                                        <input type="radio" name="gender" value="Male">
+                                                        <span> Male </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender" value="Female" checked>
+                                                        <span>Female </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender" value="Other">
+                                                        <span>Other </span>
+                                                    </label>
+        
+                                                    {% elif customer.gender == Other %}
+                                                    <label class="radio inline">
+                                                        <label>Gender *</label>
+                                                        <input type="radio" name="gender" value="Male">
+                                                        <span> Male </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender" value="Female">
+                                                        <span>Female </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender" value="Other" checked>
+                                                        <span>Other </span>
+                                                    </label>
+                                                    {% else %}
+        
+                                                    <label class="radio inline">
+                                                        <label>Gender *</label>
+                                                        <input type="radio" name="gender" value="Male" checked>
+                                                        <span> Male </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender" value="Female">
+                                                        <span>Female </span>
+                                                    </label>
+                                                    <label class="radio inline">
+                                                        <input type="radio" name="gender" value="Other">
+                                                        <span>Other </span>
+                                                    </label>
+                                                    {% endif %}
+        
+                                                </div>
+        
+                                                <div class="form-group">
+                                                    <label>Profile Pic *</label>
+                                                    {% if customer.profilepic %}
+                                                    <a href="{{customer.profilepic.url}}"> <img alt="image"
+                                                            src="{{customer.profilepic.url}}" height="50" weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <input type="file" class="form-control" accept="image/png, image/jpeg"
+                                                        name="profilepic" required/>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>PV *</label>
+                                                    <input type="number" class="form-control" value="{{ customer.pv|default:'' }}" disabled/>
+                                                </div>
+        
+        
+                                            </div>
+        
+                                            <div class="col-md-4">
+        
+                                                <div class="form-group">
+                                                    <label>Street Address *</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Street Address *"
+                                                        id="address" title="Only (a-z) letters are allowed." 
+                                                        name="streetaddress" value="{{customer.streetaddress|default:''}}" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Near by Address *</label>
+                                                    <input type="text" class="form-control"
+                                                        placeholder="Enter Near by Address *" id='nearbyaddress'
+                                                        title="Only (a-z) letters are allowed."  name="nearbyaddress"
+                                                        value="{{customer.nearbyaddress|default:''}}" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>City *</label>
+                                                    <input type="text" class="form-control" placeholder="Enter City *" id='city'
+                                                        title="Only (a-z) letters are allowed."  name="city"
+                                                        value="{{customer.city|default:''}}" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>State *</label>
+                                                    <input type="text" class="form-control" placeholder="Enter State *"
+                                                        id='state' title="Only (a-z) letters are allowed."  name="state"
+                                                        value="{{customer.state|default:''}}" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Country *</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Country *"
+                                                        id='country' title="Only (a-z) letters are allowed." 
+                                                        name="country" value="{{customer.country|default:''}}" />
+                                                </div>
+        
+                                                <div class="form-group">
+                                                    <label>Pincode *</label>
+                                                    <input type="text" placeholder="Enter Pincode *" id='pincode'
+                                                        class="form-control" minlength="6" maxlength="6" name="pincode"
+                                                        value="{{customer.pincode|default:''}}" />
+                                                </div>
+        
+                                                <input type="hidden" placeholder="latitude *" id='latitude' class="form-control"
+                                                    name="latitude" value="{{customer.latitude|default:''}}" />
+                                                <input type="hidden" placeholder="longitude *" id='longitude'
+                                                    class="form-control" name="longitude"
+                                                    value="{{customer.longitude|default:''}}" />
+        
+        
+        
+                                                <div class="form-group">
+                                                    <label>PAN Card No *</label>
+                                                    <input type="text" class="form-control" placeholder="PAN Number *"
+                                                        pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                                                        title="Please enter the correct PAN number." name="pancardno"
+                                                        value="{{customer.pancardno|default:''}}" />
+                                                </div>
+        
+                                                <div class="form-group">
+                                                    <label>PAN Card Image *</label>
+                                                    {% if customer.pancarddoc %}
+                                                    <a href="{{customer.pancarddoc.url}}"> <img alt="image"
+                                                            src="{{customer.pancarddoc.url}}" height="50" weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                        name="pancarddoc" />
+                                                </div>
+        
+        
+                                            </div>
+                                            <div class="col-md-4">
+        
+                                                <div class="form-group">
+                                                    <label for="idproof">Idproof *</label>
+                                                    <select class="form-control" id="idproof" name="idproof">
+                                                        {% if customer.idproof %}
+                                                        <option value="{{customer.idproof}}" selected>{{customer.idproof}}</option>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        <option value="" disable>-- select idproof --</option>
+                                                        <option value="Aadhaar Card">Aadhaar Card</option>
+                                                        <option value="DL">DL</option>
+                                                        <option value="Voter ID">Voter ID</option>
+                                                        <option value="Passport">Passport</option>
+                                                    </select>
+                                                </div>
+        
+                                                <div class="form-group">
+                                                    <label>Id No *</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Id Number *"
+                                                        name="idno" value="{{customer.idno|default:''}}" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>ID Front Image *</label>
+                                                    {% if customer.frontidproofdoc %}
+                                                    <a href="{{customer.frontidproofdoc.url}}"> <img alt="image"
+                                                            src="{{customer.frontidproofdoc.url}}" height="50" weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                        name="frontidproofdoc" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>ID Back Image *</label>
+                                                    {% if customer.backidproofdoc %}
+                                                    <a href="{{customer.backidproofdoc.url}}"> <img alt="image"
+                                                            src="{{customer.backidproofdoc.url}}" height="50" weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                        name="backidproofdoc" />
+                                                </div>
+        
+        
+                                                <div class="form-group">
+                                                    <label for="addressproof">Addressproof *</label>
+                                                    <select class="form-control" id="addressproof" name="addressproof">
+                                                        {% if customer.addressproof %}
+                                                        <option value="{{customer.addressproof}}" selected>{{customer.addressproof}}
+                                                        </option>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        <option value="" disable>-- select addressproof --</option>
+                                                        <option value="Aadhaar Card">Aadhaar Card</option>
+                                                        <option value="DL">DL</option>
+                                                        <option value="Voter ID">Voter ID</option>
+                                                        <option value="Passport">Passport</option>
+                                                    </select>
+                                                </div>
+        
+                                                <div class="form-group">
+                                                    <label>AddressproofId No *</label>
+                                                    <input type="text" class="form-control"
+                                                        placeholder="Enter Address Proof No *" name="addressno"
+                                                        value="{{customer.addressno|default:''}}" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Addressproof Front Image *</label>
+                                                    {% if customer.frontaddressproofdoc %}
+                                                    <a href="{{customer.frontaddressproofdoc.url}}"> <img alt="image"
+                                                            src="{{customer.frontaddressproofdoc.url}}" height="50"
+                                                            weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                        name="frontaddressproofdoc" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Addressproof Back Image *</label>
+                                                    {% if customer.backddressproofdoc %}
+                                                    <a href="{{customer.backddressproofdoc.url}}"> <img alt="image"
+                                                            src="{{customer.backddressproofdoc.url}}" height="50"
+                                                            weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                        name="backddressproofdoc" />
+                                                </div>
+        
+        
+                                            </div>
+                                        </div>
+        
+        
+        
+        
+        
+                                       
+        
+        
+                                    </div>
+        
+                                   
+                                    <div class="col-md-12">
+                                    
+                                        <input type="submit" class="btn btn-success form-control" value="Save" />
+                                        </div>
+                                       
+                                </form>
+        
+        
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
-    </section>
-</div>
+        
+        
 
 
-<div  class="modal fade" id="UpdateHomePage" role="dialog" aria-hidden="false">
-
-    <form method="POST" enctype="multipart/form-data">
-
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Update</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                </div>
-               
-                  <div class="modal-body">
-                  
-                    {% csrf_token %}
-                    
-                  
-                    {{updateform|crispy}}
 
 
-                    {{updateform2|crispy}}
-                   
-                   
-                   
-                    
-                  </div>
-                  <div class="form-group">
-                    <div class="alert alert-success" id="ins_success" style="display:none">
-      
-                    </div>
-                     <div class="alert alert-danger" id="ins_error" style="display:none">
-      
-                    </div>
-                </div>
-      
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Update</button>
-                       <div id="msg" class="alert alert-danger" style="display:none"></div>
-                     </div>
-    
-              </div>
-        </div>
-    </form>
-    
-</div>
+
+
+
+
+
 
 {% endblock %}
