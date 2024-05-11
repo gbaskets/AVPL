@@ -59,14 +59,14 @@
                             <div class="js-slide">
                            
                                 <div class="d-flex">
-                                    {% for i in store_img %}
+                                    {% for i in store_obj %}
                                 
 
                                     <div class="col-lg-4 col-sm-12 col-12 d-flex flex-column">
 
-                                        <a href="/store_details/{{i.store.id}}" class="introduce">
+                                        <a href="/store_details/{{i.id}}" class="introduce">
 
-                                            <img href="/store_details/{{i.store.id}}" style="height: 300px;"
+                                            <img href="/store_details/{{i.id}}" style="height: 300px;"
                                                 width="600px" height="300px" class="img-fluid "
                                                 src="{{i.banner.url|safe}}" alt="Image Description">
 
@@ -81,42 +81,12 @@
 
                                                 <h4 href="/store_details/{{i.store.id}}"
                                                     style="font-weight: 600; color: #231900; font-family: Montserrat;padding-left: 20px; padding-top: 15px; font-size: 22px;">
-                                                    {{i.store.name}}</h4>
-                                                <div class="row" style="margin-bottom:15px">
-                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
-                                                            title="Shakes"
-                                                            style="border-radius: 5px; margin-left: 20px; padding-top: 5px; padding-bottom: 5px;font-weight: 600; padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                                    </div>
-                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
-                                                            title="Shakes"
-                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px; margin-left:7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                                    </div>
-                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
-                                                            title="Shakes"
-                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left:-7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                                    </div>
-                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
-                                                            title="Shakes"
-                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px; margin-left: -20px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                                    </div>
-                                                </div>
+                                                    {{i.storename}}</h4>
+                                                
                                                 <div class="row">
-                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
-                                                            title="Shakes"
-                                                            style="border-radius: 5px; margin-left: 20px;padding-top: 5px; padding-bottom: 5px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                                    </div>
-                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
-                                                            title="Shakes"
-                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left:7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                                    </div>
-                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
-                                                            title="Shakes"
-                                                            style="border-radius: 5px; padding-top: 5px; padding-bottom: 5px;margin-left:-7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                                    </div>
-                                                    <div class="col-3 padding"><a href="#" class="btn btn-light"
-                                                            title="Shakes"
-                                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left: -20px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                                    </div>
+                                                    <div style="border-radius: 5px; margin-left: 20px;padding-top: 5px; padding-bottom: 5px;font-weight: 600;">{{i.description}}</a></div>
+                                                  
+                                                   
                                                 </div>
 
                                                 <hr>
@@ -124,16 +94,16 @@
 
                                             <div class="row div">
                                                 <div class="col-md-4">
-                                                    <img href="/store_details/{{store.id}}" class="img-fluid"
+                                                    <img href="/store_details/{{i.id}}" class="img-fluid"
                                                         src="{{i.logo.url|safe}}" alt="Image Description">
                                                 </div>
                                                 <div class="col-md-8">
                                                     <p style="color: #000; font-size: 16px; font-weight: 600;"><i
-                                                            class="ec ec-map-pointer mr-1"></i>{{i.store.opening_time}}
+                                                            class="ec ec-map-pointer mr-1"></i>{{i.openingtime}}
                                                         -
-                                                        {{i.store.closing_time}}<br><i
+                                                        {{i.closingtime}}<br><i
                                                             class="ec ec-map-pointer mr-1"></i>
-                                                        {{i.store.vendor.address}}</p>
+                                                        {{i.streetaddress}}</p>
 
                                                 </div>
 

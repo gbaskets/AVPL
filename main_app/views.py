@@ -1,5 +1,6 @@
 import re
 from django.shortcuts import render
+from inventory_app.models import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -457,7 +458,7 @@ def search_result(request):
 def search_result2(request):
     d = datetime.datetime.now()
     latest_product = []
-    for latest in ProductImages.objects.filter(product__is_active=True):
+    for latest in ProductImages.objects.filter(product__isactive=True):
         if latest.product.created_at.strftime("%m") == d.strftime("%m"):
             latest_product.append(latest)
 
@@ -594,27 +595,27 @@ def home(request):
         # l1 = []
         # d = datetime.datetime.now()
         # latest_product = []
-        # for latest in ProductImages.objects.filter(product__is_active=True):
+        # for latest in ProductImages.objects.filter(product__isactive=True):
         # 	if latest.product.created_at.strftime("%m") == d.strftime("%m"):
         # 		latest_product.append(latest)
         # for x in ProductCategory.objects.all():
         # 	l1.append(x)
         # for x in l1:
-        # 	if Product.objects.filter(category__name=x.name, is_active=True):
+        # 	if Product.objects.filter(category__name=x.name, isactive=True):
         # 		prod1 = Product.objects.filter(category__name=x.name)
-        # eeprod = ProductImages.objects.filter(product__category__name='Electric & Electronics',product__is_active=True)
-        # hcprod = ProductImages.objects.filter(product__category__name="Heath care",product__is_active=True)
+        # eeprod = ProductImages.objects.filter(product__category__name='Electric & Electronics',product__isactive=True)
+        # hcprod = ProductImages.objects.filter(product__category__name="Heath care",product__isactive=True)
         # # for i in ProductCategory.objects.all():
         # 	for j in Product.objects.filter(category__name=i.name).values():
         # 		l1.append({i:j})
-        # product = Product.objects.filter(is_active=True)
+        # product = Product.objects.filter(isactive=True)
         # contact = contact_us.objects.all()[0]
         # pv_percent = PointValue.objects.get(category=product.category).percentage
         # pv = (product.price/100)*pv_percent
         # bestseller = StoreImages.objects.filter(store__best_seller = True)
-        # featured = ProductImages.objects.filter(product__featured = True,product__is_active=True)
-        # offer = ProductImages.objects.filter(product__offer = True,product__is_active=True)
-        # special_offer = ProductImages.objects.filter(product__special_offer = True,product__is_active=True)
+        # featured = ProductImages.objects.filter(product__featured = True,product__isactive=True)
+        # offer = ProductImages.objects.filter(product__offer = True,product__isactive=True)
+        # special_offer = ProductImages.objects.filter(product__special_offer = True,product__isactive=True)
         # footer_banner = HomeFooterBanner.objects.all()
         # categories = ProductCategory.objects.all()
         # if request.session.get('store_ids'):
@@ -626,7 +627,7 @@ def home(request):
             # img_list = []
             # dic = get_dic(request)
             # for i in product:
-            # 	x=ProductImages.objects.filter(product=i,product__is_active=True)
+            # 	x=ProductImages.objects.filter(product=i,product__isactive=True)
             # 	img_list.append(x)
             # dic.update({'image':img_list})
             # dic.update({'banners':HomeBanner.objects.all(), 'footer_banner':footer_banner,  'bestseller':bestseller, 'store':store_objs, 'store_img':store_img,
@@ -676,13 +677,12 @@ def store_page(request):
     return render(request, 'main_app/storepage.html', dic)
 
 def all_stores(request):
-    # store = Store.objects.all()
-    all_store_images = StoreImages.objects.all()
+    store_obj = Store.objects.all()
     
     
     dic ={
             
-            'store_img':all_store_images,
+            'store_obj':store_obj,
             
             
             
@@ -692,25 +692,19 @@ def all_stores(request):
 
 def store_details(request, id):
     store = Store.objects.get(id=id)
-    all_store = StoreImages.objects.all()
-    store_img = StoreImages.objects.get(store__id =id)
-    product = Product.objects.filter(store__id=id,is_active=True).values()
-    product_num = Product.objects.filter(store__id=id,is_active=True).count()
-    image_data = []
-    for data in product:
-        product_img = ProductImages.objects.values().filter(product__id = data['id'],product__is_active=True)[0]['image']
-        image_data.append({data['id']:product_img})
-    dic = get_dic(request)
-    dic.update({
+    all_store = Store.objects.all()
+    product = Product.objects.filter(store=store,isactive=True)
+    product_num = Product.objects.filter(store=store,isactive=True).count()
+   
+    dic={
             'store':store,
-            'store_img':store_img,
             'product':product,
-            'image_data':image_data,
+            # 'image_data':image_data,
             'all_store':all_store,
             'product_num':product_num,
             # 'distance':get_store_distance(home_address)
 
-    })
+    }
     return render(request, 'usertemplate/store-details.html', dic)
 
 def home_store_categories(request):
@@ -961,11 +955,11 @@ def product_page(request):
     pv = (product.price/100)*pv_percent
     dic = {
         'product':product,
-        'images':ProductImages.objects.filter(product=product,product__is_active=True),
+        'images':ProductImages.objects.filter(product=product,product__isactive=True),
         'variants':get_product_variants(product),
         'pv':pv
     }
-    ratings = ProductRating.objects.filter(product=product,product__is_active=True)
+    ratings = ProductRating.objects.filter(product=product,product__isactive=True)
     total = 0.0
     for x in ratings:
         total = total + x.rating
@@ -981,62 +975,13 @@ def product_page(request):
 
 
 def product_detail(request):
-    product = Product.objects.get(id=request.GET.get('p'))
-    pv_percent = PointValue.objects.get(category=product.category).percentage
-    pv = (product.price/100)*pv_percent
-    sub_cat_data = Product.objects.values().filter(subcategory_id = product.subcategory)
-    for i in sub_cat_data:
-        for x in ProductImages.objects.filter(product__id=i['id']).values():
-            i['image'] = x['image']
+    product = Product.objects.get(id=request.GET.get('p'))    
     dic = {
         'product':product,
-        'sub_cat_data':sub_cat_data,
-        # 'sub_cat_data_images':ProductImages.objects.filter(product=sub_cat_data)[0],
-        'images':ProductImages.objects.filter(product=product),
+        'images':ProductImages.objects.filter(productvariants__product=product),
         'categories':ProductCategory.objects.all(),
-        'variants':get_product_variants(product),
-        'pv':pv
     }
-    ratings = ProductRating.objects.filter(product=product)
-    total = 0.0
-    rating5 = []
-    rating4 = []
-    rating3 = []
-    rating2 = []
-    rating1 = []
-    norating = []
-    for x in ratings:
-        print(x.rating)
-        total = total + x.rating
-        if x.rating == 5.0:
-            rating5.append(x.rating)
-            dic.update({'rating5':len(rating5) })
-        elif x.rating == 4.0:
-            rating4.append(x.rating)
-            dic.update({'rating4':len(rating4) })
-        elif x.rating == 3.0:
-            rating4.append(x.rating)
-            print(len(rating4))
-            dic.update({'rating3':len(rating3)})
-        elif x.rating == 2.0:
-            rating2.append(x.rating)
-            dic.update({'rating2':len(rating2)})
-        elif x.rating == 1.0:
-            rating1.append(x.rating)
-            dic.update({'rating1':len(rating1)})
-        else:
-            norating.append('0')
-            dic.update({'norating':len(rating1)})
-    print(dic)
-    
-    rating = 0.0
-    if len(ratings) <= 0:
-        rating = 0.0
-    else:
-        rating = (total/len(ratings))	
-    dic.update({'rating':round(rating, 1), 'rating_len':len(ratings), 'ratings':ratings})
-    dic.update(get_cart_len(request))
-    dic.update(get_wishlist_len(request))
+   
     return render(request, 'usertemplate/product-detail.html', dic)
 
 
@@ -1044,7 +989,7 @@ def product_filter_range(request):
     if request.method == 'POST':
         min_price = request.POST.get('min_price')
         max_price = request.POST.get('max_price')
-        prod =  Product.objects.filter(price__range=[min_price ,max_price ],is_active=True)
+        prod =  Product.objects.filter(price__range=[min_price ,max_price ],isactive=True)
         print(prod)
         return render(request, 'usertemplate/collection.html', {'prod':prod})
 
@@ -1109,7 +1054,7 @@ def resend_otp(request):
 # 					return redirect('/')
 # 				else:
 # 					logout(request)
-# 					return response(data={'msg':'Unauthorized User','response_code':201},is_active=is_active.HTTP_201_CREATED)
+# 					return response(data={'msg':'Unauthorized User','response_code':201},isactive=isactive.HTTP_201_CREATED)
 # 			else:
 # 				messages.info(request,'Incorrect Password')
 # 				return redirect('/login/')
@@ -1819,7 +1764,7 @@ def verify_account(request):
                 user = request.session['user']
                 if otp == otp_2:
 
-                    UserData.objects.filter(user=User.objects.get(id=user)).update(is_active=True,sponsor= User.objects.get(id=request.session['parent']),)
+                    UserData.objects.filter(user=User.objects.get(id=user)).update(isactive=True,sponsor= User.objects.get(id=request.session['parent']),)
                     
                     request.session['child'] = user
 

@@ -340,16 +340,7 @@ def getresult(key, category, brand, min_price, max_price, in_stock, rate):
 			return Product.objects.filter(is_active=True)
 
 
-def get_product_variants(product):
-	lt = []
-	for variant in Variant.objects.all():
-		if ProductVariant.objects.filter(product=product, variant=variant).exists():
-			data = []
-			for x in ProductVariant.objects.filter(product=product, variant=variant):
-				data.append(x)
-			dic = {'variant':variant, 'data':data}
-			lt.append(dic)
-	return lt
+
 
 import random
 

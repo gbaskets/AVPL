@@ -38,18 +38,18 @@ border-radius: 5px;
              <!-- Single product content Start -->
              <div class="mb-12">
                 <div class="position-relative">
-                       <img class="img-fluid" src="{{store_img.banner.url}}" alt="Image Description" style="height:350px; width: 100%;">
+                       <img class="img-fluid" src="{{store.banner.url}}" alt="Image Description" style="height:350px; width: 100%;">
                     </div>
                    <div class="container">
         
                       <div class="row" style="background-color:#e6e7f1">
                        <div class="col-md-3">
-                    <img class="img-fluid" src="{{store_img.logo.url}}" alt="Image Description" style="height: 181px;border-color: #fff;border-radius: 0% 0% 0px 0px;position: relative;">
+                    <img class="img-fluid" src="{{store.logo.url}}" alt="Image Description" style="height: 181px;border-color: #fff;border-radius: 0% 0% 0px 0px;position: relative;">
                        </div>
                        <div class="col-md-6">
                <div class="new-stars-main adddd"><div class="stars"><i class="fa fa-star "></i><i class="fa fa-star "></i><i class="fa fa-star "></i><i class="fa fa-star "></i><i class="fa fa-star "></i></div><div class="rating-number"></div></div>
-               <h2 style="color: #231900;line-height: 1.2; font-size:32px; font-weight:700">{{ store.name }}</h2>
-               <p style="line-height: 0.7; font-family: Nunito;color: #4e4e4e; font-weight: 400;"><i class="ec ec-map-pointer mr-1"></i>{{ store.vendor.address }} {{ store.vendor.zipcode }}</p>
+               <h2 style="color: #231900;line-height: 1.2; font-size:32px; font-weight:700">{{ store.storename }}</h2>
+               <p style="line-height: 0.7; font-family: Nunito;color: #4e4e4e; font-weight: 400;"><i class="ec ec-map-pointer mr-1"></i>{{ store.streetaddress }} {{ store.pincode }}</p>
                <ul class="list-inline mb-0">
                 <li class="list-inline-item mr-0">
                     <a class="btn font-size-20 btn-icon btn-soft-dark btn-bg-transparent rounded-circle" href="https://www.facebook.com/" target="_blank">
@@ -79,13 +79,13 @@ border-radius: 5px;
                    Working Hours
                 </button>
                 <div style="width: 335px;" class="dropdown-menu">
-                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Monday  ({{store.opening_time}} - {{store.closing_time}})</a>
-                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Tuesday ({{store.opening_time}} - {{store.closing_time}})</a>
-                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Wednesday ({{store.opening_time}} - {{store.closing_time}})</a>
-                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Thursday ({{store.opening_time}} - {{store.closing_time}})</a>
-                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Friday ({{store.opening_time}} - {{store.closing_time}})</a>
-                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Saturday ({{store.opening_time}} - {{store.closing_time}})</a>
-                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Sunday ({{store.opening_time}} - {{store.closing_time}})</a>
+                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Monday  ({{store.openingtime}} - {{store.closingtime}})</a>
+                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Tuesday ({{store.openingtime}} - {{store.closingtime}})</a>
+                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Wednesday ({{store.openingtime}} - {{store.closingtime}})</a>
+                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Thursday ({{store.openingtime}} - {{store.closingtime}})</a>
+                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Friday ({{store.openingtime}} - {{store.closingtime}})</a>
+                    <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Saturday ({{store.openingtime}} - {{store.closingtime}})</a>
+                    {% comment %} <a style="text-align: center;font-weight: bold;" href="#" class="dropdown-item">Sunday ({{store.openingtime}} - {{store.closingtime}})</a> {% endcomment %}
                 </div>
             </div><!-- .dropdown -->
             </div>
@@ -99,7 +99,7 @@ border-radius: 5px;
                          <div class="single-product-scroll">
                             <div class="single-product-cover">
                                <div class="single">
-                                  <img class="img-thumbnail" src="{{store_img.logo.url}}"
+                                  <img class="img-thumbnail" src="{{store.logo.url}}"
                                      alt="">
                                </div>
                             </div>
@@ -202,12 +202,12 @@ border-radius: 5px;
                               <div class="row">
                                   <div class="col-sm-12 col-md-6">
                               <div class="form-group">
-                                  <input type="number" class="form-control" placeholder="Min. Price" name="min_price">
+                                  <input type="number" class="form-control" placeholder="Min. Price" name="min_price" required>
                               </div>
                           </div>
                           <div class="col-sm-12 col-md-6">
                               <div class="form-group">
-                                  <input type="number" class="form-control" placeholder="Max. Price" name="max_price">
+                                  <input type="number" class="form-control" placeholder="Max. Price" name="max_price" required>
                               </div>
                           </div>
                               <button type="submit" class="btn px-4 btn-primary-dark-w py-2 rounded-lg text-light">Filter</button>
@@ -283,30 +283,29 @@ border-radius: 5px;
                   <div class="tab-pane fade pt-2 active show" id="pills-one-example1" role="tabpanel" aria-labelledby="pills-one-example1-tab" data-target-group="groups">
                       <ul class="row list-unstyled products-group no-gutters">
                         {% for i in product %}
-                        {{i.category}}
+                         {{i.category}}
+
+                        {% with first_variant=i.products.first %}
                           <li class="col-6 col-md-3 col-wd-2gdot4 product-item">
                               <div class="product-item__outer h-100">
                                   <div class="product-item__inner px-xl-4 p-3">
                                       <div class="product-item__body pb-xl-2">
                                           <div class="mb-2"><a href="" class="font-size-12 text-gray-5">{{ i.category.name }}</a></div>
-                                          <h5 class="mb-1 product-item__title"><a href="/productdetail/?p={{i.id}}">{{ i.name}}</a></h5>
+                                          <h5 class="mb-1 product-item__title"><a href="/productdetail/?p={{i.id}}">{{ first_variant.productvariantname }}</a></h5>
                                           <div class="mb-2">
-                                            {% for image in image_data %}
-                                            {% for x,y in image.items %}
-                                            {% if x == i.id%}
-                                              <a href="/productdetail/?p={{i.id}}" class="d-block text-center"><img class="img-fluid" src="/media/{{y}}" alt="Image Description"></a>
-                                            {% endif %}
-                                            {% endfor %}
-                                            {% endfor %}
+                                           
+                                        
+                                              <a href="/productdetail/?p={{i.id}}" class="d-block text-center"><img class="img-fluid" src="{{ first_variant.productimage.url }}" alt="Image Description"></a>
+                                           
                                             </div>
                                           <div class="flex-center-between mb-1">
                                               <div class="prodcut-price">
-                                                  <span><i class="fa fa-inr"></i>₹{{ i.price }}</span>
+                                                  <span><i class="fa fa-inr"></i>{{ first_variant.price }}</span>
                                               </div><br>
                                           </div>
                                           <div class="flex-center-between mb-1">
                                               <div class="prodcut-price">
-                                                  <div style="text-decoration: line-through;" class="text-gray-50">₹{{ i.mrp }}</div>
+                                                  <div style="text-decoration: line-through;" class="text-gray-50">₹{{ first_variant.mrp }}</div>
                                               </div>
                                           </div>
                                       </div>
@@ -320,6 +319,8 @@ border-radius: 5px;
                                   </div>
                               </div>
                           </li>
+                          {% endwith %}
+                          
                           {% endfor %}
                       </ul>
                   </div>
@@ -420,39 +421,32 @@ border-radius: 5px;
         {% for i in all_store %}
         <div class="col-lg-4 col-sm-12 col-12 d-flex flex-column">
             
-            <a href="/store_details/{{i.store.id}}" class="introduce">
+            <a href="/store_details/{{i.id}}" class="introduce">
                 
-                <img href="/store_details/{{i.store.id}}" style="height: 300px;"  width="600px" height="300px"   class="img-fluid " src="{{i.banner.url|safe}}" alt="Image Description">
+                <img href="/store_details/{{i.id}}" style="height: 300px;"  width="600px" height="300px"   class="img-fluid " src="{{i.banner.url|safe}}" alt="Image Description">
 
                     <div class="new-stars-main add"><div class="stars"><i class="fa fa-star "></i><i class="fa fa-star "></i><i class="fa fa-star "></i><i class="fa fa-star "></i><i class="fa fa-star "></i></div> <div class="rating-number"></div> </div>
                     <div class="flex-column-1 ">
 
-                            <h4 href="/store_details/{{i.store.id}}" style="font-weight: 600; color: #231900; font-family: Montserrat;padding-left: 20px; padding-top: 15px; font-size: 22px;">{{i.store.name}}</h4>
+                            <h4 href="/store_details/{{i.id}}" style="font-weight: 600; color: #231900; font-family: Montserrat;padding-left: 20px; padding-top: 15px; font-size: 22px;">{{i.storename}}</h4>
                         <div class="row" style="margin-bottom:15px">
-                                <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes" style="border-radius: 5px; margin-left: 20px; padding-top: 5px; padding-bottom: 5px;font-weight: 600; padding-right: 7px; padding-left: 7px;">Shakes</a></div>
-                                <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes" style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px; margin-left:7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a></div>
-                                <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes" style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left:-7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a></div>
-                                <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes" style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px; margin-left: -20px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a></div>
-                            </div>
-                            <div class="row">
-                                <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes" style="border-radius: 5px; margin-left: 20px;padding-top: 5px; padding-bottom: 5px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a></div>
-                                <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes" style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left:7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a></div>
-                                <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes" style="border-radius: 5px; padding-top: 5px; padding-bottom: 5px;margin-left:-7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a></div>
-                                <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes" style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left: -20px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a></div>
-                            </div>
+                               
+                          
+                        <div style="border-radius: 5px; margin-left: 20px;padding-top: 5px; padding-bottom: 5px;font-weight: 600;">{{i.description}}</a></div>
+                        </div>
                             
                             <hr>
                         </div>
                         
                         <div class="row div">
                         <div class="col-md-4">
-                            <img href="/store_details/{{store.id}}" class="img-fluid" src="{{i.logo.url|safe}}" alt="Image Description">
+                            <img href="/store_details/{{i.id}}" class="img-fluid" src="{{i.logo.url|safe}}" alt="Image Description">
                         </div>
                         <div class="col-md-8">
-                            <p style="color: #000; font-size: 16px; font-weight: 600;"><i class="ec ec-map-pointer mr-1"></i>{{i.store.opening_time}} - {{i.store.closing_time}}<br><i class="ec ec-map-pointer mr-1"></i>
-                                {{i.store.vendor.address}}</p>
+                            <p style="color: #000; font-size: 16px; font-weight: 600;"><i class="ec ec-map-pointer mr-1"></i>{{i.openingtime}} - {{i.closingtime}}<br><i class="ec ec-map-pointer mr-1"></i>
+                                {{i.streetaddress}}</p>
           
-        </div>
+           </div>
             
        
         </div>

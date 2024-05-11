@@ -213,7 +213,7 @@ class Product(models.Model):
 
 
 class ProductVariants(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True,related_name="products")
     store = models.ForeignKey(Store,on_delete=models.CASCADE,null=True, blank=True)
     sku=models.CharField(max_length=255,null=True,blank=True,unique=True)
     upc=models.CharField(max_length=255,null=True,blank=True,unique=True)
@@ -242,7 +242,7 @@ class ProductVariants(models.Model):
 
 
 class ProductImages(models.Model):
-    productvariants = models.ForeignKey(ProductVariants,on_delete=models.CASCADE,blank=True,null=True)
+    productvariants = models.ForeignKey(ProductVariants,on_delete=models.CASCADE,blank=True,null=True,related_name="product_variants")
     image = models.FileField(upload_to='inventory/productvariant/productvariantimages',blank=True,null=True)
     isactive = models.BooleanField(default=True)
     createdat = models.DateTimeField(auto_now_add=True)
