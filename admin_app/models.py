@@ -48,13 +48,14 @@ class MinAmountForFreeDelivery(models.Model):
 		return 'Minimum Amount for Free Delivery is Rs '+str(self.amount)+' (Click Here to Change)'
 
 class CompanyContactUs(models.Model):
-	address = models.TextField()
-	mobile = models.IntegerField()
+	address = models.TextField(null=True,blank=True)
+	mobile = models.IntegerField(null=True,blank=True)
 	email = models.CharField(max_length=255,null=True,blank=True)
-	facbook = models.CharField(max_length=255,null=True,blank=True)
-	instagram= models.CharField(max_length=255,null=True,blank=True)
-	twitter = models.CharField(max_length=255,null=True,blank=True)
-	linkedin = models.CharField(max_length=255,null=True,blank=True)
+	whatsapp = models.CharField(max_length=255,null=True,blank=True,default="https://www.whatsapp.com/")
+	facbook = models.CharField(max_length=255,null=True,blank=True,default="https://www.facebook.com/")
+	instagram= models.CharField(max_length=255,null=True,blank=True,default="https://www.instagram.com/")
+	twitter = models.CharField(max_length=255,null=True,blank=True,default="https://twitter.com/")
+	linkedin = models.CharField(max_length=255,null=True,blank=True,default="https://www.linkedin.com/")
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)
 	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)

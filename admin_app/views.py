@@ -2776,7 +2776,7 @@ def admin_set_pv_conversion(request):
 
 @csrf_exempt
 def admin_direct_referal(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			value = request.POST.get('value')
 			DirectReferalCommission.objects.all().delete()
@@ -2796,7 +2796,7 @@ def admin_direct_referal(request):
 
 @csrf_exempt
 def admin_leadership_bonus_set(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			value = request.POST.get('leader')
 			target = request.POST.get('target')
@@ -2818,7 +2818,7 @@ def admin_leadership_bonus_set(request):
 
 @csrf_exempt
 def admin_travel_fund_set(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			value = request.POST.get('value')
 			target = request.POST.get('target')
@@ -2840,7 +2840,7 @@ def admin_travel_fund_set(request):
 
 @csrf_exempt
 def admin_car_fund_set(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			value = request.POST.get('value')
 			target = request.POST.get('target')
@@ -2862,7 +2862,7 @@ def admin_car_fund_set(request):
 
 @csrf_exempt
 def admin_house_fund_set(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			value = request.POST.get('value')
 			target = request.POST.get('target')
@@ -2884,7 +2884,7 @@ def admin_house_fund_set(request):
 
 @csrf_exempt
 def admin_directorship_fund_set(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			value = request.POST.get('value')
 			target = request.POST.get('target')
@@ -3336,7 +3336,7 @@ def admin_tds_log_details(request, id):
 
 @csrf_exempt
 def terms(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			title = request.POST.get('title')
 			print(title, 'jkkkkkk')
@@ -3348,17 +3348,17 @@ def terms(request):
 				content=content
 			)
 		dic = {
-			'data':termsandcondition.objects.all(),
+			
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/terms-condition.html',dic)
+		return render(request, 'admin_app/pages/terms-condition.html',dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 @csrf_exempt
 def privacy(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			title = request.POST.get('title')
 			content = request.POST.get('content')
@@ -3368,51 +3368,80 @@ def privacy(request):
 				content=content
 			)
 		dic = {
-			'data':privacypolicy.objects.all(),
+		
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/privacy.html',dic)
+		return render(request, 'admin_app/pages/privacy.html',dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
-
 @csrf_exempt
 def contact(request):
-	if check_user_authentication(request,'Admin'):
-		if request.method == 'POST':
-			address= request.POST.get('address')
-			contact_no= request.POST.get('phone')
-			gmail_id= request.POST.get('gmail')
-			facbook_id= request.POST.get('fb')
-			instagram_id= request.POST.get('insta')
-			twitter_id= request.POST.get('twitter')
-			linkedin_id= request.POST.get('linkedin')
-			contact_us.objects.all().delete()
-			contact_us.objects.create(
-				address=address,
-				contact_no=contact_no,
-				gmail_id=gmail_id,
-				facbook_id=facbook_id,
-				instagram_id=instagram_id,
-				twitter_id=twitter_id,
-				linkedin_id=linkedin_id,
-			)
-			print(contact_us)
+	if check_user_authentication(request,'ADMIN'):
+		if len(CompanyContactUs.objects.all()) == 0 :
+			companycontactusobj=CompanyContactUs()
+			companycontactusobj.updatedby= request.user
+			companycontactusobj.save()
 		dic = {
-			'data':contact_us.objects.all(),
+		    'data':CompanyContactUs.objects.filter().first(),
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		dic.update(get_cart_len(request))
 		dic.update(get_wishlist_len(request))
-		return render(request, 'admin_app/contact.html',dic)
+		return render(request, 'admin_app/pages/contact.html',dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def contact_update(request):
+	if check_user_authentication(request,'ADMIN'):
+		if len(CompanyContactUs.objects.all()) == 0 :
+			companycontactusobj=CompanyContactUs()
+			companycontactusobj.updatedby= request.user
+			companycontactusobj.save()
+   
+		if request.method == 'POST':
+			address= request.POST.get('address')
+			mobile= request.POST.get('mobile')
+			email= request.POST.get('email')
+			whatsapp= request.POST.get('whatsapp')  
+			facbook= request.POST.get('facbook')
+			instagram= request.POST.get('instagram')
+			twitter= request.POST.get('twitter')
+			linkedin= request.POST.get('linkedin')
+			
+			
+			companycontactusobj=CompanyContactUs.objects.filter().first()
+			if address:
+				companycontactusobj.address =address
+			if mobile:			
+				companycontactusobj.mobile = mobile
+			if email:			
+				companycontactusobj.email = email
+			if whatsapp :
+				companycontactusobj.whatsapp=whatsapp
+			if facbook:			
+				companycontactusobj.facbook = facbook
+			if instagram:			
+				companycontactusobj.instagram= instagram
+			if twitter:			
+				companycontactusobj.twitter = twitter
+			if linkedin:			
+				companycontactusobj.linkedin = linkedin
+			companycontactusobj.updatedby= request.user
+			companycontactusobj.save()
+			messages.success(request,"Contact Deatils has been updated successfully !")
+		
+		return redirect('/admins/contact')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 @csrf_exempt
 def admin_about_us(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			# form = AboutForm(request.POST)
 			title = request.POST.get('title')
@@ -3432,13 +3461,13 @@ def admin_about_us(request):
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/about-us.html',dic)
+		return render(request, 'admin_app/pages/about-us.html',dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 @csrf_exempt
 def admin_gallery(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			title = request.POST.get('title')
 			image = request.FILES.getlist('pict')
@@ -3456,13 +3485,13 @@ def admin_gallery(request):
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/gallery.html',dic)
+		return render(request, 'admin_app/pages/gallery.html',dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 @csrf_exempt
 def admin_blog(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			title = request.POST.get('title')
 			content = request.POST.get('content')
@@ -3479,14 +3508,14 @@ def admin_blog(request):
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/blog.html',dic)
+		return render(request, 'admin_app/pages/blog.html',dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 
 @csrf_exempt
 def admin_banner(request):
-	if check_user_authentication(request,'Admin'):
+	if check_user_authentication(request,'ADMIN'):
 		if request.method == 'POST':
 			title = request.POST.get('title')
 			print(title)
@@ -3509,7 +3538,7 @@ def admin_banner(request):
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/banner.html',dic)
+		return render(request, 'admin_app/pages/banner.html',dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 

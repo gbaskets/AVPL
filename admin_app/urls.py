@@ -162,6 +162,7 @@ urlpatterns = [
     path('tds_log/', admin_tds_withdraw),
     path('tds_log_details/<int:id>',admin_tds_log_details, name='tds_log_details'),
     path('contact', contact),
+    path('contact-update', contact_update),
     path('terms', terms),
     path('privacy', privacy),
     path('about-us', admin_about_us),

@@ -1,6 +1,7 @@
 import re
 from django.shortcuts import render
 from inventory_app.models import *
+from mlm_app.models import UserLinkType
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -456,11 +457,20 @@ def search_result(request):
     return render(request, 'main_app/search.html', dic)
 
 def search_result2(request):
-    d = datetime.datetime.now()
-    latest_product = []
-    for latest in ProductImages.objects.filter(product__isactive=True):
-        if latest.product.created_at.strftime("%m") == d.strftime("%m"):
-            latest_product.append(latest)
+    import datetime
+
+    # Get the current month
+    current_month = datetime.datetime.now().strftime("%m")
+
+    # Fetch products created in the current month
+    latest_product = Product.objects.filter(isactive=True,createdat__month=current_month)
+    # If you also need to filter by year, you can add this:
+    current_year = datetime.datetime.now().strftime("%Y")
+    latest_product = latest_product.filter(createdat__year=current_year)
+    
+    special_offer = Product.objects.filter(isactive=True,isspecialoffer=True)
+    footer_banner = HomeFooterBanner.objects.all()
+    categories = ProductCategory.objects.all()
 
     brand_list = Brand.objects.all()
     if request.method == 'POST':
@@ -476,7 +486,7 @@ def search_result2(request):
             results = []
             if min_price and max_price and in_stock==True and rate:
                 for product in getresult(key, category, brand, min_price, max_price, in_stock, rate):
-                    results.append(get_product_thumb(product))
+                    results.append((product))
             else:
                 for product in getresult(key, category,brand, min_price, max_price, in_stock, rate):
                     results.append(get_product_thumb(product))
@@ -592,70 +602,31 @@ def home(request):
         request.session['lng'] = None
         request.session['cat'] = None
 
-        # l1 = []
-        # d = datetime.datetime.now()
-        # latest_product = []
-        # for latest in ProductImages.objects.filter(product__isactive=True):
-        # 	if latest.product.created_at.strftime("%m") == d.strftime("%m"):
-        # 		latest_product.append(latest)
-        # for x in ProductCategory.objects.all():
-        # 	l1.append(x)
-        # for x in l1:
-        # 	if Product.objects.filter(category__name=x.name, isactive=True):
-        # 		prod1 = Product.objects.filter(category__name=x.name)
-        # eeprod = ProductImages.objects.filter(product__category__name='Electric & Electronics',product__isactive=True)
-        # hcprod = ProductImages.objects.filter(product__category__name="Heath care",product__isactive=True)
-        # # for i in ProductCategory.objects.all():
-        # 	for j in Product.objects.filter(category__name=i.name).values():
-        # 		l1.append({i:j})
-        # product = Product.objects.filter(isactive=True)
-        # contact = contact_us.objects.all()[0]
-        # pv_percent = PointValue.objects.get(category=product.category).percentage
-        # pv = (product.price/100)*pv_percent
-        # bestseller = StoreImages.objects.filter(store__best_seller = True)
-        # featured = ProductImages.objects.filter(product__featured = True,product__isactive=True)
-        # offer = ProductImages.objects.filter(product__offer = True,product__isactive=True)
-        # special_offer = ProductImages.objects.filter(product__special_offer = True,product__isactive=True)
-        # footer_banner = HomeFooterBanner.objects.all()
-        # categories = ProductCategory.objects.all()
-        # if request.session.get('store_ids'):
-            # store_objs=Store.objects.get(vendor__id__in=request.session.get('store_ids'))
-            # store_id = store_objs.id
-            # store_img = StoreImages.objects.get(store__vendor__id__in=request.session.get('store_ids'))
-            # # del request.session.get('store_ids')
-            
-            # img_list = []
-            # dic = get_dic(request)
-            # for i in product:
-            # 	x=ProductImages.objects.filter(product=i,product__isactive=True)
-            # 	img_list.append(x)
-            # dic.update({'image':img_list})
-            # dic.update({'banners':HomeBanner.objects.all(), 'footer_banner':footer_banner,  'bestseller':bestseller, 'store':store_objs, 'store_img':store_img,
-            # 	'offer':offer,'featured':featured, 'special_offer':special_offer, 'categories':categories, 'l1':l1,'product':product,
-            # 	'eeprod':eeprod, 'hcprod':hcprod, 'latest':latest_product, 'contact_us':contact})
-            # # dic.update({'banners':HomeBanner.objects.all(), 'product':ProductRating.objects.all(), 'bestseller':bestseller, 'img':ProductImages.objects.all() , 'stores':fetch_vendors(request.session['lat'], 
-            # 		request.session['lng']),'st':fetch_vendors_catby(request.session['cat'],request.session['lat'], request.session['lng']),
-            # 		'store':store_objs, 'store_img':store_img})
-        
+        import datetime
 
+        # Get the current month
+        current_month = datetime.datetime.now().strftime("%m")
 
-        # 	return render(request,'usertemplate/index.html',dic)
-        # else:
-        # 	dic = get_dic(request)
-            # img_list = []
-            # for i in product:
-            # 	x=ProductImages.objects.filter(product=i)
-            # 	img_list.append(x)
-            # dic.update({'image':img_list})
-            # dic.update({'banners':HomeBanner.objects.all(), 'footer_banner':footer_banner,'bestseller':bestseller,'offer':offer,'featured':featured, 'special_offer':special_offer
-            # 	, 'categories':categories, 'l1':l1, 'eeprod':eeprod, 'hcprod':hcprod , 'product':product,'latest':latest_product,
-             # 	'contact_us':contact })
-            # # dic.update({'banners':HomeBanner.objects.all(), 'product':ProductRating.objects.all(),'img':ProductImages.objects.all() ,'bestseller':bestseller, 'stores':fetch_vendors(request.session['lat'], 
-            # # 		request.session['lng']),'st':fetch_vendors_catby(request.session['cat'],request.session['lat'], request.session['lng'])})
-            # return render(request,'usertemplate/index.html',dic)
-        dic={
-            
-        }
+        # Fetch products created in the current month
+        latest_product = Product.objects.filter(isactive=True,createdat__month=current_month)
+        # If you also need to filter by year, you can add this:
+        current_year = datetime.datetime.now().strftime("%Y")
+        latest_product = latest_product.filter(createdat__year=current_year)
+       
+        special_offer = Product.objects.filter(isactive=True,isspecialoffer=True)
+        footer_banner = HomeFooterBanner.objects.all()
+        categories = ProductCategory.objects.all()
+        if request.session.get('store_ids'):
+            storeobjs=Store.objects.get(id__in=request.session.get('store_ids'))
+        else:
+            storeobjs=None
+         
+        dic={'banners':HomeBanner.objects.all(), 'footer_banner':footer_banner, 
+            'storeobjs':storeobjs,'special_offer':special_offer, 'categories':categories, 
+            'latest':latest_product, 'contact_us':contact,
+            'stores':fetch_vendors(request.session['lat'], request.session['lng']),
+            'st':fetch_vendors_catby(request.session['cat'],request.session['lat'], request.session['lng']),
+            		}
         return render(request,'usertemplate/index.html',dic)
 
 

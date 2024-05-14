@@ -204,6 +204,7 @@ class Product(models.Model):
     isproductrejected=models.BooleanField(default=False,null=True,blank=True)
     reasonforproductrejected=models.TextField(null=True,blank=True)
     isactive = models.BooleanField(default=False)
+    isspecialoffer = models.BooleanField(default=False)
     createdat = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)

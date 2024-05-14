@@ -1,6 +1,7 @@
 from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
+from inventory_app.models import Product, ProductImages
 from xhtml2pdf import pisa
 from django.db.models import *
 from django.contrib.auth.models import User
@@ -147,7 +148,7 @@ def getproduct_bylocation(lat, lng):
 	for v in vendors:
 		vendor = v['store']
 		if Store.objects.filter(vendor=vendor).exists():
-			for product in Product.objects.filter(store=vendor.store, is_active=True):
+			for product in Product.objects.filter(store=vendor.store, isactive=True):
 				products.append(product)
 	return products
 
@@ -305,29 +306,29 @@ def save_pv_transaction(user, product, subtotal, plan):
 	UserData.objects.filter(user=user).update(pv=total_pv)
 
 def getresult(key, category, brand, min_price, max_price, in_stock, rate):
-	if Product.objects.filter(is_active = True):
+	if Product.objects.filter(isactive = True):
 		if category != '0' and key =='' and brand is None:
 			print('1')
-			return Product.objects.filter(category__id=category , is_active=True)
+			return Product.objects.filter(category__id=category , isactive=True)
 		if brand and category == '' and key =='' :
 			print('6')
-			return Product.objects.filter(brand__id=brand , is_active=True)
+			return Product.objects.filter(brand__id=brand , isactive=True)
 		elif key and category=='0' and brand is None:
 			print('2')
-			return Product.objects.filter(Q(name__icontains=key) , Q(description__icontains=key),is_active=True)
+			return Product.objects.filter(Q(name__icontains=key) , Q(description__icontains=key),isactive=True)
 		elif category and key:
 			print('3')
-			key_prod = Product.objects.filter(Q(name__icontains=key , is_active=True) )
+			key_prod = Product.objects.filter(Q(name__icontains=key , isactive=True) )
 			cat_prod = key_prod.filter(category__id=category)
 			return cat_prod
 		elif category is None and key is None and brand is None and max_price and min_price and in_stock is None:
 			print('5')
-			return Product.objects.filter(price__range = [min_price,max_price] , is_active=True)
+			return Product.objects.filter(price__range = [min_price,max_price] , isactive=True)
 		elif category is None and key is None and brand is None and max_price and min_price and in_stock:
 			print('8')
 			for i in Product.objects.all():
 				if i.stock >= 1 :
-					return Product.objects.filter(price__range = [min_price,max_price] , is_active=True)
+					return Product.objects.filter(price__range = [min_price,max_price] , isactive=True)
 		elif rate and category is None and key is None and brand is None and max_price is None and min_price is None and in_stock  is None:
 			product = ProductRating.objects.filter(rating = float(rate) ).values().first()
 			if product:
@@ -337,7 +338,7 @@ def getresult(key, category, brand, min_price, max_price, in_stock, rate):
 				return Product.objects.all()
 		else:
 			print('4')
-			return Product.objects.filter(is_active=True)
+			return Product.objects.filter(isactive=True)
 
 
 
@@ -345,7 +346,7 @@ def getresult(key, category, brand, min_price, max_price, in_stock, rate):
 import random
 
 def get_product_thumb(product):
-	dic = {'product':product, 'image':ProductImages.objects.filter(product=product)[0]}
+	dic = {'product':product, 'image':ProductImages.objects.filter(productvariants__product=product)[0]}
 	ratings = ProductRating.objects.filter(product=product)
 	total = 0.0
 	for x in ratings:
