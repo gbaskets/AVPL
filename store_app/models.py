@@ -50,6 +50,7 @@ class Store(models.Model):
 	returnandrefundpolicy = RichTextField(null=True, blank=True)
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)
+	isbestseller = models.BooleanField(default=False)
 	isactive = models.BooleanField(default=True)
 
 	def __str__(self):

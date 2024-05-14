@@ -366,8 +366,9 @@
                             </div>
                         </div>
                         <div class="mb-4">
-                            <a href="/productdetail/?p={{i.product.id}}" class="d-block text-center"><img class="img-fluid"
-                                    src="{{i.image.url}}" alt="Image Description" height="250px" width="250px"></a>
+                            <a href="/productdetail/?p={{i.product.id}}" class="d-block text-center"><img
+                                    class="img-fluid" src="{{i.image.url}}" alt="Image Description" height="250px"
+                                    width="250px"></a>
                         </div>
                         <h5 class="mb-2 font-size-14 text-center mx-auto max-width-180 text-lh-18"><a
                                 href="/productdetail/?p={{i.product.id}}"
@@ -754,60 +755,42 @@
 <div class="container">
     <!-- Prodcut-cards-carousel -->
     <div class="space-top-2">
-        <dv class=" d-flex justify-content-between border-bottom border-color-1 flex-md-nowrap flex-wrap border-sm-bottom-0">
-            <h3 class="section-title mb-0 pb-2 font-size-22">Best Stores</h3><a href="/stores">View All Stores</a> 
+        <dv
+            class=" d-flex justify-content-between border-bottom border-color-1 flex-md-nowrap flex-wrap border-sm-bottom-0">
+            <h3 class="section-title mb-0 pb-2 font-size-22">Best Stores</h3><a href="/stores">View All Stores</a>
         </dv>
         <div class="js-slick-carousel u-slick u-slick--gutters-2 overflow-hidden u-slick-overflow-visble pt-3 pb-6"
             data-pagi-classes="text-center right-0 bottom-1 left-0 u-slick__pagination u-slick__pagination--long mb-0 z-index-n1 mt-4">
             <div class="js-slide">
-                
+
                 <div class="d-flex">
                     {% for i in bestseller %}
+                    
                     <div class="col-lg-4 col-sm-12 col-12 d-flex flex-column">
-                       
-                        <a href="/store_details/{{i.store.id}}" class="introduce">
 
-                            <img href="/store_details/{{i.store.id}}" style="height: 300px;" width="600px"
-                                height="300px" class="img-fluid " src="{{i.banner.url|safe}}" alt="Image Description">
+                        <a href="/store_details/{{i.id}}" class="introduce">
+
+                            <img href="/store_details/{{i.id}}" style="height: 300px;"
+                                width="600px" height="300px" class="img-fluid "
+                                src="{{i.banner.url|safe}}" alt="Image Description">
 
                             <div class="new-stars-main add">
-                                <div class="stars"><i class="fa fa-star "></i><i class="fa fa-star "></i><i
-                                        class="fa fa-star "></i><i class="fa fa-star "></i><i class="fa fa-star "></i>
+                                <div class="stars"><i class="fa fa-star "></i><i
+                                        class="fa fa-star "></i><i class="fa fa-star "></i><i
+                                        class="fa fa-star "></i><i class="fa fa-star "></i>
                                 </div>
-                                <div class="rating-number"></div>
+                                <div class="rating-number">5</div>
                             </div>
                             <div class="flex-column-1 ">
 
                                 <h4 href="/store_details/{{i.store.id}}"
                                     style="font-weight: 600; color: #231900; font-family: Montserrat;padding-left: 20px; padding-top: 15px; font-size: 22px;">
-                                    {{i.store.name}}</h4>
-                                <div class="row" style="margin-bottom:15px">
-                                    <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes"
-                                            style="border-radius: 5px; margin-left: 20px; padding-top: 5px; padding-bottom: 5px;font-weight: 600; padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                    </div>
-                                    <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes"
-                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px; margin-left:7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                    </div>
-                                    <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes"
-                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left:-7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                    </div>
-                                    <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes"
-                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px; margin-left: -20px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                    </div>
-                                </div>
+                                    {{i.storename}}</h4>
+                                
                                 <div class="row">
-                                    <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes"
-                                            style="border-radius: 5px; margin-left: 20px;padding-top: 5px; padding-bottom: 5px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                    </div>
-                                    <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes"
-                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left:7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                    </div>
-                                    <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes"
-                                            style="border-radius: 5px; padding-top: 5px; padding-bottom: 5px;margin-left:-7px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                    </div>
-                                    <div class="col-3 padding"><a href="#" class="btn btn-light" title="Shakes"
-                                            style="border-radius: 5px;padding-top: 5px; padding-bottom: 5px;margin-left: -20px;font-weight: 600;padding-right: 7px; padding-left: 7px;">Shakes</a>
-                                    </div>
+                                    <div style="border-radius: 5px; margin-left: 20px;padding-top: 5px; padding-bottom: 5px;font-weight: 600;">{{i.description}}</a></div>
+                                  
+                                   
                                 </div>
 
                                 <hr>
@@ -815,14 +798,16 @@
 
                             <div class="row div">
                                 <div class="col-md-4">
-                                    <img href="/store_details/{{store.id}}" class="img-fluid" src="{{i.logo.url|safe}}"
-                                        alt="Image Description">
+                                    <img href="/store_details/{{i.id}}" class="img-fluid"
+                                        src="{{i.logo.url|safe}}" alt="Image Description">
                                 </div>
                                 <div class="col-md-8">
                                     <p style="color: #000; font-size: 16px; font-weight: 600;"><i
-                                            class="ec ec-map-pointer mr-1"></i>{{i.store.opening_time}} -
-                                        {{i.store.closing_time}}<br><i class="ec ec-map-pointer mr-1"></i>
-                                        {{i.store.vendor.address}}</p>
+                                            class="ec ec-map-pointer mr-1"></i>{{i.openingtime}}
+                                        -
+                                        {{i.closingtime}}<br><i
+                                            class="ec ec-map-pointer mr-1"></i>
+                                        {{i.streetaddress}}</p>
 
                                 </div>
 
@@ -830,20 +815,20 @@
                             </div>
 
                         </a>
-                       
+
                     </div>
                     {% endfor %}
                 </div>
-            
-               
-            </div> 
+
+
+            </div>
         </div>
 
 
-        
-    
 
-            <!-- <div class="js-slide">
+
+
+        <!-- <div class="js-slide">
                             <ul class="row list-unstyled products-group no-gutters mb-0 overflow-visible">
                                 {% for i in best_seller2%}
                                 <li class="col-wd-3 col-md-4 product-item product-item__card pb-2 mb-2 pb-md-0 mb-md-0 border-bottom border-md-bottom-0">
@@ -941,14 +926,14 @@
                         </div>
                     </div>
                 </div> -->
-            <!-- End Prodcut-cards-carousel -->
+        <!-- End Prodcut-cards-carousel -->
 
 
-            
-            <!-- Full banner -->
 
-            <!-- End Full banner -->
-            <!-- <div class="mb-8">
+        <!-- Full banner -->
+
+        <!-- End Full banner -->
+        <!-- <div class="mb-8">
                         <div class="row">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <a >
@@ -963,20 +948,20 @@
                         </div>
                     </div> -->
 
-            <!-- Recently viewed -->
-            {% for i,j in d.items %}
-            <div class="mb-6">
-                <div class="position-relative">
-                    <div class="border-bottom border-color-1 mb-2">
-                        <h3 class="section-title mb-0 pb-2 font-size-22">{{i}}</h3>
-                    </div>
+        <!-- Recently viewed -->
+        {% for i,j in d.items %}
+        <div class="mb-6">
+            <div class="position-relative">
+                <div class="border-bottom border-color-1 mb-2">
+                    <h3 class="section-title mb-0 pb-2 font-size-22">{{i}}</h3>
+                </div>
 
-                    <div class="js-slick-carousel u-slick position-static overflow-hidden u-slick-overflow-visble pb-7 pt-2 px-1"
-                        data-pagi-classes="text-center right-0 bottom-1 left-0 u-slick__pagination u-slick__pagination--long mb-0 z-index-n1 mt-3 mt-md-0"
-                        data-slides-show="7" data-slides-scroll="1"
-                        data-arrows-classes="position-absolute top-0 font-size-17 u-slick__arrow-normal top-10"
-                        data-arrow-left-classes="fa fa-angle-left right-1"
-                        data-arrow-right-classes="fa fa-angle-right right-0" data-responsive='[{
+                <div class="js-slick-carousel u-slick position-static overflow-hidden u-slick-overflow-visble pb-7 pt-2 px-1"
+                    data-pagi-classes="text-center right-0 bottom-1 left-0 u-slick__pagination u-slick__pagination--long mb-0 z-index-n1 mt-3 mt-md-0"
+                    data-slides-show="7" data-slides-scroll="1"
+                    data-arrows-classes="position-absolute top-0 font-size-17 u-slick__arrow-normal top-10"
+                    data-arrow-left-classes="fa fa-angle-left right-1"
+                    data-arrow-right-classes="fa fa-angle-right right-0" data-responsive='[{
                               "breakpoint": 1400,
                              
                               "settings": {
@@ -1017,73 +1002,72 @@
                             }]'>
 
 
-                        {% for x in j%}
-                        <div class="js-slide products-group">
-                            <div class="product-item">
-                                <div class="product-item__outer h-100">
-                                    <div class="product-item__inner px-wd-4 p-2">
-                                        <div class="product-item__body pb-xl-2">
-                                            <div class="mb-2"><a href="/collection/{{x.id}}"
-                                                    class="font-size-12 text-gray-5">{{x.main_category.category}}</a>
-                                            </div>
-                                            <h5 class="mb-1 product-item__title"><a href="/single_product/{{x.id}}"
-                                                    class="text-blue font-weight-bold">{{x.title}}</a></h5>
-                                            <div class="mb-2">
-                                                <a href="/single_product/{{x.id}}" class="d-block text-center"><img
-                                                        class="img-fluid" src="/{{x.image}}"
-                                                        alt="Image Description"></a>
-                                            </div>
-                                            <div class="flex-center-between mb-1">
-                                                {%if request.user.is_retailer%}
-                                                <div class="prodcut-price">
-                                                    <div class="text-gray-100">
-                                                        ₹{{x.amount_to_pay_retailer|floatformat:2}}</div>
-                                                </div>
-                                                {%else%}
-                                                <div class="prodcut-price">
-                                                    <div class="text-gray-100">₹{{x.amount_to_pay|floatformat:2}}</div>
-                                                </div>
-                                                {%endif%}
-                                                {% if request.session.store_id%}
-                                                <div class="d-none d-xl-block prodcut-add-cart">
-                                                    <a href="/add_to_cart/{{x.id}}/"
-                                                        class="btn-add-cart btn-primary transition-3d-hover"><i
-                                                            class="ec ec-add-to-cart"></i></a>
-                                                </div>
-
-
-
-                                                {%endif%}
-                                            </div>
+                    {% for x in j%}
+                    <div class="js-slide products-group">
+                        <div class="product-item">
+                            <div class="product-item__outer h-100">
+                                <div class="product-item__inner px-wd-4 p-2">
+                                    <div class="product-item__body pb-xl-2">
+                                        <div class="mb-2"><a href="/collection/{{x.id}}"
+                                                class="font-size-12 text-gray-5">{{x.main_category.category}}</a>
                                         </div>
-                                        <div class="product-item__footer">
-                                            <div class="border-top pt-2 flex-center-between flex-wrap">
-
-                                                {% if request.session.store_id%}
-                                                <a href="/addtowish/{{x.id}}" class="text-gray-6 font-size-13"><i
-                                                        class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
-                                                {%else%}
-
-                                                <a href="/buysingle/{{x.id}}" class="text-gray-6 font-size-13"><i
-                                                        class="ec ec-compare mr-1 font-size-15"></i> Buy Now</a>
-                                                {%endif%}
+                                        <h5 class="mb-1 product-item__title"><a href="/single_product/{{x.id}}"
+                                                class="text-blue font-weight-bold">{{x.title}}</a></h5>
+                                        <div class="mb-2">
+                                            <a href="/single_product/{{x.id}}" class="d-block text-center"><img
+                                                    class="img-fluid" src="/{{x.image}}" alt="Image Description"></a>
+                                        </div>
+                                        <div class="flex-center-between mb-1">
+                                            {%if request.user.is_retailer%}
+                                            <div class="prodcut-price">
+                                                <div class="text-gray-100">
+                                                    ₹{{x.amount_to_pay_retailer|floatformat:2}}</div>
                                             </div>
+                                            {%else%}
+                                            <div class="prodcut-price">
+                                                <div class="text-gray-100">₹{{x.amount_to_pay|floatformat:2}}</div>
+                                            </div>
+                                            {%endif%}
+                                            {% if request.session.store_id%}
+                                            <div class="d-none d-xl-block prodcut-add-cart">
+                                                <a href="/add_to_cart/{{x.id}}/"
+                                                    class="btn-add-cart btn-primary transition-3d-hover"><i
+                                                        class="ec ec-add-to-cart"></i></a>
+                                            </div>
+
+
+
+                                            {%endif%}
+                                        </div>
+                                    </div>
+                                    <div class="product-item__footer">
+                                        <div class="border-top pt-2 flex-center-between flex-wrap">
+
+                                            {% if request.session.store_id%}
+                                            <a href="/addtowish/{{x.id}}" class="text-gray-6 font-size-13"><i
+                                                    class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+                                            {%else%}
+
+                                            <a href="/buysingle/{{x.id}}" class="text-gray-6 font-size-13"><i
+                                                    class="ec ec-compare mr-1 font-size-15"></i> Buy Now</a>
+                                            {%endif%}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        {%endfor%}
                     </div>
-
+                    {%endfor%}
                 </div>
-
 
             </div>
 
-            {%endfor%}
 
-            <!-- <div class="mb-6">
+        </div>
+
+        {%endfor%}
+
+        <!-- <div class="mb-6">
                     <a  class="d-block text-gray-90">
                         <div class="" >
                             <div class="space-top-2-md">
@@ -1105,12 +1089,12 @@
 
 
 
-            <!-- End Recently viewed -->
+        <!-- End Recently viewed -->
 
 
-            <!-- End Recently viewed -->
-            <!-- Brand Carousel -->
-            <!-- <div class="mb-8">
+        <!-- End Recently viewed -->
+        <!-- Brand Carousel -->
+        <!-- <div class="mb-8">
                     <div class="py-2 border-top border-bottom">
                         <div class="js-slick-carousel u-slick my-1"
                             data-slides-show="5"
@@ -1167,24 +1151,24 @@
                         </div>
                     </div>
                 </div> -->
-            <!-- End Brand Carousel -->
-        </div>
+        <!-- End Brand Carousel -->
+    </div>
 
 
 
 
-        <!--Store and products-->
-        <div class="mb-6">
-            <div class="position-relative">
-                <div class="border-bottom border-color-1 mb-2">
-                    <h3 class="section-title mb-0 pb-2 font-size-22">Our Products</h3>
-                </div>
-                <div class="js-slick-carousel u-slick position-static overflow-hidden u-slick-overflow-visble pb-7 pt-2 px-1"
-                    data-pagi-classes="text-center right-0 bottom-1 left-0 u-slick__pagination u-slick__pagination--long mb-0 z-index-n1 mt-3 mt-md-0"
-                    data-slides-show="7" data-slides-scroll="1"
-                    data-arrows-classes="position-absolute top-0 font-size-17 u-slick__arrow-normal top-10"
-                    data-arrow-left-classes="fa fa-angle-left right-1"
-                    data-arrow-right-classes="fa fa-angle-right right-0" data-responsive='[{
+    <!--Store and products-->
+    <div class="mb-6">
+        <div class="position-relative">
+            <div class="border-bottom border-color-1 mb-2">
+                <h3 class="section-title mb-0 pb-2 font-size-22">Our Products</h3>
+            </div>
+            <div class="js-slick-carousel u-slick position-static overflow-hidden u-slick-overflow-visble pb-7 pt-2 px-1"
+                data-pagi-classes="text-center right-0 bottom-1 left-0 u-slick__pagination u-slick__pagination--long mb-0 z-index-n1 mt-3 mt-md-0"
+                data-slides-show="7" data-slides-scroll="1"
+                data-arrows-classes="position-absolute top-0 font-size-17 u-slick__arrow-normal top-10"
+                data-arrow-left-classes="fa fa-angle-left right-1" data-arrow-right-classes="fa fa-angle-right right-0"
+                data-responsive='[{
                       "breakpoint": 1400,
                       "settings": {
                         "slidesToShow": 6
@@ -1211,84 +1195,83 @@
                       }
                     }]'>
 
-                    {% for i in product %}
-                    <div class="js-slide products-group">
+                {% for i in product %}
+                <div class="js-slide products-group">
 
-                        <div class="product-item">
+                    <div class="product-item">
 
-                            <div style="border-radius: 0rem;" class="product-item__outer h-100">
+                        <div style="border-radius: 0rem;" class="product-item__outer h-100">
 
-                                <div style="border-radius: 0rem;" class="product-item__inner px-wd-4 p-2 p-md-3">
+                            <div style="border-radius: 0rem;" class="product-item__inner px-wd-4 p-2 p-md-3">
 
-                                    <div class="product-item__body pb-xl-2">
-                                        <div class="mb-2"><a href="/search2/?key=&category={{i.category.id}}"
-                                                class="font-size-12 text-gray-5">{{i.category.name}}</a></div>
-                                        <div class="mb-2"><a href="/search2/?key=&category={{i.category.id}}"
-                                                class="font-size-12 text-gray-5">Store : {{i.store.name}}</a></div>
-                                        <h5 class="mb-1 product-item__title"><a href="/productdetail/?p={{i.id}}"
-                                                class="text-blue font-weight-bold">{{ i.name }}</a></h5>
-                                        <div class="mb-2">
-                                            {% for j in image %}
-                                            {% for y in j%}
-                                            {% if y.product.id == i.id %}
-                                            {% if forloop.counter == 1 %}
-                                            <a href="/productdetail/?p={{i.id}}" class="d-block text-center"><img
-                                                    class="img-fluid" src="{{y.image.url}} "
-                                                    alt="Image Description"></a>
-                                            {%endif%}
-                                            {%endif%}
-                                            {%endfor%}
-                                            {%endfor%}
-                                        </div>
-                                        <div class="flex-center-between mb-1 cart_product">
-                                            <div class="prodcut-price">
-                                                <div class="text-gray-100">₹{{ i.price}}</div>
-                                            </div>
-                                            <div class="d-none d-xl-block prodcut-add-cart ">
-
-
-
-                                                <input hidden type="number" name="ec_qtybtn" value="1" id="quantity" />
-                                                <input type="hidden" value="{{i.id|safe}}" class="product_cart">
-                                                <button type="button"
-                                                    class="button-input btn-add-cart btn-primary transition-3d-hover"><i
-                                                        class="ec ec-add-to-cart"></i></button>
-
-                                            </div>
-                                        </div>
+                                <div class="product-item__body pb-xl-2">
+                                    <div class="mb-2"><a href="/search2/?key=&category={{i.category.id}}"
+                                            class="font-size-12 text-gray-5">{{i.category.name}}</a></div>
+                                    <div class="mb-2"><a href="/search2/?key=&category={{i.category.id}}"
+                                            class="font-size-12 text-gray-5">Store : {{i.store.name}}</a></div>
+                                    <h5 class="mb-1 product-item__title"><a href="/productdetail/?p={{i.id}}"
+                                            class="text-blue font-weight-bold">{{ i.name }}</a></h5>
+                                    <div class="mb-2">
+                                        {% for j in image %}
+                                        {% for y in j%}
+                                        {% if y.product.id == i.id %}
+                                        {% if forloop.counter == 1 %}
+                                        <a href="/productdetail/?p={{i.id}}" class="d-block text-center"><img
+                                                class="img-fluid" src="{{y.image.url}} " alt="Image Description"></a>
+                                        {%endif%}
+                                        {%endif%}
+                                        {%endfor%}
+                                        {%endfor%}
                                     </div>
+                                    <div class="flex-center-between mb-1 cart_product">
+                                        <div class="prodcut-price">
+                                            <div class="text-gray-100">₹{{ i.price}}</div>
+                                        </div>
+                                        <div class="d-none d-xl-block prodcut-add-cart ">
 
-                                    <div class="product-item__footer">
-                                        <div class="border-top pt-2 flex-center-between flex-wrap">
-                                            <a href="" class="text-gray-6 font-size-13"><i
-                                                    class="ec ec-compare mr-1 font-size-15"></i> Compare</a>
-                                            <a href="" class="text-gray-6 font-size-13"><i
-                                                    class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+
+
+                                            <input hidden type="number" name="ec_qtybtn" value="1" id="quantity" />
+                                            <input type="hidden" value="{{i.id|safe}}" class="product_cart">
+                                            <button type="button"
+                                                class="button-input btn-add-cart btn-primary transition-3d-hover"><i
+                                                    class="ec ec-add-to-cart"></i></button>
+
                                         </div>
                                     </div>
                                 </div>
 
+                                <div class="product-item__footer">
+                                    <div class="border-top pt-2 flex-center-between flex-wrap">
+                                        <a href="" class="text-gray-6 font-size-13"><i
+                                                class="ec ec-compare mr-1 font-size-15"></i> Compare</a>
+                                        <a href="" class="text-gray-6 font-size-13"><i
+                                                class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
 
                     </div>
-                    {% endfor %}
+
                 </div>
+                {% endfor %}
             </div>
         </div>
-        <!--Latest Products -->
-        <div class="mb-6">
-            <div class="position-relative">
-                <div class="border-bottom border-color-1 mb-2">
-                    <h3 class="section-title mb-0 pb-2 font-size-22">Latest Products</h3>
-                </div>
-                <div class="js-slick-carousel u-slick position-static overflow-hidden u-slick-overflow-visble pb-7 pt-2 px-1"
-                    data-pagi-classes="text-center right-0 bottom-1 left-0 u-slick__pagination u-slick__pagination--long mb-0 z-index-n1 mt-3 mt-md-0"
-                    data-slides-show="7" data-slides-scroll="1"
-                    data-arrows-classes="position-absolute top-0 font-size-17 u-slick__arrow-normal top-10"
-                    data-arrow-left-classes="fa fa-angle-left right-1"
-                    data-arrow-right-classes="fa fa-angle-right right-0" data-responsive='[{
+    </div>
+    <!--Latest Products -->
+    <div class="mb-6">
+        <div class="position-relative">
+            <div class="border-bottom border-color-1 mb-2">
+                <h3 class="section-title mb-0 pb-2 font-size-22">Latest Products</h3>
+            </div>
+            <div class="js-slick-carousel u-slick position-static overflow-hidden u-slick-overflow-visble pb-7 pt-2 px-1"
+                data-pagi-classes="text-center right-0 bottom-1 left-0 u-slick__pagination u-slick__pagination--long mb-0 z-index-n1 mt-3 mt-md-0"
+                data-slides-show="7" data-slides-scroll="1"
+                data-arrows-classes="position-absolute top-0 font-size-17 u-slick__arrow-normal top-10"
+                data-arrow-left-classes="fa fa-angle-left right-1" data-arrow-right-classes="fa fa-angle-right right-0"
+                data-responsive='[{
               "breakpoint": 1400,
               "settings": {
                 "slidesToShow": 6
@@ -1315,69 +1298,67 @@
               }
             }]'>
 
-                    {% for i in latest %}
-                    <div class="js-slide products-group">
+                {% for i in latest %}
+                <div class="js-slide products-group">
 
-                        <div class="product-item">
+                    <div class="product-item">
 
-                            <div style="border-radius: 0rem;" class="product-item__outer h-100">
+                        <div style="border-radius: 0rem;" class="product-item__outer h-100">
 
-                                <div style="border-radius: 0rem;" class="product-item__inner px-wd-4 p-2 p-md-3">
+                            <div style="border-radius: 0rem;" class="product-item__inner px-wd-4 p-2 p-md-3">
 
-                                    <div class="product-item__body pb-xl-2">
-                                        <div class="mb-2"><a href="/search2/?key=&category={{i.product.category.id}}"
-                                                class="font-size-12 text-gray-5">{{i.product.category.name}}</a></div>
-                                        <div class="mb-2"><a href="/search2/?key=&category={{i.product.category.id}}"
-                                                class="font-size-12 text-gray-5">Store : {{i.product.store.name}}</a>
-                                        </div>
-                                        <h5 class="mb-1 product-item__title"><a
-                                                href="/productdetail/?p={{i.product.id}}"
-                                                class="text-blue font-weight-bold">{{ i.product.name }}</a></h5>
-                                        <div class="mb-2">
-
-
-                                            <a href="/productdetail/?p={{i.product.id}}"
-                                                class="d-block text-center"><img class="img-fluid"
-                                                    src="{{i.image.url}} " alt="Image Description"></a>
-
-                                        </div>
-                                        <div class="flex-center-between mb-1 cart_product">
-                                            <div class="prodcut-price">
-                                                <div class="text-gray-100">₹{{ i.product.price}}</div>
-                                            </div>
-                                            <div class="d-none d-xl-block prodcut-add-cart">
-
-
-                                                <input hidden type="number" name="ec_qtybtn" value="1" id="quantity" />
-                                                <input type="hidden" value="{{i.product.id|safe}}" class="product_cart">
-                                                <button type="button"
-                                                    class="button-input btn-add-cart btn-primary transition-3d-hover"><i
-                                                        class="ec ec-add-to-cart"></i></button>
-                                            </div>
-                                        </div>
+                                <div class="product-item__body pb-xl-2">
+                                    <div class="mb-2"><a href="/search2/?key=&category={{i.product.category.id}}"
+                                            class="font-size-12 text-gray-5">{{i.product.category.name}}</a></div>
+                                    <div class="mb-2"><a href="/search2/?key=&category={{i.product.category.id}}"
+                                            class="font-size-12 text-gray-5">Store : {{i.product.store.name}}</a>
                                     </div>
+                                    <h5 class="mb-1 product-item__title"><a href="/productdetail/?p={{i.product.id}}"
+                                            class="text-blue font-weight-bold">{{ i.product.name }}</a></h5>
+                                    <div class="mb-2">
 
-                                    <div class="product-item__footer">
-                                        <div class="border-top pt-2 flex-center-between flex-wrap">
-                                            <!-- <a href="" class="text-gray-6 font-size-13"><i class="ec ec-compare mr-1 font-size-15"></i> See Product Details</a> -->
-                                            <a href="" class="text-gray-6 font-size-13"><i
-                                                    class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+
+                                        <a href="/productdetail/?p={{i.product.id}}" class="d-block text-center"><img
+                                                class="img-fluid" src="{{i.image.url}} " alt="Image Description"></a>
+
+                                    </div>
+                                    <div class="flex-center-between mb-1 cart_product">
+                                        <div class="prodcut-price">
+                                            <div class="text-gray-100">₹{{ i.product.price}}</div>
+                                        </div>
+                                        <div class="d-none d-xl-block prodcut-add-cart">
+
+
+                                            <input hidden type="number" name="ec_qtybtn" value="1" id="quantity" />
+                                            <input type="hidden" value="{{i.product.id|safe}}" class="product_cart">
+                                            <button type="button"
+                                                class="button-input btn-add-cart btn-primary transition-3d-hover"><i
+                                                    class="ec ec-add-to-cart"></i></button>
                                         </div>
                                     </div>
                                 </div>
 
+                                <div class="product-item__footer">
+                                    <div class="border-top pt-2 flex-center-between flex-wrap">
+                                        <!-- <a href="" class="text-gray-6 font-size-13"><i class="ec ec-compare mr-1 font-size-15"></i> See Product Details</a> -->
+                                        <a href="" class="text-gray-6 font-size-13"><i
+                                                class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
 
                     </div>
-                    {% endfor %}
+
                 </div>
+                {% endfor %}
             </div>
         </div>
-        <!--End Latest Products -->
-     
     </div>
+    <!--End Latest Products -->
+
+</div>
 </div>
 </div>
 </div>
@@ -1438,7 +1419,7 @@
                         alert(res_data.response)
                         if (res_data.response == 'failed2') {
                             console.log(data, 'KKKKKKKKKK');
-                            
+
                             document.getElementById('added-cart-text').innerHTML = 'You can only add products from same shop';
                         }
                         else {
@@ -1472,50 +1453,50 @@
         flag = '0';
         product_id = document.getElementById('product').value;
         variant_lt = [];
-    //     {% for variant in variants %}
-    //     { { variant.variant.name } } = document.getElementsByName('{{variant.variant.name}}');
-    //     var {{ variant.variant.name }
-    // } _id = 'none';
-    // for (i = 0; i < {{ variant.variant.name }}.length; i++) {
-    //     if ({{ variant.variant.name }
-    // } [i].checked) {
-    //     variant_lt.push({{ variant.variant.name }} [i].value);
-    // break;
-    //         }
-    //     }
-    // {% endfor %}
-    quantity_val = document.getElementById('quantity').value;
-    document.getElementById('added-cart').style.display = 'block';
-    if (flag == '0') {
-        $.ajax({
-            type: 'POST',
-            url: '/user/addtowishlist',
-            data: { product: product_id, variants: variant_lt, quantity: quantity_val },
-            success: function (res_data) {
-                if (res_data.response == 'failed2') {
-                    console.log(data, 'KKKKKKKKKK');
-                    document.getElementById('added-cart-text').innerHTML = 'You can only add products from same shop';
-                }
-                else {
-                    if (res_data.response == 'success') {
-                        document.getElementById('cart_len_tag').innerHTML = res_data.cart_len.cart_len;
-
-                        //await.sleep(2000);
-                        document.getElementById('added-cart').style.display = 'none';
+        //     {% for variant in variants %}
+        //     { { variant.variant.name } } = document.getElementsByName('{{variant.variant.name}}');
+        //     var {{ variant.variant.name }
+        // } _id = 'none';
+        // for (i = 0; i < {{ variant.variant.name }}.length; i++) {
+        //     if ({{ variant.variant.name }
+        // } [i].checked) {
+        //     variant_lt.push({{ variant.variant.name }} [i].value);
+        // break;
+        //         }
+        //     }
+        // {% endfor %}
+        quantity_val = document.getElementById('quantity').value;
+        document.getElementById('added-cart').style.display = 'block';
+        if (flag == '0') {
+            $.ajax({
+                type: 'POST',
+                url: '/user/addtowishlist',
+                data: { product: product_id, variants: variant_lt, quantity: quantity_val },
+                success: function (res_data) {
+                    if (res_data.response == 'failed2') {
+                        console.log(data, 'KKKKKKKKKK');
+                        document.getElementById('added-cart-text').innerHTML = 'You can only add products from same shop';
                     }
                     else {
-                        document.getElementById('added-cart-text').innerHTML = 'Something went wrong, please try again later';
+                        if (res_data.response == 'success') {
+                            document.getElementById('cart_len_tag').innerHTML = res_data.cart_len.cart_len;
+
+                            //await.sleep(2000);
+                            document.getElementById('added-cart').style.display = 'none';
+                        }
+                        else {
+                            document.getElementById('added-cart-text').innerHTML = 'Something went wrong, please try again later';
+                        }
                     }
+                },
+                error: function (res) {
+                    document.getElementById('added-cart-text').innerHTML = 'Something went wrong, please try again later';
                 }
-            },
-            error: function (res) {
-                document.getElementById('added-cart-text').innerHTML = 'Something went wrong, please try again later';
-            }
 
 
-        });
-        location.reload();
-    }
+            });
+            location.reload();
+        }
     }
 </script>
 

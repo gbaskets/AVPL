@@ -422,7 +422,10 @@ def show_parent(request):
 
 def contact(request):
     # dic = get_dic(request)
-    dic={}
+    dic={
+        'contact_us':CompanyContactUs.objects.filter().first(),
+        'categories':ProductCategory.objects.all(),
+    }
 
     return render(request, 'usertemplate/contectus.html', dic)
 
@@ -587,14 +590,14 @@ def home(request):
         
         request.session['parent'] = user.id
         request.session['parent_type'] = 'User'
-        dic = {'name':user.usr.first_name+' '+user.usr.last_name ,'link_type':types.link_type}
+        dic = {'name':user.first_name+' '+user.last_name ,'link_type':types.link_type}
         dic.update(get_dic(request))
         return render(request, 'main_app/user-register.html', dic)
     elif t == 'v':
         types=UserLinkType.objects.filter(links=u).first()
         user = get_user_from_key(request.GET.get('u'),types.link_type)
         request.session['refered_by'] = user.id
-        dic = {'name':user.usr.first_name+' '+user.usr.last_name}
+        dic = {'name':user.first_name+' '+user.last_name}
         dic.update(get_dic(request))
         return render(request, 'main_app/register.html', dic)
     else:
@@ -620,10 +623,11 @@ def home(request):
             storeobjs=Store.objects.get(id__in=request.session.get('store_ids'))
         else:
             storeobjs=None
+        bestseller = Store.objects.filter(isbestseller = True)
          
-        dic={'banners':HomeBanner.objects.all(), 'footer_banner':footer_banner, 
+        dic={'banners':HomeBanner.objects.all(), 'footer_banner':footer_banner,'bestseller' :bestseller,
             'storeobjs':storeobjs,'special_offer':special_offer, 'categories':categories, 
-            'latest':latest_product, 'contact_us':contact,
+            'latest':latest_product, 'contact_us':CompanyContactUs.objects.filter().first(),
             'stores':fetch_vendors(request.session['lat'], request.session['lng']),
             'st':fetch_vendors_catby(request.session['cat'],request.session['lat'], request.session['lng']),
             		}
@@ -637,7 +641,7 @@ def store_page(request):
     for x in Product.objects.filter(store=store)[0:50]:
         products.append(get_product_thumb(x))
     dic = {
-            'store':store,
+            'store':store,'contact_us':CompanyContactUs.objects.filter().first(),
             'distance':get_store_distance(request.session['lat'], request.session['lng'], store.vendor.latitude, store.vendor.longitude),
             'store_categories':get_store_categories(store, request.session['lat'], request.session['lng']),
             'products':reversed(products)
@@ -654,7 +658,7 @@ def all_stores(request):
     dic ={
             
             'store_obj':store_obj,
-            
+            'contact_us':CompanyContactUs.objects.filter().first(),
             
             
     }
@@ -673,6 +677,7 @@ def store_details(request, id):
             # 'image_data':image_data,
             'all_store':all_store,
             'product_num':product_num,
+            'contact_us':CompanyContactUs.objects.filter().first(),
             # 'distance':get_store_distance(home_address)
 
     }
@@ -950,7 +955,8 @@ def product_detail(request):
     dic = {
         'product':product,
         'images':ProductImages.objects.filter(productvariants__product=product),
-        'categories':ProductCategory.objects.all(),
+        'contact_us':CompanyContactUs.objects.filter().first(),
+            'categories':ProductCategory.objects.all(),
     }
    
     return render(request, 'usertemplate/product-detail.html', dic)
@@ -1999,8 +2005,9 @@ def contact_us_save(request):
 
 def termsancondition(request):
     dic = {
+            'contact_us':CompanyContactUs.objects.filter().first(),
             'categories':ProductCategory.objects.all(),
-            'data':termsandcondition.objects.all(),
+         
             'cart_len':get_cart_len(request),
             
             # 'notification':get_notifications(request.user),
@@ -2012,7 +2019,7 @@ def termsancondition(request):
 
 def contactus(request):
     dic = {
-            'data':termsandcondition.objects.all(),
+            'contact_us':CompanyContactUs.objects.filter().first(),
             
             # 'notification':get_notifications(request.user),
             # 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2024,7 +2031,7 @@ def contactus(request):
 
 def privacy_policy(request):
     dic = {
-            'data':privacypolicy.objects.all(),
+            'contact_us':CompanyContactUs.objects.filter().first(),
             'categories':ProductCategory.objects.all(),
     
             # 'notification':get_notifications(request.user),
@@ -2038,6 +2045,7 @@ def about(request):
     dic = {
 
             'data':AboutUs.objects.all(),
+            'contact_us':CompanyContactUs.objects.filter().first(),
             'categories':ProductCategory.objects.all(),
             
             # 'notification':get_notifications(request.user),
@@ -2054,6 +2062,7 @@ def blog(request):
         
         dic = {
             'data':Blog.objects.all(),
+            'contact_us':CompanyContactUs.objects.filter().first(),
             'categories':ProductCategory.objects.all(),
     
             # 'notification':get_notifications(request.user),
@@ -2065,6 +2074,7 @@ def blog(request):
     else:
         dic = {
             'data':Blog.objects.all(),
+            'contact_us':CompanyContactUs.objects.filter().first(),
             'categories':ProductCategory.objects.all(),
         
             
@@ -2077,7 +2087,8 @@ def gallery_data(request):
     if User.objects.filter(username=request.user).exists():
         dic = {
                 'data':Gallery.objects.all(),
-                'categories':ProductCategory.objects.all(),
+                'contact_us':CompanyContactUs.objects.filter().first(),
+            'categories':ProductCategory.objects.all(),
             
                 'notification':get_notifications(request.user),
                 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2088,7 +2099,8 @@ def gallery_data(request):
     else:
         dic = {
                 'data':Gallery.objects.all(),
-                'categories':ProductCategory.objects.all(),
+                'contact_us':CompanyContactUs.objects.filter().first(),
+            'categories':ProductCategory.objects.all(),
         
             }
         dic.update(get_cart_len(request))
