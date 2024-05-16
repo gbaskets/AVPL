@@ -953,10 +953,10 @@ def product_page(request):
 
 
 def product_detail(request):
-    product = Product.objects.get(id=request.GET.get('p'))    
+    productvarint = ProductVariants.objects.get(id=request.GET.get('p'))    
     dic = {
-        'product':product,
-        'images':ProductImages.objects.filter(productvariants__product=product),
+        'productvarint':productvarint,
+        'images':ProductImages.objects.filter(productvariants=productvarint),
         'contact_us':CompanyContactUs.objects.filter().first(),
             'categories':ProductCategory.objects.all(),
     }

@@ -26,11 +26,11 @@
                     <ol class="breadcrumb mb-3 flex-nowrap flex-xl-wrap overflow-auto overflow-xl-visble">
                         <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1"><a href="/">Home</a></li>
                         <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1"><a
-                                href="/search2/?key=&category={{product.category.id}}">{{product.category.name}}</a>
+                                href="/search2/?key=&category={{productvarint.product.category.id}}">{{productvarint.product.category.name}}</a>
                         </li>
 
                         <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1 active" aria-current="page">
-                            {{product.name|safe }}</li>
+                            {{productvarint.productvariantname|safe }}</li>
                     </ol>
                 </nav>
             </div>
@@ -52,17 +52,15 @@
 
                                 <div class="mb-4 mb-md-0">
                                     <div class="row align-items-center justify-content-center">
-                                        {% for i in images %}
-                                        {% if forloop.counter == 1 %}   
+                                       
                                         <div class="col-sm-12 col-md-12">
                                             <a class="d-block text-center" href="javascript:;"
-                                                data-src="{{ request.scheme }}://{{ request.META.HTTP_HOST }}//{{ i.image.url }}"
+                                                data-src="{{ productvarint.productimage.url }}"
                                                 data-fancybox="fancyboxGallery6" data-speed="700"
                                                 data-is-infinite="true"><img style="height: 250px; width:300px;" class="img-fluid mx-auto"
-                                                    src="{{ i.image.url }}" alt="Image Description"></a>
+                                                    src="{{ productvarint.productimage.url }}" alt="Image Description"></a>
                                         </div>
-                                        {% endif %}
-                                        {% endfor%}
+                                       
                                         <div class="col-sm-12 col-md-12 justify-content-center">
                                             <ul class="list-group rounded-0 align-items-center justify-content-center"
                                                 style="flex-direction: row;">
@@ -71,7 +69,7 @@
                                                     <!-- Gallery -->
                                                     <a class="js-fancybox max-width-70 u-media-viewer"
                                                         href="javascript:;"
-                                                        data-src="{{ request.scheme }}://{{ request.META.HTTP_HOST }}//{{ i.image.url }}"
+                                                        data-src="{{ i.image.url }}"
                                                         data-fancybox="fancyboxGallery6" data-speed="700"   
                                                         data-is-infinite="true">
                                                         <img class="img-fluid border" src="{{i.image.url}}"
@@ -103,10 +101,10 @@
             <div class="col-md-7 mb-md-6 mb-lg-0">
                 <div class="mb-2">
                     <div class="border-bottom mb-3 pb-md-1 pb-3">
-                        <a href="/collection/{{prod.main_category.id}}"
-                            class="font-size-12 text-gray-5 mb-2 d-inline-block">{{product.category.name}}</a>
-                        <h2 class="font-size-25 text-lh-1dot2">{{product.name}}</h2>
-                        <span class="badge badge-warning" style="font-size:15px;">{{pv}} PV</span>
+                        <a href="/collection/{{productvarint.product.main_category.id}}"
+                            class="font-size-12 text-gray-5 mb-2 d-inline-block">{{productvarint.product.category.name}}</a>
+                        <h2 class="font-size-25 text-lh-1dot2">{{productvarint.productvariantname}}</h2>
+                        <span class="badge badge-warning" style="font-size:15px;">{{productvarint.product.pv}} PV</span>
                         <div class="mb-2">
 
                             <!-- <a class="d-inline-flex align-items-center small font-size-15 text-lh-1"
@@ -160,7 +158,7 @@
                         </div>
 
                         <div class="d-md-flex align-items-center">
-                            {% if product.stock > 0 %}
+                            {% if productvarint.quantity > 0 %}
                             <div class="ml-md-3 text-gray-9 font-size-14">Availability: <span
                                     class="text-green font-weight-bold"> IN STOCK</span></div>
                             {% else %}
@@ -175,25 +173,25 @@
                     </div>
                     <div class="mb-2">
                         <ul class="font-size-14 pl-3 ml-1 text-gray-110">
-                            <li><strong>Store: </strong>{{product.store.name}}</li>
-                            <li><strong>Category: </strong>{{product.category.name}}</li>
-                            <li><strong>Sub Category: </strong>{{product.subcategory.name}}</li>
-                            <li><strong>Sub Sub Category: </strong> {{product.subsubcategory.name}}</li>
-                            <li><strong>Brand: </strong>{{product.brand.name}}</li>
-                            <li><strong>Size: </strong>{{product.weight}}</li>
-                            <!-- <li><strong>Description: </strong>{{product.description}}</li> -->
+                            <li><strong>Store: </strong>{{productvarint.product.store}}</li>
+                            <li><strong>Category: </strong>{{productvarint.product.category.name}}</li>
+                            <li><strong>Sub Category: </strong>{{productvarint.product.subcategory.name}}</li>
+                            <li><strong>Sub Sub Category: </strong> {{productvarint.product.subsubcategory.name}}</li>
+                            <li><strong>Brand: </strong>{{productvarint.product.brand.name}}</li>
+                            <li><strong>Size: </strong>{{productvarint.product.weight}}</li>
+                            {% comment %} <li><strong>Description: </strong><sapn>{{productvarint.product.description|safe}}</span></li>  {% endcomment %}
                         </ul>
                     </div>
                     <div class="mb-4">
                         {% if request.user.is_retailer%}
                         <div class="d-flex align-items-baseline">
-                            <ins class="font-size-36 text-decoration-none">₹{{prod.amount_to_pay_retailer}}</ins>
-                            <del class="font-size-20 ml-2 text-gray-6">₹{{prod.price}}</del>
+                            <ins class="font-size-36 text-decoration-none">₹{{productvarint.mrp}}</ins>
+                            <del class="font-size-20 ml-2 text-gray-6">₹{{productvarint.price}}</del>
                         </div>
                         {% else%}
                         <div class="d-flex align-items-baseline">
-                            <ins class="font-size-36 text-decoration-none">₹{{product.price}}</ins>
-                            <del class="font-size-20 ml-2 text-gray-6">₹{{product.mrp}}</del>
+                            <ins class="font-size-36 text-decoration-none">₹{{productvarint.price}}</ins>
+                            <del class="font-size-20 ml-2 text-gray-6">₹{{productvarint.mrp}}</del>
                         </div>
                         {%endif%}
                     </div>
@@ -204,11 +202,11 @@
                                     <h6 class="font-size-14">Quantity</h6>
                                     <div class="border rounded-pill py-2 px-5 border-color-1">
                                         <div class="js-quantity row align-items-center">
-                                            <div value="{{ product.id|safe }}" id="product_wish" class="qty-plus-minus">
+                                            <div value="{{ productvarint.id|safe }}" id="product_wish" class="qty-plus-minus">
                                                 <input style="cursor: pointer;"
                                                     class="js-result form-control h-auto border-0 rounded p-0 shadow-none"
                                                     type="number" name="ec_qtybtn" min="1"
-                                                    onchange="update_item('{{prod.id}}')" max="{{ product.stock|safe }}"
+                                                    onchange="update_item('{{productvarint.id}}')" max="{{ productvarint.quantity|safe }}"
                                                     value="1" id="quantity" />
                                             </div>
                                         </div>
@@ -220,7 +218,7 @@
 
                             <div class="d-md-flex align-items-end mb-3">
                                 <div style="cursor: pointer;" class="ml-md-3">
-                                    <input type="hidden" value="{{ product.id|safe }}" id="product">
+                                    <input type="hidden" value="{{ productvarint.id|safe }}" id="product">
                                     <a onclick="add_to_cart();" class="btn px-5 btn-primary-dark transition-3d-hover"><i
                                             class="ec ec-add-to-cart mr-2 font-size-20"></i> Add to Cart</a>
                                             
