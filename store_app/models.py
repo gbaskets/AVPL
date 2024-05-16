@@ -54,6 +54,6 @@ class Store(models.Model):
 	isactive = models.BooleanField(default=True)
 
 	def __str__(self):
-		return str(self.id) + ' ' + str(self.storename)
+		return str(self.storename)
 
 

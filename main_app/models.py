@@ -46,6 +46,22 @@ class Wishlist(models.Model):
 	
 
 
+class ProductRating(models.Model):
+    productvariants = models.ForeignKey(ProductVariants,on_delete=models.CASCADE,blank=True,null=True,related_name="product_variantsimg")
+    # order = models.ForeignKey(OrderItems, null=True, blank= True, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
+    review = models.TextField()
+    rating = models.FloatField()
+    createdat = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+    updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+	
+    def __str__(self):
+        return self.productvariants.productvariantname+' Rating '+str(self.rating)
+
+
+
+
 class Address(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)

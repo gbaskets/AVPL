@@ -204,7 +204,10 @@ class Product(models.Model):
     isproductrejected=models.BooleanField(default=False,null=True,blank=True)
     reasonforproductrejected=models.TextField(null=True,blank=True)
     isactive = models.BooleanField(default=False)
+    isfeatured = models.BooleanField(default=False)
     isspecialoffer = models.BooleanField(default=False)
+    specialofferenddate = models.DateField(blank=True,null=True)
+    specialofferdiscount = models.PositiveIntegerField(null=True, default=0)
     createdat = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
@@ -257,9 +260,6 @@ class ProductImages(models.Model):
         if not self.id:
             self.image = compressImage(self.image)
         super(ProductImages, self).save(*args, **kwargs)
-
-            
-
 
      
 class ProductVariantSpecification(models.Model):

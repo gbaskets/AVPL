@@ -288,8 +288,8 @@
                         </div>
                         <div class="col-md-8">
                             <p style="color: #000; font-size: 16px; font-weight: 600;"><i
-                                    class="ec ec-map-pointer mr-1"></i>{{store.opening_time}} -
-                                {{store.closing_time}}<br><i class="ec ec-map-pointer mr-1"></i>
+                                    class="ec ec-map-pointer mr-1"></i>{{store.openingtime}} -
+                                {{store.closingtime}}<br><i class="ec ec-map-pointer mr-1"></i>
                                 {{store.vendor.address}}</p>
 
                         </div>
@@ -348,6 +348,7 @@
             <div class="row" style="padding-top:100px;">
                 <!-- Deal -->
                 {% for i in special_offer %}
+                {% with first_variant=i.products.first %}
                 <div class="col-md-auto mb-6 mb-md-0">
                     <div style="height: 670px;"
                         class="p-3 border border-width-2 border-primary borders-radius-0 bg-white min-width-370">
@@ -366,23 +367,23 @@
                             </div>
                         </div>
                         <div class="mb-4">
-                            <a href="/productdetail/?p={{i.product.id}}" class="d-block text-center"><img
-                                    class="img-fluid" src="{{i.image.url}}" alt="Image Description" height="250px"
+                            <a href="/productdetail/?p={{first_variant.id}}" class="d-block text-center"><img
+                                    class="img-fluid" src="{{ first_variant.productimage.url }}" alt="Image Description" height="250px"
                                     width="250px"></a>
                         </div>
                         <h5 class="mb-2 font-size-14 text-center mx-auto max-width-180 text-lh-18"><a
-                                href="/productdetail/?p={{i.product.id}}"
-                                class="text-blue font-weight-bold">{{i.product.name}}</a></h5>
+                                href="/productdetail/?p={{first_variant.id}}"
+                                class="text-blue font-weight-bold">{{ first_variant.productvariantname }}</a></h5>
                         <div class="d-flex align-items-center justify-content-center mb-3">
-                            <del class="font-size-18 mr-2 text-gray-2">₹{{i.product.mrp}}</del>
+                            <del class="font-size-18 mr-2 text-gray-2">₹{{first_variant.mrp}}</del>
                             {%if request.user.is_retailer%}
-                            <ins class="font-size-30 text-red text-decoration-none">₹{{i.product.price}}</ins>
+                            <ins class="font-size-30 text-red text-decoration-none">₹{{first_variant.price}}</ins>
                             {%else%}
-                            <ins class="font-size-30 text-red text-decoration-none">₹{{i.product.price}}</ins>
+                            <ins class="font-size-30 text-red text-decoration-none">₹{{first_variant.price}}</ins>
                             {%endif%}
                         </div>
                         <div class="mb-3 mx-2">
-                            {% if i.product.stock %}
+                            {% if first_variant.quantity != 0 %}
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="">Available: <strong style="color: green;">IN-STOCK</strong></span>
 
@@ -402,7 +403,7 @@
                         <div class="my-10">
                             <h6 class="font-size-15 text-gray-2 text-center mb-3">Hurry Up! Offer ends in:</h6>
                             <div class="js-countdown d-flex justify-content-center"
-                                data-end-date="{{i.product.special_offer_end_date}}" data-hours-format="%H"
+                                data-end-date="{{i.specialofferenddate|default_if_none:""}}" data-hours-format="%H"
                                 data-minutes-format="%M" data-seconds-format="%S">
                                 <div class="text-lh-1">
                                     <div class="text-gray-2 font-size-30 bg-gray-4 py-2 px-2 rounded-sm mb-2">
@@ -428,6 +429,7 @@
                         </div>
                     </div>
                 </div>
+                {% endwith %}
                 {%endfor%}
                 <!-- End Deal -->
                 <!-- Tab Prodcut -->
@@ -476,42 +478,43 @@
                                 aria-labelledby="pills-one-example1-tab">
                                 <ul class="row list-unstyled products-group no-gutters ">
                                     {% for i in featured %}
-                                    {{ featured_pv }}
+                                    {% with first_variant=i.products.first %}
+ 
                                     <li class="col-6 col-wd-3 col-md-4 product-item ">
                                         <div class="product-item__outer h-100">
                                             <div style="border-radius: 0rem;" class="product-item__inner px-xl-4 p-1">
                                                 <div class="product-item__body pb-xl-2">
                                                     <div class="mb-2"><a
-                                                            href="/search2/?key=&category={{i.product.category.id}}"
-                                                            class="font-size-12 text-gray-5">{{i.product.category}}</a>
+                                                            href="/search2/?key=&category={{i.category.id}}"
+                                                            class="font-size-12 text-gray-5">{{i.category}}</a>
                                                     </div>
                                                     <div class="mb-2"><a
-                                                            href="/search2/?key=&category={{i.product.category.id}}"
+                                                            href="/search2/?key=&category={{i.category.id}}"
                                                             class="font-size-12 text-gray-5">Store :
-                                                            {{i.product.store}}</a></div>
+                                                            {{i.store}}</a></div>
                                                     <h5 class="mb-1 product-item__title"><a
-                                                            href="/productdetail/?p={{i.product.id}}"
-                                                            class="text-blue font-weight-bold">{{i.product.name}}</a>
+                                                            href="/productdetail/?p={{first_variant.id}}"
+                                                            class="text-blue font-weight-bold">{{ first_variant.productvariantname }}</a>
                                                     </h5>
                                                     <div class="mb-2">
-                                                        <a href="/productdetail/?p={{i.product.id}}"><img
-                                                                class="img-fluid" src="{{i.image.url}}"></a>
+                                                        <a href="/productdetail/?p={{first_variant.id}}"><img
+                                                                class="img-fluid" src="{{ first_variant.productimage.url }}"></a>
                                                     </div>
                                                     <div class="flex-center-between mb-1">
                                                         {% if request.user.is_retailer%}
                                                         <div class="prodcut-price">
-                                                            <div class="text-gray-100">₹{{i.product.mrp|floatformat:2}}
+                                                            <div class="text-gray-100">₹{{first_variant.mrp|floatformat:2}}
                                                             </div>
                                                         </div>
                                                         {% else %}
                                                         <div class="prodcut-price">
                                                             <div class="text-gray-100">
-                                                                ₹{{i.product.price|floatformat:2}}</div>
+                                                                ₹{{first_variant.price|floatformat:2}}</div>
                                                         </div>
                                                         <div class="flex-center-between mb-1">
                                                             <div class="prodcut-price">
                                                                 <div style="text-decoration: line-through;"
-                                                                    class="text-gray-50">₹{{i.product.mrp}}</div>
+                                                                    class="text-gray-50">₹{{first_variant.mrp}}</div>
                                                             </div>
                                                         </div>
                                                         {%endif%}
@@ -537,12 +540,12 @@
                                                             <button type="button"
                                                                 class="button-input btn-add-cart btn-primary transition-3d-hover"><i
                                                                     class="ec ec-add-to-cart"></i></button>
-                                                            <a href="/productdetail/?p={{i.product.id}}"
+                                                            <a href="/productdetail/?p={{first_variant.id}}"
                                                                 tabindex="0">See Product Details</a>
 
                                                             <input hidden type="number" name="ec_qtybtn" value="1"
                                                                 id="quantity" />
-                                                            <input type="hidden" value="{{i.product.id|safe}}"
+                                                            <input type="hidden" value="{{first_variant.id|safe}}"
                                                                 class="product_cart">
                                                             <div class="modal p-4" id="added-cart"
                                                                 style="width:100%;height:100%;background-color:rgba(13, 1, 0, 0.5);text-align:center;color:white;z-index:1000">
@@ -557,6 +560,7 @@
                                             </div>
                                         </div>
                                     </li>
+                                    {% endwith %}
                                     {%endfor%}
 
 
@@ -569,50 +573,51 @@
                             <div class="tab-pane fade pt-2" id="pills-two-example1" role="tabpanel"
                                 aria-labelledby="pills-two-example1-tab">
                                 <ul class="row list-unstyled products-group no-gutters">
-                                    {% for i in offer%}
+                                    {% for i in special_offer %}
+                                    {% with first_variant=i.products.first %}
                                     <li class="col-6 col-wd-3 col-md-4 product-item">
                                         <div class="product-item__outer h-100">
                                             <div class="product-item__inner px-xl-4 p-3">
 
                                                 <div class="product-item__body pb-xl-2">
                                                     <div class="mb-2"><a
-                                                            href="/search2/?key=&category={{i.product.category.id}}"
-                                                            class="font-size-12 text-gray-5">{{i.product.category}}</a>
+                                                            href="/search2/?key=&category={{i.category.id}}"
+                                                            class="font-size-12 text-gray-5">{{i.category}}</a>
                                                     </div>
                                                     <div class="mb-2"><a
-                                                            href="/search2/?key=&category={{i.product.category.id}}"
+                                                            href="/search2/?key=&category={{i.category.id}}"
                                                             class="font-size-12 text-gray-5">Store :
-                                                            {{i.product.store}}</a></div>
+                                                            {{i.store}}</a></div>
                                                     <h5 class="mb-1 product-item__title"><a
-                                                            href="/productdetail/?p={{i.product.id}}"
-                                                            class="text-blue font-weight-bold">{{i.product.name}}</a>
+                                                            href="/productdetail/?p={{first_variant.id}}"
+                                                            class="text-blue font-weight-bold">{{first_variant.productvariantname}}</a>
                                                     </h5>
                                                     <div class="mb-2">
-                                                        <a href="/productdetail/?p={{i.product.id}}"
+                                                        <a href="/productdetail/?p={{first_variant.id}}"
                                                             class="d-block text-center"><img class="img-fluid"
-                                                                src="{{i.image.url}}" alt="Image Description"></a>
+                                                                src="{{first_variant.productimage.url}}" alt="Image Description"></a>
                                                     </div>
                                                     <div class="flex-center-between mb-1">
                                                         {% if request.session.is_retailer%}
                                                         <div class="prodcut-price">
                                                             <div class="text-gray-100">₹
-                                                                {{i.product.mrp|floatformat:2}}</div>
+                                                                {{first_variant.mrp|floatformat:2}}</div>
                                                         </div>
                                                         {%else%}
                                                         <div class="prodcut-price">
                                                             <div class="text-gray-100">₹
-                                                                {{i.product.price|floatformat:2}}</div>
+                                                                {{first_variant.price|floatformat:2}}</div>
                                                         </div>
                                                         <div class="flex-center-between mb-1">
                                                             <div class="prodcut-price">
                                                                 <div style="text-decoration: line-through;"
-                                                                    class="text-gray-50">₹{{i.product.mrp}}</div>
+                                                                    class="text-gray-50">₹{{first_variant.mrp}}</div>
                                                             </div>
                                                         </div>
                                                         {%endif%}
                                                         {%if request.session.store_id%}
                                                         <div class="d-none d-xl-block prodcut-add-cart">
-                                                            <a href="/add_to_cart/{{i.id}}/"
+                                                            <a href="/add_to_cart/{{first_variant.id}}/"
                                                                 class="btn-add-cart btn-primary transition-3d-hover"><i
                                                                     class="ec ec-add-to-cart"></i></a>
                                                         </div>
@@ -628,12 +633,12 @@
                                                         <button type="button"
                                                             class="button-input btn-add-cart btn-primary transition-3d-hover"><i
                                                                 class="ec ec-add-to-cart"></i></button>
-                                                        <a href="/productdetail/?p={{i.product.id}}" tabindex="0">See
+                                                        <a href="/productdetail/?p={{first_variant.id}}" tabindex="0">See
                                                             Product Details</a>
 
                                                         <input hidden type="number" name="ec_qtybtn" value="1"
                                                             id="quantity" />
-                                                        <input type="hidden" value="{{i.product.id|safe}}"
+                                                        <input type="hidden" value="{{first_variant.id|safe}}"
                                                             class="product_cart">
                                                         <div class="modal p-4" id="added-cart"
                                                             style="width:100%;height:100%;background-color:rgba(13, 1, 0, 0.5);text-align:center;color:white;z-index:1000">
@@ -646,6 +651,7 @@
                                             </div>
                                         </div>
                                     </li>
+                                    {% endwith %}
                                     {%endfor%}
 
 
@@ -656,6 +662,7 @@
                                 aria-labelledby="pills-three-example1-tab">
                                 <ul class="row list-unstyled products-group no-gutters">
                                     {%for i in top_rated%}
+                                    {% with first_variant=i.products.first %}
                                     <li class="col-6 col-wd-3 col-md-4 product-item">
                                         <div class="product-item__outer h-100">
                                             <div class="product-item__inner px-xl-4 p-3">
@@ -711,6 +718,7 @@
                                             </div>
                                         </div>
                                     </li>
+                                    {% endwith %}
                                     {%endfor%}
 
 

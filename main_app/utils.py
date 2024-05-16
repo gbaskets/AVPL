@@ -114,7 +114,7 @@ def fetch_vendors_catby(category,lat, lng):
 		res.append(y.store)
 	results=[]
 	for i in fetch_vendors(lat, lng):
-		if i['store'].store in res:
+		if i['store'].id in res:
 			results.append(i)
 	return results
 
@@ -130,8 +130,8 @@ def fetch_vendors(lat, lng):
 			results.append({
 				'store':x,
 				'distance':round(Km, 4),
-				'price':Product.objects.filter(store=x.store).order_by('price'),
-				'rating':get_store_rating(x.store)
+				'price':ProductVariants.objects.filter(store__vendor__id=x.id).order_by('price'),
+				# 'rating':get_store_rating(x.store)
 			})
 	return results
 
@@ -148,7 +148,7 @@ def getproduct_bylocation(lat, lng):
 	for v in vendors:
 		vendor = v['store']
 		if Store.objects.filter(vendor=vendor).exists():
-			for product in Product.objects.filter(store=vendor.store, isactive=True):
+			for product in Product.objects.filter(store__vendor__id=vendor.id, isactive=True):
 				products.append(product)
 	return products
 
@@ -170,8 +170,8 @@ def get_dic(request):
 	}
 	if request.user.is_authenticated:
 		#print(request.user.role.level.level)
-		if request.user.role.level.level == 'C':
-			user = UserData.objects.get(user=request.user)
+		if check_user_authentication(request, 'CUSTOMER'):
+			user = Customer.objects.get(user=request.user)
 			request.session['lat'] = user.latitude
 			request.session['lng'] = user.longitude
 			dic.update({'lat':user.latitude, 'lng':user.longitude})
@@ -346,22 +346,26 @@ def getresult(key, category, brand, min_price, max_price, in_stock, rate):
 import random
 
 def get_product_thumb(product):
-	dic = {'product':product, 'image':ProductImages.objects.filter(productvariants__product=product)[0]}
-	ratings = ProductRating.objects.filter(product=product)
-	total = 0.0
-	for x in ratings:
-		total = total + x.rating
-	rating = 0.0
-	if len(ratings) <= 0:
+	productvariantsobj=ProductVariants.objects.filter(product=product).first()
+	if productvariantsobj:
+		dic = {'product':product, 'image':productvariantsobj.productimage}
+		ratings = ProductRating.objects.filter(productvariants=productvariantsobj)
+		total = 0.0
+		for x in ratings:
+			total = total + x.rating
 		rating = 0.0
+		if len(ratings) <= 0:
+			rating = 0.0
+		else:
+			rating = (total/len(ratings))
+		dic.update({'rating':round(rating, 1)})
+		fake_price = (productvariantsobj.price/100)*50
+		dic.update({'rating':round(rating, 1), 'fake_price':round(fake_price+productvariantsobj.price, 2)})
+		pv_percent = product.pv
+		pv = (productvariantsobj.price/100)*pv_percent
+		dic.update({'pv':round(pv, 1)})
 	else:
-		rating = (total/len(ratings))
-	dic.update({'rating':round(rating, 1)})
-	fake_price = (product.price/100)*50
-	dic.update({'rating':round(rating, 1), 'fake_price':round(fake_price+product.price, 2)})
-	pv_percent = PointValue.objects.get(category=product.category).percentage
-	pv = (product.price/100)*pv_percent
-	dic.update({'pv':round(pv, 1)})
+		dic = {'product':None, 'image':None,rating:None,fake_price:None,pv:None}
 	return dic
 
 # In case Case on delivey
