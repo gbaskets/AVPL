@@ -618,7 +618,7 @@ def home(request):
        
         special_offer = Product.objects.filter(isactive=True,isspecialoffer=True)
         featured = Product.objects.filter(isactive=True,isfeatured=True)
-        
+        product=Product.objects.filter(isactive=True)
         footer_banner = HomeFooterBanner.objects.all()
         categories = ProductCategory.objects.all()
         if request.session.get('store_ids'):
@@ -627,7 +627,7 @@ def home(request):
             storeobjs=None
         bestseller = Store.objects.filter(isbestseller = True)
          
-        dic={'banners':HomeBanner.objects.all(), 'footer_banner':footer_banner,'bestseller' :bestseller,'featured':featured,
+        dic={'banners':HomeBanner.objects.all(), 'product':product,'footer_banner':footer_banner,'bestseller' :bestseller,'featured':featured,
             'storeobjs':storeobjs,'special_offer':special_offer, 'categories':categories, 
             'latest':latest_product, 'contact_us':CompanyContactUs.objects.filter().first(),
             'stores':fetch_vendors(request.session['lat'], request.session['lng']),
