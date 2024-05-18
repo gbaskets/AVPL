@@ -291,7 +291,12 @@
                   <li class="dropdown">
                      <a href="#" data-toggle="dropdown"
                         class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+
+                        {% if customer.profilepic %}
+                     <img alt="image" src="{{ customer.profilepic.url|safe }}" class="user-img-radious-style">
+                     {% else %}
                      <img alt="image" src="{% static 'download.png' %}" class="user-img-radious-style">
+                     {% endif %}
                      <span class="d-sm-none d-lg-inline-block"></span></a>
                      <div class="dropdown-menu dropdown-menu-right">
                         <div class="dropdown-title" href="/user/profile">Hello {{ user.first_name|safe }}</div>
@@ -309,7 +314,10 @@
                <aside id="sidebar-wrapper">
                   <div class="sidebar-brand">
                      <a href="/">
-                     <i class="header-logo fa fa-home" style="font-size: 50px;"></i>
+      
+                     <img alt="image" src="{% static 'img/Vector.png' %}" class="header-logo" />
+                         
+                     {% comment %} <i class="header-logo fa fa-home" style="font-size: 50px;"></i> {% endcomment %}
                      
                      </a>
                   </div>
@@ -320,8 +328,10 @@
                      <li class="dropdown active" style="display: block;">
                         <div class="sidebar-profile">
                            <div class="siderbar-profile-pic">
-                              {% if user.profile_pic %}
-                             <a href="/user/profile"> <img src="{{user.profile_pic.url}}" class="profile-img-circle box-center" alt="User Image"></a>
+               
+                              {% if customer.profilepic %}
+            
+                             <a href="/user/profile"> <img src="{{customer.profilepic.url|safe}}" class="profile-img-circle box-center" alt="User Image"></a>
                              {% else %}
                              <a href="/user/profile"> <img src="{% static 'download.png' %}" class="profile-img-circle box-center" alt="User Image"></a>
                              {% endif %}

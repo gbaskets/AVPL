@@ -75,8 +75,8 @@
                                                         value="{{request.user.first_name|default:''}}" required/>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Last Name *</label>
-                                                    <input type="text" class="form-control" placeholder="Enter Last Name *"
+                                                    <label>Last Name</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Last Name"
                                                         title="Only (a-z) letters are allowed."  name="lastname"
                                                         value="{{request.user.last_name|default:''}}" />
                                                 </div>
@@ -164,18 +164,18 @@
                                                 </div>
         
                                                 <div class="form-group">
-                                                    <label>Profile Pic *</label>
+                                                    <label>Profile Pic</label>
                                                     {% if customer.profilepic %}
                                                     <a href="{{customer.profilepic.url}}"> <img alt="image"
                                                             src="{{customer.profilepic.url}}" height="50" weight="50" /></a>
                                                     {% else %}
                                                     {% endif %}
                                                     <input type="file" class="form-control" accept="image/png, image/jpeg"
-                                                        name="profilepic" required/>
+                                                        name="profilepic"/>
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label>PV *</label>
+                                                    <label>PV </label>
                                                     <input type="number" class="form-control" value="{{ customer.pv|default:'' }}" disabled/>
                                                 </div>
         
@@ -185,40 +185,40 @@
                                             <div class="col-md-4">
         
                                                 <div class="form-group">
-                                                    <label>Street Address *</label>
-                                                    <input type="text" class="form-control" placeholder="Enter Street Address *"
+                                                    <label>Street Address</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Street Address"
                                                         id="address" title="Only (a-z) letters are allowed." 
                                                         name="streetaddress" value="{{customer.streetaddress|default:''}}" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Near by Address *</label>
+                                                    <label>Near by Address</label>
                                                     <input type="text" class="form-control"
-                                                        placeholder="Enter Near by Address *" id='nearbyaddress'
+                                                        placeholder="Enter Near by Address" id='nearbyaddress'
                                                         title="Only (a-z) letters are allowed."  name="nearbyaddress"
                                                         value="{{customer.nearbyaddress|default:''}}" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>City *</label>
-                                                    <input type="text" class="form-control" placeholder="Enter City *" id='city'
+                                                    <label>City</label>
+                                                    <input type="text" class="form-control" placeholder="Enter City" id='city'
                                                         title="Only (a-z) letters are allowed."  name="city"
                                                         value="{{customer.city|default:''}}" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>State *</label>
-                                                    <input type="text" class="form-control" placeholder="Enter State *"
+                                                    <label>State</label>
+                                                    <input type="text" class="form-control" placeholder="Enter State"
                                                         id='state' title="Only (a-z) letters are allowed."  name="state"
                                                         value="{{customer.state|default:''}}" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Country *</label>
-                                                    <input type="text" class="form-control" placeholder="Enter Country *"
+                                                    <label>Country</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Country"
                                                         id='country' title="Only (a-z) letters are allowed." 
                                                         name="country" value="{{customer.country|default:''}}" />
                                                 </div>
         
                                                 <div class="form-group">
-                                                    <label>Pincode *</label>
-                                                    <input type="text" placeholder="Enter Pincode *" id='pincode'
+                                                    <label>Pincode</label>
+                                                    <input type="text" placeholder="Enter Pincode" id='pincode'
                                                         class="form-control" minlength="6" maxlength="6" name="pincode"
                                                         value="{{customer.pincode|default:''}}" />
                                                 </div>
@@ -232,15 +232,15 @@
         
         
                                                 <div class="form-group">
-                                                    <label>PAN Card No *</label>
-                                                    <input type="text" class="form-control" placeholder="PAN Number *"
+                                                    <label>PAN Card No</label>
+                                                    <input type="text" class="form-control" placeholder="PAN Number"
                                                         pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                                                         title="Please enter the correct PAN number." name="pancardno"
                                                         value="{{customer.pancardno|default:''}}" />
                                                 </div>
         
                                                 <div class="form-group">
-                                                    <label>PAN Card Image *</label>
+                                                    <label>PAN Card Image</label>
                                                     {% if customer.pancarddoc %}
                                                     <a href="{{customer.pancarddoc.url}}"> <img alt="image"
                                                             src="{{customer.pancarddoc.url}}" height="50" weight="50" /></a>
@@ -255,7 +255,7 @@
                                             <div class="col-md-4">
         
                                                 <div class="form-group">
-                                                    <label for="idproof">Idproof *</label>
+                                                    <label for="idproof">Idproof</label>
                                                     <select class="form-control" id="idproof" name="idproof">
                                                         {% if customer.idproof %}
                                                         <option value="{{customer.idproof}}" selected>{{customer.idproof}}</option>
@@ -270,12 +270,12 @@
                                                 </div>
         
                                                 <div class="form-group">
-                                                    <label>Id No *</label>
-                                                    <input type="text" class="form-control" placeholder="Enter Id Number *"
+                                                    <label>Id No</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Id Number"
                                                         name="idno" value="{{customer.idno|default:''}}" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>ID Front Image *</label>
+                                                    <label>ID Front Image</label>
                                                     {% if customer.frontidproofdoc %}
                                                     <a href="{{customer.frontidproofdoc.url}}"> <img alt="image"
                                                             src="{{customer.frontidproofdoc.url}}" height="50" weight="50" /></a>
@@ -285,7 +285,7 @@
                                                         name="frontidproofdoc" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>ID Back Image *</label>
+                                                    <label>ID Back Image</label>
                                                     {% if customer.backidproofdoc %}
                                                     <a href="{{customer.backidproofdoc.url}}"> <img alt="image"
                                                             src="{{customer.backidproofdoc.url}}" height="50" weight="50" /></a>
@@ -297,7 +297,7 @@
         
         
                                                 <div class="form-group">
-                                                    <label for="addressproof">Addressproof *</label>
+                                                    <label for="addressproof">Addressproof</label>
                                                     <select class="form-control" id="addressproof" name="addressproof">
                                                         {% if customer.addressproof %}
                                                         <option value="{{customer.addressproof}}" selected>{{customer.addressproof}}
@@ -313,13 +313,13 @@
                                                 </div>
         
                                                 <div class="form-group">
-                                                    <label>AddressproofId No *</label>
+                                                    <label>AddressproofId No</label>
                                                     <input type="text" class="form-control"
-                                                        placeholder="Enter Address Proof No *" name="addressno"
+                                                        placeholder="Enter Address Proof No" name="addressno"
                                                         value="{{customer.addressno|default:''}}" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Addressproof Front Image *</label>
+                                                    <label>Addressproof Front Image</label>
                                                     {% if customer.frontaddressproofdoc %}
                                                     <a href="{{customer.frontaddressproofdoc.url}}"> <img alt="image"
                                                             src="{{customer.frontaddressproofdoc.url}}" height="50"
@@ -330,7 +330,7 @@
                                                         name="frontaddressproofdoc" />
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Addressproof Back Image *</label>
+                                                    <label>Addressproof Back Image</label>
                                                     {% if customer.backddressproofdoc %}
                                                     <a href="{{customer.backddressproofdoc.url}}"> <img alt="image"
                                                             src="{{customer.backddressproofdoc.url}}" height="50"
@@ -376,6 +376,96 @@
 
 
 
+
+        <script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&libraries=places&callback=initialize"></script>
+    
+    
+    <script>
+        function initialize() {
+            var input = document.getElementById('address');
+            var autocomplete = new google.maps.places.Autocomplete(input);
+    
+            autocomplete.addListener('place_changed', function () {
+                var place = autocomplete.getPlace();
+    
+                // Extract address components
+                var addressComponents = place.address_components;
+    
+                // Initialize variables for pin code, state, city, country, and nearby places
+                var pincode = "";
+                var state = "";
+                var city = "";
+                var country = "";
+                var nearbyPlace = "";
+                var latitude = "";
+                var longitude = "";
+    
+                // Iterate through address components to find specific details
+                for (var i = 0; i < addressComponents.length; i++) {
+                    var component = addressComponents[i];
+                    var types = component.types;
+    
+                    // Fill in pin code
+                    if (types.includes('postal_code')) {
+                        pincode = component.long_name;
+                    }
+    
+                    // Fill in state
+                    if (types.includes('administrative_area_level_1')) {
+                        state = component.long_name;
+                    }
+    
+                    // Fill in city
+                    if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+                        // Remove the word "Division" from the city
+                        city = component.long_name.replace(/ Division$/, '');
+                    }
+    
+                    // Fill in country
+                    if (types.includes('country')) {
+                        country = component.long_name;
+                    }
+                }
+    
+                // Get latitude and longitude
+                if (place.geometry && place.geometry.location) {
+                    latitude = place.geometry.location.lat();
+                    longitude = place.geometry.location.lng();
+                }
+    
+    
+                // Get nearby place
+                if (place.geometry && place.geometry.location) {
+                    var service = new google.maps.places.PlacesService(document.createElement('div'));
+                    service.nearbySearch({
+                        location: place.geometry.location,
+                        radius: 5000, // You can adjust the radius as needed
+                        type: 'point_of_interest' // You can adjust the type as needed
+                    }, function (results, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+                            nearbyPlace = results[0].name;
+                        }
+    
+    
+    
+                        // Update input fields
+                        document.getElementById('pincode').value = pincode;
+                        document.getElementById('state').value = state;
+                        document.getElementById('city').value = city;
+                        document.getElementById('country').value = country;
+                        document.getElementById('nearbyaddress').value = nearbyPlace;
+                        document.getElementById('latitude').value = latitude;
+                        document.getElementById('longitude').value = longitude;
+                    });
+                }
+            });
+        }
+    
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+    
+    
 
 
 

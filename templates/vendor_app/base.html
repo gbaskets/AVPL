@@ -73,7 +73,7 @@
                         {% if vendor.profilepic %}
                      <img alt="image" src="{{ vendor.profilepic.url|safe }}" class="user-img-radious-style">
                      {% else %}
-                      P
+                     <img alt="image" src="{% static 'download.png' %}" class="user-img-radious-style">
                      {% endif %}
                      <span class="d-sm-none d-lg-inline-block"></span></a>
                      <div class="dropdown-menu dropdown-menu-right">

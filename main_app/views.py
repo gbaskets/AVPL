@@ -1433,7 +1433,7 @@ def signup_view(request):
 
             if UserOTP.objects.filter(email=email).exists():
                 chk_otp = UserOTP.objects.get(email=email) 
-                if chk_otp.otp == otp :
+                if int(chk_otp.otp) == int(otp) :
                     if not User.objects.filter(email=email).exists():
                         userobje=User.objects.create(username=email,email=email)
                         p=str(email)
@@ -1451,7 +1451,9 @@ def signup_view(request):
                             email = EmailMessage(subject, message, to=[to_email])
                             email.content_subtype = "html"
                             email.send()
-                            
+                            if userobje is not None:
+                                # <-- Create  Token Dataa -->
+                                login(request,userobje)
                             
                         # elif chk_otp.typeuser=='VENDOR':
                         #     Vendor.objects.create(user=userobje)
@@ -1488,6 +1490,9 @@ def signup_view(request):
                         userobje.groups.add(groupobj)
                         userobje.save()
                         messages.info(request,'Your account is created sucessfully !')
+                        if userobje is not None:
+                            # <-- Create  Token Dataa -->
+                            login(request,userobje)
             else:
                 messages.warning(request,'Incorrect Mobile No')
                 return redirect('/signup/')
@@ -1513,7 +1518,7 @@ def signup_vendor_view(request):
 
             if UserOTP.objects.filter(email=email).exists():
                 chk_otp = UserOTP.objects.get(email=email) 
-                if chk_otp.otp == int(otp) :
+                if int(chk_otp.otp) == int(otp) :
                     if not User.objects.filter(email=email).exists():
                         userobje=User.objects.create(username=email,email=email)
                         p=str(email)
