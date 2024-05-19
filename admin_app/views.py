@@ -3533,7 +3533,6 @@ def admin_add_banner(request):
 		if request.method == 'POST':
 			category= request.POST.get('category')
 			title= request.POST.get('title')
-			subtitle = request.POST.get('subtitle')
 			description = request.POST.get('description')
 			link = request.POST.get('link')
 			image=request.FILES.get('image')
@@ -3543,8 +3542,7 @@ def admin_add_banner(request):
 				homebannerobj.updatedby=request.user
 			if category:
 				homebannerobj.category=ProductCategory.objects.filter(id=category).first()
-			if subtitle:
-				homebannerobj.subtitle=subtitle
+	
 			if description:
 				homebannerobj.description=description
 			if link:
@@ -3565,7 +3563,7 @@ def admin_edit_banner(request,id):
 		if request.method == 'POST':
 			category= request.POST.get('category')
 			title= request.POST.get('title')
-			subtitle = request.POST.get('subtitle')
+
 			description = request.POST.get('description')
 			link = request.POST.get('link')
 			image=request.FILES.get('image')
@@ -3575,8 +3573,7 @@ def admin_edit_banner(request,id):
 				homebannerobj.title=title		
 			if category:
 				homebannerobj.category=ProductCategory.objects.filter(id=category).first()
-			if subtitle:
-				homebannerobj.subtitle=subtitle
+		
 			if description:
 				homebannerobj.description=description
 			if link:

@@ -77,7 +77,6 @@ class WalletTransferApprovalSettings(models.Model):
 class HomeBanner(models.Model):
 	category=models.ForeignKey("inventory_app.ProductCategory",on_delete=models.SET_NULL ,null=True,blank=True)
 	title = models.CharField(max_length=255)
-	subtitle = models.CharField(max_length=255,null=True,blank=True)
 	description = models.CharField(max_length=255,null=True,blank=True)
 	link = models.CharField(max_length=255,null=True,blank=True )
 	image = models.FileField(upload_to='homebanner/image',null=True,blank=True)
