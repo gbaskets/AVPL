@@ -169,6 +169,12 @@ urlpatterns = [
     path('gallery', admin_gallery),
     path('blog', admin_blog),
     path('banner', admin_banner),
+    path('add-banner', admin_add_banner),
+    path('edit-banner/<int:id>', admin_edit_banner, name="edit-banner"),
+    path('delete-banner/<int:id>', admin_delete_banner, name="delete-banner"),
+    
+    
+    
     path('direct-referal', admin_direct_referal),
 
     path('subscription-pack',admin_subscription_pack),

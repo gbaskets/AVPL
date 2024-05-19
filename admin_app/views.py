@@ -3516,29 +3516,102 @@ def admin_blog(request):
 @csrf_exempt
 def admin_banner(request):
 	if check_user_authentication(request,'ADMIN'):
-		if request.method == 'POST':
-			title = request.POST.get('title')
-			print(title)
-			sub_title = request.POST.get('sub_title')
-			desc = request.POST.get('desc')
-			link = request.POST.get('link')
-			image = request.FILES.get('file')
-			print(image, type(image))
-			# HomeBanner.objects.all().delete()
-			HomeBanner.objects.create(
-				title=title,
-				sub_title=sub_title,
-				description=desc,
-				link=link,
-				image=image,
-
-			)
+		
 		dic = {
 			'data':HomeBanner.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
 		return render(request, 'admin_app/pages/banner.html',dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_add_banner(request):
+	if check_user_authentication(request, 'ADMIN'):
+		if request.method == 'POST':
+			category= request.POST.get('category')
+			title= request.POST.get('title')
+			subtitle = request.POST.get('subtitle')
+			description = request.POST.get('description')
+			link = request.POST.get('link')
+			image=request.FILES.get('image')
+	
+			if title:
+				homebannerobj=HomeBanner.objects.create(title=title)			
+				homebannerobj.updatedby=request.user
+			if category:
+				homebannerobj.category=ProductCategory.objects.filter(id=category).first()
+			if subtitle:
+				homebannerobj.subtitle=subtitle
+			if description:
+				homebannerobj.description=description
+			if link:
+				homebannerobj.link=link
+			if image:
+				homebannerobj.image=image
+			if title:
+				homebannerobj.save()
+				return redirect("/admins/banner")
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_edit_banner(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		homebannerobj=HomeBanner.objects.filter(id=id).first()
+		if request.method == 'POST':
+			category= request.POST.get('category')
+			title= request.POST.get('title')
+			subtitle = request.POST.get('subtitle')
+			description = request.POST.get('description')
+			link = request.POST.get('link')
+			image=request.FILES.get('image')
+			isactive= request.POST.get('isactive')
+	
+			if title:
+				homebannerobj.title=title		
+			if category:
+				homebannerobj.category=ProductCategory.objects.filter(id=category).first()
+			if subtitle:
+				homebannerobj.subtitle=subtitle
+			if description:
+				homebannerobj.description=description
+			if link:
+				homebannerobj.link=link
+			if image:
+				homebannerobj.image=image
+		
+
+			    
+			if isactive:
+				print(isactive,type(isactive),'isactive')
+				if isactive == 'on':
+					isactive=True
+				else:
+					isactive=False
+				homebannerobj.isactive=isactive
+			else:
+				isactive=False	
+				homebannerobj.isactive=isactive
+             
+			homebannerobj.updatedby=request.user
+			homebannerobj.save()
+			return redirect("/admins/banner")
+			
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_delete_banner(request,id):
+	if check_user_authentication(request, 'ADMIN'):
+		if id :
+			homebannerobj=HomeBanner.objects.filter(id=id).first()
+			homebannerobj.delete()
+			return redirect("/admins/banner")
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 

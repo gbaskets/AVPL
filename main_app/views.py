@@ -619,7 +619,7 @@ def home(request):
         special_offer = Product.objects.filter(isactive=True,isspecialoffer=True)
         featured = Product.objects.filter(isactive=True,isfeatured=True)
         product=Product.objects.filter(isactive=True)
-        footer_banner = HomeFooterBanner.objects.all()
+        footer_banner = HomeBanner.objects.all()
         categories = ProductCategory.objects.all()
         if request.session.get('store_ids'):
             storeobjs=Store.objects.get(id__in=request.session.get('store_ids'))

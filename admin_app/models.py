@@ -5,7 +5,6 @@ from django.db import models
 from django.contrib.auth.models import User, AbstractUser
 from vendor_app.models import *
 from main_app.models import *
-from admin_app.models import *
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.fields import RichTextField
 from  user_app.models import *
@@ -76,24 +75,13 @@ class WalletTransferApprovalSettings(models.Model):
 
 
 class HomeBanner(models.Model):
+	category=models.ForeignKey("inventory_app.ProductCategory",on_delete=models.SET_NULL ,null=True,blank=True)
 	title = models.CharField(max_length=255)
 	subtitle = models.CharField(max_length=255,null=True,blank=True)
 	description = models.CharField(max_length=255,null=True,blank=True)
 	link = models.CharField(max_length=255,null=True,blank=True )
 	image = models.FileField(upload_to='homebanner/image',null=True,blank=True)
-	createdat = models.DateTimeField(auto_now_add=True)
-	updatedon = models.DateTimeField(auto_now=True)
-	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
-
-	def __str__(self):
-		return self.title
-
-class HomeFooterBanner(models.Model):
-	title = models.CharField(max_length=255)
-	subtitle = models.CharField(max_length=255,null=True,blank=True)
-	description = models.CharField(max_length=255,null=True,blank=True)
-	link = models.CharField(max_length=255,null=True,blank=True )
-	image = models.FileField(upload_to='homefooterbanner/image',null=True,blank=True)
+	isactive = models.BooleanField(default=True)
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)
 	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
