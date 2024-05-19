@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -72,6 +72,7 @@ def create_user(request):
 			)
 			return send_otp(request, 'User', user)
 @csrf_exempt
+@login_required(login_url='/login/')
 def user_dashboard(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		customer_obj=Customer.objects.filter(user=request.user).first()
@@ -469,6 +470,7 @@ def add_to_wishlist(request):
 		return JsonResponse({'response': 'Login to continue'})
 		return render(request, '403.html')
 @csrf_exempt
+@login_required(login_url='/login/')
 def user_wishlist(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		categories = ProductCategory.objects.all()
@@ -509,6 +511,7 @@ def user_wishlist(request):
 
 
 @csrf_exempt
+@login_required(login_url='/login/')
 def user_cart(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		categories = ProductCategory.objects.all()
@@ -549,6 +552,7 @@ def user_cart(request):
 		# return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 @csrf_exempt
+@login_required(login_url='/login/')
 def update_cart_item(request):
 	cart = Cart.objects.get(user=request.user)
 	print("cart=>", cart)
@@ -591,6 +595,7 @@ def update_cart_item(request):
 	}
 	return JsonResponse(dic)
 @csrf_exempt
+@login_required(login_url='/login/')
 def remove_cart_item(request):
 	cart = Cart.objects.get(user=request.user)
 	item = CartItems.objects.get(id=request.GET.get('item'))
@@ -613,6 +618,7 @@ def remove_cart_item(request):
 	}
 	return JsonResponse(dic)
 @csrf_exempt
+@login_required(login_url='/login/')
 def remove_wishlist_item(request):
 	wishlist = Wishlist.objects.get(user=request.user)
 	item = WishlistItems.objects.get(id=request.GET.get('item'))
@@ -635,6 +641,7 @@ def remove_wishlist_item(request):
 	return JsonResponse(dic)
 
 @csrf_exempt
+@login_required(login_url='/login/')
 def my_address(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
@@ -690,6 +697,7 @@ def my_address(request):
 	else:
 		return render(request, '403.html')
 @csrf_exempt
+@login_required(login_url='/login/')
 def user_set_default_address(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'GET':
@@ -703,6 +711,7 @@ def user_set_default_address(request):
 		return render(request, '403.html')
 
 @csrf_exempt
+@login_required(login_url='/login/')
 def add_new_address(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		if request.method == 'POST':
@@ -743,6 +752,7 @@ def add_new_address(request):
 	else:
 		return render(request, '403.html')
 @csrf_exempt
+@login_required(login_url='/login/')
 def my_order(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		store_id = request.GET.get('store')
@@ -762,6 +772,7 @@ def my_order(request):
 	else:
 		return render(request, '403.html')
 
+
 def enable_self_pickup(request):
 	check = request.GET.get('self')
 	if check == '1':
@@ -772,6 +783,7 @@ def enable_self_pickup(request):
 	return JsonResponse({'response':'success'})
 
 @csrf_exempt
+@login_required(login_url='/login/')
 def save_location(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		address = request.GET.get('location')
@@ -786,6 +798,7 @@ def save_location(request):
 		)
 		return JsonResponse({'response':'success'})
 @csrf_exempt
+@login_required(login_url='/login/')
 def user_wallet(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		customer_obj=Customer.objects.filter(user=request.user).first()
@@ -1576,6 +1589,7 @@ def transfer_amount(request):
 
 
 @csrf_exempt
+@login_required(login_url='/login/')
 def user_profile(request):
 	if check_user_authentication(request, 'CUSTOMER'):
      
