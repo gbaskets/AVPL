@@ -73,12 +73,8 @@
 
                             <td data-title="Product">
                                 <a href="/single_product/{{x.item.id}}" class="text-gray-90">{{ item.name|safe }} </a><br>
-                                {% for x in item.set_all %}
-                                <span><strong>variant name: </strong>{{item.category.name}} </span><br>
-                                <span><strong>brand: </strong>{{x.variant_value.value}}</span><br>
-                                <span><strong>discount: </strong>{{x.item.discount_percent}} %</span><br>
-                              {%endfor%}
-                                {%if item.quantity <= item.stock%}
+                         
+                                {%if item.stock_out == False %}
                                 <span><strong>Availability: </strong><span style="color: green">In-Stock</span></span>
                                 {%else%}
                                 <span><strong>Availability: </strong><span style="color: red">Out-of-Stock</span></span>
@@ -122,7 +118,7 @@
                                     <div class="d-block d-md-flex flex-center-between">
                                        
                                         <div class="d-md-flex">
-                                            
+                                            {{ cart.id }}
                                             <a href="/selectaddress/?cart={{ cart.id }}" class="btn btn-primary-dark-w ml-md-2 px-5 px-md-4 px-lg-5 w-100 w-md-auto text-light d-none d-md-inline-block">Proceed to checkout</a>
                                         </div>
                                     </div>

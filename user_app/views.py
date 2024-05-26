@@ -517,39 +517,71 @@ def user_set_default_address(request):
 @login_required(login_url='/login/')
 def add_new_address(request):
 	if check_user_authentication(request, 'CUSTOMER'):
+		customerobj=Customer.objects.filter(user=request.user).first()
 		if request.method == 'POST':
-			location = request.POST.get('location')
-			name = request.POST.get('name')
-			home_no = request.POST.get('home_no')
-			landmark = request.POST.get('landmark')
-			city = request.POST.get('city')
+			mobile = request.POST.get('mobile')
+			email = request.POST.get('email')
+			firstname= request.POST.get('firstname')
+			lastname= request.POST.get('lastname')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
 			pincode = request.POST.get('pincode')
-			state = request.POST.get('state')
-			contact = request.POST.get('contact')
-			if len(Address.objects.filter(user=request.user)) == 0:
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			addresstype=request.POST.get('addresstype')
+			companyname=request.POST.get('companyname')
+			isbillingaddress=request.POST.get('isbillingaddress')
+			isshippingaddress=request.POST.get('isshippingaddress')
+			gstno=request.POST.get('gstno')
+			
+			if len(Address.objects.filter(customer=customerobj)) == 0:
 				default = True
 			else:
 				default = False
 			gmaps = googlemaps.Client(key='AIzaSyCEjY246d9MYQIe69nPzV_ceogrpglpY0Q')
-			if location:
-				# add_lat_long = gmaps.geocode(location)
-				# lat = add_lat_long[0]['geometry']['location']['lat']
-				# lng = add_lat_long[0]['geometry']['location']['lng']
-				lat= 28.7983
-				lng = 79.0220
-				Address.objects.create(
-					user = request.user,
-					latitude = lat,
-					longitude = lng,
-					name = name,
-					home_no = home_no,
-					landmark = landmark,
-					city = city,
-					pincode = pincode,
-					state = state,
-					contact = contact,
-					default = default
-				)
+			addressobj=Address()
+			addressobj.customer = customerobj
+			if addresstype:
+				addressobj.addresstype = addresstype
+			if companyname:
+				addressobj.companyname=companyname
+			if mobile:
+				addressobj.mobile = mobile
+			if email:
+				addressobj.email=email
+			if firstname:
+				addressobj.firstname= firstname
+			if lastname:
+				addressobj.lastname= lastname
+			if streetaddress:
+				addressobj.streetaddress =  streetaddress
+			if nearbyaddress:
+				addressobj.nearbyaddress =  nearbyaddress
+			if pincode:
+				addressobj.pincode = pincode
+			if city:
+				addressobj.city= city
+			if state:
+				addressobj.state= state
+			if country:
+				addressobj.country= country
+			if latitude:
+				addressobj.latitude =  latitude
+			if longitude:
+				addressobj.longitude =  longitude
+			if default:
+				addressobj.isdefaultaddress = default
+			if isbillingaddress:
+				addressobj.isbillingaddress=isbillingaddress
+			if isshippingaddress:
+				addressobj.isshippingaddress=isshippingaddress
+			if gstno:
+				addressobj.gstno=gstno
+			addressobj.updatedby= request.user
+			addressobj.save()
 			return redirect('/selectaddress/?cart='+request.session['cart_id'])
 		return render(request, 'user_app/my-address.html', {"customer_obj":Customer.objects.filter(user=request.user).first(), 'data':Address.objects.filter(user=request.user)})
 	else:

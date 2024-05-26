@@ -43,32 +43,41 @@ def get_cart_items(request,user_type):
 	else:
 		cartobj = Cart.objects.filter(vendor__user=request.user)
 	print(cartobj)
-	lt = []
-	alltotal=0
-	allsubtotal=0
-	for x in cartobj:
-		p=x.productvariants.price
-		t=(x.productvariants.price + ((x.productvariants.product.tax * x.productvariants.price)/100)) * x.quantity
-		dic = {
-		'id':x.id,
-		'image':x.productvariants.productimage.url,
-		'name':x.productvariants.productvariantname,
-		'quantity':x.quantity,
-		'price':x.productvariants.price,
-        'mrp':x.productvariants.mrp,
-        'tax':(x.productvariants.product.tax * x.productvariants.price)/100,
-		'total': (x.productvariants.price + ((x.productvariants.product.tax * x.productvariants.price)/100)) * x.quantity,
-		'product_id':x.productvariants.id,
-		'alltotal':alltotal+t,
-  	    'allsubtotal':allsubtotal+p,
-		}	
+
+	# Initialize list and totals
+	item_list = []
+	total_amount = 0
+	tax_amount = 0
+	subtotal_amount = 0
+
+	# Iterate through cart items and create dictionaries
+	for item in cartobj:
+		price = item.productvariants.price
+		tax = (item.productvariants.product.tax * price) / 100
+		total = (price + tax) * item.quantity
 		
-		if x.productvariants.quantity == 0:
-			dic.update({'stock_out':True})
-		else:
-			dic.update({'stock_out':False})
-		lt.append(dic)
-	dic = {'items':lt, 'cart':cartobj}
+		item_dict = {
+			'id': item.id,
+			'image': item.productvariants.productimage.url,
+			'name': item.productvariants.productvariantname,
+			'quantity': item.quantity,
+			'price': price,
+			'mrp': item.productvariants.mrp,
+			'tax': tax,
+			'total': total,
+			'product_id': item.productvariants.id,
+			'stock_out': item.productvariants.quantity == 0
+		}
+		
+		# Add the dictionary to the list
+		item_list.append(item_dict)
+		
+		# Update totals
+		subtotal_amount += price * item.quantity
+		tax_amount += tax
+		total_amount += total
+
+	dic = {'items':item_list,'tax_amount':tax_amount, "subtotal_amount":subtotal_amount,'total_amount':total_amount}
 	dic.update(get_cart_len(request,"CUSTOMER"))
 	return dic
 

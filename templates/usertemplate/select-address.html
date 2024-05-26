@@ -109,10 +109,10 @@
                             <thead>
                                 <tr>
                                     <th class="product-name">Product</th>
-                                    <th class="product-name">Price</th>
+                                    <th class="product-name">Prodct Price</th>
                                     <th class="product-name">Quantity</th>
-                                    <!-- <th class="product-name">Tax(%)</th> -->
-                                    <th class="product-total"> Subtotal</th>
+                                    <th class="product-name">Tax</th>
+                                    <th class="product-total">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -121,30 +121,36 @@
                                     <td style="border-top:0;">{{i.name}}</td>
                                     <td style="border-top:0;">₹{{i.price}}</td>
                                     <td style="border-top:0;">{{i.quantity}}</td>
-                                    <!-- <td style="border-top:0;">{{i.tax}}</td> -->
+                                    <td style="border-top:0;">{{i.tax}}</td> 
                                     <td style="border-top:0;">₹{{i.total}}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="3">Subtotal</th>
-                                    <input type="hidden" value="{{ cart.subtotal }}" id="subtotal">
-                                    <td >₹{{ cart.subtotal }}</td>
+                                    <th colspan="4">Subtotal Amount</th>
+                                    <input type="hidden" value="{{ subtotal_amount }}" id="subtotal">
+                                    <td >₹{{ subtotal_amount }}</td>
                                 </tr>
-                                <tr>
+                                {% comment %} <tr>
                                     <input type="hidden" value="{{ cart.delivery_charges }}" id="delivery_charge">
-                                    <th colspan="3">Delivery Charge</th>
-                                    <td>Flat rate {% if cart.subtotal <= 499 %}{{ cart.delivery_charges }}{% else%} {{0.0}}{% endif %}</td>
+                                    <th colspan="4">Delivery Charge</th>
+                                    <td>Flat rate {% if subtotal_amount <= 499 %}{{ cart.delivery_charges }}{% else%} {{0.0}}{% endif %}</td>
+                                </tr> {% endcomment %}
+                                <tr>
+                        
+                                    <th colspan="4">Tax Amount</th>
+                                    <input type="hidden" value="{{ tax_amount }}" id="tax_p">
+                                    <td><strong id="tax_amount_p">₹ {{ tax_amount }} </strong></td>
                                 </tr>
                                 <tr>
-                                    <th colspan="3">Total</th>
-                                    <input type="hidden" value="{{ cart.total }}" id="total_p">
-                                    <td><strong id="total_amount_p">₹ {{ cart.total }} </strong></td>
+                                    <th colspan="4">Total Amount</th>
+                                    <input type="hidden" value="{{ total_amount }}" id="total_p">
+                                    <td><strong id="total_amount_p">₹ {{ total_amount }} </strong></td>
                                 </tr>
                             </tfoot>
                         </table>
-                        <p style="padding-left: 15px;" class="product-name">Select Plan</p>
+                        {% comment %} <p style="padding-left: 15px;" class="product-name">Select Plan</p>
                         <div class="form-check" aria-required="true">
                             <input required type="radio" name="plan_type" id="exampleRadios2" value="Binary">
                             <label  for="exampleRadios2">Re-purchase</label>
@@ -164,7 +170,7 @@
                             {% else%} 
                             
                             {% endif %}
-                        </div>
+                        </div> {% endcomment %}
                         <div class="shop-bar clearfix pt-4 text-success">
                             
                                 <input type="hidden" value="{{ cart.id }}" name="cart">
