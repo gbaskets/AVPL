@@ -516,7 +516,7 @@
                                     <a href="#" data-toggle="modal" data-target="#locationModal"
                                         class="u-header-topbar__nav-link location text-light "><i
                                             class="ec text-light  ec-map-pointer mr-1"></i><span
-                                            class="search-text">{{request.session.store_name}}</span></a>
+                                            class="search-text">{{request.session.storename}}</span></a>
 
                                     {%else%}
                                     <a href="#" data-toggle="modal" data-target="#locationModal"
@@ -882,8 +882,7 @@
                                                         <li class="nav-item u-header__nav-item" data-event="hover"
                                                             data-position="left">
                                                             <a href="/search2/?key=&category={{cate.id}}"
-                                                                class="nav-link u-header__nav-link font-weight-bold">{{
-                                                                cate.name|safe }}</a>
+                                                                class="nav-link u-header__nav-link font-weight-bold">{{cate.name|safe }}</a>
                                                             <!-- <a href="/storecategories/?c={{cate.id}}&sort=3" class="nav-link u-header__nav-link font-weight-bold">{{ cate.name|safe }}</a> -->
 
 

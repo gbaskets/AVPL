@@ -53,8 +53,6 @@
                            <tr>
                               <th>Title</th>
                               <th>Category</th>
-                              <th>Description</th>
-                              <th>Link</th>
                               <th>Banner</th>
                               <th>Status</th>
                               <th>Updated On</th>
@@ -65,11 +63,13 @@
                         <tbody>
                            {% for x in data %}
                            <tr>
-                              <td>{{i.title }}</td>
-                              <td>{{i.subtitle }}</td>
-                              <td>{{i.description }}</td>
-                              <td>{{i.link }}</td>
-                                <td><img src="{{i.image.url}}" style="height: 200px;width:200px ;" class="img-fluid profile-img"></td>
+                              <td>{{x.title}}</td>
+                              <td>{{x.category.name|default:"--" }}</td>
+                                <td> {% if x.image %}
+                                 <a href="{{x.image.url}}"> <img alt="image" src="{{x.image.url}}"  height="50" weight="50" /></a>
+                                 {% else %}
+                                   --
+                                 {% endif %}</td>
                               {% if x.isactive == True %}
                               <td><span>Active</span></td>
                               {% else %}
@@ -133,7 +133,8 @@
                <div class="form-group">
                   <label>Product Categories</label>
                   <select class="form-control" required name="main_id">
-                  {% for category in productcategory %}
+                  {% for category in categories %}
+                  <option value="">--</option>
                   <option value="{{ category.id }}" {% if x.category.id == category.id %} selected {% endif %}>{{ category.name }}</option>
                   {% endfor %}
                </select>    

@@ -224,133 +224,49 @@ def referal_transaction(request):
 
 @csrf_exempt
 def user_add_to_cart(request):
-	print('=====user')
 	if check_user_authentication(request, 'CUSTOMER'):
-		print(request.user)
-		variants = request.POST.getlist('variants[]')
+		customerobj=Customer.objects.filter(user=request.user).first()
 		quantity = request.POST.get('quantity')
-		product = Product.objects.get(id=request.POST.get('product'))
-		print(product)
-		flag = True
-		print(product.stock)
-		if product.stock >= int(quantity):
-			print('hellllo')
-			if True:
-					print("fggd")
-				
-					if Cart.objects.filter(user=request.user).exists():
-						print("bjhbjhgjh")
-						cart = Cart.objects.get(user=request.user)
+		product_variants_id=request.POST.get('product_variants_id')
+		productvariantsobj = ProductVariants.objects.filter(id=product_variants_id).first()
+		print(productvariantsobj)
+		if productvariantsobj.quantity >= int(quantity):
+			if Cart.objects.filter(customer=customerobj).exists():
+				cartobj = Cart.objects.filter(customer=customerobj)
+				for x in cartobj:
+					if x.productvariants.store.id == productvariantsobj.store.id:
 						allow = True
-						for x in CartItems.objects.filter(cart=cart):
-							print("jhvghvgf")
-							if x.product.store == product.store:
-								
-								allow = True
-								print(allow)
-								break
-							else:
-								allow = False
-								print(allow)
-								break
-						if allow:
-							print("jhvhfty")
-							variant_matched = False
-							item = ''
-							for items in CartItems.objects.filter(cart=cart, product=product):
-								cart_variants = []
-								print(cart_variants,"cart_variants")
-								for x in CartItemVariant.objects.filter(cartitem=items):
-									print("cccccc",x)
-									cart_variants.append(str(x.product_variant.id))
-								if variants == cart_variants:
-									variant_matched = True
-									item = items
-									break
-							if variant_matched:
-								new_quantity = int(quantity) + item.quantity
-								print(new_quantity,'hhhhhhhhhhhhhhhh')
-								if new_quantity > product.stock:
-									new_quantity = product.stock
-								price = item.product.price
-								total_price = item.product.price * new_quantity
-								CartItems.objects.filter(id=item.id).update(
-									quantity = new_quantity,
-									per_item_cost = price,
-									total_cost = total_price
-								)
-								subtotal = cart.subtotal + (int(quantity)*item.product.price)
-								Cart.objects.filter(user=request.user).update(subtotal=subtotal)
-								calculate_cart_tax(request)
-								return JsonResponse({'response':'product already in cart !', 'cart_len':get_cart_len(request)})
-							else:
-								if int(quantity) > product.stock:
-									quantity = product.stock
-								item = CartItems.objects.create(
-										cart = cart,
-										product = product,
-										quantity = quantity,
-										per_item_cost = product.price,
-										total_cost = product.price*int(quantity)
-									)
-								for x in variants:
-									print("xxxxx",x)
-									CartItemVariant.objects.create(cart=cart, cartitem=item, product_variant=ProductVariant.objects.get(id=x))
-								subtotal = cart.subtotal + (int(quantity)*product.price)
-								Cart.objects.filter(user=request.user).update(subtotal=subtotal)
-								print("prining here")
-								print(subtotal)
-								calculate_cart_tax(request)
-								return JsonResponse({'response':'product added successfully !', 'cart_len':get_cart_len(request)})
-						else:
-							# if int(quantity) > product.stock:
-							# 	quantity = product.stock
-							# print(quantity)
-							# item = CartItems.objects.create(
-							# 	cart = cart,
-							# 	product = product,
-							# 	quantity = quantity,
-							# 	per_item_cost = product.price,
-							# 	total_cost = product.price*int(quantity)
-							# )
-							# print(item,'iiiiiiiiiiiiiiiii')
-							# for x in variants:
-							# 	print("xxxxx",x)
-							# 	CartItemVariant.objects.create(cart=cart, cartitem=item, product_variant=ProductVariant.objects.get(id=x))
-							# subtotal = cart.subtotal + (int(quantity)*product.price)
-							# Cart.objects.filter(user=request.user).update(subtotal=subtotal)
-							# print("prining here")
-							# print(subtotal)
-							# calculate_cart_tax(request)
-							messages.info(request, 'Add Product from same store.')
-							print("==================>Add Product from same store")
-							return JsonResponse({'response': 'Add Product from same store !'})
-						return render(request, 'usertemplate/index.html')
-						# else:
-						# 	return JsonResponse({'response':'failed2', 'cart_len':get_cart_len(request)})
+						print(allow,'product is same store !')
+						break
 					else:
-						if int(quantity) > product.stock:
-								quantity = product.stock
-						cart = Cart.objects.create(user=request.user)
-						total = product.price*int(quantity)
-						item = CartItems.objects.create(
-							cart = Cart.objects.get(user=request.user),
-							product = product,
-							quantity = quantity,
-							per_item_cost = product.price,
-							total_cost = total
-						)
-						for x in variants:
-							print("rerwe", x)
-							CartItemVariant.objects.create(cart=cart, cartitem=item, product_variant=ProductVariant.objects.get(id=x))
-						Cart.objects.filter(user=request.user).update(subtotal=total)	
-						calculate_cart_tax(request)
-						return JsonResponse({'response':'success', 'cart_len':get_cart_len(request)})
+						allow = False
+						print(allow,'product is not same store !')
+						break
+				if allow:
+					print(allow,"allow")
+					if cartobj.filter(productvariants__id=productvariantsobj.id).exists():
+						cartobjexits=cartobj.filter(productvariants__id=productvariantsobj.id).first()
+						new_quantity = int(quantity) + cartobjexits.quantity
+						print(new_quantity,'new_quantityhhhhhhhhhhhhhhhh')
+						cartobjexits.quantity = new_quantity
+						cartobjexits.updatedby=request.user
+						cartobjexits.save()
+						return JsonResponse({'response':'Product is already in cart !', 'cart_len':get_cart_len(request)})
+					else:
+						Cart.objects.create(customer=customerobj,productvariants =productvariantsobj,quantity=quantity,updatedby=request.user)
+						#calculate_cart_tax(request)
+						return JsonResponse({'response':'Product is added to cart successfully !', 'cart_len':get_cart_len(request)})
+				else:
+					messages.info(request, 'Add Product from same store.')
+					print("==================>Add Product from same store")
+					return JsonResponse({'response': 'Add Product from same store !'})
+			else:
+				Cart.objects.create(customer=customerobj,productvariants =productvariantsobj,quantity=quantity,updatedby=request.user)
+				#calculate_cart_tax(request)
+				return JsonResponse({'response':'success', 'cart_len':get_cart_len(request)})
 		return JsonResponse({'response':'failed'})
 	else:
 		return JsonResponse({'response': 'Login to continue'})
-		print('jello')
-		return render(request, '403.html')
 
 # wishlist
 @csrf_exempt
@@ -515,9 +431,9 @@ def user_wishlist(request):
 def user_cart(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		categories = ProductCategory.objects.all()
-		if Cart.objects.filter(user=request.user).exists():
-			dic = get_cart_items(request)
-			if len(CartItems.objects.filter(cart=Cart.objects.get(user=request.user))) == 0:
+		if Cart.objects.filter(customer__user=request.user).exists():
+			dic = get_cart_items(request, 'CUSTOMER')
+			if len(Cart.objects.filter(customer__user=request.user)) == 0:
 				empty = True
 			else:
 				empty = False
@@ -539,11 +455,11 @@ def user_cart(request):
 			dic = {'empty':True}
 			dic.update(get_dic(request))
 			dic.update({
-				'contact_us':contact_us.objects.all()[0],
+				'contact_us':CompanyContactUs.objects.all()[0],
 				'categories':categories,
 				'wish_len':get_wishlist_len(request),
-				'notification':get_notifications(request.user),
-				'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+				# 'notification':get_notifications(request.user),
+				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 				})
 			return render(request, 'usertemplate/cart.html', dic)
 	else:
