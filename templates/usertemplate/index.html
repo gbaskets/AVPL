@@ -15,7 +15,7 @@
 <style>
     @media screen and (min-width: 480px) {
     .slidersss {
-        height: 420px;
+        height: 430px;
        
      } }
 </style>
@@ -25,48 +25,41 @@
     <div class="mb-5">
        
             <div class="container  overflow-hidden">
-                
+                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                       
+                      <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                      {% for i in banners|slice:"1:" %}
+                      <li data-target="#carouselExampleIndicators" data-slide-to="{{i.id}}"></li>
+                      {% endfor %}
+                    </ol>
+                    <div class="carousel-inner">
+                        {% for i in banners|slice:":1" %}
+                      <div class="carousel-item slidersss active">
+                        <img class="d-block w-100" src="{{i.image.url}}" >
+                      </div>
+                      {% endfor %}
+                      {% for i in banners|slice:"1:" %}
+                     
+                      <div class="carousel-item slidersss">
+                       
+                           <img class="d-block w-100" src="{{i.image.url}}" >
+                      </div>
+                      {% endfor %}
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </div>
                    
                     
-                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-                       
-                        <ol class="carousel-indicators">
-                            {% for i in banners|slice:":1" %}
-                          <li data-target="#carouselExampleIndicators" data-slide-to="{{i.id}}" class="active"></li>
-                          {%endfor%}
-                          {% for i in banners|slice:"0:" %}
-                          <li data-target="#carouselExampleIndicators" data-slide-to="{{i.id}}"></li>
-                          {%endfor%}
-                        </ol>
-                        <div class="carousel-inner">
-                            {% for i in banners|slice:":1" %}
-                          <div class="carousel-item active">
-                            <img class="d-block w-100 slidersss" src="{{i.image.url}}" >
-                          </div>
-                          {%endfor%}
-
-                          {% for i in banners|slice:"0:"%}
-                          <div class="carousel-item">
-                            <img class="d-block w-100 slidersss" src="{{i.image.url}}" >
-                            <div class="carousel-caption d-none d-md-block">
-                              <h5>{{i.title}}</h5>
-                              <p>{{i.description}}</p>
-                            </div>
-                          </div>
-                          {%endfor%}
-
-                        </div>
-                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                          <span class="sr-only">Previous</span>
-                        </a>
-                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                          <span class="sr-only">Next</span>
-                        </a>
-                      </div>
-                
-
+                    
+                      
                
             </div>
         
@@ -86,7 +79,7 @@
                             {% if i.image %}
                             <img style="height: 90px;" class="img-fluid" src="{{i.image.url}}" alt="Image Description">
                             {% else %}
-                            <h3>No Category Image Available!!</h3>
+                           
                             {% endif %}
                         </div>
                         <div class="col-6 col-xl-7 col-wd-6">
@@ -229,9 +222,7 @@
 <div class="container">
     <!-- Prodcut-cards-carousel -->
     <div class="space-top-2">
-        <!-- <dv class=" d-flex justify-content-between border-bottom border-color-1 flex-md-nowrap flex-wrap border-sm-bottom-0"> -->
-
-
+       
         <h3 class="section-title mb-0 pb-2 font-size-22">Near By Store</h3>
         <div class="d-flex">
             <div class="col-lg-4 col-sm-12 col-12 d-flex flex-column">
@@ -303,40 +294,7 @@
 
             </div>
         </div>
-        <!-- <div class="row margin-minus-tb-15"> -->
-        <!-- <div class="js-slide"> -->
-
-        <!-- <ul class="row list-unstyled products-group mb-0">
-                                        <li  class="col-wd-3 col-md-4 product-item product-item__card pb-2 mb-2 pb-md-0 mb-md-0 border-bottom border-md-bottom-0">
-                                            <div  class="product-item__outer">
-                                                <div style="border-radius: 0rem;"  class="product-item__inner">
-                                                    <div class="col col-lg-auto product-media-left">
-                                                        <a href="/single_product/{{i.id}}" class="max-width-150 d-block"><img class="img-fluid" src="https://onlineapnidukan.com/media/{{store_img.logo}}" alt="Image Description"></a> -->
-        <!-- <a href="/store_details/{{store.id}}" class="max-width-150 d-block"><img style="margin:auto;height:100px;" class="img-fluid" src="{{store_img.logo.url}}" alt="Image Description"></a>
-                                                    </div>
-                                                    <div class="col product-item__body pl-2 pl-lg-3 mr-xl-2 mr-wd-1">
-                                                        <div class="mb-4">
-                                                            <div class="mb-2"><a href="" class="font-size-12 text-gray-5">{{i.main_category.category}}</a></div>
-                                                            <h5 class="product-item__title"><a href="/store_details/{{store.id}}" class="text-blue font-weight-bold">{{store}}</a></h5>
-                                                            <small class="text-info">{{store.distance}} KM Away</small>
-                                                            <p class="alert alert-success"style="border-left: 0px;><span class="text">Open Time: </span><span class="badge badge-success mx-2">{{store.opening_time}}</span><br>
-                                                                <span class="text" >Close Time: </span><span class="badge badge-danger mx-2">{{store.closing_time}}</span></p>
-
-                                                        </div>
-                                                        <div class="product-item__footer">
-                                                            <div class="border-top pt-2 flex-center-between flex-wrap">
-                                                                <a href="/buysingle/{{i.id}}" class="text-gray-6 font-size-13"><i class="ec ec-compare mr-1 font-size-15"></i> See Details</a>
-                                                                
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul> -->
-        <!-- </div> -->
-        <!-- </div> -->
-        <!-- </dv> -->
+       
     </div>
     {% else %}
 
@@ -746,7 +704,7 @@
 
         <div class="mb-8">
             <div class="row">
-                {% for i in footer_banner %}
+                {% for i in footer_banner|slice:"2:4" %}
                 <div class=" col-md-6  mb-3 mb-md-0">
                     <a href="">
                         <img class="img-fluid" src="{{ i.image.url }}" alt="Image Description">
@@ -834,130 +792,6 @@
 
             </div>
         </div>
-
-
-
-
-
-        <!-- <div class="js-slide">
-                            <ul class="row list-unstyled products-group no-gutters mb-0 overflow-visible">
-                                {% for i in best_seller2%}
-                                <li class="col-wd-3 col-md-4 product-item product-item__card pb-2 mb-2 pb-md-0 mb-md-0 border-bottom border-md-bottom-0">
-                                    <div class="product-item__outer h-100">
-                                        <div class="product-item__inner p-md-3 row no-gutters">
-                                            <div class="col col-lg-auto product-media-left">
-                                                <a href="/single_product/{{i.id}}" class="max-width-150 d-block"><img class="img-fluid" src="/{{i.image}}" alt="Image Description"></a>
-                                            </div>
-                                            <div class="col product-item__body pl-2 pl-lg-3 mr-xl-2 mr-wd-1">
-                                                <div class="mb-4">
-                                                    <div class="mb-2"><a href="/collection/{{i.main_category.id}}" class="font-size-12 text-gray-5">{{i.main_category.category}}</a></div>
-                                                    <h5 class="product-item__title"><a href="/single_product/{{i.id}}" class="text-blue font-weight-bold">{{i.title}}</a></h5>
-                                                </div>
-                                                <div class="flex-center-between mb-3">
-                                                    {%if rerquest.user.is_retailer%}
-                                                    <div class="prodcut-price">
-                                                        <div class="text-gray-100">₹{{i.amount_to_pay_retailer|floatformat:2}}</div>
-                                                    </div>
-                                                    {%else%}
-                                                    <div class="prodcut-price">
-                                                        <div class="text-gray-100">₹{{i.amount_to_pay|floatformat:2}}</div>
-                                                    </div>
-                                                    {%endif%}
-                                                    {% if request.session.store_id%}
-                                                    <div class="d-none d-xl-block prodcut-add-cart">
-                                                        <a href="/add_to_cart/{{i.id}}/" class="btn-add-cart btn-primary transition-3d-hover"><i class="ec ec-add-to-cart"></i></a>
-                                                    </div>
-                                                    {%endif%}
-                                                </div>
-                                                <div class="product-item__footer">
-                                                    <div class="border-top pt-2 flex-center-between flex-wrap">
-                                                        {% if request.session.store_id%}
-                                                        <a href="/addtowish/{{i.id}}" class="text-gray-6 font-size-13"><i class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
-                                                        {%else%}
-                                                        <a href="/buysingle/{{i.id}}" class="text-gray-6 font-size-13"><i class="ec ec-compare mr-1 font-size-15"></i> Buy Now</a>
-                                                        {%endif%}
-                                                        
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                {%endfor%}
-                            </ul>
-                        </div>
-                        <div class="js-slide">
-                            <ul class="row list-unstyled products-group no-gutters mb-0 overflow-visible">
-                                {%for i in best_seller3%}
-                                <li class="col-wd-3 col-md-4 product-item product-item__card pb-2 mb-2 pb-md-0 mb-md-0 border-bottom border-md-bottom-0">
-                                    <div class="product-item__outer h-100">
-                                        <div class="product-item__inner p-md-3 row no-gutters">
-                                            <div class="col col-lg-auto product-media-left">
-                                                <a href="/single_product/{{x.id}}" class="max-width-150 d-block"><img class="img-fluid" src="/{{i.image}}" alt="Image Description"></a>
-                                            </div>
-                                            <div class="col product-item__body pl-2 pl-lg-3 mr-xl-2 mr-wd-1">
-                                                <div class="mb-4">
-                                                    <div class="mb-2"><a href="/collection/{{i.main_category.id}}" class="font-size-12 text-gray-5">{{i.main_category.category}}</a></div>
-                                                    <h5 class="product-item__title"><a href="/single_product/{{i.id}}" class="text-blue font-weight-bold">{{i.title}}</a></h5>
-                                                </div>
-                                                <div class="flex-center-between mb-3">
-                                                    {% if request.user.is_retailer%}
-                                                    <div class="prodcut-price">
-                                                        <div class="text-gray-100">₹{{i.amount_to_pay_retailer|floatformat:2}}</div>
-                                                    </div>
-                                                    {%else%}
-                                                    <div class="prodcut-price">
-                                                        <div class="text-gray-100">₹{{i.amount_to_pay|floatformat:2}}</div>
-                                                    </div>
-                                                    {%endif%}
-                                                    {%if request.session.store_id%}
-                                                    <div class="d-none d-xl-block prodcut-add-cart">
-                                                        <a href="/add_to_cart/{{i.id}}/" class="btn-add-cart btn-primary transition-3d-hover"><i class="ec ec-add-to-cart"></i></a>
-                                                    </div>
-                                                    {%endif%}
-                                                </div>
-                                                <div class="product-item__footer">
-                                                    <div class="border-top pt-2 flex-center-between flex-wrap">
-                                                        
-                                                        {% if request.session.store_id%}
-                                                        <a href="/addtowish/{{i.id}}" class="text-gray-6 font-size-13"><i class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
-                                                        {% else %}
-
-                                                            <a href="/buysingle/{{i.id}}" class="text-gray-6 font-size-13"><i class="ec ec-compare mr-1 font-size-15"></i> Buy Now</a>
-
-                                                        {%endif%}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                {%endfor%}
-                            </ul>
-                        </div>
-                    </div>
-                </div> -->
-        <!-- End Prodcut-cards-carousel -->
-
-
-
-        <!-- Full banner -->
-
-        <!-- End Full banner -->
-        <!-- <div class="mb-8">
-                        <div class="row">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <a >
-                                    <img class="img-fluid" src="{% static 'assets1/img/690X150/personal care 690 by 150.webp' %}" alt="Image Description">
-                                </a>
-                            </div>
-                            <div class="col-md-6">
-                                <a >
-                                    <img class="img-fluid" src="{% static 'assets1/img/690X150/690 by 150 pasta and vermicelli.webp' %}" alt="Image Description">
-                                </a>
-                            </div>
-                        </div>
-                    </div> -->
 
         <!-- Recently viewed -->
         {% for i,j in d.items %}
@@ -1081,91 +915,9 @@
 
         {%endfor%}
 
-        <!-- <div class="mb-6">
-                    <a  class="d-block text-gray-90">
-                        <div class="" >
-                            <div class="space-top-2-md">
-                                <div class="flex-horizontal-center mt-lg-3 mt-xl-0 overflow-auto overflow-md-visble">
-                                 <img src="{%static 'assets1/img/BANNER-1400-BY206.webp' %}" class="img-fluid">
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div> -->
-
-
-
-
-
-
-
-
-
-
-
+        
         <!-- End Recently viewed -->
 
-
-        <!-- End Recently viewed -->
-        <!-- Brand Carousel -->
-        <!-- <div class="mb-8">
-                    <div class="py-2 border-top border-bottom">
-                        <div class="js-slick-carousel u-slick my-1"
-                            data-slides-show="5"
-                            data-slides-scroll="1"
-                            data-arrows-classes="d-none d-lg-inline-block u-slick__arrow-normal u-slick__arrow-centered--y"
-                            data-arrow-left-classes="fa fa-angle-left u-slick__arrow-classic-inner--left z-index-9"
-                            data-arrow-right-classes="fa fa-angle-right u-slick__arrow-classic-inner--right"
-                            data-responsive='[{
-                                "breakpoint": 992,
-                                "settings": {
-                                    "slidesToShow": 2
-                                }
-                            }, {
-                                "breakpoint": 768,
-                                "settings": {
-                                    "slidesToShow": 1
-                                }
-                            }, {
-                                "breakpoint": 554,
-                                "settings": {
-                                    "slidesToShow": 1
-                                }
-                            }]'>
-                            <div class="js-slide">
-                                <a href="#" class="link-hover__brand">
-                                    <img class="img-fluid m-auto max-height-50" src="{% static 'assets1/img/200X60/img1.png' %}" alt="Image Description">
-                                </a>
-                            </div>
-                            <div class="js-slide">
-                                <a href="#" class="link-hover__brand">
-                                    <img class="img-fluid m-auto max-height-50" src="{% static 'assets1/img/200X60/img2.png' %}" alt="Image Description">
-                                </a>
-                            </div>
-                            <div class="js-slide">
-                                <a href="#" class="link-hover__brand">
-                                    <img class="img-fluid m-auto max-height-50" src="{% static 'assets1/img/200X60/img3.png' %}" alt="Image Description">
-                                </a>
-                            </div>
-                         <div class="js-slide">
-                                <a href="#" class="link-hover__brand">
-                                    <img class="img-fluid m-auto max-height-50" src="{% static 'assets1/img/200X60/img4.png' %}" alt="Image Description">
-                                </a>
-                            </div>
-                            <div class="js-slide">
-                                <a href="#" class="link-hover__brand">
-                                    <img class="img-fluid m-auto max-height-50" src="{% static 'assets1/img/200X60/img5.png' %}" alt="Image Description">
-                                </a>
-                            </div>
-                            <div class="js-slide">
-                                <a href="#" class="link-hover__brand">
-                                    <img class="img-fluid m-auto max-height-50" src="{% static 'assets1/img/200X60/img6.png' %}" alt="Image Description">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-        <!-- End Brand Carousel -->
     </div>
 
 
@@ -1389,6 +1141,8 @@
 
 
 </main>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 
@@ -1398,25 +1152,9 @@
     $(document).ready(function () {
         $('.button-input').click(function () {
             console.log('hhhhhh')
-
-            console.log('hehhhhhhhh')
             flag = '0';
-
             product_id = $(this).closest(".cart_product").find('.product_cart').val()
             console.log(product_id)
-            variant_lt = [];
-            //     {% for variant in variants %}
-            //     { { variant.variant.name } } = document.getElementsByName('{{variant.variant.name}}');
-            //     var {{ variant.variant.name }
-            // } _id = 'none';
-            // for (i = 0; i < {{ variant.variant.name }}.length; i++) {
-            //     if ({{ variant.variant.name }
-            // } [i].checked) {
-            //     variant_lt.push({{ variant.variant.name }} [i].value);
-            // break;
-            //     }
-            // }
-            // {% endfor %}
             quantity_val = document.getElementById('quantity').value;
             console.log(quantity_val)
             document.getElementById('added-cart').style.display = 'block';
@@ -1424,15 +1162,12 @@
                 $.ajax({
                     type: 'POST',
                     url: '/user/addtocart',
-
-                    data: { product: product_id, variants: variant_lt, quantity: quantity_val },
-
+                    data: { product_variants_id: product_id,quantity: quantity_val },
                     success: function (res_data) {
                         alert(res_data.response)
                         if (res_data.response == 'failed2') {
                             console.log(data, 'KKKKKKKKKK');
-
-                            document.getElementById('added-cart-text').innerHTML = 'You can only add products from same shop';
+                            document.getElementById('added-cart-text').innerHTML = 'You can only add to cart product from same store !';
                         }
                         else {
                             if (res_data.response == 'success') {
@@ -1464,26 +1199,13 @@
     async function add_to_wishlist() {
         flag = '0';
         product_id = document.getElementById('product').value;
-        variant_lt = [];
-        //     {% for variant in variants %}
-        //     { { variant.variant.name } } = document.getElementsByName('{{variant.variant.name}}');
-        //     var {{ variant.variant.name }
-        // } _id = 'none';
-        // for (i = 0; i < {{ variant.variant.name }}.length; i++) {
-        //     if ({{ variant.variant.name }
-        // } [i].checked) {
-        //     variant_lt.push({{ variant.variant.name }} [i].value);
-        // break;
-        //         }
-        //     }
-        // {% endfor %}
         quantity_val = document.getElementById('quantity').value;
         document.getElementById('added-cart').style.display = 'block';
         if (flag == '0') {
             $.ajax({
                 type: 'POST',
                 url: '/user/addtowishlist',
-                data: { product: product_id, variants: variant_lt, quantity: quantity_val },
+                data: {  product_variants_id: product_id, quantity: quantity_val },
                 success: function (res_data) {
                     if (res_data.response == 'failed2') {
                         console.log(data, 'KKKKKKKKKK');

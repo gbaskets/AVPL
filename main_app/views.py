@@ -472,7 +472,6 @@ def search_result2(request):
     latest_product = latest_product.filter(createdat__year=current_year)
     
     special_offer = Product.objects.filter(isactive=True,isspecialoffer=True)
-    footer_banner = HomeFooterBanner.objects.all()
     categories = ProductCategory.objects.all()
 
     brand_list = Brand.objects.all()

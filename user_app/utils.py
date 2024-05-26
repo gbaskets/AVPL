@@ -8,7 +8,7 @@ from django.utils import timezone
 def get_cart_len(request):
 	if request.user.is_authenticated:
 		if Cart.objects.filter(customer__user=request.user).exists():
-			cart = Cart.objects.get(customer__user=request.user)
+			cart = Cart.objects.filter(customer__user=request.user)
 			cart_len=len(cart)
 		else:
 			cart_len = 0
@@ -33,35 +33,32 @@ def get_wishlist_len(request):
 		dic = {'wish_len':0}
 		return dic
 
-def get_cart_items(request):
-	cart = Cart.objects.get(user=request.user)
-	print(cart)
+def get_cart_items(request,user_type):
+	if user_type == "CUSTOMER":
+		cartobj = Cart.objects.filter(customer__user=request.user)
+	else:
+		cartobj = Cart.objects.filter(vendor__user=request.user)
+	print(cartobj)
 	lt = []
-	for x in CartItems.objects.filter(cart=cart):
-		image = ProductImages.objects.filter(product=x.product)[0]
+	for x in cartobj:
 		dic = {
 		'id':x.id,
-		'image':image.image.url,
-		'name':x.product.name,
+		'image':x.productvariants.productimage.url,
+		'name':x.productvariants.productvariantname,
 		'quantity':x.quantity,
-		'price':x.per_item_cost,
-		'total':x.total_cost,
-		'stock':x.product.stock,
-		'product_id':x.product.id,
-		'tax':x.product.category.tax
+		'price':x.productvariants.price,
+        'mrp':x.productvariants.mrp,
+		'total':x.productvariants.mrp,
+		'product_id':x.productvariants.id,
+		'tax':x.productvariants.product.tax
 		}	
-		variant = []
-		print("xxxxxxxx", x)
-		for y in CartItemVariant.objects.filter(cartitem=x):
-			print("y111	", y)
-			variant.append(y.product_variant)
-		dic.update({'variant':variant})
-		if x.product.stock == 0:
+		
+		if x.productvariants.quantity == 0:
 			dic.update({'stock_out':True})
 		else:
 			dic.update({'stock_out':False})
 		lt.append(dic)
-	dic = {'items':lt, 'cart':cart}
+	dic = {'items':lt, 'cart':cartobj}
 	dic.update(get_cart_len(request))
 	return dic
 
