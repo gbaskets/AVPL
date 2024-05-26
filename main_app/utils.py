@@ -9,6 +9,7 @@ import datetime
 import uuid
 import requests
 from django.contrib import messages
+from user_app.utils import get_wishlist_len
 from vendor_app.models import *
 import geocoder
 import googlemaps
@@ -175,8 +176,8 @@ def get_dic(request):
 			request.session['lat'] = user.latitude
 			request.session['lng'] = user.longitude
 			dic.update({'lat':user.latitude, 'lng':user.longitude})
-	dic.update(get_cart_len(request))
-	dic.update(get_wishlist_len(request))
+	dic.update(get_cart_len(request, 'CUSTOMER'))
+	dic.update(get_wishlist_len(request, 'CUSTOMER'))
 	return dic
 
 def save_order_items(cart, order, user, ordertype = 'COD', plan = 'Binary'):

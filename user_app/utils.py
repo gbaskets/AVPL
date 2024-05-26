@@ -5,34 +5,38 @@ from main_app.mlm_utils import *
 from vendor_app.models import *
 from django.utils import timezone
 
-def get_cart_len(request):
-	if request.user.is_authenticated:
+def get_cart_len(request,user_type):
+	if user_type == "CUSTOMER":
 		if Cart.objects.filter(customer__user=request.user).exists():
-			cart = Cart.objects.filter(customer__user=request.user)
-			cart_len=len(cart)
+			cartobj = Cart.objects.filter(customer__user=request.user)
+			cart_len=len(cartobj)
 		else:
 			cart_len = 0
-		
-		dic = {'cart_len':cart_len}
-		return dic
 	else:
-		dic = {'cart_len':0}
-		return dic
+		if Cart.objects.filter(vendor__user=request.user).exists():
+			cartobj = Cart.objects.filter(vendor__user=request.user)
+			cart_len=len(cartobj)
+		else:
+			cart_len = 0
+	dic = {'cart_len':cart_len}
+	return dic
 
-def get_wishlist_len(request):
-	if request.user.is_authenticated:
+def get_wishlist_len(request,user_type):
+	if user_type == "CUSTOMER":
 		if Wishlist.objects.filter(customer__user=request.user).exists():
-			cart = Wishlist.objects.get(customer__user=request.user)
-			wish_len=len(cart)
+			wishlistobj = Wishlist.objects.filter(customer__user=request.user)
+			wish_len=len(wishlistobj)
 		else:
 			wish_len = 0
-		
-		dic = {'wish_len':wish_len}
-		return dic
-	else:
-		dic = {'wish_len':0}
-		return dic
-
+	else: 
+		if Wishlist.objects.filter(vendor__user=request.user).exists():
+			wishlistobj = Wishlist.objects.filter(vendor__user=request.user)
+			wish_len=len(wishlistobj)
+		else:
+			wish_len = 0
+	dic = {'wish_len':wish_len}
+	return dic
+	
 def get_cart_items(request,user_type):
 	if user_type == "CUSTOMER":
 		cartobj = Cart.objects.filter(customer__user=request.user)
@@ -48,9 +52,10 @@ def get_cart_items(request,user_type):
 		'quantity':x.quantity,
 		'price':x.productvariants.price,
         'mrp':x.productvariants.mrp,
-		'total':x.productvariants.mrp,
+        'tax':(x.productvariants.product.tax * x.productvariants.price)/100,
+		'total': (x.productvariants.price + ((x.productvariants.product.tax * x.productvariants.price)/100)) * x.quantity,
 		'product_id':x.productvariants.id,
-		'tax':x.productvariants.product.tax
+		
 		}	
 		
 		if x.productvariants.quantity == 0:
@@ -59,44 +64,34 @@ def get_cart_items(request,user_type):
 			dic.update({'stock_out':False})
 		lt.append(dic)
 	dic = {'items':lt, 'cart':cartobj}
-	dic.update(get_cart_len(request))
+	dic.update(get_cart_len(request,"CUSTOMER"))
 	return dic
 
-def get_wishlist_items(request):
-	cart = Wishlist.objects.get(user=request.user)
+def get_wishlist_items(request,user_type):
+	if user_type == "CUSTOMER":
+		wishlistobj = Wishlist.objects.filter(customer__user=request.user)
+	else:
+		wishlistobj = Wishlist.objects.filter(vendor__user=request.user)
+		
 	lt = []
-	for x in WishlistItems.objects.filter(wishlist=cart):
-		image = ProductImages.objects.filter(product=x.product)[0]
+	for x in wishlistobj:
 		dic = {
 		'id':x.id,
-		'image':image.image.url,
-		'name':x.product.name,
-		'mrp':x.product.mrp,
-		'price':x.product.price,
-		'offer':x.product.offer,
-		'weight':x.product.weight,
-		'store':x.product.store.name,
-		'brand':x.product.brand.name,
-		'description':x.product.description,
+		'image':x.productvariants.productimage.url,
+		'name':x.productvariants.productvariantname,
 		'quantity':x.quantity,
-		'price':x.per_item_cost,
-		'total':x.total_cost,
-		'stock':x.product.stock,
-		'product_id':x.product.id
-		}	
-		variant = []
-		print("xxxxxxxx", x)
-		for y in WishlistItemVariant.objects.filter(wishlistitem=x):
-			print("y111	", y)
-			variant.append(y.product_variant)
-		dic.update({'variant':variant})
-		if x.product.stock == 0:
+		'price':x.productvariants.price,
+        'mrp':x.productvariants.mrp,
+        'tax':(x.productvariants.product.tax * x.productvariants.price)/100,
+		'total': (x.productvariants.price + ((x.productvariants.product.tax * x.productvariants.price)/100)) * x.quantity,
+		'product_id':x.productvariants.id,}	
+		if x.productvariants.quantity == 0:
 			dic.update({'stock_out':True})
 		else:
 			dic.update({'stock_out':False})
 		lt.append(dic)
-	dic = {'items':lt, 'cart':cart}
-	dic.update(get_wishlist_len(request))
+	dic = {'items':lt, 'wishlist':wishlistobj}
+	dic.update(get_wishlist_len(request,'CUSTOMER'))
 	return dic
 
 def calculate_cart_tax(request):

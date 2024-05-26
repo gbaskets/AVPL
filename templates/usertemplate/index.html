@@ -490,7 +490,7 @@
                                                 <div class="product-item__footer ">
                                                     <div class="border-top pt-2 flex-center-between flex-wrap">
                                                         {% if request.session.store_id%}
-                                                        <a class="text-gray-6 font-size-13"><i
+                                                        <a  class="text-gray-6 font-size-13"><i
                                                                 class="ec ec-favorites mr-1 font-size-15"></i> Add to
                                                             Wishlist</a>
                                                         {%else%}
@@ -663,7 +663,7 @@
                                                     <div class="border-top pt-2 flex-center-between flex-wrap">
 
                                                         {%if request.session.store_id%}
-                                                        <a href="/addtowish/{{first_variant.id}}"
+                                                        <a  
                                                             class="text-gray-6 font-size-13"><i
                                                                 class="ec ec-favorites mr-1 font-size-15"></i> Add to
                                                             Wishlist</a>
@@ -891,7 +891,7 @@
                                         <div class="border-top pt-2 flex-center-between flex-wrap">
 
                                             {% if request.session.store_id%}
-                                            <a href="/addtowish/{{first_variant.id}}" class="text-gray-6 font-size-13"><i
+                                            <a  class="text-gray-6 font-size-13"><i
                                                     class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
                                             {%else%}
 
@@ -993,7 +993,7 @@
 
 
                                             <input hidden type="number" name="ec_qtybtn" value="1" id="quantity" />
-                                            <input type="hidden" value="{{first_variant.id|safe}}" class="product_cart">
+                                            <input type="hidden" value="{{first_variant.id|safe}}" id="product" class="product_cart">
                                             <button type="button"
                                                 class="button-input btn-add-cart btn-primary transition-3d-hover"><i
                                                     class="ec ec-add-to-cart"></i></button>
@@ -1004,10 +1004,12 @@
 
                                 <div class="product-item__footer">
                                     <div class="border-top pt-2 flex-center-between flex-wrap">
-                                        <a href="" class="text-gray-6 font-size-13"><i
-                                                class="ec ec-compare mr-1 font-size-15"></i> Compare</a>
-                                        <a href="" class="text-gray-6 font-size-13"><i
-                                                class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+                                        <a href="/productdetail/?p={{first_variant.id}}"
+                                        tabindex="0">See Product Details</a>
+                    
+                                        <a href="" onclick="add_to_wishlist();"  class="text-gray-6 font-size-13 mr-2"><i
+                                            class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+                                            
                                     </div>
                                 </div>
                             </div>
@@ -1104,7 +1106,7 @@
                                 <div class="product-item__footer">
                                     <div class="border-top pt-2 flex-center-between flex-wrap">
                                         <!-- <a href="" class="text-gray-6 font-size-13"><i class="ec ec-compare mr-1 font-size-15"></i> See Product Details</a> -->
-                                        <a href="" class="text-gray-6 font-size-13"><i
+                                        <a  class="text-gray-6 font-size-13"><i
                                                 class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
                                     </div>
                                 </div>
@@ -1229,7 +1231,7 @@
 
 
             });
-            location.reload();
+            
         }
     }
 </script>

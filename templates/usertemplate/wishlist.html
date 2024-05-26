@@ -52,46 +52,57 @@
                     <thead>
                         <tr>
                             <th class="product-thumbnail">&nbsp;Product Image</th>
-                            <th class="product-name">&nbsp;Product</th>
-                            <!-- <th class="product-price">Description</th>  -->
-                            <th class="product-mrp">&nbsp;MRP</th>
-                            <th class="product-price">&nbsp;Price</th>
+                            <th class="product-name">Product</th>
+                            <th class="product-name">Price</th>
+                            <th class="product-name">Quantity</th>
+                            <th class="product-Tax">Tax</th>
+                            <th class="product-subtotal">Total Amount(in Rs.)</th>
                             <th class="product-remove">&nbsp;Remove</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for item in items%}
                         <tr class="">
-                            
                             <td class="d-none d-md-table-cell">
-                                <a href="/productdetail/?p={{item.product_id}}"><img class="img-fluid max-width-100 p-1 border border-color-1" src="{{item.image}}" alt="Image Description"></a>
+                                <a href=""><img class="img-fluid max-width-100 p-1 border border-color-1" src="{{item.image}}" alt="Image Description"></a>
                             </td>
-
                             <td data-title="Product">
-                                <a href="/productdetail/?p={{item.product_id}}" class="text-red-90">{{ item.name|safe }}</a><br>
-                               
-                                <span><strong>Store: </strong>{{item.store}}</span><br>
-                                <span><strong>Quantity: </strong>{{item.quantity}}</span><br>                                
-                                <span><strong>Weight: </strong>{{item.weight}}</span><br>
-                                <span><strong>Brand: </strong>{{item.brand}}</span><br>
-                                <span><strong>Discount: </strong>{{item.offer}}</span>
-                                
+                                <a href="/single_product/{{x.item.id}}" class="text-gray-90">{{ item.name|safe }} </a><br>
+                                {% for x in item.set_all %}
+                                <span><strong>variant name: </strong>{{item.category.name}} </span><br>
+                                <span><strong>brand: </strong>{{x.variant_value.value}}</span><br>
+                                <span><strong>discount: </strong>{{x.item.discount_percent}} %</span><br>
+                              {%endfor%}
+                                {%if item.quantity <= item.stock%}
+                                <span><strong>Availability: </strong><span style="color: green">In-Stock</span></span>
+                                {%else%}
+                                <span><strong>Availability: </strong><span style="color: red">Out-of-Stock</span></span>
+                                {%endif%}
                             </td>
-                            <!-- <td data-title="Description">
-                                <a href="/productdetail/?p={{item.product_id}}" class="text-gray-90">{{ item.description|safe }}</a><br>
-
-                            </td> -->
-                            
-                            <td data-title="MRP">
-                                <spam>₹<del>{{item.mrp}}</del></spam>
-                                <!-- <span class="">₹{{item.total}}</span> -->
-                            </td>
-                            
+                            {%if request.user.is_retailer%}
                             <td data-title="Price">
-                                <span>₹{{item.price}}</span>
-                                <!-- <span class="">₹{{item.amount_to_pay}}</span> -->
+                                <spam><del>₹{{item.mrp|floatformat:2}}</del></spam>
+                                <span class="">₹{{item.price|floatformat:2}}</span>
                             </td>
-                            
+                            {%else%}
+                            <td data-title="Price">
+                                <span><del>₹{{item.mrp}}</del></span><br>
+                                <span class="">₹{{item.price}}</span>
+                            </td>
+                            {%endif%}
+
+                            <td data-title="Quantity">
+                                {{ item.quantity }}
+                            </td>
+                            <td data-title="Tax">
+                                
+                                <span class="">₹{{item.tax}}</span>
+                            </td>
+
+                            <td data-title="Total" >
+                                ₹{{item.total}}
+                                
+                            </td> 
 
                             <td class="text-center">
                                 <i class="fa fa-trash-o" style="font-size:48px;color:red"></i>

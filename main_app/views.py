@@ -565,6 +565,7 @@ def home(request):
             return redirect('/vendor/')
         elif check_user_authentication(request, 'ADMIN'):
             return redirect('/admins/dashboard')
+      
     t = request.GET.get('t')
     request.session['t']=t
     u = request.GET.get('u')
@@ -632,6 +633,13 @@ def home(request):
             'stores':fetch_vendors(request.session['lat'], request.session['lng']),
             'st':fetch_vendors_catby(request.session['cat'],request.session['lat'], request.session['lng']),
             		}
+        if request.user.is_authenticated:
+            dic.update(get_cart_len(request,"CUSTOMER"))
+            dic.update(get_wishlist_len(request,"CUSTOMER"))
+        else:
+            dic.update({'cart_len':0,'wish_len':0})
+            
+        
         return render(request,'usertemplate/index.html',dic)
 
 
@@ -1779,9 +1787,10 @@ def logout_view(request):
 def checkout_1(request):
     if check_user_authentication(request, 'CUSTOMER'):
         if request.method == 'GET':
+            customerobj=Customer.objects.filter(user=request.user).first()
             request.session['cart_id'] = request.GET.get('cart')
-            dic = {'addresses':Address.objects.filter(user=request.user), 'address_len':len(Address.objects.filter(user=request.user))}
-            dic.update(get_cart_items(request))
+            dic = {'addresses':Address.objects.filter(customer=customerobj), 'address_len':len(Address.objects.filter(customer=customerobj))}
+            dic.update(get_cart_items(request,'CUSTOMER'))
             dic.update(get_dic(request))
             return render(request, 'usertemplate/select-address.html', dic)
         else:

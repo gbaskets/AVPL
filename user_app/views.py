@@ -251,11 +251,11 @@ def user_add_to_cart(request):
 						cartobjexits.quantity = new_quantity
 						cartobjexits.updatedby=request.user
 						cartobjexits.save()
-						return JsonResponse({'response':'Product is already in cart !', 'cart_len':get_cart_len(request)})
+						return JsonResponse({'response':'Product is already in cart !', 'cart_len':get_cart_len(request,'CUSTOMER')})
 					else:
 						Cart.objects.create(customer=customerobj,productvariants =productvariantsobj,quantity=quantity,updatedby=request.user)
 						#calculate_cart_tax(request)
-						return JsonResponse({'response':'Product is added to cart successfully !', 'cart_len':get_cart_len(request)})
+						return JsonResponse({'response':'Product is added to cart successfully !', 'cart_len':get_cart_len(request,'CUSTOMER')})
 				else:
 					messages.info(request, 'Add Product from same store.')
 					print("==================>Add Product from same store")
@@ -263,8 +263,9 @@ def user_add_to_cart(request):
 			else:
 				Cart.objects.create(customer=customerobj,productvariants =productvariantsobj,quantity=quantity,updatedby=request.user)
 				#calculate_cart_tax(request)
-				return JsonResponse({'response':'success', 'cart_len':get_cart_len(request)})
-		return JsonResponse({'response':'failed'})
+				return JsonResponse({'response':'Product is added to cart successfully !', 'cart_len':get_cart_len(request,"CUSTOMER")})
+		else:
+			return JsonResponse({'response':'failed'})
 	else:
 		return JsonResponse({'response': 'Login to continue'})
 
@@ -272,127 +273,41 @@ def user_add_to_cart(request):
 @csrf_exempt
 def add_to_wishlist(request):
 	if check_user_authentication(request, 'CUSTOMER'):
-		variants = request.POST.getlist('variants[]')
+		customerobj=Customer.objects.filter(user=request.user).first()
 		quantity = request.POST.get('quantity')
-		product = Product.objects.get(id=request.POST.get('product'))
-		print(product)
-		flag = True
-		if product.stock >= int(quantity):
-			if True:
-					print("fggd")
-				
-					if Wishlist.objects.filter(user=request.user).exists():
-						print("bjhbjhgjh")
-						wishlist = Wishlist.objects.get(user=request.user)
-						allow = True
-						for x in WishlistItems.objects.filter(wishlist=wishlist):
-							print("jhvghvgf")
-							if x.product.store == product.store:
-								allow = True
-								break
-							else:
-								allow = False
-								break
-						if allow:
-							print("jhvhfty")
-							variant_matched = False
-							item = ''
-							print(item)
-							for items in WishlistItems.objects.filter(wishlist=wishlist, product=product):
-								wishlist_variants = []
-								print(wishlist_variants,"wishlist_variants")
-								for x in WishlistItemVariant.objects.filter(wishlistitem=items):
-									print("cccccc",x)
-									wishlist_variants.append(str(x.product_variant.id))
-								if variants == wishlist_variants:
-									variant_matched = True
-									item = items
-									break
-							if variant_matched:
-								new_quantity = int(quantity) + item.quantity
-								if new_quantity > product.stock:
-									new_quantity = product.stock
-								price = item.product.price
-								print(price,'KKKKKKKKKKKK')
-								total_price = item.product.price * new_quantity
-								WishlistItems.objects.filter(id=item.id).update(
-									quantity = new_quantity,
-									per_item_cost = price,
-									total_cost = total_price
-								)
-								subtotal = wishlist.subtotal + (int(quantity)*item.product.price)
-								Wishlist.objects.filter(user=request.user).update(subtotal=subtotal)
-							else:
-								if int(quantity) > product.stock:
-									quantity = product.stock
-								item = WishlistItems.objects.create(
-									wishlist = wishlist,
-									product = product,
-									quantity = quantity,
-									per_item_cost = product.price,
-									total_cost = product.price*int(quantity)
-								)
-								for x in variants:
-									print("xxxxx",x)
-									WishlistItemVariant.objects.create(wishlist=wishlist, wishlistitem=item, product_variant=ProductVariant.objects.get(id=x))
-								subtotal = wishlist.subtotal + (int(quantity)*product.price)
-								Wishlist.objects.filter(user=request.user).update(subtotal=subtotal)
-								print("prining here")
-								print(subtotal)
-								# calculate_wishlist_tax(request)
-								return JsonResponse({'response':'success', 'wishlist_len':get_wishlist_len(request)})
-								# calculate_wishlist_tax(request)
-						else:
-							if int(quantity) > product.stock:
-								quantity = product.stock
-							item = WishlistItems.objects.create(
-								wishlist = wishlist,
-								product = product,
-								quantity = quantity,
-								per_item_cost = product.price,
-								total_cost = product.price*int(quantity)
-							)
-							for x in variants:
-								print("xxxxx",x)
-								WishlistItemVariant.objects.create(wishlist=wishlist, wishlistitem=item, product_variant=ProductVariant.objects.get(id=x))
-							subtotal = wishlist.subtotal + (int(quantity)*product.price)
-							Wishlist.objects.filter(user=request.user).update(subtotal=subtotal)
-							print("prining here")
-							print(subtotal)
-							# calculate_wishlist_tax(request)
-						return JsonResponse({'response':'success', 'wishlist_len':get_wishlist_len(request)})
-						# else:
-						# 	return JsonResponse({'response':'failed2', 'wishlist_len':get_wishlist_len(request)})
-					else:
-						if int(quantity) > product.stock:
-								quantity = product.stock
-						wishlist = Wishlist.objects.create(user=request.user)
-						total = product.price*int(quantity)
-						item = WishlistItems.objects.create(
-							wishlist = Wishlist.objects.get(user=request.user),
-							product = product,
-							quantity = quantity,
-							per_item_cost = product.price,
-							total_cost = total
-						)
-						for x in variants:
-							print("rerwe", x)
-							WItemVariant.objects.create(wishlist=wishlist, wishlistitem=item, product_variant=ProductVariant.objects.get(id=x))
-						Wishlist.objects.filter(user=request.user).update(subtotal=total)
-						# calculate_wishlist_tax(request)
-						return JsonResponse({'response':'success', 'wishlist_len':get_wishlist_len(request)})
-		return JsonResponse({'response':'failed'})
+		product_variants_id=request.POST.get('product_variants_id')
+		productvariantsobj = ProductVariants.objects.filter(id=product_variants_id).first()
+		print(productvariantsobj)
+	
+		if Wishlist.objects.filter(customer=customerobj).exists():
+			cartobj = Wishlist.objects.filter(customer=customerobj)
+			if cartobj.filter(productvariants__id=productvariantsobj.id).exists():
+				cartobjexits=cartobj.filter(productvariants__id=productvariantsobj.id).first()
+				new_quantity = int(quantity) + cartobjexits.quantity
+				print(new_quantity,'new_quantityhhhhhhhhhhhhhhhh')
+				cartobjexits.quantity = new_quantity
+				cartobjexits.updatedby=request.user
+				cartobjexits.save()
+				return JsonResponse({'response':'Product is already in wishlist !', 'wishlist_len':get_wishlist_len(request,'CUSTOMER')})
+			else:
+				Wishlist.objects.create(customer=customerobj,productvariants =productvariantsobj,quantity=quantity,updatedby=request.user)
+				#calculate_cart_tax(request)
+				return JsonResponse({'response':'Product is added to wishlist successfully !','wishlist_len':get_wishlist_len(request,'CUSTOMER')})
+		else:
+			Wishlist.objects.create(customer=customerobj,productvariants =productvariantsobj,quantity=quantity,updatedby=request.user)
+			#calculate_cart_tax(request)
+			return JsonResponse({'response':'Product is added to wishlist successfully !', 'wishlist_len':get_wishlist_len(request,'CUSTOMER')})
 	else:
 		return JsonResponse({'response': 'Login to continue'})
-		return render(request, '403.html')
+	
 @csrf_exempt
 @login_required(login_url='/login/')
 def user_wishlist(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		categories = ProductCategory.objects.all()
-		if Wishlist.objects.filter(user=request.user).exists():
-			dic = get_wishlist_items(request)
-			if len(WishlistItems.objects.filter(wishlist=Wishlist.objects.get(user=request.user))) == 0:
+		if Wishlist.objects.filter(customer__user=request.user).exists():
+			dic = get_wishlist_items(request,'CUSTOMER')
+			if len(Wishlist.objects.filter(customer__user=request.user)) == 0:
 				empty = True
 			else:
 				empty = False
@@ -402,22 +317,22 @@ def user_wishlist(request):
 					stock_out = True
 					break
 			dic.update({'empty':empty, 'stock_out':stock_out})
-			dic.update(get_cart_len(request))
+			dic.update(get_cart_len(request,'CUSTOMER'))
 			dic.update({
-				        'contact_us':contact_us.objects.all()[0],
+				        'contact_us':CompanyContactUs.objects.all()[0],
 						'categories':categories,
-						'notification':get_notifications(request.user),
-						'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+						# 'notification':get_notifications(request.user),
+						# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 					})
 			return render(request, 'usertemplate/wishlist.html', dic)
 		else:
 			dic = {'empty':True}
 			dic.update(get_dic(request))
-			dic.update(get_cart_len(request))
+			dic.update(get_cart_len(request,"CUSTOMER"))
 			dic.update({
-							'categories':categories,
-						'notification':get_notifications(request.user),
-						'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+						'categories':categories,
+						# 'notification':get_notifications(request.user),
+						# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 					})
 			return render(request, 'usertemplate/wishlist.html', dic)
 	else:
@@ -448,16 +363,17 @@ def user_cart(request):
 				# 'notification':get_notifications(request.user),
 				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 				})
-			dic.update(get_wishlist_len(request))
+			dic.update(get_wishlist_len(request,"CUSTOMER"))
 			print(dic)
 			return render(request, 'usertemplate/cart.html', dic)
 		else:
 			dic = {'empty':True}
+			dic.update(get_wishlist_len(request,"CUSTOMER"))
 			dic.update(get_dic(request))
 			dic.update({
 				'contact_us':CompanyContactUs.objects.all()[0],
 				'categories':categories,
-				'wish_len':get_wishlist_len(request),
+				
 				# 'notification':get_notifications(request.user),
 				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 				})
@@ -470,88 +386,59 @@ def user_cart(request):
 @csrf_exempt
 @login_required(login_url='/login/')
 def update_cart_item(request):
-	cart = Cart.objects.get(user=request.user)
-	print("cart=>", cart)
-	item = CartItems.objects.get(id=request.GET.get('item'))
+	customerobj=Customer.objects.filter(user=request.user).first()
+	item = Cart.objects.filter(id=request.GET.get('item')).first()
 	print("item", item)
 	new_quantity = int(request.GET.get('quantity'))
 	if new_quantity > item.quantity:
 		print('1')
 		updated_quantity = new_quantity - item.quantity
-		total_price = item.total_cost + (item.product.price * updated_quantity)
-		price = item.product.price
-		CartItems.objects.filter(id=request.GET.get('item')).update(
-			quantity = new_quantity,
-			per_item_cost = price,
-			total_cost = total_price
-		)
-		subtotal = cart.subtotal + (updated_quantity*price)
-		Cart.objects.filter(user=request.user).update(subtotal=subtotal)
-		calculate_cart_tax(request)
+		Cart.objects.filter(id=request.GET.get('item')).update(quantity = new_quantity)
+		# calculate_cart_tax(request)
 	else:
 		print('2')
 		updated_quantity = item.quantity - new_quantity
-		total_price = item.total_cost - (item.product.price * updated_quantity)
-		price = item.product.price
-		CartItems.objects.filter(id=request.GET.get('item')).update(
-			quantity = new_quantity,
-			per_item_cost = price,
-			total_cost = total_price
-		)
-		subtotal = cart.subtotal - (int(updated_quantity)*item.product.price)
-		Cart.objects.filter(user=request.user).update(subtotal=subtotal)
-		calculate_cart_tax(request)
+		Cart.objects.filter(id=request.GET.get('item')).update(quantity = new_quantity)
+		# calculate_cart_tax(request)
 	cart = Cart.objects.get(user=request.user)
 	dic = {
-		'item_total':CartItems.objects.get(id=request.GET.get('item')).total_cost,
-		'subtotal':cart.subtotal,
-		'tax':cart.tax,
-		'delivery':cart.delivery_charges,
-		'total':cart.total
+		
 	}
 	return JsonResponse(dic)
 @csrf_exempt
 @login_required(login_url='/login/')
 def remove_cart_item(request):
-	cart = Cart.objects.get(user=request.user)
-	item = CartItems.objects.get(id=request.GET.get('item'))
-	subtotal = cart.subtotal - item.total_cost
-	CartItemVariant.objects.filter(cartitem=CartItems.objects.get(id=request.GET.get('item'))).delete()
-	CartItems.objects.filter(id=request.GET.get('item')).delete()
-	Cart.objects.filter(user=request.user).update(subtotal=subtotal)
-	calculate_cart_tax(request)
-	cart = Cart.objects.get(user=request.user)
-	if len(CartItems.objects.filter(cart=cart)) == 0:
+	item = Cart.objects.get(id=request.GET.get('item'))
+	Cart.objects.filter(id=request.GET.get('item')).delete()
+	# calculate_cart_tax(request)
+	if len(Cart.objects.filter(customer__user=request.user)) == 0:
 		empty = '1'
 	else:
 		empty = '0'
 	dic = {
-		'subtotal':cart.subtotal,
-		'tax':cart.tax,
-		'delivery':cart.delivery_charges,
-		'total':cart.total,
+		# 'subtotal':cart.subtotal,
+		# 'tax':cart.tax,
+		# 'delivery':cart.delivery_charges,
+		# 'total':cart.total,
 		'empty':empty
 	}
 	return JsonResponse(dic)
 @csrf_exempt
 @login_required(login_url='/login/')
 def remove_wishlist_item(request):
-	wishlist = Wishlist.objects.get(user=request.user)
-	item = WishlistItems.objects.get(id=request.GET.get('item'))
-	subtotal = wishlist.subtotal - item.total_cost
-	WishlistItemVariant.objects.filter(wishlistitem=WishlistItems.objects.get(id=request.GET.get('item'))).delete()
-	WishlistItems.objects.filter(id=request.GET.get('item')).delete()
-	Wishlist.objects.filter(user=request.user).update(subtotal=subtotal)
-	wishlist = Wishlist.objects.get(user=request.user)
-	if len(WishlistItems.objects.filter(wishlist=wishlist)) == 0:
+
+	item = Wishlist.objects.get(id=request.GET.get('item'))
+	Wishlist.objects.filter(id=request.GET.get('item')).delete()
+	# calculate_cart_tax(request)
+	if len(Wishlist.objects.filter(customer__user=request.user)) == 0:
 		empty = '1'
 	else:
 		empty = '0'
 	dic = {
-		'subtotal':wishlist.subtotal,
-		'tax':wishlist.tax,
-		'delivery':wishlist.delivery_charges,
-		'total':wishlist.total,
+		# 'subtotal':wishlist.subtotal,
+		# 'tax':wishlist.tax,
+		# 'delivery':wishlist.delivery_charges,
+		# 'total':wishlist.total,
 		'empty':empty
 	}
 	return JsonResponse(dic)

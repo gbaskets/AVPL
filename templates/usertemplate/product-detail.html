@@ -338,7 +338,7 @@
                             <div class="product-item__footer">
                                 <div class="border-top pt-2 flex-center-between flex-wrap">
                                     <!-- <a href="" class="text-gray-6 font-size-13"><i class="ec ec-compare mr-1 font-size-15"></i> See Product Details</a> -->
-                                    <a href="" class="text-gray-6 font-size-13"><i class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+                                    <a  onclick="add_to_wishlist();"  class="text-gray-6 font-size-13"><i class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
                                 </div>
                             </div>
                         </div>
@@ -792,26 +792,13 @@
         console.log('hehhhhhhhh')
         flag = '0';
         product_id = document.getElementById('product').value;
-        variant_lt = [];
-    //     {% for variant in variants %}
-    //     { { variant.variant.name } } = document.getElementsByName('{{variant.variant.name}}');
-    //     var {{ variant.variant.name }
-    // } _id = 'none';
-    // for (i = 0; i < {{ variant.variant.name }}.length; i++) {
-    //     if ({{ variant.variant.name }
-    // } [i].checked) {
-    //     variant_lt.push({{ variant.variant.name }} [i].value);
-    // break;
-    //     }
-    // }
-    // {% endfor %}
     quantity_val = document.getElementById('quantity').value;
     document.getElementById('added-cart').style.display = 'block';
     if (flag == '0') {
         $.ajax({
             type: 'POST',
             url: '/user/addtocart',
-            data: { product: product_id, variants: variant_lt, quantity: quantity_val },
+            data: { product_variants_id: product_id, quantity: quantity_val },
             success: function (res_data) {
                 if (res_data.response == 'failed2') {
                     document.getElementById('added-cart-text').innerHTML = 'You can only add products from same shop';
@@ -842,26 +829,13 @@
     async function add_to_wishlist() {
         flag = '0';
         product_id = document.getElementById('product').value;
-        variant_lt = [];
-    //     {% for variant in variants %}
-    //     { { variant.variant.name } } = document.getElementsByName('{{variant.variant.name}}');
-    //     var {{ variant.variant.name }
-    // } _id = 'none';
-    // for (i = 0; i < {{ variant.variant.name }}.length; i++) {
-    //     if ({{ variant.variant.name }
-    // } [i].checked) {
-    //     variant_lt.push({{ variant.variant.name }} [i].value);
-    // break;
-    //         }
-    //     }
-    // {% endfor %}
     quantity_val = document.getElementById('quantity').value;
     document.getElementById('added-cart').style.display = 'block';
     if (flag == '0') {
         $.ajax({
             type: 'POST',
             url: '/user/addtowishlist',
-            data: { product: product_id, variants: variant_lt, quantity: quantity_val },
+            data: { product_variants_id: product_id, quantity: quantity_val },
             success: function (res_data) {
                 if (res_data.response == 'failed2') {
                     document.getElementById('added-cart-text').innerHTML = 'You can only add products from same shop';
@@ -974,19 +948,6 @@ flag = '0';
 
 product_id =$(this).closest(".cart_product").find('.product_cart').val()
 console.log(product_id)
-variant_lt = [];
-//     {% for variant in variants %}
-//     { { variant.variant.name } } = document.getElementsByName('{{variant.variant.name}}');
-//     var {{ variant.variant.name }
-// } _id = 'none';
-// for (i = 0; i < {{ variant.variant.name }}.length; i++) {
-//     if ({{ variant.variant.name }
-// } [i].checked) {
-//     variant_lt.push({{ variant.variant.name }} [i].value);
-// break;
-//     }
-// }
-// {% endfor %}
 quantity_val = document.getElementById('quantity').value;
 console.log(quantity_val)
 document.getElementById('added-cart').style.display = 'block';
@@ -995,7 +956,7 @@ $.ajax({
     type: 'POST',
     url: '/user/addtocart',
     
-    data: { product: product_id, variants: variant_lt, quantity: quantity_val },
+    data: { product_variants_id: product_id, quantity: quantity_val },
     
     success: function (res_data) {
         if (res_data.response == 'failed2') {
