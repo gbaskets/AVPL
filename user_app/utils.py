@@ -44,7 +44,11 @@ def get_cart_items(request,user_type):
 		cartobj = Cart.objects.filter(vendor__user=request.user)
 	print(cartobj)
 	lt = []
+	alltotal=0
+	allsubtotal=0
 	for x in cartobj:
+		p=x.productvariants.price
+		t=(x.productvariants.price + ((x.productvariants.product.tax * x.productvariants.price)/100)) * x.quantity
 		dic = {
 		'id':x.id,
 		'image':x.productvariants.productimage.url,
@@ -55,7 +59,8 @@ def get_cart_items(request,user_type):
         'tax':(x.productvariants.product.tax * x.productvariants.price)/100,
 		'total': (x.productvariants.price + ((x.productvariants.product.tax * x.productvariants.price)/100)) * x.quantity,
 		'product_id':x.productvariants.id,
-		
+		'alltotal':alltotal+t,
+  	    'allsubtotal':allsubtotal+p,
 		}	
 		
 		if x.productvariants.quantity == 0:
