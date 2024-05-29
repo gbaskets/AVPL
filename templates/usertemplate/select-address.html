@@ -16,8 +16,9 @@
         <div class="my-md-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-3 flex-nowrap flex-xl-wrap overflow-auto overflow-xl-visble">
-                    <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1"><a href="/">Home     ><a></li>
-                    <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1 active" aria-current="page">  Checkout</li>                </ol>
+                    <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1 active" aria-current="page">Checkout</li>
+                </ol>
             </nav>
         </div>
         <!-- End breadcrumb -->
@@ -25,13 +26,6 @@
 </div>
 
 
-<div class="home">
-    <div class="home_background parallax-window" data-parallax="scroll" style="min-height:50px;"></div>
-    <div class="home_overlay"></div>
-    <div class="home_content d-flex flex-column align-items-center justify-content-center">
-        <h2 style="font-size: 40px;" class="text-center">Checkout</h2>
-    </div>
-</div>
 
 <!-- Shop -->
 
@@ -42,7 +36,7 @@
     <div class="container">
         <div class="row">
             {% if address_len != 0 %}
-            <div style="padding-top:50px" class="col-lg-7">
+            <div class="col-lg-6">
                 <div  class=" ">
                     <div class="border-bottom border-color-1 mb-5">
                         <h3 style="font-color:white" class="section-title mb-0 pb-2 font-size-25">Select Address</h3>
@@ -64,11 +58,19 @@
                                             <div class="product_details px-4">
                                                 
                                                 <div class="form-check">
-                                                  <input class="form-check-input" type="radio" name="address_id" id="exampleRadios1" value="{{x.id}}" {% if x.default %}checked{% endif %}>
+                                                  <input class="form-check-input" type="radio" name="address_id" id="exampleRadios1" value="{{x.id}}" {% if x.isdefaultaddress %}checked{% endif %}>
                                                   <label class="form-check-label" for="exampleRadios1">
                                                     
-                                                    <p class="product-description ">{{x.name}} {% if x.default %}<span class="badge badge-success mx-4"> Default </span>{% endif %} <span class="text-primary">+91-{{ x.contact }}</span></p> 
-                                                    <p class="text-dark">{{x.home_no}}, {{x.landmark}}<br>{{x.city}}, {{x.state}} <strong>({{x.pincode}})</strong></p>
+                                                    <p>{{x.firstname|default:""}} {{x.lastname|default:""}} {% if x.isdefaultaddress %}<span class="badge badge-success mx-4"> Default </span>{% endif %} <span class="text-primary">+91-{{ x.mobile }}</span>
+                                                    <br>
+                                                    <strong> {{x.addresstype|default:""}}</strong> <br>
+                                                   {{x.streetaddress|default:""}}<strong>({{x.pincode|default:""}})</strong>
+                                                   <br>
+                                                   {{x.companyname|default:""}}
+                                                   <br>
+                                                   {{x.gstno|default:""}}
+
+                                                   </p>
                                                   </label>
                                                 </div>
                                             
@@ -93,18 +95,11 @@
             {% else %}
 
             {% endif %}
-            <div class="col-lg-5 ">
+            <div class="col-lg-6 ">
                 <div class="card">
                     <div class="card-body">
                         <div class="bg-gray-1 rounded-lg">
-                        <div class="p-4 mb-4 checkout-table">
-                            <div class="border-bottom border-color-1 mb-5">
-                                <h3>
-                                    Your Order id#{{cart.id}}
-                                </h3>
-                            </div>
-                            
-                        </div>
+                        
                         <table class="table">
                             <thead>
                                 <tr>
@@ -118,7 +113,7 @@
                             <tbody>
                                 {% for i in items %}
                                 <tr class="cart_item">
-                                    <td style="border-top:0;">{{i.name}}</td>
+                                    <td style="border-top:0;">{{i.name|truncatechars:30}}</td>
                                     <td style="border-top:0;">₹{{i.price}}</td>
                                     <td style="border-top:0;">{{i.quantity}}</td>
                                     <td style="border-top:0;">{{i.tax}}</td> 
@@ -173,7 +168,7 @@
                         </div> {% endcomment %}
                         <div class="shop-bar clearfix pt-4 text-success">
                             
-                                <input type="hidden" value="{{ cart.id }}" name="cart">
+                                
                                 <button type="submit" class="btn btn-primary" style="width:100%;background-color: red;border-color: red;">Proceed</button>
                             </form>
                         </div>
@@ -182,7 +177,7 @@
                     </div>
                 </div>
                 
-                <div style="padding-bottom: 50px;" class="col-lg-7">
+                <div style="padding-bottom: 50px;" class="col-lg-6">
 
                     <div class=" ">
                         <div class="">
@@ -197,53 +192,117 @@
                     <div class="">
                         <form action="/user/add_new_address" method="POST">
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="text-dark">Name</label>
-                                        <input type="text" name="name" class="form-control" required>
+                                        <label>First Name *</label>
+                                        <input type="text" class="form-control" placeholder="Enter First Name *"
+                                            title="Only (a-z) letters are allowed." required name="firstname"
+                                           />
                                     </div>
+                                    <div class="form-group">
+                                        <label>Last Name *</label>
+                                        <input type="text" class="form-control" placeholder="Enter Last Name *"
+                                            title="Only (a-z) letters are allowed." required name="lastname"
+                                            />
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label>Email *</label>
+                                        <input type="email" class="form-control" placeholder="Enter Email *"
+                                            required name="email"  />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Mobile *</label>
+                                        <input type="text" minlength="10" maxlength="10" class="form-control"
+                                            placeholder="Enter Mobile *" name="mobile" required
+                                           />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Company Name </label>
+                                        <input type="text" class="form-control"
+                                            placeholder="Enter Company Name " name="companyname" 
+                                             />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>GST No </label>
+                                        <input type="text" class="form-control"
+                                            placeholder="Enter GST No" name="gstno" 
+                                            />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Address Type *</label>
+                                        <br>
+                                        <label class="radio inline">
+                                            <input type="radio" name="addresstype" value="Billing" checked>
+                                            <span> Billing </span>
+                                        </label>
+                                        <label class="radio inline">
+                                            <input type="radio" name="addresstype" value="Shipping">
+                                            <span>Shipping </span>
+                                        </label>
+                                        <label class="radio inline">
+                                            <input type="radio" name="addresstype" value="Both" checked>
+                                            <span>Both </span>
+                                        </label>
+                                       
+                                    </div>
+                                    
+                                   
+                                    
+                                     
+
                                 </div>
-                                <div class="col-lg-6">
+
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="text-dark">House No./Flat No.</label>
-                                        <input type="text" name="home_no" class="form-control" required>
+                                        <label>Street Address *</label>
+                                        <input type="text" class="form-control" placeholder="Enter Street Address *"
+                                            id="address" title="Only (a-z) letters are allowed." required
+                                            name="streetaddress"/>
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
+                                    
+
                                     <div class="form-group">
-                                        <label class="text-dark">Location</label>
-                                        <input type="text" name="location" id="adrs" class="form-control" required>
+                                        <label>Near by Address *</label>
+                                        <input type="text" class="form-control"
+                                            placeholder="Enter Near by Address *" id='nearbyaddress'
+                                            title="Only (a-z) letters are allowed." required name="nearbyaddress"
+                                             />
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label class="text-dark">Landmark/Colony</label>
-                                        <input type="text" name="landmark" class="form-control" required>
+                                        <label>City *</label>
+                                        <input type="text" class="form-control" placeholder="Enter City *" id='city'
+                                            title="Only (a-z) letters are allowed." required name="city"
+                                           />
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label class="text-dark">City</label>
-                                        <input type="text" name="city" class="form-control" required>
+                                        <label>State *</label>
+                                        <input type="text" class="form-control" placeholder="Enter State *"
+                                            id='state' title="Only (a-z) letters are allowed." required name="state"
+                                            />
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label class="text-dark">Pincode</label>
-                                        <input type="text"  pattern="[0-9]{6}" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" maxlength="6" name="pincode" class="form-control" required>
+                                        <label>Country *</label>
+                                        <input type="text" class="form-control" placeholder="Enter Country *"
+                                            id='country' title="Only (a-z) letters are allowed." required
+                                            />
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
+
                                     <div class="form-group">
-                                        <label class="text-dark">State</label>
-                                        <input type="text" name="state" class="form-control" required>
+                                        <label>Pincode *</label>
+                                        <input type="text" placeholder="Enter Pincode *" id='pincode'
+                                            class="form-control" minlength="6" maxlength="6" name="pincode"
+                                            />
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="text-dark">Contact</label>
-                                        <input type="text"  onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" maxlength="10" pattern="[7-9]{1}[0-9]{9}" name="contact" class="form-control" required>
-                                    </div>
+
+                                    <input type="hidden" placeholder="latitude *" id='latitude' class="form-control"
+                                        name="latitude" value="{{vendor.latitude|default:''}}" />
+                                    <input type="hidden" placeholder="longitude *" id='longitude'
+                                        class="form-control" name="longitude"
+                                       />
+
                                 </div>
                                 <div class="col-lg-12 col-sm-12">
                                         <button type="submit" class="btn btn-primary">Add Address</button>
@@ -311,6 +370,97 @@
    }
 
    
+</script>
+
+
+
+
+<script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&libraries=places&callback=initialize"></script>
+
+
+<script>
+    function initialize() {
+        var input = document.getElementById('address');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        autocomplete.addListener('place_changed', function () {
+            var place = autocomplete.getPlace();
+
+            // Extract address components
+            var addressComponents = place.address_components;
+
+            // Initialize variables for pin code, state, city, country, and nearby places
+            var pincode = "";
+            var state = "";
+            var city = "";
+            var country = "";
+            var nearbyPlace = "";
+            var latitude = "";
+            var longitude = "";
+
+            // Iterate through address components to find specific details
+            for (var i = 0; i < addressComponents.length; i++) {
+                var component = addressComponents[i];
+                var types = component.types;
+
+                // Fill in pin code
+                if (types.includes('postal_code')) {
+                    pincode = component.long_name;
+                }
+
+                // Fill in state
+                if (types.includes('administrative_area_level_1')) {
+                    state = component.long_name;
+                }
+
+                // Fill in city
+                if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+                    // Remove the word "Division" from the city
+                    city = component.long_name.replace(/ Division$/, '');
+                }
+
+                // Fill in country
+                if (types.includes('country')) {
+                    country = component.long_name;
+                }
+            }
+
+            // Get latitude and longitude
+            if (place.geometry && place.geometry.location) {
+                latitude = place.geometry.location.lat();
+                longitude = place.geometry.location.lng();
+            }
+
+
+            // Get nearby place
+            if (place.geometry && place.geometry.location) {
+                var service = new google.maps.places.PlacesService(document.createElement('div'));
+                service.nearbySearch({
+                    location: place.geometry.location,
+                    radius: 5000, // You can adjust the radius as needed
+                    type: 'point_of_interest' // You can adjust the type as needed
+                }, function (results, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+                        nearbyPlace = results[0].name;
+                    }
+
+
+
+                    // Update input fields
+                    document.getElementById('pincode').value = pincode;
+                    document.getElementById('state').value = state;
+                    document.getElementById('city').value = city;
+                    document.getElementById('country').value = country;
+                    document.getElementById('nearbyaddress').value = nearbyPlace;
+                    document.getElementById('latitude').value = latitude;
+                    document.getElementById('longitude').value = longitude;
+                });
+            }
+        });
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
 </script>
 
 

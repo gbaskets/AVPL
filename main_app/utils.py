@@ -9,6 +9,7 @@ import datetime
 import uuid
 import requests
 from django.contrib import messages
+from sales_app.models import SalesOrder, SalesOrderItems
 from user_app.utils import get_wishlist_len
 from vendor_app.models import *
 import geocoder
@@ -180,16 +181,13 @@ def get_dic(request):
 	dic.update(get_wishlist_len(request, 'CUSTOMER'))
 	return dic
 
-def save_order_items(cart, order, user, ordertype = 'COD', plan = 'Binary'):
-	cartitems = CartItems.objects.filter(cart=cart)
-	print(plan)
-	print(user,'USERSSSSSSSSS')
-	for x in cartitems:
-		tax = (x.total_cost/100)*x.product.category.tax
+def save_order_items(cartobj, order, customer, ordertype = 'COD'):
+    
+	for x in cartobj["items"]:
 		# tax = 0.0
 		vendor_commission = x.product.vendor_commission
 		print('VVVVV____Commm---===>',vendor_commission)
-		orderitem = OrderItems.objects.create(
+		orderitem = SalesOrderItems.objects.create(
 			store = x.product.store,
 			order = order,
 			product = x.product,
@@ -370,39 +368,29 @@ def get_product_thumb(product):
 	return dic
 
 # In case Case on delivey
-def create_cod_order(cart, address, user, plan):
-	cartitems = CartItems.objects.filter(cart=cart)
-	check_user_subscription(cart.user)
-	if cart.self_pickup:
-		total = cart.total - cart.delivery_charges
-		order = Orders.objects.create(
-			order_date = timezone.now(),
-			user = user,
-			address = address,
-			subtotal = cart.subtotal,
-			tax = cart.tax,
-			total = total,
-			point_value = calculate_point_value_on_order(cart),
-			self_pickup = True
-		)
-		save_order_items(cart, order, user, 'COD', plan)
-		Cart.objects.filter(id=cart.id).delete()
-	else:
-		if user.usr.subscribed and (cart.total >= Min_Amount_For_Free_Delivery.objects.all()[0].amount):
-			total = cart.total - cart.delivery_charges
-		order = Orders.objects.create(
-			order_date = timezone.now(),
-			user = user,
-			address = address,
-			delivery_charges = cart.delivery_charges,
-			subtotal = cart.subtotal,
-			tax = cart.tax,
-			total = cart.total,
-			point_value = calculate_point_value_on_order(cart),
-		)
-		save_order_items(cart, order, user, 'COD', plan)
-		Cart.objects.filter(id=cart.id).delete()
+def create_cod_order(cartobj, address,usertype, user):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		# check_user_subscription(cart.user)
+		total_amount=cartobj['total_amount']
+		tax_amount=cartobj['tax_amount']
+		subtotal_amount=cartobj['subtotal_amount']
+		
+		# if cart.self_pickup:
+		# 	total = cart.total - cart.delivery_charges
 
+		order = SalesOrder.objects.create(
+			customer = customer,
+			address = address,
+			subtotal = subtotal_amount,
+			tax = tax_amount,
+			total = total_amount,
+			# selfpickup = True
+		)
+		save_order_items(cartobj, order, customer, 'COD')
+
+		Cart.objects.filter(customer=customer).delete()
+		
 # In case Online Payment
 def save_order(cart, address, user, razorpaytransaction):
 	print(razorpaytransaction)

@@ -65,7 +65,7 @@ class ProductRating(models.Model):
 class Address(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
-	addresstype = models.CharField(max_length=30,default='Home', choices=(('Home', 'Home'), ('Work', 'Work'),('Other','Other')))
+	addresstype = models.CharField(max_length=30,default='Both', choices=(('Billing', 'Billing'), ('Shipping', 'Shipping'),('Both','Both')))
 	companyname=models.CharField(max_length=255,null=True,blank=True)
 	firstname = models.CharField(max_length=255,blank=True,null=True)
 	lastname = models.CharField(max_length=255,blank=True,null=True)
@@ -80,8 +80,6 @@ class Address(models.Model):
 	email = models.EmailField(null=True, blank=True)
 	mobile = models.IntegerField(null=True, blank=True)
 	isdefaultaddress = models.BooleanField(default=False)
-	isbillingaddress=models.BooleanField(default=False)
-	isshippingaddress=models.BooleanField(default=False)
 	gstno=models.CharField(max_length=255, null=True, blank=True)
 	isactive = models.BooleanField(default=True)
 	createdat = models.DateTimeField(auto_now_add=True)
@@ -90,7 +88,7 @@ class Address(models.Model):
 
 
 	def __str__(self):
-		return self.firstname+' Address'	
+		return str(self.firstname)+ ' Address'	
 
 
 

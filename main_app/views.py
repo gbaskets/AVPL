@@ -1788,7 +1788,6 @@ def checkout_1(request):
     if check_user_authentication(request, 'CUSTOMER'):
         if request.method == 'GET':
             customerobj=Customer.objects.filter(user=request.user).first()
-            request.session['cart_id'] = request.GET.get('cart')
             dic = {'addresses':Address.objects.filter(customer=customerobj), 'address_len':len(Address.objects.filter(customer=customerobj))}
             dic.update(get_cart_items(request,'CUSTOMER'))
             dic.update(get_dic(request))
@@ -1803,11 +1802,9 @@ def checkout_2(request):
     if check_user_authentication(request, 'CUSTOMER'):
         if request.method == 'POST':
             request.session['address_id'] = request.POST.get('address_id')
-            request.session['plan_type'] = request.POST.get('plan_type')
-            print(request.session['plan_type'],'PPPPPPPPLAN TYPE')
             dic = {'address':Address.objects.get(id=request.POST.get('address_id')),
-                     'bal': Wallet.objects.filter(user=request.user).first().current_balance    }
-            dic.update(get_cart_items(request))
+                     'bal': Wallet.objects.filter(customer__user=request.user).first().currentbalance}
+            dic.update(get_cart_items(request,"CUSTOMER"))
             dic.update(get_dic(request))
              
 
@@ -1821,16 +1818,17 @@ def checkout_2(request):
 def place_order(request):
     if check_user_authentication(request, 'CUSTOMER'):
         
-        Orders.objects.all()
         address = Address.objects.get(id=request.session['address_id'])
-        cart = Cart.objects.get(id=request.session['cart_id'])
+        
+        cart_obj=(get_cart_items(request,"CUSTOMER"))
+        print(cart_obj,'cart_obj')
         payment_type = request.POST.get('payment_type')
         dic = {}
         # request.session['plan_type'] = request.POST.get('plan')
-        plan_type = request.session.get('plan_type')
-        print(plan_type, cart, address, request.user, 'LLLLLLLLLLLLLLLL')
+       
+        print( cart_obj, address, request.user,'CUSTOMER', 'LLLLLLLLLLLLLLLL')
         if payment_type == 'cod':
-            create_cod_order(cart, address, request.user, plan_type)
+            create_cod_order(cart_obj, address,'CUSTOMER', request.user)
             print(create_cod_order,'KKKKKKKKKKKKKKKKKK')
             sub = 'AVPL - Order Placed'
             msg = ''' Hi there!

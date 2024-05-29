@@ -1106,8 +1106,8 @@
                                 <div class="product-item__footer">
                                     <div class="border-top pt-2 flex-center-between flex-wrap">
                                         <!-- <a href="" class="text-gray-6 font-size-13"><i class="ec ec-compare mr-1 font-size-15"></i> See Product Details</a> -->
-                                        <a  class="text-gray-6 font-size-13"><i
-                                                class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
+                                        <a href="" onclick="add_to_wishlist();"  class="text-gray-6 font-size-13 mr-2"><i
+                                            class="ec ec-favorites mr-1 font-size-15"></i> Wishlist</a>
                                     </div>
                                 </div>
                             </div>
@@ -1159,7 +1159,7 @@
             console.log(product_id)
             quantity_val = document.getElementById('quantity').value;
             console.log(quantity_val)
-            document.getElementById('added-cart').style.display = 'block';
+           
             if (flag == '0') {
                 $.ajax({
                     type: 'POST',
@@ -1176,7 +1176,7 @@
                                 document.getElementById('cart_len_tag').innerHTML = res_data.cart_len.cart_len;
 
                                 //await.sleep(2000);
-                                document.getElementById('added-cart').style.display = 'none';
+                                
                             }
                             else {
                                 document.getElementById('added-cart-text').innerHTML = 'Something went wrong, please try again later';
@@ -1202,7 +1202,7 @@
         flag = '0';
         product_id = document.getElementById('product').value;
         quantity_val = document.getElementById('quantity').value;
-        document.getElementById('added-cart').style.display = 'block';
+     
         if (flag == '0') {
             $.ajax({
                 type: 'POST',
@@ -1218,7 +1218,7 @@
                             document.getElementById('cart_len_tag').innerHTML = res_data.cart_len.cart_len;
 
                             //await.sleep(2000);
-                            document.getElementById('added-cart').style.display = 'none';
+                            
                         }
                         else {
                             document.getElementById('added-cart-text').innerHTML = 'Something went wrong, please try again later';

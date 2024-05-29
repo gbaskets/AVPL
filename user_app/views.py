@@ -533,15 +533,13 @@ def add_new_address(request):
 			longitude =  request.POST.get('longitude')
 			addresstype=request.POST.get('addresstype')
 			companyname=request.POST.get('companyname')
-			isbillingaddress=request.POST.get('isbillingaddress')
-			isshippingaddress=request.POST.get('isshippingaddress')
 			gstno=request.POST.get('gstno')
 			
 			if len(Address.objects.filter(customer=customerobj)) == 0:
 				default = True
 			else:
 				default = False
-			gmaps = googlemaps.Client(key='AIzaSyCEjY246d9MYQIe69nPzV_ceogrpglpY0Q')
+			# gmaps = googlemaps.Client(key='AIzaSyCEjY246d9MYQIe69nPzV_ceogrpglpY0Q')
 			addressobj=Address()
 			addressobj.customer = customerobj
 			if addresstype:
@@ -574,15 +572,11 @@ def add_new_address(request):
 				addressobj.longitude =  longitude
 			if default:
 				addressobj.isdefaultaddress = default
-			if isbillingaddress:
-				addressobj.isbillingaddress=isbillingaddress
-			if isshippingaddress:
-				addressobj.isshippingaddress=isshippingaddress
 			if gstno:
 				addressobj.gstno=gstno
 			addressobj.updatedby= request.user
 			addressobj.save()
-			return redirect('/selectaddress/?cart='+request.session['cart_id'])
+			return redirect('/selectaddress/')
 		return render(request, 'user_app/my-address.html', {"customer_obj":Customer.objects.filter(user=request.user).first(), 'data':Address.objects.filter(user=request.user)})
 	else:
 		return render(request, '403.html')
