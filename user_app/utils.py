@@ -58,6 +58,7 @@ def get_cart_items(request,user_type):
 		
 		item_dict = {
 			'id': item.id,
+            'store': item.productvariants.store,
 			'image': item.productvariants.productimage.url,
 			'name': item.productvariants.productvariantname,
 			'quantity': item.quantity,
@@ -65,7 +66,11 @@ def get_cart_items(request,user_type):
 			'mrp': item.productvariants.mrp,
 			'tax': tax,
 			'total': total,
+            'pv':item.productvariants.product.pv,
+            'admincommission':item.productvariants.product.admincommission,
+            'product':item.productvariants.product,
 			'product_id': item.productvariants.id,
+            'productvariants': item.productvariants,
 			'stock_out': item.productvariants.quantity == 0
 		}
 		

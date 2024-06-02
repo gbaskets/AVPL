@@ -1836,7 +1836,7 @@ Your order has been placed successfully, Kindly check the My Order section in yo
 
 Thanks!'''
             EmailMessage(sub, msg, to=[request.user.email]).send()
-            notification(request.user, 'Order Placed Successfully.')
+            # notification(request.user, 'Order Placed Successfully.')
 
         elif payment_type == 'usewallet':
             amount=cart.total

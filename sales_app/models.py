@@ -10,8 +10,8 @@ from main_app.models import *
 
 class SalesOrder(models.Model):
     orderno=models.CharField(max_length=250, null=True, blank=True)
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE,  null=True, blank=True)
-    vendor = models.OneToOneField('vendor_app.Vendor', on_delete=models.CASCADE, null=True, blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,  null=True, blank=True)
+    vendor = models.ForeignKey('vendor_app.Vendor', on_delete=models.CASCADE, null=True, blank=True)
     paymenttransaction = models.ForeignKey("main_app.PaymentTransaction",on_delete=models.CASCADE, null=True, blank=True)
     address = models.ForeignKey(Address,on_delete=models.CASCADE)
     shippingcharges = models.FloatField(default=0.00,null=True,blank=True)
@@ -41,7 +41,6 @@ class SalesOrderItems(models.Model):
     productvariants = models.ForeignKey(ProductVariants, on_delete=models.CASCADE,blank=True,null=True)
     quantity = models.PositiveIntegerField()
     price = models.FloatField(default=0.00,null=True,blank=True)
-    subtotal = models.FloatField(default=0.00,null=True,blank=True)
     tax = models.FloatField(default=0.00,null=True,blank=True)
     total =  models.FloatField(default=0.00,null=True,blank=True)
     orderstatus = models.CharField(max_length=255, default='Pending',null=True,blank=True)

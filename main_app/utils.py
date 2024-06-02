@@ -1,7 +1,7 @@
 from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
-from inventory_app.models import Product, ProductImages
+from inventory_app.models import Product, ProductCategory, ProductImages, ProductSubCategory, ProductSubSubCategory
 from xhtml2pdf import pisa
 from django.db.models import *
 from django.contrib.auth.models import User
@@ -182,44 +182,37 @@ def get_dic(request):
 	return dic
 
 def save_order_items(cartobj, order, customer, ordertype = 'COD'):
-    
+	
 	for x in cartobj["items"]:
 		# tax = 0.0
-		vendor_commission = x.product.vendor_commission
-		print('VVVVV____Commm---===>',vendor_commission)
-		orderitem = SalesOrderItems.objects.create(
-			store = x.product.store,
-			order = order,
-			product = x.product,
-			quantity = x.quantity,
-			per_item_cost = x.per_item_cost,
-			subtotal = x.total_cost,
-			tax = tax,
-			total = x.total_cost + tax,
-			plan = plan
-		)
-		save_vendor_commission(x.product.store.vendor.user, x.total_cost + tax, x.product.category.commission, ordertype)
-		if x.product.store.vendor.is_AVPL_Vendor == True :
+		print(x,'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiit')
+		admincommission = x["admincommission"]
+		print('VVVVV____Commm---===>',admincommission)
+		orderitemobj = SalesOrderItems()
+		orderitemobj.store = x["store"]
+		orderitemobj.salesorder =order
+		orderitemobj.productvariants = x["productvariants"]
+		orderitemobj.quantity =x["quantity"]
+		orderitemobj.price = x["price"]
+		orderitemobj.tax = x["tax"]
+		orderitemobj.total =  x["total"]
+		orderitemobj.orderstatus ="Pending"
+		orderitemobj.save()
+	
+		save_vendor_commission(x["store"], x["total"], admincommission, ordertype)
+		if x["store"].vendor.isavplvendor == True :
 			print('Vendor_Commission ==>>>>>')
-			per_product_vendor_commission(x.product.store.vendor.user,user, x.total_cost + tax, x.product.vendor_commission, ordertype)
-
+			per_product_vendor_commission(x["store"],customer, x["total"], admincommission, ordertype)
 		
-		if len(Tax.objects.all()) == 0:
-			Tax.objects.create(current_tax = tax)
-		else:
-			current_tax = Tax.objects.all()[0].current_tax + tax
-			Tax.objects.all().update(current_tax = current_tax)
+		# if len(Tax.objects.all()) == 0:
+		# 	Tax.objects.create(current_tax = tax)
+		# else:
+		# 	current_tax = Tax.objects.all()[0].current_tax + tax
+		# 	Tax.objects.all().update(current_tax = current_tax)
 		
-		for y in CartItemVariant.objects.filter(cartitem=x):
-			OrderItemVariant.objects.create(order=order, orderitem=orderitem, product_variant=y.product_variant)
-			pro_var = ProductVariant.objects.get(product=x.product, variant=y.product_variant.variant, variant_value=y.product_variant.variant_value)
-			variant_stock = (pro_var.variant_stock-x.quantity)
-			if variant_stock < 0:
-				variant_stock = 0
-			ProductVariant.objects.filter(product=x.product, variant=pro_var.variant, variant_value=pro_var.variant_value).update(
-				variant_stock=variant_stock
-			)
-		Product.objects.filter(id=x.product.id).update(stock=x.product.stock-x.quantity)
+		productvariants=x["productvariants"]
+		productvariants.quantity =productvariants.quantity - x["quantity"]
+		productvariants.save()
 		# save_pv_transaction(user, x.product, x.total_cost, plan)
 
 def binary_mlm(user, pv):
@@ -429,38 +422,53 @@ def save_order(cart, address, user, razorpaytransaction):
 
 
 # In case make  Payment by wllet
-def make_wallet_transaction(user, amount, trans_type):
-	if not Wallet.objects.filter(user=user).exists():
-		Wallet.objects.create(user=user)
-	wallet = Wallet.objects.filter(user=user).first()
-	print(wallet)
-	if trans_type == 'CREDIT':
+def make_wallet_transaction(usertype, user, amount, transtype):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		if not Wallet.objects.filter(customer=customer).exists():
+			wallet=Wallet.objects.create(customer=customer,isactive=True)
+		else:
+			wallet = Wallet.objects.filter(customer=customer,isactive=True).first()
+      
+	elif usertype == "VENDOR":
+		vendor=Vendor.objects.filter(user=user).first()
+		if not Wallet.objects.filter(vendor=vendor).exists():
+			wallet=Wallet.objects.create(vendor=vendor,isactive=True)
+		else:
+			wallet = Wallet.objects.filter(vendor=vendor,isactive=True).first()
+	elif usertype == "ADMIN":
+		admin=User.objects.filter(user=user).first()
+		if not Wallet.objects.filter(admin=admin).exists():
+			wallet=Wallet.objects.create(admin=admin,isactive=True)
+		else:
+			wallet = Wallet.objects.filter(admin=admin,isactive=True).first()
+   
+	if transtype == 'CREDIT':
 		print('1')
-		wallet_transactions = WalletTransaction.objects.create(
+		wallettransactions = WalletTransaction.objects.create(
 			wallet = wallet,
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			previous_amount = round(wallet.current_balance, 2),
-			remaining_amount = round(wallet.current_balance,2) + round(amount,2)
+			transactiondate = timezone.now(),
+			transactiontype = transtype,
+			transactionamount = amount,
+			previousamount = round(wallet.currentbalance, 2),
+			remainingamount = round(wallet.currentbalance,2) + round(amount,2)
 		)
-		Wallet.objects.filter(user=user).update(current_balance = round(wallet.current_balance, 2) + round(amount, 2))
+		wallet.currentbalance = round(wallet.currentbalance, 2) + round(amount, 2)
+		wallet.save()
 
-
-	elif trans_type == 'DEBIT':
+	elif transtype == 'DEBIT':
 		print(2)
-		wallet_transactions = WalletTransaction.objects.create(
+		wallettransactions = WalletTransaction.objects.create(
 			wallet = wallet,
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			previous_amount = wallet.current_balance,
-			remaining_amount = wallet.current_balance - amount
+			transactiondate = timezone.now(),
+			transactiontype = transtype,
+			transactionamount = amount,
+			previousamount = round(wallet.currentbalance, 2),
+			remainingamount = round(wallet.currentbalance, 2) - round(amount,2)
 		)
-		print(wallet)
-		Wallet.objects.filter(user=user).update(current_balance = wallet.current_balance - amount)
+		wallet.currentbalance = round(wallet.currentbalance, 2) - round(amount, 2)
+		wallet.save()
 
-	
 
 def save_order_by_wallet(cart, address, user, wallet_transactions):
 	print(wallet_transactions)
@@ -499,60 +507,80 @@ def save_order_by_wallet(cart, address, user, wallet_transactions):
 
 
 
-def save_vendor_commission(user, amount, percentage, ordertype = 'COD'):
+def save_vendor_commission(store, amount, percentage, ordertype = 'COD'):
 	if ordertype == 'Online':
 		admin_commission = (amount/100)*percentage
 		remaining_amount = amount - admin_commission
 		# Credited amount to vendor wallet
-		make_wallet_transaction(user, remaining_amount, 'CREDIT')
+		make_wallet_transaction("VENDOR",store.vendor.user, remaining_amount, 'CREDIT')
 		# Credited amount to admin commission wallet
-		make_commission_transaction(user, admin_commission, 'CREDIT')
-		if UserVendorRelation.objects.filter(vendor__id=user.id).exists():
-			user__ = UserVendorRelation.objects.filter(vendor=user.id)
-			#user commission 10% of vendor amount
-			user_c = (remaining_amount * 10)/100
-			# credit amount 10% in user wallet
-			make_wallet_transaction(user__.user, user_c, 'CREDIT')
-			print(user.first_name+"Vendor paid User Commission to ")
+		admin=User.objects.filter(username="admin").first()
+		make_commission_transaction("ADMIN", admin, admin_commission, 'CREDIT')
+		# if UserVendorRelation.objects.filter(vendor__id=user.id).exists():
+		# 	user__ = UserVendorRelation.objects.filter(vendor=user.id)
+		# 	#user commission 10% of vendor amount
+		# 	user_c = (remaining_amount * 10)/100
+		# 	# credit amount 10% in user wallet
+		# 	make_wallet_transaction(user__.user, user_c, 'CREDIT')
+		# 	print(user.first_name+"Vendor paid User Commission to ")
 		return admin_commission
 	else:
 		admin_commission = (amount/100)*percentage
 		return admin_commission
 
-def make_commission_transaction(user, amount, trans_type):
-	if len(Commission.objects.all()) == 0:
-		Commission.objects.create()
-	commission = Commission.objects.all()[0]
-	print(commission,'LLLLLLLLLL')
-	if trans_type == 'CREDIT':
-		CommissionTransaction.objects.create(
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			user = user,
-			previous_amount = commission.current_balance,
-			remaining_amount = commission.current_balance + amount
-		)
-		Commission.objects.all().update(current_balance=commission.current_balance + amount)
-	elif trans_type == 'DEBIT':
-		CommissionTransaction.objects.create(
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			user = user,
-			previous_amount = commission.current_balance,
-			remaining_amount = commission.current_balance - amount
-		)
-		Commission.objects.all().update(current_balance=commission.current_balance - amount)
+def make_commission_transaction(usertype,user, amount, transtype):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		if not CommissionWallet.objects.filter(customer=customer).exists():
+			commissionwallet=CommissionWallet.objects.create(customer=customer,isactive=True)
+		else:
+			commissionwallet = CommissionWallet.objects.filter(customer=customer,isactive=True).first()
+		
+	elif usertype == "VENDOR":
+		vendor=Vendor.objects.filter(user=user).first()
+		if not CommissionWallet.objects.filter(vendor=vendor).exists():
+			commissionwallet=CommissionWallet.objects.create(vendor=vendor,isactive=True)
+		else:
+			commissionwallet = CommissionWallet.objects.filter(vendor=vendor,isactive=True).first()
+	elif usertype == "ADMIN":
+		admin=User.objects.filter(user=user).first()
+		if not CommissionWallet.objects.filter(admin=admin).exists():
+			commissionwallet=CommissionWallet.objects.create(admin=admin,isactive=True)
+		else:
+			commissionwallet = CommissionWallet.objects.filter(admin=admin,isactive=True).first()
 
-def per_product_vendor_commission(vendor,user, amount, percentage, ordertype = 'COD'):
+	if transtype == 'CREDIT':
+		CommissionWalletTransaction.objects.create(
+            commissionwallet = commissionwallet,
+			transactiondate = timezone.now(),
+			transactiontype = transtype,
+			transactionamount = amount,
+			previousamount = round(commissionwallet.currentbalance, 2), 
+			remainingamount = round((commissionwallet.currentbalance + amount),2) 
+		)
+		commissionwallet.currentbalance=((commissionwallet.currentbalance + amount),2)
+		commissionwallet.save()
+  
+	elif transtype == 'DEBIT':
+		CommissionWalletTransaction.objects.create(
+            commissionwallet = commissionwallet,
+			transactiondate = timezone.now(),
+			transactiontype = transtype,
+			transactionamount = amount,
+            previousamount = round(commissionwallet.currentbalance, 2), 
+			remainingamount = round((commissionwallet.currentbalance - amount),2) 
+		)
+		commissionwallet.currentbalance=((commissionwallet.currentbalance - amount),2)
+		commissionwallet.save()
+
+def per_product_vendor_commission(store,customer, amount, percentage, ordertype = 'COD'):
 	if ordertype == 'Online':
 		vendor_commission = (amount/100)*percentage
 		remaining_amount = amount - vendor_commission
 		# Credited amount to vendor wallet
 		# make_wallet_transaction(vendor, remaining_amount, 'CREDIT')
 			# Credited amount to admin commission wallet
-		make_vendor_commission_transaction(vendor,user, vendor_commission, 'CREDIT')
+		make_commission_transaction("VENDOR",store.vendor.user, vendor_commission, 'CREDIT')
 		# if UserVendorRelation.objects.filter(vendor__id=vendor.id).exists():
 		# 	user__ = UserVendorRelation.objects.filter(vendor=user.id)
 		# 	#user commission 10% of vendor amount
@@ -564,33 +592,6 @@ def per_product_vendor_commission(vendor,user, amount, percentage, ordertype = '
 	else:
 		vendor_commission = (amount/100)*percentage
 		return vendor_commission
-
-def make_vendor_commission_transaction(vendor,user, amount, trans_type):
-	if not Vendor_Wallet_Commission.objects.filter(user=vendor).exists():
-		Vendor_Wallet_Commission.objects.create(user=vendor)
-	wallet_commission = Vendor_Wallet_Commission.objects.get(user=vendor)
-	if trans_type == 'CREDIT':
-		VendorWalletTransaction.objects.create(
-			vendor_wallet_commission = wallet_commission,
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			user = user,
-			previous_amount = wallet_commission.current_balance,
-			remaining_amount = wallet_commission.current_balance + amount
-		)
-		Vendor_Wallet_Commission.objects.filter(user=vendor).update(current_balance=wallet_commission.current_balance + amount)
-	elif trans_type == 'DEBIT':
-		VendorWalletTransaction.objects.create(
-			vendor_wallet_commission = wallet_commission,
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			user = user,
-			previous_amount = Vendor_Wallet_Commission.current_balance,
-			remaining_amount = Vendor_Wallet_Commission.current_balance - amount
-		)
-		Vendor_Wallet_Commission.objects.filter(user=vendor).update(current_balance=Vendor_Wallet_Commission.current_balance - amount)
 
 def sort_products(products, flag):
 	if flag == 3:
