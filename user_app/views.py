@@ -84,6 +84,7 @@ def user_dashboard(request):
 			# 'tree':fetch_empty_nodes(request.user),
 			# 'referrals':referals,
 			# 'pv':fetch_pv(request.user),
+            'salesorder':SalesOrder.objects.filter(customer=customer_obj),
 			'wallet':Wallet.objects.filter(customer=customer_obj).first(),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -584,6 +585,7 @@ def add_new_address(request):
 @login_required(login_url='/login/')
 def my_order(request):
 	if check_user_authentication(request, 'CUSTOMER'):
+		customer_obj=Customer.objects.filter(user=request.user).first()
 		store_id = request.GET.get('store')
 		orders = []
 		if store_id:
@@ -593,7 +595,7 @@ def my_order(request):
 		# 	orders = get_my_orders(request.user)
 		dic = {
 			"customer_obj":Customer.objects.filter(user=request.user).first(),
-			# 'orders':orders,
+			'salesorder':SalesOrder.objects.filter(customer=customer_obj),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}

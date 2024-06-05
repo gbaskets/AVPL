@@ -72,7 +72,7 @@ urlpatterns = [
 	path('admins/', include('admin_app.urls')),
 	path('vendor/', include('vendor_app.urls')),
 	path('user/', include('user_app.urls')),
-	path('userpv/',userpv),
+	# path('userpv/',userpv),
 	path('parents/',show_parent),#testing
 	path('assign_store/',assign_store),
     

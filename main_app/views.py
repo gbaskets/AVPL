@@ -1982,9 +1982,9 @@ def mark_notification_read(request):
     Notification.objects.filter(admin=request.user).update(isread=True)
     return JsonResponse({'response':'Success'})
 
-def userpv(request):
-    dic = get_user_indecater(request.user)
-    return JsonResponse(dic)
+# def userpv(request):
+#     dic = get_user_indecater(request.user)
+#     return JsonResponse(dic)
 
 def category_wise_store(request):
     #Notification.objects.filter(user=request.user).update(read=True)

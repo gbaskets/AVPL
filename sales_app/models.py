@@ -37,7 +37,7 @@ class SalesOrderItems(models.Model):
     ("Rejected", "Rejected")
     )
     store = models.ForeignKey(Store,on_delete=models.CASCADE)
-    salesorder = models.ForeignKey(SalesOrder,on_delete=models.CASCADE)
+    salesorder = models.ForeignKey(SalesOrder,on_delete=models.CASCADE,related_name="salesorders")
     productvariants = models.ForeignKey(ProductVariants, on_delete=models.CASCADE,blank=True,null=True)
     quantity = models.PositiveIntegerField()
     price = models.FloatField(default=0.00,null=True,blank=True)
