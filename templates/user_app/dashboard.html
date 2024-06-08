@@ -115,6 +115,8 @@
                       <ul class="nav nav-tabs"  role="tablist">
                         <li role="presentation" class="nav-link active"><a href="#myallorder" aria-controls="myallorder" role="tab"
                             data-toggle="tab">All Order</a></li>
+                        <li role="presentation" class="nav-link"><a href="#mypendingdorder" aria-controls="mypendingdorder"
+                          role="tab" data-toggle="tab">Pending Order</a></li>
                         <li role="presentation" class="nav-link"><a href="#mydeliveredorder" aria-controls="mydeliveredorder"
                             role="tab" data-toggle="tab">Delivered Order</a></li>
                         <li role="presentation" class="nav-link"><a href="#myreturnorder" aria-controls="myreturnorder"
@@ -143,10 +145,10 @@
                             <tbody>
 
                               {% for data in salesorder %}
-                
-
+                            
                               {% with first_orderitem=data.salesorders.first %}
                               
+                             
                               <tr>
                                 <td>{{data.id}}</td>
                                 <td>{{data.orderno}}</td>
@@ -182,7 +184,7 @@
                                 <td><a href="#" >View Details</a></td>
 
                               </tr>
-
+                            
 
                               {% endwith %}
 
@@ -195,6 +197,81 @@
                             </tbody>
                           </table>
 
+                        </div>
+
+
+                        <div role="tabpanel" class="tab-pane" id="mypendingdorder">
+
+                          <table class="table">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Product</th>
+                                <th>Order Amount</th>
+                                <th>Payment Status</th>
+                                <th>Order Status</th>
+                                <th>Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+
+                              {% for data in salesorder %}
+                
+
+                              {% with first_orderitem=data.salesorders.first %}
+
+                              {% if first_orderitem.orderstatus == 'Pending' %}
+
+                              <tr>
+                                <td>{{data.id}}</td>
+                                <td>{{data.orderno}}</td>
+                                <td>{{data.createdat}}</td>
+                                <td>
+                                {% for orderitem in data.salesorders.all %}
+                                {{orderitem.productvariants}}
+                               <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
+                                {% endfor %}
+                                </td>
+                                <td>{{data.total}}</td>
+                                <td> {% if data.ispaymentpaid == True %} <span class="badge badge-success"><b>Paid</b></span> {% else %} <span class="badge badge-danger"><b>UnPaid</b></span>  {% endif %}</td>
+                                <td>
+
+                                  {% if first_orderitem.orderstatus == 'Pending' %}
+                                  <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Packed' %}
+                                  <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Shipped' %}
+                                  <span class="badge badge-danger">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Delivered' %}
+                                  <h5>Delivered on {{first_orderitem.deliveredon}}</h5>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Cancelled' %}
+                                  <h5>Cancelled on {{first_orderitem.cancelledon}}</h5>
+                                  {% endif %}
+                                
+
+                                </td>
+                                <td><a href="#" >View Details</a></td>
+
+                              </tr>
+                               
+                              {% endif %}
+                              {% endwith %}
+
+
+
+
+
+                              {% endfor %}
+
+                            </tbody>
+                          </table>
+                        
                         </div>
 
                         <div role="tabpanel" class="tab-pane" id="mydeliveredorder">
@@ -219,6 +296,8 @@
 
                               {% with first_orderitem=data.salesorders.first %}
 
+                              {% if first_orderitem.orderstatus == 'Delivered' %}
+
                               <tr>
                                 <td>{{data.id}}</td>
                                 <td>{{data.orderno}}</td>
@@ -254,7 +333,8 @@
                                 <td><a href="#" >View Details</a></td>
 
                               </tr>
-
+                               
+                              {% endif %}
                               {% endwith %}
 
 
@@ -289,7 +369,7 @@
                 
 
                               {% with first_orderitem=data.salesorders.first %}
-                              
+                              {% if first_orderitem.orderstatus == 'Return' %}
                               <tr>
                                 <td>{{data.id}}</td>
                                 <td>{{data.orderno}}</td>
@@ -326,7 +406,7 @@
 
                               </tr>
 
-
+                              {% endif %}
                               {% endwith %}
 
 
@@ -362,7 +442,7 @@
                 
 
                               {% with first_orderitem=data.salesorders.first %}
-                             
+                              {% if first_orderitem.orderstatus == 'Cancelled' %}
                               
                               <tr>
                                 <td>{{data.id}}</td>
@@ -400,7 +480,7 @@
 
                               </tr>
 
-
+                              {% endif %}
                               {% endwith %}
 
 
