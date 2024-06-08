@@ -146,6 +146,7 @@
                 
 
                               {% with first_orderitem=data.salesorders.first %}
+                              
                               <tr>
                                 <td>{{data.id}}</td>
                                 <td>{{data.orderno}}</td>
@@ -155,13 +156,33 @@
                                 {{orderitem.productvariants}}
                                <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
                                 {% endfor %}
-                              </td>
+                                </td>
                                 <td>{{data.total}}</td>
-                                <td> {% if data.ispaymentpaid == True %} <b>Paid</b> {% else %} <b>UnPaid</b>  {% endif %}</td>
-                                <td>{{first_orderitem.orderstatus}}</td>
+                                <td> {% if data.ispaymentpaid == True %} <span class="badge badge-success"><b>Paid</b></span> {% else %} <span class="badge badge-danger"><b>UnPaid</b></span>  {% endif %}</td>
+                                <td>
+
+                                  {% if first_orderitem.orderstatus == 'Pending' %}
+                                  <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Packed' %}
+                                  <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Shipped' %}
+                                  <span class="badge badge-danger">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Delivered' %}
+                                  <h5>Delivered on {{first_orderitem.deliveredon}}</h5>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Cancelled' %}
+                                  <h5>Cancelled on {{first_orderitem.cancelledon}}</h5>
+                                  {% endif %}
+                                
+
+                                </td>
                                 <td><a href="#" >View Details</a></td>
 
                               </tr>
+
 
                               {% endwith %}
 
@@ -197,6 +218,7 @@
                 
 
                               {% with first_orderitem=data.salesorders.first %}
+
                               <tr>
                                 <td>{{data.id}}</td>
                                 <td>{{data.orderno}}</td>
@@ -206,9 +228,9 @@
                                 {{orderitem.productvariants}}
                                <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
                                 {% endfor %}
-                              </td>
+                                </td>
                                 <td>{{data.total}}</td>
-                                <td> {% if data.ispaymentpaid == True %} <b>Paid</b> {% else %} <b>UnPaid</b>  {% endif %}</td>
+                                <td> {% if data.ispaymentpaid == True %} <span class="badge badge-success"><b>Paid</b></span> {% else %} <span class="badge badge-danger"><b>UnPaid</b></span>  {% endif %}</td>
                                 <td>
 
                                   {% if first_orderitem.orderstatus == 'Pending' %}
@@ -267,6 +289,7 @@
                 
 
                               {% with first_orderitem=data.salesorders.first %}
+                              
                               <tr>
                                 <td>{{data.id}}</td>
                                 <td>{{data.orderno}}</td>
@@ -276,13 +299,33 @@
                                 {{orderitem.productvariants}}
                                <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
                                 {% endfor %}
-                              </td>
+                                </td>
                                 <td>{{data.total}}</td>
-                                <td> {% if data.ispaymentpaid == True %} <b>Paid</b> {% else %} <b>UnPaid</b>  {% endif %}</td>
-                                <td>{{first_orderitem.orderstatus}}</td>
+                                <td> {% if data.ispaymentpaid == True %} <span class="badge badge-success"><b>Paid</b></span> {% else %} <span class="badge badge-danger"><b>UnPaid</b></span>  {% endif %}</td>
+                                <td>
+
+                                  {% if first_orderitem.orderstatus == 'Pending' %}
+                                  <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Packed' %}
+                                  <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Shipped' %}
+                                  <span class="badge badge-danger">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Delivered' %}
+                                  <h5>Delivered on {{first_orderitem.deliveredon}}</h5>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Cancelled' %}
+                                  <h5>Cancelled on {{first_orderitem.cancelledon}}</h5>
+                                  {% endif %}
+                                
+
+                                </td>
                                 <td><a href="#" >View Details</a></td>
 
                               </tr>
+
 
                               {% endwith %}
 
@@ -319,6 +362,8 @@
                 
 
                               {% with first_orderitem=data.salesorders.first %}
+                             
+                              
                               <tr>
                                 <td>{{data.id}}</td>
                                 <td>{{data.orderno}}</td>
@@ -328,13 +373,33 @@
                                 {{orderitem.productvariants}}
                                <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
                                 {% endfor %}
-                              </td>
+                                </td>
                                 <td>{{data.total}}</td>
-                                <td> {% if data.ispaymentpaid == True %} <b>Paid</b> {% else %} <b>UnPaid</b>  {% endif %}</td>
-                                <td>{{first_orderitem.orderstatus}}</td>
+                                <td> {% if data.ispaymentpaid == True %} <span class="badge badge-success"><b>Paid</b></span> {% else %} <span class="badge badge-danger"><b>UnPaid</b></span>  {% endif %}</td>
+                                <td>
+
+                                  {% if first_orderitem.orderstatus == 'Pending' %}
+                                  <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Packed' %}
+                                  <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Shipped' %}
+                                  <span class="badge badge-danger">{{first_orderitem.orderstatus}}</span>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Delivered' %}
+                                  <h5>Delivered on {{first_orderitem.deliveredon}}</h5>
+                                  {% endif %}
+                                  {% if first_orderitem.orderstatus == 'Cancelled' %}
+                                  <h5>Cancelled on {{first_orderitem.cancelledon}}</h5>
+                                  {% endif %}
+                                
+
+                                </td>
                                 <td><a href="#" >View Details</a></td>
 
                               </tr>
+
 
                               {% endwith %}
 
