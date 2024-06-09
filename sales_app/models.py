@@ -6,7 +6,17 @@ from store_app.models import Store
 from vendor_app.models import *
 from main_app.models import *
 # Create your models here.
+import random
+import string
 
+def generate_order_number(id):
+    prefix = f'ORD{id}'  # Prefix for the order number
+    length = 8  # Length of the random part of the order number
+
+    # Generate a random string of digits and uppercase letters
+    random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+
+    return f"{prefix}{random_part}"
 
 class SalesOrder(models.Model):
     orderno=models.CharField(max_length=250, null=True, blank=True)
@@ -24,6 +34,12 @@ class SalesOrder(models.Model):
     createdat = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.orderno:
+            # Generate your order number here
+            self.orderno = generate_order_number(self.id)  # You need to implement this function
+        super().save(*args, **kwargs)
 
 
     def __str__(self):

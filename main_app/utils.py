@@ -23,6 +23,18 @@ from django.utils import timezone
 from .models import *
 import datetime
 import timeago
+import random
+import string
+
+def generate_order_number(id):
+    prefix = f'ORD{id}'  # Prefix for the order number
+    length = 8  # Length of the random part of the order number
+
+    # Generate a random string of digits and uppercase letters
+    random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+
+    return f"{prefix}{random_part}"
+
 
 def generate_link(user,for_,type_):
 
@@ -378,8 +390,12 @@ def create_cod_order(cartobj, address,usertype, user):
 			subtotal = subtotal_amount,
 			tax = tax_amount,
 			total = total_amount,
+            
 			# selfpickup = True
 		)
+		if order:
+			order.orderno=generate_order_number(order.id)
+			order.save()
 		save_order_items(cartobj, order, customer, 'COD')
 
 		Cart.objects.filter(customer=customer).delete()
