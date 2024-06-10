@@ -1839,7 +1839,7 @@ Thanks!'''
             # notification(request.user, 'Order Placed Successfully.')
 
         elif payment_type == 'usewallet':
-            amount=cart.total
+            amount=cart_obj.total
             trans_type= 'DEBIT'
             user=request.user
             
@@ -1858,7 +1858,7 @@ Thanks!'''
                     remaining_amount = round(wallet.current_balance,2) + round(amount,2)
                 )
                 Wallet.objects.filter(user=user).update(current_balance = round(wallet.current_balance, 2) + round(amount, 2))
-                save_order_by_wallet(cart, address, user, wallet_transactions)
+                save_order_by_wallet(cart_obj, address, user, wallet_transactions)
 
             elif trans_type == 'DEBIT':
                 print(2)
@@ -1872,7 +1872,7 @@ Thanks!'''
                 )
                 print(wallet)
                 Wallet.objects.filter(user=user).update(current_balance = wallet.current_balance - amount)
-                save_order_by_wallet(cart, address, user, wallet_transactions)
+                save_order_by_wallet(cart_obj, address, user, wallet_transactions)
 
             sub = 'AVPL - Order Placed'
             msg = ''' Hi there!
@@ -1884,7 +1884,7 @@ Thanks!'''
 
 
         elif payment_type == 'online':
-            dic = create_online_order(cart, address, request.user)
+            dic = create_online_order(cart_obj, address, 'CUSTOMER', request.user,'Razorpay')
         
             print('hhhhhhhhhhhhhhhhhhh',dic)
             # razorpaytransacti   on = dic['id']
