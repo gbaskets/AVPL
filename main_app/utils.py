@@ -409,13 +409,17 @@ def save_order(cartobj, address,usertype, user, razorpaytransaction):
 		subtotal_amount=cartobj['subtotal_amount']
 	print(razorpaytransaction)
 	paymenttransactionobj=PaymentTransaction.objects.filter(transactionid=razorpaytransaction).first()
-
+	if paymenttransactionobj.status == True:
+		ispaymentpaid=True
+	else:
+		ispaymentpaid=False
 	order = SalesOrder.objects.create(
 		customer = customer,
 		address = address,
 		subtotal = subtotal_amount,
 		tax = tax_amount,
 		total = total_amount,
+        ispaymentpaid=ispaymentpaid,
 		paymenttransaction=paymenttransactionobj,
 		
 		# selfpickup = True

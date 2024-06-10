@@ -58,7 +58,7 @@
             <h3 class="section-title mb-0 pb-2 font-size-25">Pay Here</h3>
             </div>
             <br>
-            <p class="lead"><strong>Address:-</strong> {{request.session.full_name}}</p>
+            <p class="lead"><strong>Address:-</strong> {{request.session.firstname}}</p>
             <p class="lead">{{request.session.full_address1}}</p>
             <p class="lead">{{request.session.state}}</p>
             <p class="lead"> {{request.session.city}}</p>
@@ -85,100 +85,13 @@
             <h3 class="section-title mb-0 pb-2 font-size-25">Pay Here</h3>
         </div>
             <br>
-            <!-- <h5>Product Details</h4>
-            <div class="ec-cart-inner">
-                <div class="row">
-                    <form action="#">
-                        <div class="table-content cart-table-content">
-                            <table class="table" style="width: 130%;">                               
-                                 <thead>
-                                    <tr>
-                                        <th class="product-name">Product</th>
-                                        <th class="product-total">Price</th>
-                                        <th class="product-total">Quantity</th>
-                                        <th class="product-total">Total</th>
-                                        <th class="product-name">Delivery Address</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in items %}
-                                    <tr id="{{item.id}}">
-                                        <td data-label="Product" class="ec-cart-pro-name">{{ item.name|safe }}{% for x in item.variant %} | {{x.variant.name}} : {{x.variant_value.value}}{% endfor %}</td>
-                                        <td data-label="Price" class="ec-cart-pro-price"><span class="amount"><i class="fa fa-inr"></i> {{item.price}}</span></td>
-                                        <td data-label="Quantity" class="ec-cart-pro-qty" style="text-align: center;">
-                                            <div class="">
-                                                <input style="width:75px;border:none; text-align: center;" type="number" min="1" max="{{item.stock}}" value="{{ item.quantity }}" disabled id="{{item.id}}quantity" />
-                                            </div>
-                                        </td>
-                                        <td data-label="Total" class="ec-cart-pro-subtotal"><i class="fa fa-inr"></i> <span id="{{item.id}}total">₹{{item.total}}</span></td>
-                                        <td data-label="Delivery Address" class="ec-cart-pro-subtotal"> <p>
-                                            <span><strong>{{address.name}}</strong></span><br>
-                                            {{address.home_no}}, {{address.landmark}}{{address.city}}, {{address.state}} ,({{address.pincode}})<br>+91-{{address.contact}}
-                                        </p></td>
+          
 
-                                        <td data-label="Remove" class="ec-cart-pro-remove">
-                                            
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
-                </div>
-            </div> -->
-
-            <!-- <div class="col-lg-30 ">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="shop_bar clearfix pt-3">
-                            <div class="shop_product-count">
-                                <h3>
-                                    Price Detail
-                                </h3>
-                            </div>
-                            
-                        </div>
-                        <div class="shop-bar clearfix pt-5">
-                            <div class="table-responsive">
-                                <table style="width:90%;">
-                                    <tr style="height:30px;">
-                                        <td>Sub Total</td>
-                                        <th style="text-align:right;"><i class="fa fa-inr"></i> <span id="cart-subtotal">{{ cart.subtotal }}</span></th>
-                                    </tr>
-                                    <tr style="height:30px;">
-                                        <td>Delivery Charge</td>
-                                        <th style="text-align:right;"><i class="fa fa-inr"></i> <span id="cart-delivery">{% if cart.subtotal < "499" %}{{ cart.delivery_charges }}{% else%} {{0.0}}{% endif %}</span></th>
-                                    </tr>
-                                    <tr style="height:30px;">
-                                        <td>Total Tax</td>
-                                        <th style="text-align:right;"><i class="fa fa-inr"></i> <span id="cart-tax">{{ cart.tax }}</span></th>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="shop_bar clearfix bg-primary" style="color:white;padding:10px;border-radius:10px;">
-                            <div class="row">
-                                <div class="col-lg-2">
-                                    <input type="checkbox" style="width: 100%;" value="1" id="self" onchange="enable_self_pickup();"{% if cart.self_pickup %}checked{% endif %}>
-                                </div>
-                                <div class="col-lg-10">
-                                    <strong>SELF PICKUP :</strong> Check this if you want self pick your order. In this case your delivery charge will be zero.
-                                </div>
-                            </div>
-                        </div> -->
-                        
-                            <!-- <input type="hidden" value="cod" name="payment"> -->
-                            <!-- <div class="shop_bar clearfix pt-4" style="padding:10px;border-radius:5px">
-                                <div class="shop_product-count" style="float:left"><h4>Total Amount</h4></div>
-                                <div class="shop-sorting" style="float:right;font-size:20px;font-weight:bold;"><i class="fa fa-inr"></i><span id="cart-total"> {{ cart.total }}</span></div>
-                            </div> -->
                             <div class="container">
                             <!-- End Title -->
                         <form class="js-validate">
                             <!-- Form Group -->
-                             <h4>Total Price: <span id="cart-total">{{cart.total}}</span></h4>
+                             <h4>Total Price: <span id="cart-total">{{total_amount}}</span></h4>
                              <h4 hidden>Cart <span id="cart-item">{{cart.id}}</span></h4>
                                     <div class="row ">
 
@@ -190,11 +103,11 @@
                                 <input type="hidden" value="{{ cart.id }}" name="cart">
                                 <button  type="button" onclick="proceed_to_pay('cod');" class="btn btn-primary" style="width:30%;">Cash on Delivery (COD)</button>
                                 
-                                <button  type="button"  class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="width:25%;">Wallet</button>
+                                <button  type="button"   class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="width:25%;">Wallet</button>
                              <a><button  type="button" onclick="proceed_to_pay('online');" class="btn btn-primary" style="width:30%;">Online Payment</button></a> 
 
                              <br><br>
-                                <a style="background-color: red;border-color: red;" class="btn btn-primary float-left" href="/selectaddress/?cart={{ cart.id }} ">Cancel Payment</a>
+                                <a style="background-color: red;border-color: red;" class="btn btn-primary float-left" href="/selectaddress/ ">Cancel Payment</a>
                             </div>
                             
                      
@@ -207,26 +120,33 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="walletModalLabel">Pay by Wallet (Current Balance : Rs. {{bal}})</h5>
+          <h5 class="modal-title" id="walletModalLabel">Pay by Wallet <span class="btn btn-primary">Current Balance : Rs. {{bal|floatformat:2 }}</span></h5> 
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
             <div class="card-header">
-                
-               <h3>Total Price: <span class="btn btn-success"> <h2>Rs. {{cart.total}}</h2></span></h3>
-             </div>
+            {% if bal >= total_amount %}    
+               <h3>Total Price: <span class="btn btn-success"> <h2>Rs. {{total_amount|floatformat:2 }}</h2></span></h3>
+            {% else %}
+            <h3><span class="btn btn-danger"> <h2>Insufficient Balance</h2></span></h3>
+            {% endif %}
+            
+            </div>
 
                
         <div class="modal-footer">
-            <form method="POST" >
-                {% csrf_token%}
+            <!-- <form method="POST" >
+                {% csrf_token%} -->
 
              
           <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+          {% if bal >= total_amount %} 
           <input type="submit" class="btn btn-primary" onclick="proceed_to_pay2('usewallet');" value="Pay Now">
-        </form> 
+          {% else %}
+          <!-- <input type="submit" class="btn btn-primary"  value="Recharge Wallet"> -->
+          {% endif %}
         </div>
       </div>
     </div>
@@ -515,7 +435,7 @@
     {% if i == 1 %}
     <script>
         var timer = setTimeout(function() {
-            window.location='http://demoserver.aaratechnologies.in:8082/user/myorder'
+            window.location='http://127.0.0.1:8000/user/myorder'
         }, 10000);
     </script>
     {% else %}
@@ -592,14 +512,14 @@ function pay_online() {
     
     var options = {
         "key": "rzp_test_OcvfBakbfEdBxL", // Enter the Key ID generated from the Dashboard
-        "amount": amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "amount": parseInt(amount) * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         // "currency": data['currency'],
         "name": "AVPL - Payments",
         "description": "Order Payment",
         "image": "https://example.com/your_logo",
         "order_id": cart , //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-        "callback_url": "http://demoserver.aaratechnologies.in:8082/captureonlinepayment/",
-        // "callback_url": "http://apnionlinedukan.in/captureonlinepayment/",
+        "callback_url": "http://127.0.0.1:8000/captureonlinepayment/",
+        // "callback_url": "http://127.0.0.1:8000/captureonlinepayment/",
         "prefill": {
             "name": "{{cart.user.usr.first_name}} {{cart.user.usr.last_name}}",
             "email": "{{cart.user.email}}",
@@ -620,6 +540,7 @@ function pay_online() {
 }
 
 </script>
+
 <script>
 function proceed_to_pay(payment_type) {
     // document.getElementById('loading').style.display = 'block';
@@ -646,8 +567,8 @@ function proceed_to_pay(payment_type) {
                     console.log(amount)
                     
                     var options = {
-                        "key": "rzp_test_hpJq2nYr2dg8WT", // Enter the Key ID generated from the Dashboard
-                        "amount": amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                        "key": "rzp_test_OcvfBakbfEdBxL", // Enter the Key ID generated from the Dashboard
+                        "amount": parseInt(amount) * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                         // "currency": INR,
                         "name": "AVPL - Payments",
                         "description": "Order Payment",
@@ -735,5 +656,125 @@ function proceed_to_pay(payment_type) {
           });
      }
     </script>
+
+
+
+
+<script>
+    function proceed_to_pay2(payment_type) {
+        // document.getElementById('loading').style.display = 'block';
+        //payment = document.getElementsByName('payment');
+        console.log(payment_type);
+        $.ajax({
+              type:'POST',
+              url:'/placeorder/',
+              
+              data:{payment_type:payment_type},
+              
+              success: function(data){
+                  console.log(data)
+                  if(data.pay_type == 'usewallet'){
+                    //   document.getElementById('loading').style.display = 'none'; 
+                      document.getElementById('order-placed').style.display = 'block';
+                  }
+                  else{
+                                    {
+                        console.log()
+                        amount = document.getElementById('cart-total').innerHTML;
+                        cart = document.getElementById('cart-item').innerHTML;
+                        console.log(cart)
+                        console.log(amount)
+                        
+                        var options = {
+                            "key": "rzp_test_OcvfBakbfEdBxL", // Enter the Key ID generated from the Dashboard
+                            "amount": parseInt(amount) * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                            // "currency": INR,
+                            "name": "AVPL - Payments",
+                            "description": "Order Payment",
+                            "image": "https://example.com/your_logo",
+                            "order_id": cart , //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                            // "callback_url": "http://demoserver.aaratechnologies.in:8082/captureonlinepayment/",
+                            // "callback_url": "http://apnionlinedukan.in/captureonlinepayment/",
+                            "handler": function (responseRazor) {
+                                    // console.log(responseRazor)
+                                    // alert(responseRazor.razorpay_payment_id);
+                                    $.ajax({
+                                    method: "POST",
+                                    url: '{/captureonlinepayment/',
+                                    data: {
+                                    // 'user_address': user_address,
+                                    // 'city_name': city_name,
+                                    // 'mobile_number': mobile_number,
+                                    // 'country': country,
+                                    // 'postal_code': postal_code,
+                                    // 'totalamount': user_totalamount,
+                                    'razorpay_payment_id': responseRazor.razorpay_payment_id,
+                                    "order_id": data['id'],
+                                    'razorpay_order_id': responseRazor.razorpay_order_id,
+                                    'razorpay_signature': responseRazor.razorpay_signature,
+                                    "payment_method": status,
+                                    csrfmiddlewaretoken: token,
+                                    },
+                                    success:function(newdata){
+    
+                                    }
+                                })
+    
+                                },
+                            "prefill": {
+                                "name": "{{cart.user.usr.first_name}} {{cart.user.usr.last_name}}",
+                                "email": "{{cart.user.email}}",
+                                "contact": "{{cart.user.usr.phone}}"
+                            },
+                            "notes": {
+                                "address": "Razorpay Corporate Office"
+                            },
+                            "theme": {
+                                "color": "#3399cc"
+                            }
+                        };
+                        
+                    console.log(options)
+                    var rzp1 = new Razorpay(options);
+                    rzp1.on('payment.failed', function (response){
+                    alert(response.error.code);
+                    alert(response.error.description);
+                    alert(response.error.source);
+                    alert(response.error.step);
+                    alert(response.error.reason);
+                    alert(response.error.metadata.order_id);
+                    alert(response.error.metadata.payment_id);
+                    });
+                    console.log(rzp1)
+                    rzp1.open();
+                        //e.preventDefault();
+                    }
+                  }
+              }
+          });
+     }
+    </script>
+    <script>
+        function select_plan(plan) {
+            document.getElementById('loading').style.display = 'block';
+            //payment = document.getElementsByName('payment');
+            var payment_type_val = 'usewallet';
+            $.ajax({
+                  type:'POST',
+                  url:'/placeorder/',
+                  
+                  data:{payment_type:payment_type_val, plan:plan},
+                  
+                  success: function(data){
+                      console.log(data)
+                      if(data.pay_type == 'usewallet'){
+                          document.getElementById('loading').style.display = 'none';
+                          document.getElementById('order-placed').style.display = 'block';
+                      }
+                  }
+              });
+         }
+        </script>
+
         </body>
     </html>

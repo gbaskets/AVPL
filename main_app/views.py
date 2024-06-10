@@ -1893,8 +1893,8 @@ Thanks!'''
         elif payment_type == 'online':
             dic = create_online_order(cart_obj, address, 'CUSTOMER', request.user,'Razorpay')
         
-            razorpaytransaction = dic['id']
-            dic = save_order(cart_obj, address,'CUSTOMER', request.user, razorpaytransaction)
+            # razorpaytransaction = dic['id']
+            # dic = save_order(cart_obj, address,'CUSTOMER', request.user, razorpaytransaction)
         return JsonResponse({'response':'Success', 'pay_type':payment_type, 'data':dic})
     else:
         return HttpResponse('Error 500 : Unauthorized User')
@@ -1909,20 +1909,26 @@ def capture_online_payment(request):
     if request.method == 'POST':
         payment_id = request.POST.get('razorpay_payment_id')
         print(payment_id)
+        cart_obj=(get_cart_items(request,"CUSTOMER"))
+        print(cart_obj,'cart_obj')
         order_id = request.POST.get('razorpay_order_id')
         signature = request.POST.get('razorpay_signature')
-        order = RazorpayOrder.objects.get(razorpay_order_id=order_id)
+        customer=Customer.objects.filter(user=request.user).first()
+        order = PaymentTransaction.objects.filter(customer=customer).last()
+        order.status=True
+        order.save()
         print(payment_id,signature,order_id)
-        razorpaytransaction = RazorpayTransaction.objects.create(payment_id=payment_id, order_id=order_id, signature=signature)
-        save_order(order.cart, order.address, order.user, razorpaytransaction)
+        dic = save_order(cart_obj, order.address,'CUSTOMER', request.user, order.transactionid)
+        
         sub = 'AVPL - Order Placed'
         msg = '''Hi there!
 We have received your payment and your order has been placed successfully, Kindly check the My Order section in your dashboard.
 
 Thanks!'''
         EmailMessage(sub, msg, to=[request.user.email]).send()
-        notification(request.user, 'Order Placed Successfully.')
-        return render(request, 'main_app/order-success.html')
+        # notification(request.user, 'Order Placed Successfully.')
+        print('order done !!!!!!!!!!1')
+        return redirect("/user/myorder")
     else:
         return HttpResponse('Failed')
 

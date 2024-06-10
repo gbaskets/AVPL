@@ -577,11 +577,11 @@ function proceed_to_pay(payment_type) {
                         // "callback_url": "http://demoserver.aaratechnologies.in:8082/captureonlinepayment/",
                         // "callback_url": "http://apnionlinedukan.in/captureonlinepayment/",
                         "handler": function (responseRazor) {
-                                // console.log(responseRazor)
-                                // alert(responseRazor.razorpay_payment_id);
+                                console.log(responseRazor)
+                                //alert(responseRazor.razorpay_order_id);
                                 $.ajax({
                                 method: "POST",
-                                url: '{/captureonlinepayment/',
+                                url: '/captureonlinepayment/',
                                 data: {
                                 // 'user_address': user_address,
                                 // 'city_name': city_name,
@@ -594,10 +594,11 @@ function proceed_to_pay(payment_type) {
                                 'razorpay_order_id': responseRazor.razorpay_order_id,
                                 'razorpay_signature': responseRazor.razorpay_signature,
                                 "payment_method": status,
-                                csrfmiddlewaretoken: token,
+                                //csrfmiddlewaretoken: token,
                                 },
                                 success:function(newdata){
-
+                                console.log("success","ORDER DONE")
+                                window.location='http://127.0.0.1:8000/user/myorder'
                                 }
                             })
 
@@ -700,7 +701,7 @@ function proceed_to_pay(payment_type) {
                                     // alert(responseRazor.razorpay_payment_id);
                                     $.ajax({
                                     method: "POST",
-                                    url: '{/captureonlinepayment/',
+                                    url: '/captureonlinepayment/',
                                     data: {
                                     // 'user_address': user_address,
                                     // 'city_name': city_name,
@@ -713,10 +714,11 @@ function proceed_to_pay(payment_type) {
                                     'razorpay_order_id': responseRazor.razorpay_order_id,
                                     'razorpay_signature': responseRazor.razorpay_signature,
                                     "payment_method": status,
-                                    csrfmiddlewaretoken: token,
+                                    //csrfmiddlewaretoken: token,
                                     },
                                     success:function(newdata){
-    
+                                    console.log('DONE ORDER')
+                                    window.location='http://127.0.0.1:8000/user/myorder'
                                     }
                                 })
     

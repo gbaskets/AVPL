@@ -41,7 +41,7 @@ def create_online_order(cartobj, address,usertype, user,paymentgatway):
 
 	order_id = data['id']
 	razorpay_order_id=data['id']
-	print(order_id)
+	print(order_id,'razorpay_order_idrazorpay_order_id')
 	paymenttransactionobj=PaymentTransaction()
 	paymenttransactionobj.customer = customer
 	paymenttransactionobj.paymentgatway=paymentgatway
