@@ -3,28 +3,54 @@ from main_app.models import *
 from vendor_app.models import *
 
 # client = razorpay.Client(auth=("rzp_live_x7PnIDVsQs52F2", "suxN8QoVA16C6QeRV0hjexWU"))
-# client = razorpay.Client(auth=("rzp_test_OcvfBakbfEdBxL", "tLlVOve6xEK1DwoqYgjVBI8i"))
-client = razorpay.Client(auth=("rzp_test_hpJq2nYr2dg8WT", "hswI4ZKUKC3mIUN6gfmgvETq"))
+client = razorpay.Client(auth=("rzp_test_OcvfBakbfEdBxL", "tLlVOve6xEK1DwoqYgjVBI8i"))
 
-def create_online_order(cart, address, user):
-	RazorpayOrder.objects.all().delete()
-	order_amount = int(cart.total)
+# client = razorpay.Client(auth=("rzp_test_QOX9qreyce5Ewm", "FJx9ZVKVzVNlQBCemV2qQvuf"))
+
+
+def create_online_order(cartobj, address,usertype, user,paymentgatway):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+	elif usertype == "VENDOR":
+		vendor=Vendor.objects.filter(user=user).first()
+	elif usertype == "ADMIN":
+		admin=User.objects.filter(user=user).first()
+  
+	total_amount=cartobj['total_amount']
+	tax_amount=cartobj['tax_amount']
+	subtotal_amount=cartobj['subtotal_amount']
+		
+	order_amount = int(total_amount)
 	order_currency = 'INR'
-	order_receipt = str(cart.id)
+	order_receipt = cartobj["items"][0]["id"]
 	print('jhgbjhgbjh', order_amount,order_currency, order_receipt)
-	address_val = address.name+', '+address.home_no+', '+address.landmark+' '+address.city+' '+address.state 
+	if address.firstname and  address.lastname :
+		fullname= f'{address.firstname} {address.lastname}'
+	else:
+		fullname= address.firstname 
+	address_val = fullname +', '+address.streetaddress+', '+address.nearbyaddress+' '+address.city+' '+address.state+' '+ str(address.mobile)
 	notes = {'Shipping address': address_val}   # OPTIONAL
 	dic = {
-	'amount' : order_amount,
+	'amount' : order_amount * 100,
 	'currency' : order_currency,
-	'receipt' : order_receipt,
+	'receipt' : str(order_receipt),
 	'notes' : notes,
 	'payment_capture': 0
 	}
 	data = client.order.create(data=dic)
+
 	order_id = data['id']
+	razorpay_order_id=data['id']
 	print(order_id)
-	RazorpayOrder.objects.create(cart=cart, user=user, address=address, razorpay_order_id=data['id'])
+	paymenttransactionobj=PaymentTransaction()
+	paymenttransactionobj.customer = customer
+	paymenttransactionobj.paymentgatway=paymentgatway
+	paymenttransactionobj.transactionid =razorpay_order_id
+	paymenttransactionobj.transactionrealted= 'PRODUCT-ORDER'
+	paymenttransactionobj.transactiondetails = order_receipt 
+	paymenttransactionobj.amount = order_amount
+	paymenttransactionobj.address = address
+	paymenttransactionobj.save()
 	return data
 
 def create_razorpay_order(receipt_id, user, amount):

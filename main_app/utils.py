@@ -193,7 +193,7 @@ def get_dic(request):
 	dic.update(get_wishlist_len(request, 'CUSTOMER'))
 	return dic
 
-def save_order_items(cartobj, order, customer, ordertype = 'COD'):
+def save_order_items(cartobj, order, customer, ordertype):
 	
 	for x in cartobj["items"]:
 		# tax = 0.0
@@ -401,40 +401,32 @@ def create_cod_order(cartobj, address,usertype, user):
 		Cart.objects.filter(customer=customer).delete()
 		
 # In case Online Payment
-def save_order(cart, address, user, razorpaytransaction):
+def save_order(cartobj, address,usertype, user, razorpaytransaction):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		total_amount=cartobj['total_amount']
+		tax_amount=cartobj['tax_amount']
+		subtotal_amount=cartobj['subtotal_amount']
 	print(razorpaytransaction)
-	cartitems = CartItems.objects.filter(cart=cart)
-	if cart.self_pickup:
-		total = cart.total - cart.delivery_charges
-		order = Orders.objects.create(
-			order_date = timezone.now(),
-			user = user,
-			razorpaytransaction = razorpaytransaction,
-			address = address,
-			subtotal = cart.subtotal,
-			tax = cart.tax,
-			total = total,
-			point_value = calculate_point_value_on_order(cart),
-			self_pickup = True,
-			paid = True
-		)
-		save_order_items(cart, order, user, 'Online')
-		Cart.objects.filter(id=cart.id).delete()
-	else:
-		order = Orders.objects.create(
-			order_date = timezone.now(),
-			user = user,
-			razorpaytransaction = razorpaytransaction,
-			address = address,
-			delivery_charges = cart.delivery_charges,
-			subtotal = cart.subtotal,
-			tax = cart.tax,
-			total = cart.total,
-			point_value = calculate_point_value_on_order(cart),
-			paid = True
-		)
-		save_order_items(cart, order, user, 'Online')
-		Cart.objects.filter(id=cart.id).delete()
+	paymenttransactionobj=PaymentTransaction.objects.filter(transactionid=razorpaytransaction).first()
+
+	order = SalesOrder.objects.create(
+		customer = customer,
+		address = address,
+		subtotal = subtotal_amount,
+		tax = tax_amount,
+		total = total_amount,
+		paymenttransaction=paymenttransactionobj,
+		
+		# selfpickup = True
+	)
+	if order:
+		order.orderno=generate_order_number(order.id)
+		order.save()
+	save_order_items(cartobj, order, customer, 'Online')
+
+	Cart.objects.filter(customer=customer).delete()
+ 
 
 
 # In case make  Payment by wllet
@@ -486,42 +478,43 @@ def make_wallet_transaction(usertype, user, amount, transtype):
 		wallet.save()
 
 
-def save_order_by_wallet(cart, address, user, wallet_transactions):
+def save_order_by_wallet(cartobj, address,usertype, user, wallet_transactions):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		total_amount=cartobj['total_amount']
+		tax_amount=cartobj['tax_amount']
+		subtotal_amount=cartobj['subtotal_amount']
 	print(wallet_transactions)
-	cartitems = CartItems.objects.filter(cart=cart)
-	if cart.self_pickup:
-		total = cart.total - cart.delivery_charges
-		order = Orders.objects.create(
-			order_date = timezone.now(),
-			user = user,
-			wallet_transactions = wallet_transactions,
-			address = address,
-			subtotal = cart.subtotal,
-			tax = cart.tax,
-			total = total,
-			point_value = calculate_point_value_on_order(cart),
-			self_pickup = True,
-			paid = True
-		)
-		save_order_items(cart, order, user, 'Online')
-		Cart.objects.filter(id=cart.id).delete()
-	else:
-		order = Orders.objects.create(
-			order_date = timezone.now(),
-			user = user,
-			wallet_transactions = wallet_transactions,
-			address = address,
-			delivery_charges = cart.delivery_charges,
-			subtotal = cart.subtotal,
-			tax = cart.tax,
-			total = cart.total,
-			point_value = calculate_point_value_on_order(cart),
-			paid = True
-		)
-		save_order_items(cart, order, user, 'Online')
-		Cart.objects.filter(id=cart.id).delete()
+  
+	paymenttransactionobj=PaymentTransaction()
+	paymenttransactionobj.customer = customer
+	paymenttransactionobj.paymentgatway='Wallet'
+	paymenttransactionobj.transactionid =wallet_transactions.id
+	paymenttransactionobj.transactionrealted= 'PRODUCT-ORDER'
+	paymenttransactionobj.transactiondetails = wallet_transactions.id
+	paymenttransactionobj.amount = wallet_transactions.transactionamount
+	paymenttransactionobj.address = address
+	paymenttransactionobj.save()
 
+	order = SalesOrder.objects.create(
+		customer = customer,
+		address = address,
+		subtotal = subtotal_amount,
+		tax = tax_amount,
+		total = total_amount,
+		paymenttransaction=paymenttransactionobj,
+		
+		# selfpickup = True
+	)
+	if order:
+		order.orderno=generate_order_number(order.id)
+		order.save()
+	save_order_items(cartobj, order, customer, 'Online')
 
+	Cart.objects.filter(customer=customer).delete()
+    
+	print(wallet_transactions)
+	
 
 def save_vendor_commission(store, amount, percentage, ordertype = 'COD'):
 	if ordertype == 'Online':
@@ -559,7 +552,7 @@ def make_commission_transaction(usertype,user, amount, transtype):
 		else:
 			commissionwallet = CommissionWallet.objects.filter(vendor=vendor,isactive=True).first()
 	elif usertype == "ADMIN":
-		admin=User.objects.filter(user=user).first()
+		admin=user
 		if not CommissionWallet.objects.filter(admin=admin).exists():
 			commissionwallet=CommissionWallet.objects.create(admin=admin,isactive=True)
 		else:
@@ -574,7 +567,7 @@ def make_commission_transaction(usertype,user, amount, transtype):
 			previousamount = round(commissionwallet.currentbalance, 2), 
 			remainingamount = round((commissionwallet.currentbalance + amount),2) 
 		)
-		commissionwallet.currentbalance=((commissionwallet.currentbalance + amount),2)
+		commissionwallet.currentbalance=round((commissionwallet.currentbalance + amount),2)
 		commissionwallet.save()
   
 	elif transtype == 'DEBIT':
@@ -586,7 +579,7 @@ def make_commission_transaction(usertype,user, amount, transtype):
             previousamount = round(commissionwallet.currentbalance, 2), 
 			remainingamount = round((commissionwallet.currentbalance - amount),2) 
 		)
-		commissionwallet.currentbalance=((commissionwallet.currentbalance - amount),2)
+		commissionwallet.currentbalance=round((commissionwallet.currentbalance - amount),2)
 		commissionwallet.save()
 
 def per_product_vendor_commission(store,customer, amount, percentage, ordertype = 'COD'):
@@ -788,4 +781,3 @@ def transfer_into_another_account(usr,sender,reciver,amount):
 		data.save()
 	except :
 		transfer_into_another_account(usr,sender,reciver,amount)
-

@@ -100,6 +100,9 @@ class PaymentTransaction(models.Model):
 	transactionid = models.CharField(max_length=255)
 	transactionrealted= models.CharField(max_length=255)
 	transactiondetails = models.TextField(null=True,blank=True)
+	address = models.ForeignKey(Address, on_delete=models.CASCADE,blank=True,null=True)
+	amount = models.FloatField(default=0.00)
+	status = models.BooleanField(default=False)#use for payment status
 	isverified = models.BooleanField(default=False)
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)
@@ -114,7 +117,7 @@ class Wallet(models.Model):
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
 	admin = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True,related_name="admin")
 	currentbalance = models.FloatField(default=0.00)
-	isactive = models.BooleanField(default=False)
+	isactive = models.BooleanField(default=True)
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)
 	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
@@ -142,7 +145,7 @@ class BusinessLimitWallet(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
 	currentbalance = models.FloatField(default=0.00)
-	isactive = models.BooleanField(default=False)
+	isactive = models.BooleanField(default=True)
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)
 	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
@@ -215,7 +218,7 @@ class TDSLogWallet(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
 	currentbalance = models.FloatField(default=0.00)
-	isactive = models.BooleanField(default=False)
+	isactive = models.BooleanField(default=True)
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)
 	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
@@ -273,7 +276,6 @@ class WalletBalanceTransfer(models.Model):
 
 
 	
-
 
 
 
