@@ -512,7 +512,7 @@ function pay_online() {
     
     var options = {
         "key": "rzp_test_OcvfBakbfEdBxL", // Enter the Key ID generated from the Dashboard
-        "amount": amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "amount": parseInt(amount) * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         // "currency": data['currency'],
         "name": "AVPL - Payments",
         "description": "Order Payment",
@@ -567,8 +567,8 @@ function proceed_to_pay(payment_type) {
                     console.log(amount)
                     
                     var options = {
-                        "key": "rzp_test_hpJq2nYr2dg8WT", // Enter the Key ID generated from the Dashboard
-                        "amount": amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                        "key": "rzp_test_OcvfBakbfEdBxL", // Enter the Key ID generated from the Dashboard
+                        "amount": parseInt(amount) * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                         // "currency": INR,
                         "name": "AVPL - Payments",
                         "description": "Order Payment",
@@ -686,8 +686,8 @@ function proceed_to_pay(payment_type) {
                         console.log(amount)
                         
                         var options = {
-                            "key": "rzp_test_hpJq2nYr2dg8WT", // Enter the Key ID generated from the Dashboard
-                            "amount": amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                            "key": "rzp_test_OcvfBakbfEdBxL", // Enter the Key ID generated from the Dashboard
+                            "amount": parseInt(amount) * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                             // "currency": INR,
                             "name": "AVPL - Payments",
                             "description": "Order Payment",
