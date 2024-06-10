@@ -24,7 +24,7 @@
                         <div class="col-12">
                            <div class="card">
                               <div class="card-header">
-                                 <h4>Recharge Money <span class="badge badge-success">Current Balance : <i class="fa fa-inr"></i> {{business_limit.current_balance}}</span></h4>
+                                 <h4>Recharge Money <span class="badge badge-success">Current Balance : <i class="fa fa-inr"></i> {{business_limit.currentbalance}}</span></h4>
                               </div>
                               <div class="card-body">
                                  
@@ -36,15 +36,18 @@
                                  <div class="row">
                                     
                                    
-                                    <div class="col-lg-4 col-md-12 col-sm-12" style="padding-top:30px;">
+                                    <div class="col-lg-4 col-md-12 col-sm-12" >
                                        <div class="form-group">
 
-                                         
+                                          <div class="row">
+                                          <div class="col-6">
 
                                           <button type="button" class="btn btn-primary btn-lg justify-content-right" data-toggle="modal" data-target="#exampleModalonline" >Recharge by Online</button>
-
+                                          </div>
+                                          <div class="col-6">
                                           <button  type="button"   class="btn btn-primary btn-lg justify-content-right" data-toggle="modal" data-target="#exampleModal" >Recharge by Wallet</button>
-
+                                          </div>
+                                       </div>
                                        </div>
                                     </div>
 
@@ -103,7 +106,7 @@
    <div class="modal-dialog" role="document">
      <div class="modal-content">
        <div class="modal-header">
-         <h4 class="modal-title" id="walletModalLabel">Pay by Wallet <span class="btn btn-primary">Current Balance : Rs. {{bal.current_balance|floatformat:2 }}</span></h4> 
+         <h4 class="modal-title" id="walletModalLabel">Pay by Wallet <span class="btn btn-primary">Current Balance : Rs. {{bal.currentbalance|floatformat:2 }}</span></h4> 
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
          </button>

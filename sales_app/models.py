@@ -61,6 +61,7 @@ class SalesOrderItems(models.Model):
     total =  models.FloatField(default=0.00,null=True,blank=True)
     orderstatus = models.CharField(max_length=255, default='Pending',null=True,blank=True)
     deliveryexpected = models.DateField(null=True, blank=True)
+    deliveredon=models.DateTimeField(null=True, blank=True)
     createdat = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)

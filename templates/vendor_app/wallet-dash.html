@@ -38,7 +38,7 @@
                                        <div class="col-lg-12 col-md-12 col-sm-12">
                                           <h4><i class="fa fa-dashcube"></i> Current Balance</h4>
                                           <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
-                                          <h5><i class="fa fa-inr"></i> {{wallet.current_balance}}</h5>
+                                          <h5><i class="fa fa-inr"></i> {{wallet.currentbalance}}</h5>
                                        </div>
                                        <div class="col-lg-12 mt-4 col-md-12 col-sm-12">
                                           <h4><i class="fa fa-sign-in"></i> Transactions</h4>
@@ -58,16 +58,16 @@
                                                 <tbody>
                                                    {% for x in transactions %}
                                                    <tr>
-                                                      <td>{{ x.transaction_date|safe }}</td>
+                                                      <td>{{ x.transactiondate|safe }}</td>
                                                       <td>TRN{{ x.id|safe }}</td>
                                                       {% if x.transaction_type == 'CREDIT' %}
-                                                      <td><span class="badge badge-success">{{ x.transaction_type }}</span></td>
+                                                      <td><span class="badge badge-success">{{ x.transactiontype }}</span></td>
                                                       {% else %}
-                                                      <td><span class="badge badge-danger">{{ x.transaction_type }}</span></td>
+                                                      <td><span class="badge badge-danger">{{ x.transactiontype }}</span></td>
                                                       {% endif %}
-                                                      <td><i class="fa fa-inr"></i> {{ x.transaction_amount }}</td>
-                                                      <td><i class="fa fa-inr"></i> {{ x.previous_amount }}</td>
-                                                      <td><i class="fa fa-inr"></i> {{ x.remaining_amount }}</td>
+                                                      <td><i class="fa fa-inr"></i> {{ x.transactionamount }}</td>
+                                                      <td><i class="fa fa-inr"></i> {{ x.previousamount }}</td>
+                                                      <td><i class="fa fa-inr"></i> {{ x.remainingamount }}</td>
                                                    </tr>
                                                    {% endfor %}
                                                 </tbody>

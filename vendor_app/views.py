@@ -29,10 +29,11 @@ from main_app.utils import *
 from django.utils import timezone
 
 ORDER_STATUS_UPDATE = (
+    ("Pending", "Pending"),
     ("Order Placed", "Order Placed"),
     ("Packed", "Packed"),
     ("Shipped", "Shipped"),
-    ("Delivered", "Delivered"),
+    # ("Delivered", "Delivered"),
     
 )
 
@@ -74,6 +75,7 @@ def vendor_dashboard(request):
                 'wallet_commission':wallet_commission,
 				'business_limit_transactions':business_limit_transactions,
 				'transactions':transactions,
+                 'salesorder': SalesOrder.objects.filter(vendor=vendor).order_by("-id"),
 				'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
 				}
 				return render(request, 'vendor_app/dashboard.html', dic)
@@ -102,58 +104,46 @@ def order_status_update(request):
 		
 	if request.method == "POST":
 		order_id = request.POST.get('order_id')
-		order = Orders.objects.filter(id=order_id).first()
+		order = SalesOrder.objects.filter(id=order_id).first()
 		delivery_status=request.POST.get('delivery_status')
-		
-		order.delivery_status = delivery_status
-		order.save()
-		
+         
+		if SalesOrderItems .objects.filter(salesorder=order).exists():
+			if delivery_status == 'Delivered':
+				SalesOrderItems .objects.filter(salesorder=order).update(orderstatus=delivery_status, deliveredon=timezone.now())
+			else:
+				SalesOrderItems .objects.filter(salesorder=order).update(orderstatus=delivery_status)
 		messages.success(
 			request, f"The order status of order_id ORD{order_id} has been updated ! ")
-		vendor = Vendor.objects.filter(user=request.user)
-		if delivery_status == 'Delivered':
-			OrderItems.objects.filter(order=order_id).update(delivery_status=delivery_status, delivered_on=timezone.now())
-			users = OrderItems.objects.filter(order=order_id).first()
-			user=users.order.user
-			print(user)
-			order=users.order
-			print(order)
-			
 				
-			order_item = OrderItems.objects.filter(order=order_id)
-			print(order_item)
-			for x in order_item:
-				print(x.plan,'LLLLLLLLLLLLLLLLLLLLLLLLLLLL')
-				save_pv_transaction(user, x.product, x.subtotal, x.plan)
-			if not order.paid:
-				orderitems = OrderItems.objects.filter(order=order_id).first()
-				print(orderitems,'OOOOOOOOO')
-				admin_commission = (orderitems.total/100)*orderitems.product.category.commission
-				print("admin commission percentage")
-				print(orderitems.product.category.commission)
-				print(admin_commission,'KKKKKKKKKKKKKK')
-				gst = (admin_commission/100)*18   #GST of 18 per on admin charge deduct from businesslimit
-				print(gst)
-				admin_commission_plus_gst = admin_commission + gst
-				print("printing total_detection_amt")
-				print(admin_commission_plus_gst)
-				GST_Log.objects.create(orders = orderitems, gst_amt=gst)
-				trans_name = 'Transaction for ORD'+str(order.id)+str(orderitems.id)
-				#make_business_limit_transaction(vendor, admin_commission, 'DEBIT', trans_name)
-				make_business_limit_transaction(vendor, admin_commission_plus_gst, 'DEBIT', trans_name)
-				make_commission_transaction(vendor.user, admin_commission_plus_gst, 'CREDIT')
-				user_c = 0.0
-				if UserVendorRelation.objects.filter(vendor=vendor).exists():
-					print('hhhhhhhhhhhhhhhh')
-					user = UserVendorRelation.objects.get(vendor=vendor)
-					percentage = float(str(UserVendorCommission.objects.get()))
-					user_c = (orderitems.total/100) * percentage
-					make_commission_transaction(user, admin_commission_plus_gst, 'CREDIT')
-					make_wallet_transaction(vendor.user, user_c, 'DEBIT')
-		else:
-			OrderItems.objects.filter(order=order_id).update(delivery_status=delivery_status)
-			notification(vendor.user, 'Order '+delivery_status)
-
+			# for x in order_item:
+			# 	print(x.plan,'LLLLLLLLLLLLLLLLLLLLLLLLLLLL')
+			# 	save_pv_transaction(user, x.product, x.subtotal, x.plan)
+			# if not order.paid:
+			# 	orderitems = OrderItems.objects.filter(order=order_id).first()
+			# 	print(orderitems,'OOOOOOOOO')
+			# 	admin_commission = (orderitems.total/100)*orderitems.product.category.commission
+			# 	print("admin commission percentage")
+			# 	print(orderitems.product.category.commission)
+			# 	print(admin_commission,'KKKKKKKKKKKKKK')
+			# 	gst = (admin_commission/100)*18   #GST of 18 per on admin charge deduct from businesslimit
+			# 	print(gst)
+			# 	admin_commission_plus_gst = admin_commission + gst
+			# 	print("printing total_detection_amt")
+			# 	print(admin_commission_plus_gst)
+			# 	GST_Log.objects.create(orders = orderitems, gst_amt=gst)
+			# 	trans_name = 'Transaction for ORD'+str(order.id)+str(orderitems.id)
+			# 	#make_business_limit_transaction(vendor, admin_commission, 'DEBIT', trans_name)
+			# 	make_business_limit_transaction(vendor, admin_commission_plus_gst, 'DEBIT', trans_name)
+			# 	make_commission_transaction(vendor.user, admin_commission_plus_gst, 'CREDIT')
+			# 	user_c = 0.0
+			# 	if UserVendorRelation.objects.filter(vendor=vendor).exists():
+			# 		print('hhhhhhhhhhhhhhhh')
+			# 		user = UserVendorRelation.objects.get(vendor=vendor)
+			# 		percentage = float(str(UserVendorCommission.objects.get()))
+			# 		user_c = (orderitems.total/100) * percentage
+			# 		make_commission_transaction(user, admin_commission_plus_gst, 'CREDIT')
+			# 		make_wallet_transaction(vendor.user, user_c, 'DEBIT')
+		
 			# orderitem= OrderItems.objects.filter(order=order_id)
 			# print(orderitem,'oitem')
 			# for item in orderitem:  
@@ -1296,7 +1286,7 @@ def vendor_orders(request):
 		vendor = Vendor.objects.filter(user=request.user)
 		business_limit = BusinessLimitWallet.objects.get(vendor__user=request.user)
 		dic = {
-			'orders':SalesOrderItems.objects.filter(store__vendor__user=request.user),
+			'orders':SalesOrder.objects.filter(store__vendor__user=request.user),
 			'vendor':vendor,'business_limit':business_limit,
 			'allorder_status':ORDER_STATUS_UPDATE,
 			# 'notification':get_notifications(request.user),
@@ -1310,7 +1300,7 @@ def vendor_complete_orders(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user)
 		dic = {
-			'orders':SalesOrderItems.objects.filter(store__vendor__user=request.user),
+			'orders':SalesOrder.objects.filter(store__vendor__user=request.user),
 			'vendor':vendor,
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -1592,6 +1582,7 @@ from main_app.razor import *
 @csrf_exempt
 def vendor_recharge(request):
 	if check_user_authentication(request, 'VENDOR'):
+		vendor=Vendor.objects.filter(user=request.user).first()
 		if request.method == 'POST':
 			amount = request.POST.get('amount')
 			payment_type = request.POST.get('payment_type')
@@ -1600,48 +1591,55 @@ def vendor_recharge(request):
 			print(amount,amt,payment_type,'AAAAAAAAAAA')
 			if payment_type == 'usewallet':
 				
-				bal=Wallet.objects.filter(user=request.user).first()
-				bal_bussiness=BusinessLimitWallet.objects.filter(vendor=request.user.vendor).first()
-				if float(amount) >= bal.current_balance:
+				bal=Wallet.objects.filter(vendor__user=request.user).first()
+				bal_bussiness=BusinessLimitWallet.objects.filter(vendor__user=request.user).first()
+				if float(amount) >= bal.currentbalance:
 					messages.warning(request, 'Insufficent balence.')
 					return redirect('/vendor/businesslimittransaction')
 				else:
 					wallet_transactions = WalletTransaction.objects.create(wallet = bal,
-					transaction_date = timezone.now(),
-					transaction_type = "DEBIT",
-					transaction_amount = amount,
-					previous_amount = bal.current_balance,
-					remaining_amount = bal.current_balance - amount)
+					transactiondate = timezone.now(),
+					transactiontype = "DEBIT",
+					transactionamount = amount,
+					previousamount = bal.currentbalance,
+					remainingamount = bal.currentbalance - amount)					
 
-					
-
-					Wallet.objects.filter(user=request.user).update(current_balance = bal.current_balance - amount)
+					bal.currentbalance = bal.currentbalance - amount
+					bal.save()
 					wallet_tans = WalletTransaction.objects.filter(id=wallet_transactions.id).first()
-				   
-					new_receipt = Recharge_Receipt.objects.create(vendor=request.user.vendor, amount=amount,payment_id='Wallet transactions ID '+str(wallet_tans.id))
-					print(new_receipt,'NNNNN')
-					receipt = Recharge_Receipt.objects.filter(id=new_receipt.id).first()
-					print(receipt.amount,receipt.id,'RRRRRRRRRRRr')
-					make_business_limit_transaction(request.user.vendor, receipt.amount, 'CREDIT', 'Recharge Receipt ID  '+str(receipt.id))
+					paymenttransactionobj=PaymentTransaction()
+					paymenttransactionobj.vendor = vendor
+					paymenttransactionobj.paymentgatway="Wallet"
+					paymenttransactionobj.transactionid =wallet_transactions.id
+					paymenttransactionobj.transactionrealted= 'Recharge-BusinessLimitWallet'
+					paymenttransactionobj.transactiondetails = 'Wallet transactions ID '+str(wallet_tans.id)
+					paymenttransactionobj.amount = amount
+			
+					paymenttransactionobj.save()
+     
+					print(paymenttransactionobj,'NNNNN')
+					
+			
+					make_business_limit_transaction('VENDOR',request.user, amount, 'CREDIT', 'Recharge Receipt ID  '+str(paymenttransactionobj.id))
 					# make_commission_transaction(request.user.vendor, receipt.amount, 'CREDIT')
 					sub = 'AVPL - Business Limit Recharged'
 					msg = '''Hi there!
-							Your business limit has been successfully recharge with amount Rs '''+str(receipt.amount)+'''.
+							Your business limit has been successfully recharge with amount Rs '''+str(paymenttransactionobj.amount)+'''.
 
 										Thanks!'''
 					EmailMessage(sub, msg, to=[request.user.email]).send()
-					notification(request.user, 'Recharged Successfully.')
+					# notification(request.user, 'Recharged Successfully.')
 					return render(request, 'vendor_app/recharge-success.html')
 								
 
 			else:	
-				receipt = Recharge_Receipt.objects.create(vendor=request.user.vendor, amount=amt)
+				receipt = PaymentTransaction.objects.create(vendor__user=request.user, amount=amt)
 				data = create_razorpay_order(str(receipt.id), request.user.vendor, amount)
 				return JsonResponse({'data':data})
 		
 		else:
-			dic = {'business_limit':BusinessLimitWallet.objects.get(vendor=request.user.vendor),
-			'bal':Wallet.objects.filter(user=request.user).first(),}
+			dic = {'business_limit':BusinessLimitWallet.objects.get(vendor__user=request.user),
+			'bal':Wallet.objects.filter(vendor__user=request.user).first(),}
 			return render(request, 'vendor_app/businesslimittransaction.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -1694,7 +1692,7 @@ def vendor_activate_subscription(request):
 		UserSubscription.objects.filter(user = obj.user).delete()
 		UserSubscription.objects.create(user = obj.user, months=obj.month)
 		
-		business_limit=BusinessLimitWallet.objects.get(vendor=request.user.vendor)
+		business_limit=BusinessLimitWallet.objects.get(vendor__user=request.user)
 		subs_charges = SubscriptionCharge.objects.get()
 		amount = obj.amount
 		Gst = (amount/100)*18

@@ -498,6 +498,7 @@ def save_order_by_wallet(cartobj, address,usertype, user, wallet_transactions):
 	paymenttransactionobj.transactiondetails = wallet_transactions.id
 	paymenttransactionobj.amount = wallet_transactions.transactionamount
 	paymenttransactionobj.address = address
+	paymenttransactionobj.status = True
 	paymenttransactionobj.save()
 
 	order = SalesOrder.objects.create(
@@ -507,7 +508,7 @@ def save_order_by_wallet(cartobj, address,usertype, user, wallet_transactions):
 		tax = tax_amount,
 		total = total_amount,
 		paymenttransaction=paymenttransactionobj,
-		
+		ispaymentpaid=True,
 		# selfpickup = True
 	)
 	if order:
@@ -724,34 +725,36 @@ def filter_product_by_store(store, products):
 
 # for Admin comission transaction in case COD
 from vendor_app.models import *
-def make_business_limit_transaction(vendor, amount, trans_type, trans_name):
-	if not BusinessLimit.objects.filter(vendor=vendor).exists():
-		BusinessLimit.objects.create(vendor=vendor)
-	business_limit = BusinessLimit.objects.get(vendor=vendor)
+
+def make_business_limit_transaction(usertype,user, amount, trans_type, trans_name):
+	if usertype == 'VENDOR' :
+		vendor=Vendor.objects.filter(user=user).first()
+	if not BusinessLimitWallet.objects.filter(vendor=vendor).exists():
+		BusinessLimitWallet.objects.create(vendor=vendor)
+	business_limit = BusinessLimitWallet.objects.get(vendor=vendor)
 	if trans_type == 'CREDIT':
-		BusinessLimitTransaction.objects.create(
-		business_limit = business_limit,
-		transaction_date = timezone.now(),
-		transaction_type = trans_type,
-		transaction_amount = amount,
-		transaction_name =trans_name,
-		previous_amount = business_limit.current_balance,
-		remaining_amount = business_limit.current_balance + amount
+		BusinessLimitWalletTransaction.objects.create(
+		businesslimitwallet = business_limit,
+		transactiondate = timezone.now(),
+		transactiontype = trans_type,
+		transactionamount = amount,
+		previousamount = business_limit.currentbalance,
+		remainingamount = business_limit.currentbalance + amount
+
 		)
-		BusinessLimit.objects.filter(vendor=vendor).update(current_balance = business_limit.current_balance + amount)
+		BusinessLimitWallet.objects.filter(vendor=vendor).update(currentbalance = business_limit.currentbalance + amount)
 	if trans_type == 'DEBIT':
 		print(amount)
-		remaining_amount = business_limit.current_balance - amount
-		BusinessLimitTransaction.objects.create(
-			business_limit = business_limit,
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			transaction_name =trans_name,
-			previous_amount = business_limit.current_balance,
-			remaining_amount = remaining_amount
+		remaining_amount = business_limit.currentbalance - amount
+		BusinessLimitWalletTransaction.objects.create(
+			businesslimitwallet = business_limit,
+			transactiondate = timezone.now(),
+			transactiontype = trans_type,
+			transactionamount = amount,
+			previousamount = business_limit.currentbalance,
+			remainingamount = remaining_amount
 		)
-		BusinessLimit.objects.filter(vendor=vendor).update(current_balance = remaining_amount)
+		BusinessLimitWallet.objects.filter(vendor=vendor).update(currentbalance = remaining_amount)
 
 # save pv transaction for Subscription
 def save_pv_transaction2(user, subtotal, plan):

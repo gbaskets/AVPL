@@ -1887,14 +1887,13 @@ Your order has been placed successfully, Kindly check the My Order section in yo
 
 Thanks!'''
             EmailMessage(sub, msg, to=[request.user.email]).send()
-            notification(request.user, 'Order Placed Successfully.')
+            # notification(request.user, 'Order Placed Successfully.')
 
 
         elif payment_type == 'online':
             dic = create_online_order(cart_obj, address, 'CUSTOMER', request.user,'Razorpay')
         
-            # razorpaytransaction = dic['id']
-            # dic = save_order(cart_obj, address,'CUSTOMER', request.user, razorpaytransaction)
+           
         return JsonResponse({'response':'Success', 'pay_type':payment_type, 'data':dic})
     else:
         return HttpResponse('Error 500 : Unauthorized User')

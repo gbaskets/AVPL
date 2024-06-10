@@ -45,12 +45,12 @@
                                        </thead>
                                        <tbody>
                                           {% for order in orders %}
-                                          {% if order.delivery_status != 'Delivered' %}
+                                          {% if order.deliverystatus != 'Delivered' %}
                                           <tr>
-                                             {% if order.delivery_status == 'Order Placed' %}
-                                             <td><a href="/vendor/orderdetail?i={{order.id}}"><span class="badge badge-primary">NEW</span> {{order.order.order_date}}</a></td>
+                                             {% if order.deliverystatus == 'Order Placed' %}
+                                             <td><a href="/vendor/orderdetail?i={{order.id}}"><span class="badge badge-primary">NEW</span> {{order.order.orderdate}}</a></td>
                                              {% else %}
-                                             <td><a href="/vendor/orderdetail?i={{order.id}}">{{order.order.order_date}}</a></td>
+                                             <td><a href="/vendor/orderdetail?i={{order.id}}">{{order.order.orderdate}}</a></td>
                                              {% endif %}
                                              <td>ORD{{order.order.id}}</td>
                                              {% if order.order.paid == True %} 
@@ -58,14 +58,14 @@
                                              {% else %}
                                              <td><span class="badge badge-danger">UnPaid</span> </td>
                                              {% endif %}
-                                             {% if order.delivery_status == 'Order Placed' %}
-                                             <td><span class="badge badge-info">{{order.delivery_status}}</span></td>
+                                             {% if order.deliverystatus == 'Order Placed' %}
+                                             <td><span class="badge badge-info">{{order.deliverystatus}}</span></td>
                                              {% endif %}
-                                             {% if order.delivery_status == 'Packed' %}
-                                             <td><span class="badge badge-success">{{order.delivery_status}}</span></td>
+                                             {% if order.deliverystatus == 'Packed' %}
+                                             <td><span class="badge badge-success">{{order.deliverystatus}}</span></td>
                                              {% endif %}
-                                             {% if order.delivery_status == 'Shipped' %}
-                                             <td><span class="badge badge-danger">{{order.delivery_status}}</span></td>
+                                             {% if order.deliverystatus == 'Shipped' %}
+                                             <td><span class="badge badge-danger">{{order.deliverystatus}}</span></td>
                                              {% endif %}
                                             
                                              {% if order.order.paid == True %}   
@@ -73,9 +73,9 @@
                                              <form action="{% url 'order_status_update'  %}" method="POST">
                                                {% csrf_token %}
                                                <input type="hidden" name="order_id" value="{{order.order.id}}">
-                                               <select name="delivery_status">
+                                               <select name="deliverystatus">
                                                    {% for i, j in allorder_status %}
-                                                   <option value="{{i}}" {% if i == order.delivery_status %}selected{% endif %}>{{j}}</option>
+                                                   <option value="{{i}}" {% if i == order.deliverystatus %}selected{% endif %}>{{j}}</option>
                                                    {% endfor %}
                                                </select>
                                                

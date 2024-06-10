@@ -84,7 +84,7 @@ def user_dashboard(request):
 			# 'tree':fetch_empty_nodes(request.user),
 			# 'referrals':referals,
 			# 'pv':fetch_pv(request.user),
-            'salesorder':SalesOrder.objects.filter(customer=customer_obj),
+            'salesorder':SalesOrder.objects.filter(customer=customer_obj).order_by('-id'),
 			'wallet':Wallet.objects.filter(customer=customer_obj).first(),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -595,7 +595,7 @@ def my_order(request):
 		# 	orders = get_my_orders(request.user)
 		dic = {
 			"customer_obj":Customer.objects.filter(user=request.user).first(),
-			'salesorder':SalesOrder.objects.filter(customer=customer_obj),
+			'salesorder':SalesOrder.objects.filter(customer=customer_obj).order_by("-id"),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
