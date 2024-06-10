@@ -1839,40 +1839,47 @@ Thanks!'''
             # notification(request.user, 'Order Placed Successfully.')
 
         elif payment_type == 'usewallet':
-            amount=cart_obj.total
+            total_amount=cart_obj['total_amount']
+            tax_amount=cart_obj['tax_amount']
+            subtotal_amount=cart_obj['subtotal_amount']
+            amount=total_amount
             trans_type= 'DEBIT'
             user=request.user
             
-            if not Wallet.objects.filter(user=user).exists():
-                Wallet.objects.create(user=user)
-            wallet = Wallet.objects.filter(user=user).first()
+            customer=Customer.objects.filter(user=user).first()
+            if not Wallet.objects.filter(customer=customer).exists():
+                wallet=Wallet.objects.create(customer=customer,isactive=True)
+            else:
+                wallet = Wallet.objects.filter(customer=customer,isactive=True).first()
             print(wallet)
             if trans_type == 'CREDIT':
                 print('1')
                 wallet_transactions = WalletTransaction.objects.create(
                     wallet = wallet,
-                    transaction_date = timezone.now(),
-                    transaction_type = trans_type,
-                    transaction_amount = amount,
-                    previous_amount = round(wallet.current_balance, 2),
-                    remaining_amount = round(wallet.current_balance,2) + round(amount,2)
+                    transactiondate = timezone.now(),
+                    transactiontype = trans_type,
+                    transactionamount = amount,
+                    previousamount =  round(wallet.currentbalance, 2),
+                    remainingamount =round(wallet.currentbalance,2) + round(amount,2)        
                 )
-                Wallet.objects.filter(user=user).update(current_balance = round(wallet.current_balance, 2) + round(amount, 2))
-                save_order_by_wallet(cart_obj, address, user, wallet_transactions)
+                wallet.currentbalance = round(wallet.currentbalance, 2) + round(amount, 2)
+                wallet.save()
+                save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
 
             elif trans_type == 'DEBIT':
                 print(2)
                 wallet_transactions = WalletTransaction.objects.create(
-                    wallet = wallet,
-                    transaction_date = timezone.now(),
-                    transaction_type = trans_type,
-                    transaction_amount = amount,
-                    previous_amount = wallet.current_balance,
-                    remaining_amount = wallet.current_balance - amount
+                     wallet = wallet,
+                    transactiondate = timezone.now(),
+                    transactiontype = trans_type,
+                    transactionamount = amount,
+                    previousamount =  round(wallet.currentbalance, 2),
+                    remainingamount =round(wallet.currentbalance,2) - round(amount,2)        
                 )
                 print(wallet)
-                Wallet.objects.filter(user=user).update(current_balance = wallet.current_balance - amount)
-                save_order_by_wallet(cart_obj, address, user, wallet_transactions)
+                wallet.currentbalance = round(wallet.currentbalance, 2) - round(amount, 2)
+                wallet.save()
+                save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
 
             sub = 'AVPL - Order Placed'
             msg = ''' Hi there!
@@ -1887,8 +1894,8 @@ Thanks!'''
             dic = create_online_order(cart_obj, address, 'CUSTOMER', request.user,'Razorpay')
         
             print('hhhhhhhhhhhhhhhhhhh',dic)
-            # razorpaytransacti   on = dic['id']
-            # dic = save_order(cart, address, request.user, razorpaytransaction)
+            razorpaytransaction = dic['id']
+            dic = save_order(cart_obj, address,'CUSTOMER', request.user, razorpaytransaction)
         return JsonResponse({'response':'Success', 'pay_type':payment_type, 'data':dic})
     else:
         return HttpResponse('Error 500 : Unauthorized User')
