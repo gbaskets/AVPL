@@ -781,4 +781,3 @@ def transfer_into_another_account(usr,sender,reciver,amount):
 		data.save()
 	except :
 		transfer_into_another_account(usr,sender,reciver,amount)
-

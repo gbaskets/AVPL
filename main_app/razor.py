@@ -38,6 +38,7 @@ def create_online_order(cartobj, address,usertype, user,paymentgatway):
 	'payment_capture': 0
 	}
 	data = client.order.create(data=dic)
+
 	order_id = data['id']
 	razorpay_order_id=data['id']
 	print(order_id)

@@ -1843,18 +1843,9 @@ Thanks!'''
             tax_amount=cart_obj['tax_amount']
             subtotal_amount=cart_obj['subtotal_amount']
             amount=total_amount
-            total_amount=cart_obj['total_amount']
-            tax_amount=cart_obj['tax_amount']
-            subtotal_amount=cart_obj['subtotal_amount']
-            amount=total_amount
             trans_type= 'DEBIT'
             user=request.user
             
-            customer=Customer.objects.filter(user=user).first()
-            if not Wallet.objects.filter(customer=customer).exists():
-                wallet=Wallet.objects.create(customer=customer,isactive=True)
-            else:
-                wallet = Wallet.objects.filter(customer=customer,isactive=True).first()
             customer=Customer.objects.filter(user=user).first()
             if not Wallet.objects.filter(customer=customer).exists():
                 wallet=Wallet.objects.create(customer=customer,isactive=True)
@@ -1870,15 +1861,7 @@ Thanks!'''
                     transactionamount = amount,
                     previousamount =  round(wallet.currentbalance, 2),
                     remainingamount =round(wallet.currentbalance,2) + round(amount,2)        
-                    transactiondate = timezone.now(),
-                    transactiontype = trans_type,
-                    transactionamount = amount,
-                    previousamount =  round(wallet.currentbalance, 2),
-                    remainingamount =round(wallet.currentbalance,2) + round(amount,2)        
                 )
-                wallet.currentbalance = round(wallet.currentbalance, 2) + round(amount, 2)
-                wallet.save()
-                save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
                 wallet.currentbalance = round(wallet.currentbalance, 2) + round(amount, 2)
                 wallet.save()
                 save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
@@ -1892,17 +1875,8 @@ Thanks!'''
                     transactionamount = amount,
                     previousamount =  round(wallet.currentbalance, 2),
                     remainingamount =round(wallet.currentbalance,2) - round(amount,2)        
-                     wallet = wallet,
-                    transactiondate = timezone.now(),
-                    transactiontype = trans_type,
-                    transactionamount = amount,
-                    previousamount =  round(wallet.currentbalance, 2),
-                    remainingamount =round(wallet.currentbalance,2) - round(amount,2)        
                 )
                 print(wallet)
-                wallet.currentbalance = round(wallet.currentbalance, 2) - round(amount, 2)
-                wallet.save()
-                save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
                 wallet.currentbalance = round(wallet.currentbalance, 2) - round(amount, 2)
                 wallet.save()
                 save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
@@ -1917,7 +1891,6 @@ Thanks!'''
 
 
         elif payment_type == 'online':
-            dic = create_online_order(cart_obj, address, 'CUSTOMER', request.user,'Razorpay')
             dic = create_online_order(cart_obj, address, 'CUSTOMER', request.user,'Razorpay')
         
             razorpaytransaction = dic['id']
