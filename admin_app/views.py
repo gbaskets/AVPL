@@ -3667,7 +3667,7 @@ def adminbalanacetransfer(request):
 	vandordata = Vendor.objects.filter(verified = True)
 	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
 	context = {
-			'vendordata': vandordata,'userlist':User.objects.filter(is_active=True).exclude(id=request.user.id),
+			'vendordata': vandordata,'customerlist':Customer.objects.filter(isactive=True),
 			'transectiodetails':transectiondata,
 			'bal':bal,
 			# 'notification':get_notifications(request.user,'ADMIN'),
@@ -3692,7 +3692,7 @@ Your OTP for wallet transfer for sending ₹''' + str(request.session['amount'])
 Thanks!'''
 		EmailMessage('AVPL - OTP for Wallet transfer', msg, to=[request.user.email]).send()
 		print(request.user.email)
-		notification(request.user, 'OTP sent successfully.')
+		# notification(request.user, 'OTP sent successfully.')
 		messages.success(request, 'OTP sent successfully.')
 		return render(request,'admin_app/otpverify.html')
 	return render(request,'admin_app/customerwallettransfer.html',context=context)
@@ -3715,19 +3715,25 @@ def transfer_amount_admin(request):
 			# if senderotp == request.session['senderotp'] and reciverotp == request.session['reciverotp']:
 		if senderotp == request.session['senderotp']:
 			print('hjhjjjjjjjjjjjj')
-			if Wallet.objects.get(user=request.user).current_balance >= request.session['amount']:
+			if Wallet.objects.get(admin=request.user).currentbalance >= request.session['amount']:
 				print('LLLLLLLLLLLLLLLLLLL')
-				make_wallet_transaction(user = request.user, amount = request.session['amount'], trans_type = 'DEBIT')
-				make_wallet_transaction(user = User.objects.get(username = request.session['recivername']), 
-					amount = request.session['amount'], trans_type = 'CREDIT')
+               
+				make_wallet_transaction("ADMIN",request.user, request.session['amount'],'DEBIT')
+				reciveruser=User.objects.get(username = request.session['recivername'])
+				if reciveruser.groups.filter(name="ADMIN"):
+					group_name="ADMIN"   
+				elif reciveruser.groups.filter(name="VENDOR"):
+					group_name="VENDOR"  
+				elif reciveruser.groups.filter(name="CUSTOMER"):
+						group_name="CUSTOMER"  
+				make_wallet_transaction(group_name,User.objects.get(username = request.session['recivername']), 
+					request.session['amount'],'CREDIT')
 				print(request.session['recivername'])
-				transfer_into_another_account(usr = request.user, sender = request.user.username,
-					reciver = request.session['recivername'],amount = request.session['amount'])
+				transfer_into_another_account(request.user, request.user.username,
+					request.session['recivername'], request.session['amount'])
 				print('done')
-				user = User.objects.get(username = request.session['recivername'])
-				notification(user, 'Money Successfully Recived.')
-				notification(request.user, 'Money Successfully Transfered')
 				messages.success(request,'Successfully Transfered')
+			
 				return redirect('balanacetransfers')
 
 

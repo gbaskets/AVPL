@@ -1321,18 +1321,18 @@ login_required('/')
 @csrf_exempt
 def wallet_transfer_vendor(request):
 
-	if not Wallet.objects.filter(user=request.user).exists():
-		Wallet.objects.create(user=request.user,current_balance=0)	
+	if not Wallet.objects.filter(customer__user=request.user).exists():
+		Wallet.objects.create(customer__user=request.user,currentbalance=0)	
 		
 	try:
-		bal = Wallet.objects.filter(user=request.user).first().current_balance
+		bal = Wallet.objects.filter(customer__user=request.user).first().currentbalance
 	except Wallet.DoesNotExist:
 		user = None	
 	
 		
 
-	vandordata = Vendor.objects.filter(is_active = True)
-	transectiondata = WalletTransfer.objects.filter(user=request.user).order_by('-transection_time')
+	vandordata = Vendor.objects.filter(verified = True)
+	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
     
 	context = {
 			'vendordata': vandordata,
@@ -1341,10 +1341,9 @@ def wallet_transfer_vendor(request):
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 
-	user=WalletTransferApproval.objects.all()[0:1]
-	print(user)
+	
 
-	if WalletTransferApproval.objects.get(id =user).customer == 1:
+	if WalletTransferApprovalSettings.objects.filter().first().customer == True :
 		if request.method == 'POST':
 			request.session['recivername'] = request.POST.get('rvname') 
 			request.session['amount']  = int(request.POST.get('amt'))
@@ -1360,7 +1359,7 @@ Your OTP for wallet transfer for sending ₹''' + str(request.session['amount'])
 Thanks!'''
 			EmailMessage('AVPL - OTP for Wallet transfer', msg, to=[request.user.email]).send()
 			print(request.user.email)
-			notification(request.user, 'OTP sent successfully.')
+			# notification(request.user, 'OTP sent successfully.')
 			messages.success(request, 'OTP sent successfully.')
 			return render(request,'user_app/otpverify.html')
 		
@@ -1384,19 +1383,25 @@ def transfer_amount(request):
 		
 		if senderotp == request.session['senderotp']:
 			
-			if Wallet.objects.get(user=request.user).current_balance >= request.session['amount']:
-
-				make_wallet_transaction(user = request.user, amount = request.session['amount'], trans_type = 'DEBIT')
-				make_wallet_transaction(user = User.objects.get(username = request.session['recivername']), 
-					amount = request.session['amount'], trans_type = 'CREDIT')
+			if Wallet.objects.get(customer__user=request.user).currentbalance >= request.session['amount']:
+				print('LLLLLLLLLLLLLLLLLLL')
+               
+				make_wallet_transaction("CUSTOMER",request.user, request.session['amount'],'DEBIT')
+				reciveruser=User.objects.get(username = request.session['recivername'])
+				if reciveruser.groups.filter(name="ADMIN"):
+					group_name="ADMIN"   
+				elif reciveruser.groups.filter(name="VENDOR"):
+					group_name="VENDOR"  
+				elif reciveruser.groups.filter(name="CUSTOMER"):
+						group_name="CUSTOMER"  
+				make_wallet_transaction(group_name,User.objects.get(username = request.session['recivername']), 
+					request.session['amount'],'CREDIT')
 				print(request.session['recivername'])
-				transfer_into_another_account(usr = request.user, sender = request.user.username,
-					reciver = request.session['recivername'],amount = request.session['amount'])
-				print('done!')
-				user = User.objects.get(username = request.session['recivername'])
-				notification(user, 'Money Successfully Recived.')
-				notification(request.user, 'Money Successfully Transfered')
-			
+				transfer_into_another_account(request.user, request.user.username,
+					request.session['recivername'], request.session['amount'])
+				print('done')
+				
+
 				messages.success(request,'Successfully Transfered')
 				# if int(request.session['type012']) == 0:
 				# 	return redirect('transfer_money')

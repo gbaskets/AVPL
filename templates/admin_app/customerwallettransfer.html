@@ -240,7 +240,7 @@
                                              <label>Select User</label>
                                              <select class="form-control" name="rvname" id="abc" required>
                                                 <option value="">----select User----</option>
-                                                {% for i in userdata %}
+                                                {% for i in customerlist %}
                                                 <option value="{{i.user.username}}">{{i.user.username}} </option>
                                                 {% endfor %}
                                              </select>
@@ -331,10 +331,10 @@
                                        {% for i in transectiodetails %}
                                              
                                        <tr>
-                                          <td>{{i.transection_time}}</td>
-                                          <td>{{i.transection_id}}</td>
-                                          <td>{{i.senderusername}}</td>
-                                          <td>{{i.reciverusername}}</td>
+                                          <td>{{i.createdat}}</td>
+                                          <td>{{i.transectionid}}</td>
+                                          <td>{{i.sender}}</td>
+                                          <td>{{i.receiver}}</td>
                                           <td>{{i.amount}}</td>
                                        </tr>
                                        {% endfor %}

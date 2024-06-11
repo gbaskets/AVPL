@@ -451,7 +451,7 @@ def make_wallet_transaction(usertype, user, amount, transtype):
 		else:
 			wallet = Wallet.objects.filter(vendor=vendor,isactive=True).first()
 	elif usertype == "ADMIN":
-		admin=User.objects.filter(user=user).first()
+		admin=user
 		if not Wallet.objects.filter(admin=admin).exists():
 			wallet=Wallet.objects.create(admin=admin,isactive=True)
 		else:
@@ -783,7 +783,7 @@ xval = 1
 def transfer_into_another_account(usr,sender,reciver,amount):
 	global xval
 	td = str(sender[:2]).upper() + str(datetime.date.today()).replace('-','') + str(random.randint(1000,9999)) + str(xval)
-	data = WalletTransfer(user=usr,senderusername=sender, reciverusername = reciver, transection_id =td, amount=amount)
+	data = WalletBalanceTransfer(sender=sender, receiver = reciver, transectionid =td, amount=amount)
 	if xval == 10000:
 		xval = 1
 	try :

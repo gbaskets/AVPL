@@ -1838,12 +1838,20 @@ def transfer_amount_vendor(request):
 			print('hjhjjjjjjjjjjjj')
 			if Wallet.objects.get(vendor__user=request.user).currentbalance >= request.session['amount']:
 				print('LLLLLLLLLLLLLLLLLLL')
-				make_wallet_transaction(user = request.user, amount = request.session['amount'], trans_type = 'DEBIT')
-				make_wallet_transaction(user = User.objects.get(username = request.session['recivername']), 
-					amount = request.session['amount'], trans_type = 'CREDIT')
+               
+				make_wallet_transaction("VENDOR",request.user, request.session['amount'],'DEBIT')
+				reciveruser=User.objects.get(username = request.session['recivername'])
+				if reciveruser.groups.filter(name="ADMIN"):
+					group_name="ADMIN"   
+				elif reciveruser.groups.filter(name="VENDOR"):
+					group_name="VENDOR"  
+				elif reciveruser.groups.filter(name="CUSTOMER"):
+						group_name="CUSTOMER"  
+				make_wallet_transaction(group_name,User.objects.get(username = request.session['recivername']), 
+					request.session['amount'],'CREDIT')
 				print(request.session['recivername'])
-				transfer_into_another_account(usr = request.user, sender = request.user.username,
-					reciver = request.session['recivername'],amount = request.session['amount'])
+				transfer_into_another_account(request.user, request.user.username,
+					request.session['recivername'], request.session['amount'])
 				print('done')
 				messages.success(request,'Successfully Transfered')
 				return redirect('balanacetransfer')
