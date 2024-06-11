@@ -76,6 +76,7 @@ def vendor_dashboard(request):
 				'business_limit_transactions':business_limit_transactions,
 				'transactions':transactions,
                  'salesorder': SalesOrder.objects.filter(store=storeobj).order_by("-id"),
+                 'salesorder': SalesOrder.objects.filter(store=storeobj).order_by("-id"),
 				'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
 				}
 				return render(request, 'vendor_app/dashboard.html', dic)
@@ -1284,8 +1285,12 @@ def vendor_product_out_of_stock(request):
 def vendor_orders(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
+		vendor = Vendor.objects.filter(user=request.user).first()
 		business_limit = BusinessLimitWallet.objects.get(vendor__user=request.user)
 		dic = {
+			'salesorder': SalesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
+			'business_limit':business_limit,
 			'salesorder': SalesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
 			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
 			'business_limit':business_limit,
