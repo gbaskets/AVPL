@@ -194,7 +194,7 @@ def get_dic(request):
 	return dic
 
 def save_order_items(cartobj, order, customer, ordertype):
-	
+	order=SalesOrder.objects.filter(id=order.id).first()
 	for x in cartobj["items"]:
 		# tax = 0.0
 		print(x,'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiit')
@@ -202,6 +202,8 @@ def save_order_items(cartobj, order, customer, ordertype):
 		print('VVVVV____Commm---===>',admincommission)
 		orderitemobj = SalesOrderItems()
 		orderitemobj.store = x["store"]
+		order.store=x["store"]
+		order.save()
 		orderitemobj.salesorder =order
 		orderitemobj.productvariants = x["productvariants"]
 		orderitemobj.quantity =x["quantity"]
@@ -432,7 +434,7 @@ def save_order(cartobj, address,usertype, user, razorpaytransaction):
 	Cart.objects.filter(customer=customer).delete()
  
 
-
+   
 # In case make  Payment by wllet
 def make_wallet_transaction(usertype, user, amount, transtype):
 	if usertype == "CUSTOMER":

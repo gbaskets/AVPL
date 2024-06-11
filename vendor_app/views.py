@@ -75,7 +75,7 @@ def vendor_dashboard(request):
                 'wallet_commission':wallet_commission,
 				'business_limit_transactions':business_limit_transactions,
 				'transactions':transactions,
-                 'salesorder': SalesOrder.objects.filter(vendor=vendor).order_by("-id"),
+                 'salesorder': SalesOrder.objects.filter(store=storeobj).order_by("-id"),
 				'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
 				}
 				return render(request, 'vendor_app/dashboard.html', dic)
@@ -1283,29 +1283,16 @@ def vendor_product_out_of_stock(request):
 @csrf_exempt
 def vendor_orders(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
 		business_limit = BusinessLimitWallet.objects.get(vendor__user=request.user)
 		dic = {
-			'orders':SalesOrder.objects.filter(store__vendor__user=request.user),
-			'vendor':vendor,'business_limit':business_limit,
+			'salesorder': SalesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
+			'business_limit':business_limit,
 			'allorder_status':ORDER_STATUS_UPDATE,
 			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/orders.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def vendor_complete_orders(request):
-	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
-		dic = {
-			'orders':SalesOrder.objects.filter(store__vendor__user=request.user),
-			'vendor':vendor,
-			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-		}
-		return render(request, 'vendor_app/complete-orders.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -1317,10 +1304,11 @@ def vendor_order_detail(request):
 		order_id = request.GET.get('i')
 		dic = {
 			'vendor':vendor,
+            "salesorder":SalesOrder.objects.filter(id=order_id).first()
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
-		dic.update(get_order_details(order_id))
+		
 		return render(request, 'vendor_app/order-detail.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -1791,26 +1779,18 @@ login_required('/')
 @csrf_exempt
 def vendorbalanacetransfer(request):
 	bal = Wallet.objects.get(vendor__user=request.user).currentbalance
-	transectiondata = WalletTransfer.objects.filter(user=request.user).order_by('-id')
+	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
 	context = {
 			
-			'transectiodetails':transectiondata,
+			'transectiodetails':transectiondata,'userlist':User.objects.filter(is_active=True).exclude(id=request.user.id),
 			'bal':bal,# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 
-	id = WalletTransferApproval.objects.all()[0:1]
-
-	if id is not None:
-
-		for id in id:
-
-			print(id.id,'idddd')
-
-	if WalletTransferApproval.objects.get(id =id.id).vendor == 1 :
+	if WalletTransferApprovalSettings.objects.filter().first().vendor == True :
 
 		if request.method == 'POST':
-			print(request.user)
+			print(request.user,'dattransfer')
 			request.session['recivername'] = request.POST.get('rvname') 
 			request.session['amount']  = int(request.POST.get('amt'))
 			request.session['senderotp'] = random.randint(100000,999999)
@@ -1830,6 +1810,7 @@ Thanks!'''
 		return render(request,'vendor_app/customerwallettransfer.html',context=context)
 	else :
 		messages.error(request,'Payments Mode off')
+		print('Payments Mode off')
 		return render(request,'vendor_app/customerwallettransfer.html',context=context)
 
 
@@ -1850,7 +1831,7 @@ def transfer_amount_vendor(request):
 			# if senderotp == request.session['senderotp'] and reciverotp == request.session['reciverotp']:
 		if senderotp == request.session['senderotp']:
 			print('hjhjjjjjjjjjjjj')
-			if Wallet.objects.get(user=request.user).current_balance >= request.session['amount']:
+			if Wallet.objects.get(vendor__user=request.user).currentbalance >= request.session['amount']:
 				print('LLLLLLLLLLLLLLLLLLL')
 				make_wallet_transaction(user = request.user, amount = request.session['amount'], trans_type = 'DEBIT')
 				make_wallet_transaction(user = User.objects.get(username = request.session['recivername']), 
@@ -1875,8 +1856,6 @@ def transfer_amount_vendor(request):
 		# 	return redirect('balanacetransfer')
 	return render(request,'vendor_app/otpverify.html')
 	# return render(request,'user_app/otpverify.html')
-
-
 
 
 

@@ -147,42 +147,6 @@ def calculate_cart_tax(request):
 	Cart.objects.filter(user=request.user).update(tax=tax, total=total, delivery_charges=delivery_charge)
 	Cart.objects.filter(user=request.user).update(total=total, delivery_charges=delivery_charge)
 
-def get_my_orders(user, store=None):
-	items = []
-	for order in Orders.objects.filter(user=user).order_by('-order_date'):
-		if store:
-			for item in OrderItems.objects.filter(order=order, store=store):
-				dic = {'item':item, 'rating_flag':False}
-				variants = []
-				for x in OrderItemVariant.objects.filter(orderitem=item):
-					variants.append(x)
-				dic.update({'variants':variants})
-				for x in ProductImages.objects.filter(product=item.product):
-					dic.update({'image':x.image.url})
-					break
-				if ProductRating.objects.filter(product=item.product, user=user).exists():
-					dic.update({'rating_flag':True, 'rating':ProductRating.objects.get(product=item.product, user=user).rating})
-				else:
-					dic.update({'rating_flag':False})
-				dic.update({'date':order.order_date})
-				items.append(dic)
-		else:
-			for item in OrderItems.objects.filter(order=order):
-				dic = {'item':item, 'rating_flag':False}
-				variants = []
-				for x in OrderItemVariant.objects.filter(orderitem=item):
-					variants.append(x)
-				dic.update({'variants':variants})
-				for x in ProductImages.objects.filter(product=item.product):
-					dic.update({'image':x.image.url})
-					break
-				if ProductRating.objects.filter(product=item.product, user=user).exists():
-					dic.update({'rating_flag':True, 'rating':ProductRating.objects.get(product=item.product, user=user).rating})
-				else:
-					dic.update({'rating_flag':False})
-				dic.update({'date':order.order_date})
-				items.append(dic)
-	return items
 
 def fetch_pv(user):
 	if UserPV.objects.filter(user=user).exists():

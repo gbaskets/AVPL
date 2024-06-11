@@ -84,24 +84,6 @@
               <div class="row">
 
 
-                <div class="col-lg-5 col-sm-12 pt-3 pb-2 ">
-                  <div class="input-group">
-                    <input type="text" class="form-control border border-right-0" placeholder="Search your product...">
-                    <span class="input-group-append bg-secondary">
-                      <button class="btn btn-outline-light border border-left-0" type="button">
-                        <i class="fa fa-search"></i>
-                      </button>
-                    </span>
-                  </div>
-                </div>
-
-
-
-
-
-
-
-
                 <div class="col-lg-12 col-sm-12 pb-2" >
 
                   <ul class="nav nav-tabs" role="tablist">
@@ -121,7 +103,7 @@
                   <div class="tab-content" style="overflow-x:auto;">
                     <div role="tabpanel" class="tab-pane active" id="myallorder">
 
-                      <table class="table">
+                      <table class="table table-hover" id="tableExport">
                         <thead>
                           <tr>
                             <th>#</th>
@@ -160,6 +142,9 @@
                               {% if first_orderitem.orderstatus == 'Pending' %}
                               <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
                               {% endif %}
+                              {% if first_orderitem.orderstatus == 'Order Placed' %}
+                              <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
+                              {% endif %}
                               {% if first_orderitem.orderstatus == 'Packed' %}
                               <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
                               {% endif %}
@@ -175,7 +160,8 @@
 
 
                             </td>
-                            <td><a href="#">View Details</a></td>
+                             <td><a class="btn btn-primary btn-icon icon-left"
+                                                   href="/user/myorder-details?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                           </tr>
 
@@ -252,7 +238,8 @@
 
 
                             </td>
-                            <td><a href="#">View Details</a></td>
+                             <td><a class="btn btn-primary btn-icon icon-left"
+                                                   href="/user/myorder-details?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                           </tr>
 
@@ -328,7 +315,8 @@
 
 
                             </td>
-                            <td><a href="#">View Details</a></td>
+                             <td><a class="btn btn-primary btn-icon icon-left"
+                                                   href="/user/myorder-details?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                           </tr>
 
@@ -402,7 +390,8 @@
 
 
                             </td>
-                            <td><a href="#">View Details</a></td>
+                             <td><a class="btn btn-primary btn-icon icon-left"
+                                                   href="/user/myorder-details?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                           </tr>
 
@@ -478,7 +467,8 @@
 
 
                             </td>
-                            <td><a href="#">View Details</a></td>
+                             <td><a class="btn btn-primary btn-icon icon-left"
+                                                   href="/user/myorder-details?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                           </tr>
 
@@ -612,23 +602,6 @@
 
 
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
       {% endblock %}

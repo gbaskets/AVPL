@@ -3662,20 +3662,19 @@ login_required('/')
 @csrf_exempt
 def adminbalanacetransfer(request):
 	print(request.user.email,'OTPPP')
-	bal = Wallet.objects.get(user=request.user).current_balance
-	userdata = UserData.objects.filter(isactive = True)
-	vandordata = Vendor.objects.filter(isactive = True)
-	transectiondata = WalletTransfer.objects.filter(user=request.user).order_by('-id')
+	bal = Wallet.objects.get(admin=request.user).currentbalance
+	
+	vandordata = Vendor.objects.filter(verified = True)
+	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
 	context = {
-			'userdata':userdata,'vendordata': vandordata,
+			'vendordata': vandordata,'userlist':User.objects.filter(is_active=True).exclude(id=request.user.id),
 			'transectiodetails':transectiondata,
 			'bal':bal,
-			'notification':get_notifications(request.user,'ADMIN'),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False))
+			# 'notification':get_notifications(request.user,'ADMIN'),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False))
 		}
 
-	Wallet_transefer_obj = WalletTransferApprovalSettings.objects.all()
-
+	
 
 	if request.method == 'POST':
 		print(request.user)

@@ -20,6 +20,7 @@ urlpatterns = [
     
     path('myaddress', my_address),
     path('myorder', my_order),
+    path('myorder-details', my_order_details),
     path('savelocation', save_location),
     path('enableselfpickup', enable_self_pickup),
     path('add_new_address', add_new_address),

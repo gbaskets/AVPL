@@ -581,18 +581,12 @@ def add_new_address(request):
 		return render(request, 'user_app/my-address.html', {"customer_obj":Customer.objects.filter(user=request.user).first(), 'data':Address.objects.filter(user=request.user)})
 	else:
 		return render(request, '403.html')
+
 @csrf_exempt
 @login_required(login_url='/login/')
 def my_order(request):
 	if check_user_authentication(request, 'CUSTOMER'):
 		customer_obj=Customer.objects.filter(user=request.user).first()
-		store_id = request.GET.get('store')
-		orders = []
-		if store_id:
-			store = Store.objects.get(id=store_id)
-		# 	orders = get_my_orders(request.user, store)
-		# else:
-		# 	orders = get_my_orders(request.user)
 		dic = {
 			"customer_obj":Customer.objects.filter(user=request.user).first(),
 			'salesorder':SalesOrder.objects.filter(customer=customer_obj).order_by("-id"),
@@ -602,6 +596,24 @@ def my_order(request):
 		return render(request, 'user_app/my_order.html', dic)
 	else:
 		return render(request, '403.html')
+
+
+@csrf_exempt
+@login_required(login_url='/login/')
+def my_order_details(request):
+	if check_user_authentication(request, 'CUSTOMER'):
+		order_id = request.GET.get('i')
+		customer_obj=Customer.objects.filter(user=request.user).first()
+		dic = {
+			"customer_obj":Customer.objects.filter(user=request.user).first(),
+			'salesorder':SalesOrder.objects.filter(customer=customer_obj,id=order_id).first(),
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'user_app/my_order-detail.html', dic)
+	else:
+		return render(request, '403.html')
+
 
 
 def enable_self_pickup(request):

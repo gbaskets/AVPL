@@ -35,8 +35,7 @@ urlpatterns = [
     path('changeorderstatus', vendor_change_order_status),
     path('changereturnstatus', vendor_change_return_status),
     
-    path('completeorders', vendor_complete_orders),
-    # path('returnorders', vendor_return_orders),
+
     
     path('brand', vendor_brand),
     path('deleteproductimage', vendor_delete_product_image),

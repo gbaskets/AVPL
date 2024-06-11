@@ -210,17 +210,11 @@
                                  <span class="badge badge-success"><h4>Current Balance : <i class="fa fa-inr"></i> {{bal}}</h4></span>
                               </div>
                               <div class="card-body">
-                                {% if messages %}
-                                {% for msg in messages %}
-                                <div class="alert alert-{{ msg.tags }} alert-dismissible fade show rounded mb-0 w-80 " role="alert">
-                                    <strong>
-                                        {{msg}}
-                                        </strong>
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                                            aria-hidden="true">&times;</span></button>
-                                </div>
-                                {% endfor %}
-                                {% endif %}
+                                <ul style="margin-bottom:20px;" id="msg">
+                                    {% for message in messages %}
+                                    <li><span style="font-weight:bold;font-size:15px;color:red;">{{message}}</span></li>
+                                    {% endfor %}
+                                 </ul>
                                  
                            
                                  <form action="{% url 'balanacetransfer' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
@@ -233,8 +227,8 @@
                                              <label>Select User</label>
                                              <select class="form-control" name="rvname" id="abc" required>
                                                 <option value="">----select User----</option>
-                                                {% for i in userdata %}
-                                                <option value="{{i.user.username}}">{{i.user.username}} </option>
+                                                {% for i in userlist %}
+                                                <option value="{{i.username}}">{{i.username}} </option>
                                                 {% endfor %}
                                              </select>
                                           </div>

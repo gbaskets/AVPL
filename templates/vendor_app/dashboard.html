@@ -170,6 +170,9 @@
                                        {% if first_orderitem.orderstatus == 'Pending' %}
                                        <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
                                        {% endif %}
+                                       {% if first_orderitem.orderstatus == 'Order Placed' %}
+                                       <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
+                                       {% endif %}
                                        {% if first_orderitem.orderstatus == 'Packed' %}
                                        <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
                                        {% endif %}
@@ -211,7 +214,7 @@
                                     {% if data.total <= business_limit.currentbalance %} <td>
                                        <form action="{% url 'order_status_update'  %}" method="POST">
                                           {% csrf_token %}
-                                          <input type="hidden" name="order_id" value="{{order.order.id}}">
+                                          <input type="hidden" name="order_id" value="{{data.id}}">
                                           <select name="delivery_status">
                                              {% for i, j in allorder_status %}
                                              <option value="{{i}}" {% if i == first_orderitem.orderstatus %}selected{% endif %}>{{j}}
@@ -234,7 +237,7 @@
       
       
                                     <td><a class="btn btn-primary btn-icon icon-left"
-                                       href="/vendor/orderdetail?i={{order.id}}"><i class="far fa-eye"></i></a></td>
+                                       href="/vendor/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                                  </tr>
 
@@ -344,7 +347,7 @@
                                     {% if data.total <= business_limit.currentbalance %} <td>
                                        <form action="{% url 'order_status_update'  %}" method="POST">
                                           {% csrf_token %}
-                                          <input type="hidden" name="order_id" value="{{order.order.id}}">
+                                          <input type="hidden" name="order_id" value="{{data.id}}">
                                           <select name="delivery_status">
                                              {% for i, j in allorder_status %}
                                              <option value="{{i}}" {% if i == first_orderitem.orderstatus %}selected{% endif %}>{{j}}
@@ -367,7 +370,7 @@
       
       
                                     <td><a class="btn btn-primary btn-icon icon-left"
-                                       href="/vendor/orderdetail?i={{order.id}}"><i class="far fa-eye"></i></a></td>
+                                       href="/vendor/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                                  </tr>
 

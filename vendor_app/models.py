@@ -68,21 +68,6 @@ class Vendor(models.Model):
 
 
 
-#Model For Business Limit Model
-
-
-# class Recharge_Receipt(models.Model):
-# 	receipt_date = models.DateTimeField(auto_now=True)
-# 	vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE)
-# 	razorpay_order_id = models.CharField(max_length=100)
-# 	payment_id = models.CharField(max_length=200, null=True, blank=True)
-# 	amount = models.FloatField()
-# 	is_active = models.BooleanField(default=False)
-# 	class Meta:
-# 			db_table ="Recharge_Receipt"
-# 	def __str__(self):
-# 			return "Receipt ID "+str(self.id)
-
 
 
 # #model for user subscription request
