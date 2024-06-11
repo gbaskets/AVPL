@@ -211,7 +211,7 @@
                                     {% if data.total <= business_limit.currentbalance %} <td>
                                        <form action="{% url 'order_status_update'  %}" method="POST">
                                           {% csrf_token %}
-                                          <input type="hidden" name="order_id" value="{{order.order.id}}">
+                                          <input type="hidden" name="order_id" value="{{data.id}}">
                                           <select name="delivery_status">
                                              {% for i, j in allorder_status %}
                                              <option value="{{i}}" {% if i == first_orderitem.orderstatus %}selected{% endif %}>{{j}}
