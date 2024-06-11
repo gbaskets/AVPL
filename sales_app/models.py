@@ -19,6 +19,7 @@ def generate_order_number(id):
     return f"{prefix}{random_part}"
 
 class SalesOrder(models.Model):
+    store = models.ForeignKey(Store,on_delete=models.CASCADE,null=True, blank=True)
     orderno=models.CharField(max_length=250, null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE,  null=True, blank=True)
     vendor = models.ForeignKey('vendor_app.Vendor', on_delete=models.CASCADE, null=True, blank=True)
@@ -85,4 +86,3 @@ class SalesOrderItems(models.Model):
 
 # 	def __str__(self):
 # 		return 'Order ID  '+str(self.id) + '  ' +str(self.salesorder.customer)
-
