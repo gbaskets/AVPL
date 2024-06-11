@@ -75,7 +75,7 @@ def vendor_dashboard(request):
                 'wallet_commission':wallet_commission,
 				'business_limit_transactions':business_limit_transactions,
 				'transactions':transactions,
-                 'salesorder': SalesOrder.objects.filter(vendor=vendor).order_by("-id"),
+                 'salesorder': SalesOrder.objects.filter(store=storeobj).order_by("-id"),
 				'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
 				}
 				return render(request, 'vendor_app/dashboard.html', dic)
@@ -1283,14 +1283,14 @@ def vendor_product_out_of_stock(request):
 @csrf_exempt
 def vendor_orders(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
 		business_limit = BusinessLimitWallet.objects.get(vendor__user=request.user)
 		dic = {
-			'orders':SalesOrder.objects.filter(store__vendor__user=request.user),
-			'vendor':vendor,'business_limit':business_limit,
+			'salesorder': SalesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
+			'business_limit':business_limit,
 			'allorder_status':ORDER_STATUS_UPDATE,
 			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/orders.html', dic)
 	else:
@@ -1875,7 +1875,6 @@ def transfer_amount_vendor(request):
 		# 	return redirect('balanacetransfer')
 	return render(request,'vendor_app/otpverify.html')
 	# return render(request,'user_app/otpverify.html')
-
 
 
 
