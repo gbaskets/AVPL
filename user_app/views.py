@@ -401,7 +401,7 @@ def update_cart_item(request):
 		updated_quantity = item.quantity - new_quantity
 		Cart.objects.filter(id=request.GET.get('item')).update(quantity = new_quantity)
 		# calculate_cart_tax(request)
-	cart = Cart.objects.get(user=request.user)
+	cart = Cart.objects.get(customer=customerobj)
 	dic = {
 		
 	}
