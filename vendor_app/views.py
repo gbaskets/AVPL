@@ -1507,20 +1507,21 @@ def vendor_Business_limit_dash(request):
 @csrf_exempt
 def vendor_withdraw(request):
 	if check_user_authentication(request, 'VENDOR'):
+		vendorobj = Vendor.objects.filter(user=request.user).first()
 		if request.method == 'POST':
 			amount = request.POST.get('amount')
 			if float(amount) < 500:
 				messages.success(request, 'Withdrawl amount must be greater than 500.')
 				return redirect('/vendor/withdraw')
 			flag = True
-			for x in VendorWithdrawRequest.objects.filter(user=request.user):
-				if x.is_active == 0 or x.is_active == 1:
+			for x in WithdrawRequest.objects.filter(vendor=vendorobj):
+				if x.isactive == 0 or x.isactive == 1:
 					flag = False
 					break
 			if flag:
-				VendorWithdrawRequest.objects.create(
-					user = request.user,
-					request_date = timezone.now(),
+				WithdrawRequest.objects.create(
+					vendor=vendorobj,
+					requestdate = timezone.now(),
 					amount = amount
 				)
 				messages.success(request, 'We have received your payment withdraw request. Your payment wil be credited in your account in 3 working days after approval.')

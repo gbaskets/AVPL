@@ -558,6 +558,13 @@ def search_result2(request):
 
 
 def home(request):
+    # subject = 'Your account is created sucessfully ! Welcome to Gbaskets - ABHIRAJ VENTURES PVT LTD'
+    # message = render_to_string('email_template/welcome_signup.html', {'email': "chvijaypatel@gmail.com",'password': 1234,'type_user':'CUSTOMER'})
+    # to_email = "chvijaypatel@gmail.com"
+    # email = EmailMessage(subject, message, to=[to_email])
+    # email.content_subtype = "html"
+    # email.send()
+    # print(email,'email')
     if request.user.is_authenticated:
         if request.user.is_superuser:
             return redirect('/admins/dashboard')
