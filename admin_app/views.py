@@ -2587,7 +2587,7 @@ def admin_delivery_charges(request):
 def admin_payment_info(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
-			'orders':Orders.objects.all(),
+			'paymenttransaction':PaymentTransaction.objects.all().order_by('-id'),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
