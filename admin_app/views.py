@@ -2627,7 +2627,7 @@ def admin_pvpairvalue(request):
 @csrf_exempt
 def admin_withdraw(request):
 	if check_user_authentication(request, 'ADMIN'):
-		dic = {'users':UserWithdrawRequest.objects.all(), 'vendors':VendorWithdrawRequest.objects.all(), 'categories':ProductCategory.objects.all(),
+		dic = {'users':WithdrawRequest.objects.all(), 'vendors':WithdrawRequest.objects.all(), 'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}

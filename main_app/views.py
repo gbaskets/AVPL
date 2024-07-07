@@ -2082,8 +2082,8 @@ def about(request):
             # 'notification':get_notifications(request.user),
             # 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
         }
-    dic.update(get_cart_len(request))
-    dic.update(get_wishlist_len(request))
+    # dic.update(get_cart_len(request,'CUSTOMER'))
+    # dic.update(get_wishlist_len(request,'CUSTOMER'))
     data = AboutUs.objects.all()
     return render(request, 'usertemplate/about_us.html',dic)
 
