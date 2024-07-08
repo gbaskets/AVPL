@@ -13,6 +13,9 @@ from django.contrib.auth.admin import UserAdmin
 
 admin.site.register(UserOTP)
 
+admin.site.register(WithdrawRequest)
+
+
 class MyUserAdmin(UserAdmin):
     def get_fieldsets(self, request, obj=None):
         if not obj:

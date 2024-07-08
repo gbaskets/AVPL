@@ -56,6 +56,7 @@ urlpatterns = [
     path('userSubscriptionRequest',userSubscriptionRequest),
     path('activateusersubscription',vendor_activate_subscription),
     path('balanacetransfer', vendorbalanacetransfer, name='balanacetransfer'),
+    path('selfbalanacetransfer', vendorselfbalanacetransfer, name='selfbalanacetransfer'),
     path('otpvalidation', transfer_amount_vendor, name='otpvalidation'),
 
 

@@ -226,36 +226,3 @@ def check_user_subscription(user):
 
 
 
-
-def make_creditedmoney_transaction(user, amount, trans_type):
-	if not CreditedMoney.objects.filter(user=user).exists():
-		CreditedMoney.objects.create(user=user)
-	creditedmoney = CreditedMoney.objects.get(user=user)
-	print(creditedmoney)
-	if trans_type == 'CREDIT':
-		print('1')
-		creditedmoney_transactions = CreditedMoneyTransaction.objects.create(
-			creditedmoney = creditedmoney,
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			previous_amount = round(creditedmoney.current_balance, 2),
-			remaining_amount = round(creditedmoney.current_balance,2) + round(amount,2)
-		)
-		CreditedMoney.objects.filter(user=user).update(current_balance = round(creditedmoney.current_balance, 2) + round(amount, 2))
-
-
-	elif trans_type == 'DEBIT':
-		print(2)
-		creditedmoney_transactions = CreditedMoneyTransaction.objects.create(
-			creditedmoney = creditedmoney,
-			transaction_date = timezone.now(),
-			transaction_type = trans_type,
-			transaction_amount = amount,
-			previous_amount = creditedmoney.current_balance,
-			remaining_amount = creditedmoney.current_balance - amount
-		)
-		print(creditedmoney)
-		CreditedMoney.objects.filter(user=user).update(current_balance = creditedmoney.current_balance - amount)
-
-	

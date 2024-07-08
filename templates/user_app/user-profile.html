@@ -178,12 +178,7 @@
                                                     <label>PV </label>
                                                     <input type="number" class="form-control" value="{{ customer.pv|default:'' }}" disabled/>
                                                 </div>
-        
-        
-                                            </div>
-        
-                                            <div class="col-md-4">
-        
+
                                                 <div class="form-group">
                                                     <label>Street Address</label>
                                                     <input type="text" class="form-control" placeholder="Enter Street Address"
@@ -197,6 +192,13 @@
                                                         title="Only (a-z) letters are allowed."  name="nearbyaddress"
                                                         value="{{customer.nearbyaddress|default:''}}" />
                                                 </div>
+        
+        
+                                            </div>
+        
+                                            <div class="col-md-4">
+        
+                                                
                                                 <div class="form-group">
                                                     <label>City</label>
                                                     <input type="text" class="form-control" placeholder="Enter City" id='city'
@@ -249,11 +251,8 @@
                                                     <input type="file" class="form-control" accept="application/pdf, image/*"
                                                         name="pancarddoc" />
                                                 </div>
-        
-        
-                                            </div>
-                                            <div class="col-md-4">
-        
+
+                                                
                                                 <div class="form-group">
                                                     <label for="idproof">Idproof</label>
                                                     <select class="form-control" id="idproof" name="idproof">
@@ -274,6 +273,8 @@
                                                     <input type="text" class="form-control" placeholder="Enter Id Number"
                                                         name="idno" value="{{customer.idno|default:''}}" />
                                                 </div>
+        
+
                                                 <div class="form-group">
                                                     <label>ID Front Image</label>
                                                     {% if customer.frontidproofdoc %}
@@ -294,6 +295,11 @@
                                                     <input type="file" class="form-control" accept="application/pdf, image/*"
                                                         name="backidproofdoc" />
                                                 </div>
+        
+
+        
+                                            </div>
+                                            <div class="col-md-4">
         
         
                                                 <div class="form-group">
@@ -340,6 +346,41 @@
                                                     <input type="file" class="form-control" accept="application/pdf, image/*"
                                                         name="backddressproofdoc" />
                                                 </div>
+
+                                                <div class="form-group">
+                                                    <label>Bankname</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Bankname"
+                                                        name="bankname" value="{{customer.bankname|default:''}}" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Bank Ifsc</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Bankifsc"
+                                                        name="bankifsc" value="{{customer.bankifsc|default:''}}" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Bankholder</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Bankholder"
+                                                        name="bankholder" value="{{customer.bankholder|default:''}}" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Bank Account No</label>
+                                                    <input type="text" class="form-control" placeholder="Enter Bankaccountno"
+                                                        name="bankaccountno" value="{{customer.bankaccountno|default:''}}" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Bank Document</label>
+                                                    {% if customer.bankdoc %}
+                                                    <a href="{{customer.bankdoc.url}}"> <img alt="image"
+                                                            src="{{customer.bankdoc.url}}" height="50"
+                                                            weight="50" /></a>
+                                                    {% else %}
+                                                    {% endif %}
+                                                    <input type="file" class="form-control" accept="application/pdf, image/*"
+                                                        name="bankdoc" />
+                                                </div>
         
         
                                             </div>
@@ -347,10 +388,7 @@
         
         
         
-        
-        
-                                       
-        
+                                
         
                                     </div>
         

@@ -1450,7 +1450,7 @@ def vendor_wallet_dash(request):
 			Wallet.objects.create(vendor=vendor)
 		
 		wallet = Wallet.objects.get(vendor=vendor)
-		transactions = WalletTransaction.objects.filter(wallet=wallet)
+		transactions = WalletTransaction.objects.filter(wallet=wallet).order_by("-transactiondate")
 		dic = {
 			'vendor':vendor,
 			'wallet':wallet,
@@ -1513,11 +1513,16 @@ def vendor_withdraw(request):
 			if float(amount) < 500:
 				messages.success(request, 'Withdrawl amount must be greater than 500.')
 				return redirect('/vendor/withdraw')
+			if not Wallet.objects.filter(vendor__user=request.user).first().currentbalance >= float(amount) :
+				messages.success(request, 'Insufficient balance !')
+				return redirect('/vendor/withdraw')
+                
 			flag = True
 			for x in WithdrawRequest.objects.filter(vendor=vendorobj):
 				if x.isactive == 0 or x.isactive == 1:
 					flag = False
 					break
+        
 			if flag:
 				WithdrawRequest.objects.create(
 					vendor=vendorobj,
@@ -1531,7 +1536,7 @@ def vendor_withdraw(request):
 				return redirect('/vendor/withdraw')
 		vendor = Vendor.objects.filter(user=request.user)
 		if not Wallet.objects.filter(vendor__user=request.user).exists():
-			Wallet.objects.create(vendor__user=request.user)
+			Wallet.objects.create(vendor__user=request.user,)
 		dic = {
 			'vendor':vendor,
 			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),
@@ -1787,7 +1792,9 @@ def vendorbalanacetransfer(request):
 	bal = Wallet.objects.get(vendor__user=request.user).currentbalance
 	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
 	context = {
-			
+			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),
+			'business_limit_wallet':BusinessLimitWallet.objects.filter(vendor__user=request.user).first(),
+			'commission_wallet':CommissionWallet.objects.filter(vendor__user=request.user).first(),
 			'transectiodetails':transectiondata,'userlist':User.objects.filter(is_active=True).exclude(id=request.user.id),
 			'bal':bal,# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -1821,6 +1828,57 @@ Thanks!'''
 
 
 
+login_required('/')
+@csrf_exempt
+def vendorselfbalanacetransfer(request):
+	bal = Wallet.objects.get(vendor__user=request.user).currentbalance
+	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
+	context = {
+			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),
+			'business_limit_wallet':BusinessLimitWallet.objects.filter(vendor__user=request.user).first(),
+			'commission_wallet':CommissionWallet.objects.filter(vendor__user=request.user).first(),
+			'transectiodetails':transectiondata,'userlist':User.objects.filter(is_active=True).exclude(id=request.user.id),
+			'bal':bal,# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+
+	if WalletTransferApprovalSettings.objects.filter().first().vendor == True :
+
+		if request.method == 'POST':
+			print(request.user,'dattransfer')
+			balance_from = request.POST.get('balance_from') 
+			amt  = int(request.POST.get('amt'))
+			if balance_from == "businesslimit" :
+				business_limit_wallet =BusinessLimitWallet.objects.filter(vendor__user=request.user).first()
+				if business_limit_wallet.currentbalance >= amt :
+					make_business_limit_transaction("VENDOR",request.user, amt,'DEBIT')
+					make_wallet_transaction("VENDOR",request.user, amt,'CREDIT')
+					messages.success(request, 'Payment transfer has been successfully !')
+					return redirect("/vendor/balanacetransfer")
+				else:
+					messages.error(request,'Insufficient Balance !')
+					return render(request,'vendor_app/customerwallettransfer.html',context=context)
+	
+			elif balance_from == "commission" :
+				commission_wallet=CommissionWallet.objects.filter(vendor__user=request.user).first()
+				if commission_wallet.currentbalance >= amt :
+					make_commission_transaction("VENDOR",request.user, amt,'DEBIT')
+					make_wallet_transaction("VENDOR",request.user, amt,'CREDIT')
+					messages.success(request, 'Payment transfer has been successfully !')
+					return redirect("/vendor/balanacetransfer")
+				else:
+					messages.error(request,'Insufficient Balance !')
+					return render(request,'vendor_app/customerwallettransfer.html',context=context)
+			else:
+				messages.error(request,'Please select balance transfer from !')
+				return render(request,'vendor_app/customerwallettransfer.html',context=context)
+		return render(request,'vendor_app/customerwallettransfer.html',context=context)
+	else :
+		messages.error(request,'Payments Mode off')
+		print('Payments Mode off')
+		return render(request,'vendor_app/customerwallettransfer.html',context=context)
+
+
 
 login_required('/')
 @csrf_exempt
@@ -1829,12 +1887,7 @@ def transfer_amount_vendor(request):
 	if request.method == 'POST':
 		senderotp = int(request.POST.get('otp1') )
 		print(senderotp)
-		# reciverotp = int(request.POST.get('otp2') )
-		# print(datetime.datetime.strptime(request.session['timer'], '%Y-%m-%d %H:%M:%S.%f'))
-
-		# if datetime.datetime.now() < datetime.datetime.strptime(request.session['timer'], '%Y-%m-%d %H:%M:%S.%f') :
 		
-			# if senderotp == request.session['senderotp'] and reciverotp == request.session['reciverotp']:
 		if senderotp == request.session['senderotp']:
 			print('hjhjjjjjjjjjjjj')
 			if Wallet.objects.get(vendor__user=request.user).currentbalance >= request.session['amount']:

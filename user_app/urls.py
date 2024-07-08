@@ -32,7 +32,6 @@ urlpatterns = [
     path('saverating', user_save_product_rating),
     path('pvwallet', user_pv_wallet),
     path('withdraw', user_withdraw),
-    path('savepaymentinfo', user_save_paymentinfo),
     path('help', user_help),
     path('productquery', user_product_query),
     path('cancelorder', user_cancel_order),

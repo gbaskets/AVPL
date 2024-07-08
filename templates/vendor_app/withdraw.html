@@ -64,19 +64,19 @@
                                           <tbody id="data">
                                              {% for x in data %}
                                              <tr>
-                                                <td>{{ x.request_date|safe }}</td>
+                                                <td>{{ x.requestdate|safe }}</td>
                                                 <td>WTDR{{ x.id|safe }}</td>
                                                 <td><i class="fa fa-inr"></i> {{ x.amount|safe }}</td>
-                                                {% if x.is_active == 0 %}
+                                                {% if x.isactive == 0 %}
                                                 <td><span class="badge badge-primary">Received</span></td>
                                                 {% endif %}
-                                                {% if x.is_active == 1 %}
+                                                {% if x.isactive == 1 %}
                                                 <td><span class="badge badge-success">Approved</span></td>
                                                 {% endif %}
-                                                {% if x.is_active == 2 %}
+                                                {% if x.isactive == 2 %}
                                                 <td><span class="badge badge-warning">Credited</span></td>
                                                 {% endif %}
-                                                {% if x.is_active == 3 %}
+                                                {% if x.isactive == 3 %}
                                                 <td><span class="badge badge-danger">Rejected</span></td>
                                                 {% endif %}
                                              </tr>

@@ -2627,7 +2627,7 @@ def admin_pvpairvalue(request):
 @csrf_exempt
 def admin_withdraw(request):
 	if check_user_authentication(request, 'ADMIN'):
-		dic = {'users':WithdrawRequest.objects.all(), 'vendors':WithdrawRequest.objects.all(), 'categories':ProductCategory.objects.all(),
+		dic = {'users':WithdrawRequest.objects.filter().exclude(customer = None), 'vendors':WithdrawRequest.objects.filter().exclude(vendor = None), 'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -2640,46 +2640,39 @@ def admin_change_withdraw_status(request):
 		type_ = request.GET.get('t')
 		id_ = request.GET.get('i')
 		status = request.GET.get('s')
-		if type_ == 'u':
-			UserWithdrawRequest.objects.filter(id=id_).update(isactive=status)
-			withdraw = UserWithdrawRequest.objects.get(id=id_)
+		if type_ == 'CUSTOMER':
+			WithdrawRequest.objects.filter(id=id_).update(isactive=status)
+			withdraw = WithdrawRequest.objects.get(id=id_)
+			if status == '1':
+				statuschanges= 'Withdraw request has been approved !.'
 			if status == '2':
 
-				if not TDS_Log_Wallet.objects.filter(user=withdraw.user).exists():
-					TDS_Log_Wallet.objects.create(user=withdraw.user)
-					
-				tds_log_wallet= TDS_Log_Wallet.objects.filter(user=withdraw.user).first()
-				print(tds_log_wallet,"TDS_WALLET")
-				TDS_Log.objects.create(tds_log_wallet=tds_log_wallet , user=withdraw.user,transaction_type= 'CREDIT' ,amount=withdraw.amount, credited_amt=withdraw.credited_amount ,tds_amt=withdraw.tds,previous_amount= round(tds_log_wallet.current_balance, 2),remaining_amount=round(tds_log_wallet.current_balance,2) + round(withdraw.tds,2))
-				TDS_Log_Wallet.objects.filter(user=withdraw.user).update(current_balance = round(tds_log_wallet.current_balance, 2) + round(withdraw.tds, 2))
-				if len(Total_TDS.objects.all()) == 0:
-					Total_TDS.objects.create(current_total_tds = withdraw.tds)
-				else:
-					current_tds = Total_TDS.objects.all()[0].current_total_tds + withdraw.tds
-					Total_TDS.objects.all().update(current_total_tds = current_tds)
-				# make_wallet_transaction(withdraw.user, (withdraw.amount), 'DEBIT')
-				make_creditedmoney_transaction(withdraw.user, (withdraw.credited_amount), 'CREDIT')
-				notification(withdraw.user, 'Rs'+str(withdraw.amount)+' debited from your wallet.')
-				notification(withdraw.user, 'Withdraw Request Status Changed.')
+				Make_TDSLogWallet_Transaction('CUSTOMER', withdraw.customer.user, withdraw.amount, 'CREDIT',withdraw.creditedamount,withdraw.tds)
+				make_wallet_transaction('CUSTOMER', withdraw.customer.user, withdraw.amount, 'DEBIT')
+				statuschanges= 'Withdraw Amount has been Credited !.'
+				# notification(withdraw.user, 'Rs'+str(withdraw.amount)+' debited from your wallet.')
+				# notification(withdraw.user, 'Withdraw Request Status Changed.')
 			if status == '3':
-				make_wallet_transaction(withdraw.user, (withdraw.amount),'CREDIT')
-				notification(withdraw.user, 'Rs'+str(withdraw.amount)+' credit to your wallet.')
-				notification(withdraw.user, 'Withdraw Request Status Changed.')
+				statuschanges= 'Withdraw request has been Rejected !.'
+				# notification(withdraw.user, 'Withdraw Request Status Changed.')
 
-		elif type_ == 'v':
-			VendorWithdrawRequest.objects.filter(id=id_).update(isactive=status)
-			withdraw = VendorWithdrawRequest.objects.get(id=id_)
+		elif type_ == 'VENDOR':
+        
+			WithdrawRequest.objects.filter(id=id_).update(isactive=status)
+			withdraw = WithdrawRequest.objects.get(id=id_)
+			if status == '1':
+				statuschanges= 'Withdraw request has been approved !.'
 			if status == '2':
-				# make_wallet_transaction(withdraw.user, withdraw.amount, 'DEBIT')
-				# make_creditedmoney_transaction(withdraw.user, (withdraw.credited_amount), 'CREDIT')
-				notification(withdraw.user, 'Rs'+str(withdraw.amount)+' debited from your wallet.')
-				notification(withdraw.user, 'Withdraw Request Status Changed.')
+				make_wallet_transaction('VENDOR', withdraw.vendor.user, withdraw.amount, 'DEBIT')
+				statuschanges='Withdraw Amout has been Credited !.'
+				# notification(withdraw.user, 'Rs'+str(withdraw.amount)+' debited from your wallet.')
+				# notification(withdraw.user, 'Withdraw Request Status Changed.')
 			if status == '3':
-				make_wallet_transaction(withdraw.user, (withdraw.amount),'CREDIT')
-				notification(withdraw.user, 'Rs'+str(withdraw.amount)+' credit to your wallet.')
-				notification(withdraw.user, 'Withdraw Request Status Changed.')
+				statuschanges='Withdraw request has been Rejected !.'
+				# notification(withdraw.user, 'Rs'+str(withdraw.amount)+' credit to your wallet.')
+				# notification(withdraw.user, 'Withdraw Request Status Changed.')
 
-		messages.success(request, 'Status Changed Successfully')
+		messages.success(request, statuschanges)
 		return redirect('/admins/withdraw')
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')

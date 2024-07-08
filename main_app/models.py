@@ -175,6 +175,8 @@ class WithdrawRequest(models.Model):
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
 	requestdate = models.DateTimeField()
 	amount = models.FloatField()
+	creditedamount = models.FloatField(default=0.0)
+	tds = models.FloatField(default=0.0)
 	isactive = models.PositiveIntegerField(default=0)
 	
 	def __str__(self):
@@ -217,6 +219,7 @@ class CommissionWalletTransaction(models.Model):
 class TDSLogWallet(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
+	admin=models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True,related_name="admintdswallet")
 	currentbalance = models.FloatField(default=0.00)
 	isactive = models.BooleanField(default=True)
 	createdat = models.DateTimeField(auto_now_add=True)
@@ -228,6 +231,7 @@ class TDSLogWallet(models.Model):
 
 class TDSLogWalletTransaction(models.Model):
 	tdslogwallet = models.ForeignKey(TDSLogWallet, on_delete=models.CASCADE,null=True,blank=True)
+	transactiondate = models.DateTimeField(null=True)
 	transactiontype = models.CharField(max_length=255,null=True)
 	amount = models.FloatField(default=0.00)
 	creditedamount= models.FloatField(default=0.00)

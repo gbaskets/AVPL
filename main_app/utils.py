@@ -484,6 +484,56 @@ def make_wallet_transaction(usertype, user, amount, transtype):
 		wallet.save()
 
 
+
+def Make_TDSLogWallet_Transaction(usertype, user, amount, transtype,creditedamount,tdsamount):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		if not TDSLogWallet.objects.filter(customer=customer).exists():
+			tdslogwallet=TDSLogWallet.objects.create(customer=customer,isactive=True)
+		else:
+			tdslogwallet = TDSLogWallet.objects.filter(customer=customer,isactive=True).first()
+      
+	elif usertype == "VENDOR":
+		vendor=Vendor.objects.filter(user=user).first()
+		if not TDSLogWallet.objects.filter(vendor=vendor).exists():
+			tdslogwallet=TDSLogWallet.objects.create(vendor=vendor,isactive=True)
+		else:
+			tdslogwallet = TDSLogWallet.objects.filter(vendor=vendor,isactive=True).first()
+	elif usertype == "ADMIN":
+		admin=user
+		if not TDSLogWallet.objects.filter(admin=admin).exists():
+			tdslogwallet=TDSLogWallet.objects.create(admin=admin,isactive=True)
+		else:
+			tdslogwallet = TDSLogWallet.objects.filter(admin=admin,isactive=True).first()
+   
+	if transtype == 'CREDIT':
+		print('1')
+		wallettransactions = TDSLogWalletTransaction.objects.create(
+    
+			tdslogwallet = tdslogwallet,
+			transactiondate = timezone.now(),
+			transactiontype = transtype,
+			amount = amount,creditedamount = creditedamount,tdsamount = tdsamount,
+			previousamount = round(tdslogwallet.currentbalance, 2),
+			remainingamount = round(tdslogwallet.currentbalance,2) + round(amount,2)
+		)
+		tdslogwallet.currentbalance = round(tdslogwallet.currentbalance, 2) + round(amount, 2)
+		tdslogwallet.save()
+
+	elif transtype == 'DEBIT':
+		print(2)
+		wallettransactions = TDSLogWalletTransaction.objects.create(
+			tdslogwallet = tdslogwallet,
+			transactiondate = timezone.now(),
+			transactiontype = transtype,
+			amount = amount,creditedamount = creditedamount,tdsamount = tdsamount,
+			previousamount = round(tdslogwallet.currentbalance, 2),
+			remainingamount = round(tdslogwallet.currentbalance, 2) - round(amount,2)
+		)
+		tdslogwallet.currentbalance = round(tdslogwallet.currentbalance, 2) - round(amount, 2)
+		tdslogwallet.save()
+
+
 def save_order_by_wallet(cartobj, address,usertype, user, wallet_transactions):
 	if usertype == "CUSTOMER":
 		customer=Customer.objects.filter(user=user).first()
@@ -728,7 +778,7 @@ def filter_product_by_store(store, products):
 # for Admin comission transaction in case COD
 from vendor_app.models import *
 
-def make_business_limit_transaction(usertype,user, amount, trans_type, trans_name):
+def make_business_limit_transaction(usertype,user, amount, trans_type):
 	if usertype == 'VENDOR' :
 		vendor=Vendor.objects.filter(user=user).first()
 	if not BusinessLimitWallet.objects.filter(vendor=vendor).exists():

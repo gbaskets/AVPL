@@ -953,53 +953,51 @@ def user_save_product_rating(request):
 @csrf_exempt
 def user_withdraw(request):
 	if check_user_authentication(request, 'CUSTOMER'):
+		customerobj=Customer.objects.filter(user=request.user).first()
 		if request.method == 'POST':
 			amount = float(request.POST.get('amount'))
 			print(amount,'AAAAAAAAAAAA')
 			if amount < 500:
 				messages.success(request, 'Withdrawl amount must be greater than 500.')
 				return redirect('/user/withdraw')
+			if not Wallet.objects.filter(customer__user=request.user).first().currentbalance >= float(amount) :
+				messages.success(request, 'Insufficient balance !')
+				return redirect('/user/withdraw')
 			flag = True
-			for x in UserWithdrawRequest.objects.filter(user=request.user):
-				if x.is_active == 0 or x.is_active == 1:
+			for x in WithdrawRequest.objects.filter(customer=customerobj):
+				if x.isactive == 0 or x.isactive == 1:
 					flag = False
 					break
 			if flag:
-				tds = ((amount/100)*5)
-				credited_amount = amount - tds
-				withdraw=UserWithdrawRequest.objects.create(
-					user = request.user,
-					request_date = timezone.now(),
+				if customerobj.pancardno :
+					tdsp=5
+				else:
+					tdsp=18
+				tds = ((amount/100)*tdsp)
+				creditedamount = amount - tds
+				withdraw=WithdrawRequest.objects.create(
+					customer=customerobj,
+					requestdate = timezone.now(),
 					amount = amount,
-					credited_amount = credited_amount,
+					creditedamount = creditedamount,
 					tds = tds
 				)
-				make_wallet_transaction(withdraw.user, (withdraw.amount), 'DEBIT')
 				messages.success(request, 'We have received your payment withdraw request. Your payment wil be credited in your account in 3 working days after approval.')
 				return redirect('/user/withdraw')
 			else:
 				messages.success(request, 'You already have a withdrawl request pending, please wait for it to credit.')
 				return redirect('/user/withdraw')
-		flag = True
-		if PaymentInfo.objects.filter(user=request.user).exists():
-			flag = True
+		if customerobj.bankaccountno and customerobj.pancardno :
+			flag=True
 		else:
-			flag = False
-		if not Wallet.objects.filter(user=request.user).exists():
-			Wallet.objects.create(user=request.user)
-		if not CreditedMoney.objects.filter(user=request.user).exists():
-			CreditedMoney.objects.create(user=request.user)
-
-		if not TDS_Log_Wallet.objects.filter(user=request.user).exists():
-			TDS_Log_Wallet.objects.create(user=request.user)
-
-	
+			flag=False
+			
 		dic = {
-			'user':UserData.objects.filter(user=request.user).first(),
+			
 			'flag':flag,
-			'wallet':Wallet.objects.filter(user=request.user).first(),
-			'data':UserWithdrawRequest.objects.filter(user=request.user),
-			'creditedlimit':CreditedMoney.objects.filter(user=request.user).first(),
+			'wallet':Wallet.objects.filter(customer__user=request.user).first(),
+			'data':WithdrawRequest.objects.filter(customer__user=request.user),
+			
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -1007,29 +1005,6 @@ def user_withdraw(request):
 	else:
 		return render(request, '403.html')
 
-
-@csrf_exempt
-def user_save_paymentinfo(request):
-	if check_user_authentication(request, 'CUSTOMER'):
-		if request.method == 'POST':
-			pan = request.FILES['pan']
-			aadhar = request.FILES['aadhar']
-			number = request.POST.get('number')
-			name = request.POST.get('name')
-			ifsc = request.POST.get('ifsc')
-			if not PaymentInfo.objects.filter(user=request.user).exists():
-				PaymentInfo.objects.create(
-					user = request.user,
-					account_no = number,
-					bank_name = name,
-					ifsc = ifsc,
-					pan = pan,
-					aadhar = aadhar
-				)
-			messages.success(request, 'Payment Details Saved Successfully')
-			return redirect('/user/withdraw')
-	else:
-		return render(request, '403.html')
 
 @csrf_exempt
 def user_help(request):
@@ -1489,6 +1464,12 @@ def edit_customer_profile(request):
    
 			gstno=request.POST.get('gstno')
 			gstnodoc = request.FILES.get('gstnodoc')
+   
+			bankname = request.POST.get('bankname')
+			bankifsc = request.POST.get('bankifsc')
+			bankholder = request.POST.get('bankholder')
+			bankaccountno=request.POST.get('bankaccountno')
+			bankdoc =request.FILES.get('bankdoc')
 
 		
 				
@@ -1556,6 +1537,17 @@ def edit_customer_profile(request):
 				customer_obj.frontaddressproofdoc =frontaddressproofdoc
 			if backddressproofdoc:
 				customer_obj.backddressproofdoc =backddressproofdoc
+    
+			if bankname:
+				customer_obj.bankname =bankname
+			if bankifsc:
+				customer_obj.bankifsc =bankifsc
+			if bankholder:
+				customer_obj.bankholder =bankholder
+			if bankaccountno:
+				customer_obj.bankaccountno =bankaccountno
+			if bankdoc:
+				customer_obj.bankdoc =bankdoc
 			
 			if gstno:
 				customer_obj.gstno=gstno
