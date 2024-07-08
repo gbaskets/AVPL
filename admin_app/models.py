@@ -135,7 +135,7 @@ class HomeBanner(models.Model):
 # 	def __str__(self):
 # 		return 'Current Tax '+str(self.currenttax)
 
-# class Total_TDS(models.Model):
+# class TotalTDS(models.Model):
 # 	currenttotaltds = models.FloatField(default=0.00)
 	
 # 	def __str__(self):
@@ -143,7 +143,7 @@ class HomeBanner(models.Model):
 
 # class TotalTDSPay(models.Model):
 
-# 	transaction_date = models.DateTimeField(auto_now_add=True)
+# 	transactiondate = models.DateTimeField(auto_now_add=True)
 # 	taxcurrent = models.FloatField(default=0.0)
 # 	taxpaid = models.FloatField(default=0.0)
 # 	taxremaining = models.FloatField(default=0.0)
@@ -152,13 +152,13 @@ class HomeBanner(models.Model):
 # 		return 'TDS Paid Transaction ' +str(self.id) + ' ' +str(self.transactiondate)
 
 # class TaxPay(models.Model):
-# 	transaction_date = models.DateTimeField(auto_now_add=True)
-# 	tax_current = models.FloatField(default=0.0)
-# 	tax_paid = models.FloatField(default=0.0)
-# 	tax_remaining = models.FloatField(default=0.0)
+# 	transactiondate = models.DateTimeField(auto_now_add=True)
+# 	taxcurrent = models.FloatField(default=0.0)
+# 	taxpaid = models.FloatField(default=0.0)
+# 	taxremaining = models.FloatField(default=0.0)
 	
 # 	def __str__(self):
-# 		return +str(self.transaction_date)
+# 		return +str(self.transactiondate)
 	
 
 class AboutUs(models.Model):
