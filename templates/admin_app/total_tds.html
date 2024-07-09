@@ -38,13 +38,13 @@
                                        <div class="col-lg-6 col-md-12 col-sm-12">
                                           <h4><i class="fa fa-dashcube"></i> Current Total TDS</h4>
                                           <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
-                                          <h4><i class="fa fa-inr"></i> {{total_tds.current_total_tds}}</h4>
+                                          <h4><i class="fa fa-inr"></i> {{tds.currenttds}}</h4>
                                           
                                        </div>
                                        <div class="col-lg-6 col-md-12 col-sm-12">
                                           <form action="/admins/total_tds" method="POST">
                                              <div class="form-group">
-                                                <input type="hidden" class="form-control" name="pay" placeholder="Enter Value of TDS Paid" value="{{total_tds.current_total_tds}}" >
+                                                <input type="hidden" class="form-control" name="pay" placeholder="Enter Value of TDS Paid" value="{{tds.currenttds}}" >
                                              </div>
                                              <div class="form-group">
                                                 {% if total_tds.current_total_tds == 0 %}
@@ -70,13 +70,13 @@
                                                    </tr>
                                                 </thead>
                                                 <tbody>
-                                                   {% for x in total_tds_transactions %}
+                                                   {% for x in tds_transactions %}
                                                    <tr>
-                                                      <td>{{ x.transaction_date|safe }}</td>
+                                                      <td>{{ x.transactiondate|safe }}</td>
                                                       <td>TRN{{ x.id|safe }}-ADMIN</td>
-                                                      <td><i class="fa fa-inr"></i> {{ x.tax_current }}</td>
-                                                      <td><i class="fa fa-inr"></i> {{ x.tax_paid }}</td>
-                                                      <td><i class="fa fa-inr"></i> {{ x.tax_remaining }}</td>
+                                                      <td><i class="fa fa-inr"></i> {{ x.currenttds }}</td>
+                                                      <td><i class="fa fa-inr"></i> {{ x.tdspaid }}</td>
+                                                      <td><i class="fa fa-inr"></i> {{ x.tdsremaining }}</td>
                                                    </tr>
                                                    {% endfor %}
                                                 </tbody>

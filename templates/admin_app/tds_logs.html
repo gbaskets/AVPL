@@ -35,7 +35,7 @@
                                  <div class="col-lg-12 col-md-12 col-sm-12">
                                     <h4><i class="fa fa-dashcube"></i> TDS Current Balance</h4>
                                     <hr style="border-width:5px;border-color:green;border-radius:20px;margin-bottm:10px;">
-                                    <h4><i class="fa fa-inr"></i> {{tds_wallet.current_balance|floatformat:2}}</h4>
+                                    <h4><i class="fa fa-inr"></i> {{tds_wallet.currentbalance|floatformat:2}}</h4>
                                  </div>
                                  <div class="col-lg-12 mt-4 col-md-12 col-sm-12">
                                     <h4><i class="fa fa-sign-in"></i>TDS Transactions</h4>
@@ -59,18 +59,31 @@
                                        <tbody>
                                           {% for x in tds_log %}
                                           <tr>
-                                             <td>{{ x.transaction_date|safe }}</td>
-                                             <td>{{ x.user.usr.first_name|safe }} {{ x.user.usr.last_name|safe }}</td>
-                                             {% if x.transaction_type == 'CREDIT' %}
-                                             <td><span class="badge badge-success">{{ x.transaction_type }}</span></td>
+                                             <td>{{ x.transactiondate|safe }}</td>
+                                             {% if x.tdslogwallet.customer %}
+                                            
+                                             <td>{{ x.tdslogwallet.customer.firstname|safe }} {{ x.tdslogwallet.customer.lastname|safe }}</td>
+                                            
+                                             {% elif x.tdslogwallet.vendor %}
+                                           
+                                             <td>{{ x.tdslogwallet.vendor.firstname|safe }} {{ xtdslogwallet..vendor.lastname|safe }}</td>
+                                           
+                                             {% elif x.tdslogwallet.admin %}
+                                             
+                                             <td>{{ x.tdslogwallet.admin.firstname|safe }} {{ x.tdslogwallet.admin.lastname|safe }}</td>
+                                            
+                                              {% endif %}
+
+                                             {% if x.transactiontype == 'CREDIT' %}
+                                             <td><span class="badge badge-success">{{ x.transactiontype }}</span></td>
                                              {% else %}
-                                             <td><span class="badge badge-danger">{{ x.transaction_type }}</span></td>
+                                             <td><span class="badge badge-danger">{{ x.transactiontype }}</span></td>
                                              {% endif %}
                                              <td><i class="fa fa-inr"></i> {{ x.amount|safe }}</td>
-                                             <td><i class="fa fa-inr"></i> {{ x.credited_amt|safe }}</td>
-                                             <td><i class="fa fa-inr"></i> {{ x.tds_amt|safe }}</td>
-                                             <td><i class="fa fa-inr"></i> {{ x.previous_amount|floatformat:2 }}</td>
-                                             <td><i class="fa fa-inr"></i> {{ x.remaining_amount|floatformat:2 }}</td>
+                                             <td><i class="fa fa-inr"></i> {{ x.creditedamount|safe }}</td>
+                                             <td><i class="fa fa-inr"></i> {{ x.tdsamount|safe }}</td>
+                                             <td><i class="fa fa-inr"></i> {{ x.previousamount|floatformat:2 }}</td>
+                                             <td><i class="fa fa-inr"></i> {{ x.remainingamount|floatformat:2 }}</td>
                                           </tr>
                                           {% endfor %}
                                        </tbody>

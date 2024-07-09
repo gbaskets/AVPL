@@ -129,36 +129,48 @@ class HomeBanner(models.Model):
 # 	def __str__(self):
 # 		return  self.name
 
-# class Tax(models.Model):
-# 	currenttax = models.FloatField(default=0.00)
-	
-# 	def __str__(self):
-# 		return 'Current Tax '+str(self.currenttax)
+class Tax(models.Model):
+	currenttax = models.FloatField(default=0.00)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
 
-# class TotalTDS(models.Model):
-# 	currenttotaltds = models.FloatField(default=0.00)
 	
-# 	def __str__(self):
-# 		return 'Current Total TDS '+str(self.currenttotaltds)
+	def __str__(self):
+		return 'Current Tax '+str(self.currenttax)
 
-# class TotalTDSPay(models.Model):
+class TDS(models.Model):
+	currenttds = models.FloatField(default=0.00)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
 
-# 	transactiondate = models.DateTimeField(auto_now_add=True)
-# 	taxcurrent = models.FloatField(default=0.0)
-# 	taxpaid = models.FloatField(default=0.0)
-# 	taxremaining = models.FloatField(default=0.0)
+	def __str__(self):
+		return 'Current Total TDS '+str(self.currenttds)
+
+class TDSPay(models.Model):
+	transactiondate = models.DateTimeField()
+	currenttds = models.FloatField(default=0.0)
+	tdspaid = models.FloatField(default=0.0)
+	tdsremaining = models.FloatField(default=0.0)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
 	
-# 	def __str__(self):
-# 		return 'TDS Paid Transaction ' +str(self.id) + ' ' +str(self.transactiondate)
+	def __str__(self):
+		return 'TDS Paid Transaction ' +str(self.id) + ' ' +str(self.transactiondate)
 
-# class TaxPay(models.Model):
-# 	transactiondate = models.DateTimeField(auto_now_add=True)
-# 	taxcurrent = models.FloatField(default=0.0)
-# 	taxpaid = models.FloatField(default=0.0)
-# 	taxremaining = models.FloatField(default=0.0)
-	
-# 	def __str__(self):
-# 		return +str(self.transactiondate)
+class TaxPay(models.Model):
+	transactiondate = models.DateTimeField()
+	taxcurrent = models.FloatField(default=0.0)
+	taxpaid = models.FloatField(default=0.0)
+	taxremaining = models.FloatField(default=0.0)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+	def __str__(self):
+		return +str(self.transactiondate)
 	
 
 class AboutUs(models.Model):

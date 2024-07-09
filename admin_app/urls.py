@@ -139,7 +139,11 @@ urlpatterns = [
     path('wallet_details/wallet-recharge', admin_wallet_recharge),
     
     path('tax', admin_taxation),
-   
+    path('tax_log/', admin_tax_log),
+    path('tds', admin_tds),
+    path('tds_log/', admin_tds_withdraw),
+    path('tds_log_details/<int:id>',admin_tds_log_details, name='tds_log_details'),
+    
     path('users', admin_users),
     path('users/delete', admin_users_delete),
     # Per Product Vendor Commission
@@ -157,10 +161,7 @@ urlpatterns = [
     path('billing/config/', admin_billing_config),
     path('product/reject/', admin_reject_product),
     path('product/update/', admin_update_product),
-    path('gst_log/', admin_gst_log),
-    path('total_tds', admin_total_tds),
-    path('tds_log/', admin_tds_withdraw),
-    path('tds_log_details/<int:id>',admin_tds_log_details, name='tds_log_details'),
+   
     path('contact', contact),
     path('contact-update', contact_update),
     path('terms', terms),

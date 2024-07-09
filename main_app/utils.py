@@ -218,11 +218,11 @@ def save_order_items(cartobj, order, customer, ordertype):
 			print('Vendor_Commission ==>>>>>')
 			per_product_vendor_commission(x["store"],customer, x["total"], admincommission, ordertype)
 		
-		# if len(Tax.objects.all()) == 0:
-		# 	Tax.objects.create(current_tax = tax)
-		# else:
-		# 	current_tax = Tax.objects.all()[0].current_tax + tax
-		# 	Tax.objects.all().update(current_tax = current_tax)
+		if len(Tax.objects.all()) == 0:
+			Tax.objects.create(currenttax = x["tax"])
+		else:
+			current_tax = Tax.objects.all()[0].currenttax + x["tax"]
+			Tax.objects.all().update(currenttax = current_tax)
 		
 		productvariants=x["productvariants"]
 		productvariants.quantity =productvariants.quantity - x["quantity"]

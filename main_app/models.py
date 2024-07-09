@@ -214,7 +214,16 @@ class CommissionWalletTransaction(models.Model):
 	def __str__(self):
 		return str(self.transactiondate)+' Commission Transaction'
 
+class TaxLog(models.Model):
+	transactiondate =  models.DateTimeField(null=True)
+	salesorderitems = models.ForeignKey('sales_app.SalesOrderItems', on_delete=models.CASCADE, null=True, blank=True)
+	taxamount = models.FloatField(default=0.00)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
 
+	def __str__(self):
+		return str(self.transactiondate)
 
 class TDSLogWallet(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)

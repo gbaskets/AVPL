@@ -2968,21 +2968,31 @@ def admin_activate_product(request):
 @csrf_exempt
 def admin_taxation(request):
 	if check_user_authentication(request, 'ADMIN'):
+		if len(Tax.objects.all()) == 0 :
+			Tax.objects.create(currenttax=0)
+			
+		tax =Tax.objects.filter().first()
 		if request.method == 'POST':
 			pay = request.POST.get('pay')
-			TaxPay.objects.create(
-				transaction_date = timezone.now(),
-				tax_current = Tax.objects.all()[0].current_tax,
-				tax_paid = pay,
-				tax_remaining = (Tax.objects.all()[0].current_tax - float(pay))
-			)
-			Tax.objects.all().update(current_tax = (Tax.objects.all()[0].current_tax - float(pay)))
-			return redirect('/admins/tax')
-		dic = {'tax':Tax.objects.all(), 'transactions':TaxPay.objects.all()}
+			if tax.currenttax >=  float(pay) and float(pay) != 0  :
+				
+				TaxPay.objects.create(
+					transactiondate = timezone.now(),
+					taxcurrent = tax.currenttax,
+					taxpaid = pay,
+					taxremaining = tax.currenttax - float(pay)
+				)
+				tax.currenttax = tax.currenttax - float(pay)
+				tax.save()
+				messages.success(request, 'Tax has been paid sucessfully !')
+				return redirect('/admins/tax')
+			else:
+				messages.warning(request, 'Insufficient balance !')
+				return redirect('/admins/tax')
+		dic = {'tax':tax, 'transactions':TaxPay.objects.all()}
 		return render(request, 'admin_app/tax.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-
 
 
 
@@ -3254,51 +3264,72 @@ def admin_update_product(request):
 	else:
 		return redirect('/401/')
 
-def admin_gst_log(request):
+def admin_tax_log(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
-			'order':GST_Log.objects.all().order_by('-id'),
-			'orders':OrderItems.objects.all(),
+			'taxlog':TaxLog.objects.all().order_by('-id'),
+			'orders':SalesOrder.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
-		return render(request, 'admin_app/gstlogs.html', dic)
+		return render(request, 'admin_app/taxlogs.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
 @csrf_exempt
-def admin_total_tds(request):
+def admin_tds(request):
 	if check_user_authentication(request, 'ADMIN'):
+		if len(TDS.objects.all()) == 0 :
+			TDS.objects.create(currenttds=0)
+		
+		tds =TDS.objects.filter().first()
 		if request.method == 'POST':
 			pay = request.POST.get('pay')
-			Total_TDS_Pay.objects.create(
-				transaction_date = timezone.now(),
-				tax_current = Total_TDS.objects.all()[0].current_total_tds,
-				tax_paid = pay,
-				tax_remaining = (Total_TDS.objects.all()[0].current_total_tds - float(pay))
-			)
-			Total_TDS.objects.all().update(current_total_tds = (Total_TDS.objects.all()[0].current_total_tds - float(pay)))
-			if Total_TDS.objects.all()[0].current_total_tds == 0:
-				tds_log_wallet=TDS_Log_Wallet.objects.all()
-				for x in tds_log_wallet:
-					print(x.user,'TDS_WALLLLLLLLLLLLLLLL')
-					TDS_Log.objects.create(tds_log_wallet=x , user=x.user,transaction_type= 'Paid TDS : Rs.'+ str(x.current_balance),amount=0, credited_amt=0 ,tds_amt=0,previous_amount= round(x.current_balance, 2),remaining_amount=round(x.current_balance,2) - round(x.current_balance,2))
-					TDS_Log_Wallet.objects.filter(user=x.user).update(current_balance = round(x.current_balance, 2) - round(x.current_balance, 2))
+			if tds.currenttds >=  float(pay) and  float(pay) != 0 :
+				
+				TDSPay.objects.create(
+					transactiondate = timezone.now(),
+					currenttds = tds.currenttds,
+					tdspaid = pay,
+					tdsremaining = tds.currenttds - float(pay)
+				)
+				tds.currenttds = tds.currenttds - float(pay)
+				tds.save()
+				if tds.currenttds == 0:
+					tdslogwallet=TDSLogWallet.objects.all()
+					for x in tdslogwallet:
+						if x.customer :
+							TDSLogWalletTransaction.objects.create(tdslogwallet=x ,transactiondate = timezone.now(), transactiontype= 'Paid TDS : Rs.'+ str(x.currentbalance),amount=0, creditedamount=0 ,tdsamount=0,previousamount= round(x.currentbalance, 2),remainingamount=round(x.currentbalance,2) - round(x.currentbalance,2))
+							TDSLogWallet.objects.filter(customer= x.customer).update(currentbalance = round(x.currentbalance, 2) - round(x.currentbalance, 2))
 
-			return redirect('/admins/total_tds')
-		dic = {'total_tds':Total_TDS.objects.all()[0], 'total_tds_transactions':Total_TDS_Pay.objects.all(),'notification':get_notifications(request.user,'ADMIN'),
+						if x.vendor :
+							TDSLogWalletTransaction.objects.create(tdslogwallet=x ,transactiondate = timezone.now(), transactiontype= 'Paid TDS : Rs.'+ str(x.currentbalance),amount=0, creditedamount=0 ,tdsamount=0,previousamount= round(x.currentbalance, 2),remainingamount=round(x.currentbalance,2) - round(x.currentbalance,2))
+							TDSLogWallet.objects.filter(vendor=x.vendor).update(currentbalance = round(x.currentbalance, 2) - round(x.currentbalance, 2))
+
+						if x.admin :
+							TDSLogWalletTransaction.objects.create(tdslogwallet=x ,transactiondate = timezone.now(),transactiontype= 'Paid TDS : Rs.'+ str(x.currentbalance),amount=0, creditedamount=0 ,tdsamount=0,previousamount= round(x.currentbalance, 2),remainingamount=round(x.currentbalance,2) - round(x.currentbalance,2))
+							TDSLogWallet.objects.filter(admin=x.admin).update(currentbalance = round(x.currentbalance, 2) - round(x.currentbalance, 2))
+       					
+				messages.success(request, 'TDS has been paid sucessfully !')
+				return redirect('/admins/total_tds')
+			else:
+				messages.warning(request, 'Insufficient balance !')
+				return redirect('/admins/total_tds')
+		dic = {'tds':tds, 'tds_transactions':TDSPay.objects.all(),'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),}
 		return render(request, 'admin_app/total_tds.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 @csrf_exempt
 def admin_tds_withdraw(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
-			'tds_log':TDS_Log.objects.all(),'total_tds':Total_TDS.objects.all(), 
-			'users':UserWithdrawRequest.objects.all(),'tds_wallet':TDS_Log_Wallet.objects.all(),
-			'vendors':VendorWithdrawRequest.objects.all(),
+			'tds_wallet':TDSLogWallet.objects.all(),'total_tds':TDS.objects.filter().first(), 
+			'tds_wallet_transaction':TDSLogWalletTransaction.objects.all(),
+			
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
@@ -3310,14 +3341,12 @@ def admin_tds_withdraw(request):
 def admin_tds_log_details(request, id):
 	if check_user_authentication(request, 'ADMIN'):
 
-		tds_wallet=TDS_Log_Wallet.objects.filter(id=id).first()
-		tds_log = TDS_Log.objects.filter(tds_log_wallet=id)
+		tds_wallet=TDSLogWallet.objects.filter(id=id).first()
+		tds_log = TDSLogWalletTransaction.objects.filter(tdslogwallet=id)
 		dic = {
 
 			'tds_wallet': tds_wallet,
 			'tds_log': tds_log,
-			'users':UserWithdrawRequest.objects.all(),
-			'vendors':VendorWithdrawRequest.objects.all(),
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),

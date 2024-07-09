@@ -107,7 +107,15 @@ def order_status_update(request):
 		order_id = request.POST.get('order_id')
 		order = SalesOrder.objects.filter(id=order_id).first()
 		delivery_status=request.POST.get('delivery_status')
-         
+		if order.ispaymentpaid == False :
+			if SalesOrderItems .objects.filter(salesorder=order).exists():
+				for salesitem in SalesOrderItems .objects.filter(salesorder=order).all():
+					TaxLog.objects.create(transactiondate=timezone.now(),salesorderitems = salesitem, taxamount=salesitem.tax)
+			order.ispaymentpaid=True
+			order.save()
+			make_business_limit_transaction("VENDOR",request.user,order.total, 'DEBIT')
+		
+		
 		if SalesOrderItems .objects.filter(salesorder=order).exists():
 			if delivery_status == 'Delivered':
 				SalesOrderItems .objects.filter(salesorder=order).update(orderstatus=delivery_status, deliveredon=timezone.now())
@@ -131,7 +139,7 @@ def order_status_update(request):
 			# 	admin_commission_plus_gst = admin_commission + gst
 			# 	print("printing total_detection_amt")
 			# 	print(admin_commission_plus_gst)
-			# 	GST_Log.objects.create(orders = orderitems, gst_amt=gst)
+			# 	TaxLog.objects.create(transactiondate=timezone.now(),salesorderitems = orderitems, taxamount=gst)
 			# 	trans_name = 'Transaction for ORD'+str(order.id)+str(orderitems.id)
 			# 	#make_business_limit_transaction(vendor, admin_commission, 'DEBIT', trans_name)
 			# 	make_business_limit_transaction(vendor, admin_commission_plus_gst, 'DEBIT', trans_name)
@@ -152,6 +160,7 @@ def order_status_update(request):
 			# 	item.save()
 		
 	return redirect('/vendor')
+
 @csrf_exempt
 def order_status_updates(request):
 
@@ -189,8 +198,8 @@ def order_status_updates(request):
 				print(gst)
 				admin_commission_plus_gst = admin_commission + gst
 				print("printing total_detection_amt")
-				print(admin_commission_plus_gst)
-				GST_Log.objects.create(orders = orderitems, gst_amt=gst)
+
+				TaxLog.objects.create(transactiondate=timezone.now(),salesorderitems = orderitems, taxamount=gst)
 				trans_name = 'Transaction for ORD'+str(order.id)+str(orderitems.id)
 				#make_business_limit_transaction(vendor, admin_commission, 'DEBIT', trans_name)
 				print(trans_name,'TTTTTTT')
@@ -1352,7 +1361,7 @@ def vendor_change_order_status(request):
 				admin_commission_plus_gst = admin_commission + gst
 				print("printing total_detection_amt")
 				print(admin_commission_plus_gst)
-				GST_Log.objects.create(orders = orderitems, gst_amt=gst)
+				TaxLog.objects.create(transactiondate=timezone.now(),salesorderitems = orderitems, taxamount=gst)
 				trans_name = 'Transaction for ORD'+str(order.id)+str(orderitems.id)
 				#make_business_limit_transaction(vendor, admin_commission, 'DEBIT', trans_name)
 				make_business_limit_transaction(vendor, admin_commission_plus_gst, 'DEBIT', trans_name)
@@ -1619,7 +1628,7 @@ def vendor_recharge(request):
 					print(paymenttransactionobj,'NNNNN')
 					
 			
-					make_business_limit_transaction('VENDOR',request.user, amount, 'CREDIT', 'Recharge Receipt ID  '+str(paymenttransactionobj.id))
+					make_business_limit_transaction('VENDOR',request.user, amount, 'CREDIT')
 					# make_commission_transaction(request.user.vendor, receipt.amount, 'CREDIT')
 					sub = 'AVPL - Business Limit Recharged'
 					msg = '''Hi there!

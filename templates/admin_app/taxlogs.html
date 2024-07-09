@@ -1,6 +1,6 @@
 {% extends 'admin_app/base.html' %}
 {% load static %}
-{% block title %}GST Logs{% endblock %}
+{% block title %}Tax Logs{% endblock %}
 {% block main %}
             <!-- Main Content -->
             <div class="main-content">
@@ -9,10 +9,10 @@
                      <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                            <div class="section-header-breadcrumb-content">
-                              <h1>GST Logs</h1>
+                              <h1>Tax Logs</h1>
                               <div class="section-header-breadcrumb">
                                  <div class="breadcrumb-item active"><a href="/admins/dashboard"><i class="fas fa-home"></i></a></div>
-                                 <div class="breadcrumb-item"><a href="#">GST Logs</a></div>
+                                 <div class="breadcrumb-item"><a href="#">Tax Logs</a></div>
                               </div>
                            </div>
                         </div>
@@ -23,7 +23,7 @@
                         <div class="col-12">
                            <div class="card">
                               <div class="card-header">
-                                 <h4>GST Logs</h4>
+                                 <h4>Tax Logs</h4>
                               </div>
                               <div class="card-body">
                                  <ul style="margin-bottom:20px;">
@@ -39,17 +39,17 @@
                                              <th>Store</th>
                                              <th>Product</th>
                                              <th>Total Amount</th>
-                                             <th>GST</th>
+                                             <th>Tax</th>
                                           </tr>
                                        </thead>
                                        <tbody>
-                                          {% for x in order %}
+                                          {% for x in taxlog %}
                                           <tr>
-                                             <td>{{ x.transaction_date|safe }}</td>
-                                             <td>{{ x.orders.store.name|safe }}</td>
-                                             <td>{{ x.orders.product.name|safe }}</td>
-                                             <td>{{ x.orders.total|floatformat:2 }}</td>
-                                             <td>{{ x.gst_amt|floatformat:2 }}</td>
+                                             <td>{{ x.transactiondate|safe }}</td>
+                                             <td>{{ x.salesorderitems.store|safe }}</td>
+                                             <td>{{ x.salesorderitems.productvariants.productvariantname|safe }}</td>
+                                             <td>{{ x.salesorderitems.total|floatformat:2 }}</td>
+                                             <td>{{ x.taxamount|floatformat:2 }}</td>
                                           </tr>
                                           {% endfor %}
                                        </tbody>

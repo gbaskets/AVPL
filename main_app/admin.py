@@ -14,7 +14,7 @@ from django.contrib.auth.admin import UserAdmin
 admin.site.register(UserOTP)
 
 admin.site.register(WithdrawRequest)
-
+admin.site.register(TaxLog)
 
 class MyUserAdmin(UserAdmin):
     def get_fieldsets(self, request, obj=None):
