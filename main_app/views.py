@@ -629,6 +629,7 @@ def home(request):
         footer_banner = HomeBanner.objects.all()
         categories = ProductCategory.objects.all()
         if request.session.get('store_ids'):
+            print(request.session.get('store_ids'),'hhhhhhhhhhhhh')
             storeobjs=Store.objects.get(id__in=request.session.get('store_ids'))
         else:
             storeobjs=None
@@ -2152,79 +2153,80 @@ def find_lat_long(t1,t2):
 def assign_store(request):
     if request.method=='POST':        
         home_address=request.POST.get('home_address')
-        print(home_address)
-        lat=request.POST.get('lat',True)
-        lng=request.POST.get('lng',True)
-        print(lat,lng)
+        
+        lat=request.POST.get('la',True)
+        lng=request.POST.get('ln',True)
+        print(lat,lng,'Llllllllllllll')
         if home_address or (lat and lng):
-            try:
-                gmaps = googlemaps.Client(key='AIzaSyBlEb2wyEYcwIj2HjR0ALpVXhj9Oo8zpVc')
-                print(gmaps)
-                if home_address:
-                    add_lat_long=gmaps.geocode(home_address)
-                    user_lat=add_lat_long[0]['geometry']['location']['lat']
-                    print(user_lat, 'jjjjjjjjjj')
-                    user_lng=add_lat_long[0]['geometry']['location']['lng']
-                else:
-                    user_lat=float(lat)
-                    user_lng=float(lng)
+            # try:
+            gmaps = googlemaps.Client(key='AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA')
+            print(gmaps)
+            if home_address:
+                add_lat_long=gmaps.geocode(home_address)
+                user_lat=add_lat_long[0]['geometry']['location']['lat']
+                
+                user_lng=add_lat_long[0]['geometry']['location']['lng']
+                print(user_lat,user_lng, 'find lat ln')
+            else:
+                user_lat=float(lat)
+                user_lng=float(lng)
 
-                store_address_obj=Vendor.objects.all()
-                print(store_address_obj)
-                request.session['usr_address']=home_address
-                print(home_address)
-                l={}
-                for i in store_address_obj:
-                    store_addr=gmaps.geocode(str(i.address) +","+str(i.zipcode))
-                    store_lat=store_addr[0]['geometry']['location']['lat']
-                    store_lng=store_addr[0]['geometry']['location']['lng']
-                    l[i.id]=(store_lat, store_lng)
-                small=None
-                user_store_id=None
-                print('litem==>',l.items())
-                store_distance = []
-                for i,j in l.items():
-                    x=find_lat_long((user_lat,user_lng),j)
-                    store_distance.append({"store_id":i,"store_distance":x})
+            store_address_obj=Store.objects.all()
+            
+            request.session['usr_address']=home_address
+            print(home_address)
+            l={}
+            for i in store_address_obj:
+                store_addr=gmaps.geocode(str(i.streetaddress) +","+str(i.pincode))
+                store_lat=store_addr[0]['geometry']['location']['lat']
+                store_lng=store_addr[0]['geometry']['location']['lng']
+                l[i.id]=(store_lat, store_lng)
+            small=None
+            user_store_id=None
+            print('litem==>',l.items())
+            store_distance = []
+            for i,j in l.items():
+                x=find_lat_long((user_lat,user_lng),j)
+                store_distance.append({"store_id":i,"store_distance":x})
 
-                print(store_distance,'distance')	
-                store_ids = []	
-                for d in store_distance:
-                    if d['store_distance']<=30:
-                        store_ids.append(d['store_id'])
-                request.session['store_ids'] = store_ids
-                print(request.session['store_ids'], 'store')
-                   # if small<=30:
-                    
-                # 	store_name=Store.objects.get(vendor__id=user_store_id)
-                # 	# store_ids.append(user_store_id)
-                # 	# request.session['name'] = store_name.name
-                # 	# request.session['description'] = store_name.description
-                # 	# request.session['closing_day'] = store_name.closing_day
-                # 	# request.session['opening_time'] = store_name.opening_time
-                # 	# request.session['closing_time'] = store_name.closing_time
-                # 	# request.session['distance'] = small
-                # 	store_img = StoreImages.objects.get(store__id = store_name.id)
-                # 	# logo = str(store_img.logo)
-                # 	# request.session['logo'] = logo
-                # 	# dic = {
-                # 	# 	'store':store_name,
-                # 	# 	'store_img':store_img,
-                # 	# 	'distance':small
-                # 	# }
-                messages.warning(request,f'The store near you are...')
-                return redirect('/')
-                    # return render(request, 'main_app/index.html', dic)
-                # else:
-                # 	try:
-                # 		del request.session['store_id']
-                # 	except:
-                # 		pass
-                # 	messages.warning(request,f'There are not any store near you')
-                # 	return redirect('/')
-            except:
-                messages.warning(request,f'please enter valid address.')
-                return redirect('/')
+            print(store_distance,'distance')	
+            store_ids = []	
+            for d in store_distance:
+                if d['store_distance']<=30:
+                    store_ids.append(d['store_id'])
+            request.session['store_ids'] = store_ids
+            print(request.session['store_ids'], 'store')
+            # if small<=30:
+                
+            #     store_name=Store.objects.get(vendor__id=user_store_id)
+            #     store_ids.append(user_store_id)
+            #     request.session['name'] = store_name.name
+            #     request.session['description'] = store_name.description
+            #     request.session['closing_day'] = store_name.closing_day
+            #     request.session['opening_time'] = store_name.opening_time
+            #     request.session['closing_time'] = store_name.closing_time
+            #     request.session['distance'] = small
+            #     store_img = StoreImages.objects.get(store__id = store_name.id)
+            #     logo = str(store_img.logo)
+            #     request.session['logo'] = logo
+            #     dic = {
+            #         'store':store_name,
+            #         'store_img':store_img,
+            #         'distance':small
+            #     }
+            messages.warning(request,f'The store near you are...')
+            return redirect('/')
+            #         # return render(request, 'main_app/index.html', dic)
+            #     # else:
+            #     # 	try:
+            #     # 		del request.session['store_id']
+            #     # 	except:
+            #     # 		pass
+            #     # 	messages.warning(request,f'There are not any store near you')
+            #     # 	return redirect('/')
+            # except:
+            #     messages.warning(request,f'please enter valid address.')
+            #     return redirect('/')
 
         else:
             messages.warning(request,f'please enter valid address ')

@@ -12,7 +12,7 @@
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="{% static 'img/Vector.png' %}">
-    {% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> {% endcomment %}
+   
     <link rel="stylesheet" href="{% static 'assets/fontawesome/css/fontawesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'assets/fontawesome/css/fontawesome.css' %}">
     
@@ -41,6 +41,19 @@
     <link rel="stylesheet" href="{% static 'dash/bundles/datatables/datatables.min.css' %}">
     <link rel="stylesheet"
         href="{% static 'dash/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css' %}">
+
+
+    <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA"></script>
+    {% comment %} <script src="https://unpkg.com/location-picker/dist/location-picker.min.js"></script> {% endcomment %}
+    {% comment %} C:\Users\chvijaypatel\AVPL\static\js\loctionmap.js {% endcomment %}
+    <script src="{% static 'js/picker.min.js' %}"></script>
+    <style type="text/css">
+    #map {
+    width: 100%;
+    height: 200px;
+    }
+    </style>
 
 
 
@@ -1045,11 +1058,11 @@
 
                 <!-- Modal body -->
                 <div class="container" id="adddress_form">
-                    <div class="p-3" style="z-index: 999999;">
+                    <div class="p-0" style="z-index: 999999;">
                         {% if store%}
                         <h3 style="color:green"><u>Store Assigned </u></h3>
                         <h5><b>Store Name: </b>{{store}}</h5>
-                        <h5><b>Store Person Name: </b>{{store.vendor.first_name}} {{store.vendor.last_name}}</h5>
+                        <h5><b>Store Person Name: </b>{{store.vendor.firstname}} {{store.vendor.lastname}}</h5>
                         <br>
                         <p style="color: red;font-size: 12px;"> You can change you address by searching another address because delivery
                             will be on this
@@ -1060,7 +1073,7 @@
                             <b>Store.</b>
                         </p>
                         {% endif %}
-                        <div class="container">
+                        <div >
                             {% for mess in messages %}
                             <div class="alert alert-{{mess.tags}}" role="alert">
                                 {{mess}}
@@ -1073,16 +1086,81 @@
 
                                     <div class="col-xs-12 col-md-12 col-lg-12">
                                         <div class="form-group">
-                                            {% comment %} <label for="exampleInputEmail1"><b>Address:</b></label> {% endcomment %}
+                                                                           
                                             <input type="text" name="home_address" class="form-control" id="address"
                                                 aria-describedby="emailHelp" placeholder="Search by typing address....."
                                                 required>
+
+
+                                               
+                                                <div id="map"></div>
+                                                <span id="onIdlePositionView"></span>
+                                                <br>
+                                                <button type="submit" getLocation  class="btn btn-primary btn-sm">Save Location</button>
+                                                <br>
+                                            
+                                                Location Name : <span id="placeNameView"></span>
+                                              
+                                                <input type="hidden" name="la" class="form-control" id="la" value="26.8467">
+                                                
+                                                <input type="hidden" name="ln" class="form-control" id="ln" value="80.9462">
+                                                
+
+                                              
+                                                <script>
+                                                // Get element references
+                            
+                                            
+                                                var onIdlePositionView = document.getElementById('onIdlePositionView');
+                                                var placeNameView = document.getElementById('placeNameView');
+                                                var la = document.getElementById('la').value;
+                                                var ln = document.getElementById('ln').value;
+                                                //center: new google.maps.LatLng(26.8467, 80.9462),
+                                                // Initialize locationPicker plugin
+                                                var lp = new locationPicker('map', {
+                                                    setCurrentPosition: true // You can omit this, defaults to true
+                                                }, {
+                                                    center: new google.maps.LatLng(la, ln),
+                                                    zoom: 10 // You can set any Google Maps options here, zoom defaults to 15
+                                                });
+                                                
+                                                
+                                                // Listen to map idle event, listening to idle event is more accurate than listening to ondrag event
+                                                google.maps.event.addListener(lp.map, 'idle', function(event) {
+                                                    // Get current location and show it in HTML
+                                                    var location = lp.getMarkerPosition();
+                                                    onIdlePositionView.innerHTML =location.lat + ',' + location.lng;
+                                                    document.getElementById('la').value = location.lat;
+                                                    document.getElementById('ln').value = location.lng;
+                                                    // Call function to fetch and display full address
+                                                    fetchAddress(location.lat, location.lng);
+                                                });
+                                                
+                                                // Function to fetch and display full address using Google Maps Geocoding API
+                                                function fetchAddress(lat, lng) {
+                                                    var geocoder = new google.maps.Geocoder();
+                                                    var latlng = { lat: parseFloat(lat), lng: parseFloat(lng) };
+                                                
+                                                    geocoder.geocode({ 'location': latlng }, function(results, status) {
+                                                        if (status === 'OK') {
+                                                            if (results[0]) {
+                                                                var placeName = results[0].formatted_address;
+                                                                document.getElementById('placeNameView').innerHTML = placeName;
+                                                                document.getElementById('address').value = placeName;
+                                                            } else {
+                                                                console.log('No results found');
+                                                            }
+                                                        } else {
+                                                            console.log('Geocoder failed due to: ' + status);
+                                                        }
+                                                    });
+                                                }
+                                                </script>
+                                                
+                                                                                                
                                         </div>
                                     </div>
-                                    <div class="col-xs-12 col-md-4 col-lg-4 justify-content-end">
-
-                                        <button type="submit" class="btn btn-primary btn-block">Submit</button>
-                                    </div>
+                                   
 
                                 </div>
 
@@ -1426,29 +1504,35 @@
     <script type="text/javascript"
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&loading=async&libraries=places"></script>
     <script>
-        function initialize() {
-            var input = document.getElementById('address');
-            new google.maps.places.Autocomplete(input);
-            google.maps.event.addListener('place_changed', function () { });
-        }
-
-        google.maps.event.addDomListener(window, 'load', initialize);
-
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else {
-                x.innerHTML = "Geolocation is not supported by this browser.";
+            function initialize() {
+                var input = document.getElementById('address');
+                new google.maps.places.Autocomplete(input);
+                google.maps.event.addListener('place_changed', function () { });
+               
+                console.log('HHHHHHHHHHHHHHHHHHHHHhh1')
             }
-        }
-
-        function showPosition(position) {
-            document.getElementById("demo1").setAttribute('value', position.coords.latitude)
-            document.getElementById("demo2").setAttribute('value', position.coords.longitude)
-        }
-
-    </script>
+        
+            google.maps.event.addDomListener(window, 'load', initialize);
+        
+        
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    x.innerHTML = "Geolocation is not supported by this browser.";
+                }
+            }
+        
+            function showPosition(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                console.log('HHHHHHHHHHHHHHHHHHHHHhh')
+                document.getElementById("la").value = lat.toFixed(6);
+                document.getElementById("ln").value = lng.toFixed(6);
+                
+            }
+        </script>
+        
     
 
 

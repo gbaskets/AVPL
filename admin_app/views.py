@@ -2207,11 +2207,10 @@ def admin_create_link(request):
 def wallet_details(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
-			'wallet':Wallet.objects.filter(user__is_superuser=True),'categories':ProductCategory.objects.all(),
-			'wallettransactions':WalletTransaction.objects.filter(wallet__user__is_superuser=True),
-			# 'wallettransactions':WalletTransaction.objects.all(),
+			'wallet':Wallet.objects.filter(admin=request.user).first(),'categories':ProductCategory.objects.all(),
+			'wallettransactions':WalletTransaction.objects.filter(wallet__admin=request.user),
 			'notification':get_notifications(request.user,'ADMIN'),
-			'notification_len':len(Notification.objects.filter(user=request.user, read=False))
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False))
 	    	}
 		return render(request, 'admin_app/wallet.html', dic)
 	else:
@@ -2220,28 +2219,28 @@ def wallet_details(request):
 @csrf_exempt
 def admin_wallet_recharge(request):
 	if check_user_authentication(request, 'ADMIN'):
-		if not Wallet.objects.filter(user=request.user).exists():
-			Wallet.objects.create(user=request.user)
+		if not Wallet.objects.filter(admin=request.user).exists():
+			Wallet.objects.create(admin=request.user,isactive=True)
 
-		wallet=Wallet.objects.filter(user__is_superuser=True).first()
+		wallet=Wallet.objects.filter(admin=request.user,isactive=True).first()
 		if request.method == 'POST':
 			amoun = request.POST.get('amount')
 			amount = float(amoun)
 
 			WalletTransaction.objects.create(
 			wallet = wallet,
-			transaction_date = timezone.now(),
-			transaction_type = 'CREDIT',
-			transaction_amount = amount,
-			previous_amount = round(wallet.current_balance, 2) if wallet.current_balance else 0 ,
-			remaining_amount = round(wallet.current_balance,2) + round(amount,2)
+			transactiondate = timezone.now(),
+			transactiontype = 'CREDIT',
+			transactionamount = amount,
+			previousamount = round(wallet.currentbalance, 2) if wallet.currentbalance else 0 ,
+			remainingamount = round(wallet.currentbalance,2) + round(amount,2)
 			)
-			wallet=Wallet.objects.filter(user__is_superuser=True).update(current_balance = round(wallet.current_balance, 2) + round(amount, 2))		
+			wallet=Wallet.objects.filter(admin=request.user,isactive=True).update(currentbalance = round(wallet.currentbalance, 2) + round(amount, 2))		
 				
 			return redirect('/admins/wallet_details')
 
-		dic = {'wallet':Wallet.objects.filter(user__is_superuser=True),'categories':ProductCategory.objects.all(),
-			'wallettransactions':WalletTransaction.objects.filter(wallet__user__is_superuser=True),'notification':get_notifications(request.user,'ADMIN'),
+		dic = {'wallet':Wallet.objects.filter(admin=request.user,isactive=True).first(),'categories':ProductCategory.objects.all(),
+			'wallettransactions':WalletTransaction.objects.filter(wallet__admin=request.user),'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),}
 		return render(request, 'admin_app/wallet.html', dic)
 	else:
