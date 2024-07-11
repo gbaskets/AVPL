@@ -10,37 +10,133 @@ height: 200px;
 }
 </style>
 
-<div id="map"></div>
-<br>
-<button id="confirmPosition">Save Loction</button>
-<br>
-<p>On idle position: <span id="onIdlePositionView"></span></p>
-<p>On click position: <span id="onClickPositionView"></span></p>
-<script>
-// Get element references
-var confirmBtn = document.getElementById('confirmPosition');
-var onClickPositionView = document.getElementById('onClickPositionView');
-var onIdlePositionView = document.getElementById('onIdlePositionView');
+<form method="POST" action="/assign_store/">
+    {% csrf_token%}
 
-// Initialize locationPicker plugin
-var lp = new locationPicker('map', {
-setCurrentPosition: true, // You can omit this, defaults to true
-}, {
-zoom: 15 // You can set any google map options here, zoom defaults to 15
-});
+    <div class="row">
 
-// Listen to button onclick event
-confirmBtn.onclick = function () {
-// Get current location and show it in HTML
-var location = lp.getMarkerPosition();
-onClickPositionView.innerHTML = 'The chosen location is ' + location.lat + ',' + location.lng;
-};
+        <div class="col-xs-12 col-md-12 col-lg-12">
+            <div class="form-group">
+                                 
+                <input type="text" name="home_address" class="form-control" id="address"
+                aria-describedby="emailHelp" placeholder="Search by typing address....." required>
+         
+         <div id="map"></div>
+         <span id="onIdlePositionView"></span>
+         <br>
+         <button type="submit" class="btn btn-primary btn-sm">Save Location</button>
+         <br>
+         
+         Location Name : <span id="placeNameView"></span>
+         
+         <input type="hidden" name="la" class="form-control" id="la">
+         <input type="hidden" name="ln" class="form-control" id="ln">
+         
+         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&libraries=places&callback=initialize"
+                 async defer></script>
+         
+         <script>
+             let lp; // Declare lp globally so it can be accessed in other functions
+         
+             function initialize() {
+                 var input = document.getElementById('address');
+                 var autocomplete = new google.maps.places.Autocomplete(input);
+         
+                 autocomplete.addListener('place_changed', function() {
+                     var place = autocomplete.getPlace();
+                     if (place.geometry) {
+                         var lat = place.geometry.location.lat();
+                         var lng = place.geometry.location.lng();
+         
+                         // Update the latitude and longitude fields
+                         document.getElementById("la").value = lat.toFixed(6);
+                         document.getElementById("ln").value = lng.toFixed(6);
+         
+                         // Update the map with the new location
+                         lp.map.setCenter(new google.maps.LatLng(lat, lng));
+                         lp.marker.setPosition(new google.maps.LatLng(lat, lng));
+                         fetchAddress(lat, lng);
+                     }
+                 });
+         
+                 // Call getLocation() automatically when the page loads
+                 getLocation();
+             }
+         
+             function getLocation() {
+                 if (navigator.geolocation) {
+                     navigator.geolocation.getCurrentPosition(showPosition);
+                 } else {
+                     console.log("Geolocation is not supported by this browser.");
+                 }
+             }
+         
+             function showPosition(position) {
+                 var lat = position.coords.latitude;
+                 var lng = position.coords.longitude;
+         
+                 // Update the latitude and longitude fields
+                 document.getElementById("la").value = lat.toFixed(6);
+                 document.getElementById("ln").value = lng.toFixed(6);
+         
+                 // Initialize the map with the current location
+                 initializeMap(lat, lng);
+         
+                 // Optionally, you can trigger any other actions here based on the geolocation
+                 console.log('Got location:', lat, lng);
+             }
+         
+             function initializeMap(lat, lng) {
+                 var onIdlePositionView = document.getElementById('onIdlePositionView');
+                 var placeNameView = document.getElementById('placeNameView');
+         
+                 // Initialize locationPicker plugin
+                 lp = new locationPicker('map', {
+                     setCurrentPosition: false // Do not set current position initially
+                 }, {
+                     center: new google.maps.LatLng(lat, lng),
+                     zoom: 10 // You can set any Google Maps options here, zoom defaults to 15
+                 });
+         
+                 // Listen to map idle event, listening to idle event is more accurate than listening to ondrag event
+                 google.maps.event.addListener(lp.map, 'idle', function (event) {
+                     // Get current location and show it in HTML
+                     var location = lp.getMarkerPosition();
+                     onIdlePositionView.innerHTML = location.lat + ',' + location.lng;
+                     document.getElementById('la').value = location.lat.toFixed(6);
+                     document.getElementById('ln').value = location.lng.toFixed(6);
+                     // Call function to fetch and display full address
+                     fetchAddress(location.lat, location.lng);
+                 });
+             }
+         
+             // Function to fetch and display full address using Google Maps Geocoding API
+             function fetchAddress(lat, lng) {
+                 var geocoder = new google.maps.Geocoder();
+                 var latlng = {lat: parseFloat(lat), lng: parseFloat(lng)};
+         
+                 geocoder.geocode({'location': latlng}, function (results, status) {
+                     if (status === 'OK') {
+                         if (results[0]) {
+                             var placeName = results[0].formatted_address;
+                             document.getElementById('placeNameView').innerHTML = placeName;
+                             document.getElementById('address').value = placeName;
+                         } else {
+                             console.log('No results found');
+                         }
+                     } else {
+                         console.log('Geocoder failed due to: ' + status);
+                     }
+                 });
+             }
+         </script>
+         
+                                                                    
+            </div>
+        </div>
+       
 
-// Listen to map idle event, listening to idle event more accurate than listening to ondrag event
-google.maps.event.addListener(lp.map, 'idle', function (event) {
-// Get current location and show it in HTML
-var location = lp.getMarkerPosition();
-onIdlePositionView.innerHTML = 'The chosen location is ' + location.lat + ',' + location.lng;
-});
-</script>
+    </div>
+
+</form>
 

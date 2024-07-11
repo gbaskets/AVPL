@@ -2149,91 +2149,75 @@ def find_lat_long(t1,t2):
     x = geopy.distance.geodesic(t1, t2).km
     print(x, 'distance')
     return x
+        
+import googlemaps
+from django.shortcuts import redirect
+from django.contrib import messages
 
 def assign_store(request):
-    if request.method=='POST':        
-        home_address=request.POST.get('home_address')
-        
-        lat=request.POST.get('la',True)
-        lng=request.POST.get('ln',True)
-        print(lat,lng,'Llllllllllllll')
+    if request.method == 'POST':        
+        home_address = request.POST.get('home_address')
+        lat = request.POST.get('la')
+        lng = request.POST.get('ln')
+
         if home_address or (lat and lng):
-            # try:
-            gmaps = googlemaps.Client(key='AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA')
-            print(gmaps)
-            if home_address:
-                add_lat_long=gmaps.geocode(home_address)
-                user_lat=add_lat_long[0]['geometry']['location']['lat']
-                
-                user_lng=add_lat_long[0]['geometry']['location']['lng']
-                print(user_lat,user_lng, 'find lat ln')
-            else:
-                user_lat=float(lat)
-                user_lng=float(lng)
+            try:
+                gmaps = googlemaps.Client(key='AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA')
 
-            store_address_obj=Store.objects.all()
+                if home_address:
+                    geocode_result = gmaps.geocode(home_address)
+                    if geocode_result:
+                        user_lat = geocode_result[0]['geometry']['location']['lat']
+                        user_lng = geocode_result[0]['geometry']['location']['lng']
+                    else:
+                        messages.warning(request, 'Invalid home address provided.')
+                        return redirect('/')
+                else:
+                    user_lat = float(lat)
+                    user_lng = float(lng)
+
+                store_addresses = Store.objects.all()
+                request.session['usr_address'] = home_address
+                store_distances = []
+
+                for store in store_addresses:
+                    store_geocode = gmaps.geocode(f"{store.streetaddress},{store.pincode}")
+                    if store_geocode:
+                        store_lat = store_geocode[0]['geometry']['location']['lat']
+                        store_lng = store_geocode[0]['geometry']['location']['lng']
+                        distance = find_lat_long((user_lat, user_lng), (store_lat, store_lng))
+                        store_distances.append({"store_id": store.id,"storename": store.storename,"storevendorname": f'{store.vendor.firstname} {store.vendor.lastname}', "store_distance": distance})
+
+                store_ids = [d['store_id'] for d in store_distances if d['store_distance'] <= 30]
             
-            request.session['usr_address']=home_address
-            print(home_address)
-            l={}
-            for i in store_address_obj:
-                store_addr=gmaps.geocode(str(i.streetaddress) +","+str(i.pincode))
-                store_lat=store_addr[0]['geometry']['location']['lat']
-                store_lng=store_addr[0]['geometry']['location']['lng']
-                l[i.id]=(store_lat, store_lng)
-            small=None
-            user_store_id=None
-            print('litem==>',l.items())
-            store_distance = []
-            for i,j in l.items():
-                x=find_lat_long((user_lat,user_lng),j)
-                store_distance.append({"store_id":i,"store_distance":x})
-
-            print(store_distance,'distance')	
-            store_ids = []	
-            for d in store_distance:
-                if d['store_distance']<=30:
-                    store_ids.append(d['store_id'])
-            request.session['store_ids'] = store_ids
-            print(request.session['store_ids'], 'store')
-            # if small<=30:
+                request.session['store_ids'] = store_ids
+              
                 
-            #     store_name=Store.objects.get(vendor__id=user_store_id)
-            #     store_ids.append(user_store_id)
-            #     request.session['name'] = store_name.name
-            #     request.session['description'] = store_name.description
-            #     request.session['closing_day'] = store_name.closing_day
-            #     request.session['opening_time'] = store_name.opening_time
-            #     request.session['closing_time'] = store_name.closing_time
-            #     request.session['distance'] = small
-            #     store_img = StoreImages.objects.get(store__id = store_name.id)
-            #     logo = str(store_img.logo)
-            #     request.session['logo'] = logo
-            #     dic = {
-            #         'store':store_name,
-            #         'store_img':store_img,
-            #         'distance':small
-            #     }
-            messages.warning(request,f'The store near you are...')
-            return redirect('/')
-            #         # return render(request, 'main_app/index.html', dic)
-            #     # else:
-            #     # 	try:
-            #     # 		del request.session['store_id']
-            #     # 	except:
-            #     # 		pass
-            #     # 	messages.warning(request,f'There are not any store near you')
-            #     # 	return redirect('/')
-            # except:
-            #     messages.warning(request,f'please enter valid address.')
-            #     return redirect('/')
+                # Find the closest store within 30 km
+                closest_store = None
+                storevendorname=None
+                for store in store_distances:
+                    if store['store_distance'] <= 30:
+                        closest_store = store['storename']
+                        storevendorname=store['storevendorname']
+                        break
 
+                if closest_store:
+                    request.session['storename'] = closest_store
+                    request.session['storevendorname'] = storevendorname
+                    
+                    messages.success(request, 'There is a store near you.')
+                else:
+                    messages.info(request, 'No stores found within 30 km radius.')
+                return redirect('/')
+            except Exception as e:
+                messages.error(request, f'Error: {e}')
+                return redirect('/')
         else:
-            messages.warning(request,f'please enter valid address ')
+            messages.warning(request, 'Please enter a valid address.')
             return redirect('/')
 
-
-def get_store_distance():
+def get_store_distance(request):
     if request.method=='POST':        
         home_address=request.POST.get('home_address')
         print(home_address)
