@@ -2109,7 +2109,6 @@ def blog(request):
             'contact_us':CompanyContactUs.objects.filter().first(),
             'categories':ProductCategory.objects.all(),
         
-            
             }
        
         return render(request, 'usertemplate/blog.html',dic)
