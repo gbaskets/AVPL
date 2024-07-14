@@ -739,6 +739,7 @@ def vendor_product_variants_all_list(request):
 def vendor_product_variants_list(request,id):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
+		productobj=Product.objects.filter(store__vendor__user=request.user,id=id).first()
 		dic = {
 			'vendor':vendor,
 			'categories':ProductCategory.objects.filter(),
@@ -746,9 +747,9 @@ def vendor_product_variants_list(request,id):
 			'subsubcategories':ProductSubSubCategory.objects.filter(),
             'units':Unit.objects.filter(),
 			'brands':Brand.objects.filter(),
-			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=id),
-			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=id),
-			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=id),
+			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=productobj.category.id),
+			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=productobj.category.id),
+			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=productobj.category.id),
 			'products':Product.objects.filter(store__vendor__user=request.user,id=id).first(),
             'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user,product__id=id),
 			# 'notification':get_notifications(request.user),

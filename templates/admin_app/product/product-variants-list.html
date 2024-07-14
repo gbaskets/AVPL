@@ -217,7 +217,7 @@
                   <select class="form-control text-center" name="firstvariantvalue_id" id="firstvariantvalue_id">
                      <option selected disabled value="">----select color ----</option>
                      {% for cate in firstvariantvalue %}
-                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.firstvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.firstvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.firstvariant.name|safe }} | {{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -229,7 +229,7 @@
                   <select class="form-control text-center" id="secondvariantvalue_id" name="secondvariantvalue_id" >
                      <option selected disabled value="">----select second variant----</option>
                      {% for cate in secondvariantvalue %}
-                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.secondvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.secondvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.secondvariant.name|safe }} | {{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -241,7 +241,7 @@
                   <select class="form-control text-center" id="thirdvariantvalue_id" name="thirdvariantvalue_id">
                      <option selected disabled value="">----select third variant----</option>
                      {% for cate in thirdvariantvalue %}
-                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.thirdvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{ cate.value|safe }}" {% if pro.thirdvariantvalue.id == cate.id %} selected {% else %}  {% endif %}>{{ cate.thirdvariant.name|safe }} | {{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -421,7 +421,7 @@
                   <select class="form-control text-center" name="firstvariantvalue_id" id="firstvariantvalue_idadd">
                      <option selected disabled value="">----select color ----</option>
                      {% for cate in firstvariantvalue %}
-                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ cate.firstvariant.name|safe }} | {{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -433,7 +433,7 @@
                   <select class="form-control text-center" id="secondvariantvalue_idadd" name="secondvariantvalue_id" >
                      <option selected disabled value="">----select second variant----</option>
                      {% for cate in secondvariantvalue %}
-                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ cate.secondvariant.name|safe }} | {{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>
@@ -445,7 +445,7 @@
                   <select class="form-control text-center" id="thirdvariantvalue_idadd" name="thirdvariantvalue_id">
                      <option selected disabled value="">----select third variant----</option>
                      {% for cate in thirdvariantvalue %}
-                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ cate.value|safe }}</option>
+                     <option value="{{ cate.id|safe }},{{cate.value}}">{{ third.secondvariant.name|safe }} | {{ cate.value|safe }}</option>
                      {% endfor %}
                   </select>
                </div>

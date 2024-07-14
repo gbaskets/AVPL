@@ -2100,8 +2100,8 @@ def blog(request):
             # 'notification':get_notifications(request.user),
             # 'notification_len':len(Notification.objects.filter(user=request.user, isread=False)),
             }
-        dic.update(get_cart_len(request))
-        dic.update(get_wishlist_len(request))
+        dic.update(get_cart_len(request,'CUSTOMER'))
+        dic.update(get_wishlist_len(request,'CUSTOMER'))
         return render(request, 'usertemplate/blog.html',dic)
     else:
         dic = {
@@ -2111,8 +2111,7 @@ def blog(request):
         
             
             }
-        dic.update(get_cart_len(request))
-        dic.update(get_wishlist_len(request))	
+       
         return render(request, 'usertemplate/blog.html',dic)
 
 def gallery_data(request):

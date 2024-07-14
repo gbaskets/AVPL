@@ -590,14 +590,18 @@ def admin_add_product_firstvariant(request):
 			print(category_id,name,'hhghgjjgjgjjh')
 
 			if name and category_id:
-				productobj=ProductCategory.objects.filter(id=category_id).first()	
-				bussinessmaincateobj=FirstVariant.objects.create(name=name,category=productobj)			
-				bussinessmaincateobj.updatedby=request.user
-			
-			if name and category_id:
-				bussinessmaincateobj.save()
-				return redirect("/admins/product-firstvariant")
-			
+				productobj=ProductCategory.objects.filter(id=category_id).first()
+				if not FirstVariant.objects.filter(name=name,category=productobj).exists():
+					bussinessmaincateobj=FirstVariant.objects.create(name=name,category=productobj)			
+					bussinessmaincateobj.updatedby=request.user
+					bussinessmaincateobj.save()
+					messages.success(request, f"{name} is created sucessfully ! ")
+					return redirect("/admins/product-firstvariant")
+				else:
+					messages.warning(request, f"{name} is alredy exists ! ")
+					return redirect("/admins/product-firstvariant")
+					
+				
 		dic = {
 			'data':FirstVariant.objects.all(),
             'productcategory':ProductCategory.objects.all(),
@@ -695,7 +699,7 @@ def admin_add_product_firstvariantvalue(request):
 				firstvariantobj =FirstVariant.objects.filter(id=firstvariant_id).first()			
 				bussinessmaincateobj=FirstVariantValue.objects.create(firstvariant=firstvariantobj,value=value)			
 				bussinessmaincateobj.updatedby=request.user
-
+                
 			if firstvariant_id and value:
 				bussinessmaincateobj.save()
 				return redirect("/admins/product-firstvariantvalue")
@@ -1622,16 +1626,16 @@ def admin_edit_product(request,id):
 @csrf_exempt
 def admin_product_variants_list(request,id):
 	if check_user_authentication(request, 'ADMIN'):
-	
+		productobj=Product.objects.filter(id=id).first()
 		dic = {
 			'categories':ProductCategory.objects.filter(),
 			'subcategories':ProductSubCategory.objects.filter(),
 			'subsubcategories':ProductSubSubCategory.objects.filter(),
             'units':Unit.objects.filter(),
 			'brands':Brand.objects.filter(),
-			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=id),
-			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=id),
-			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=id),
+			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=productobj.category.id),
+			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=productobj.category.id),
+			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=productobj.category.id),
 			'products':Product.objects.filter(id=id).first(),
             'product_variants':ProductVariants.objects.filter(product__id=id),
 			# 'notification':get_notifications(request.user),
