@@ -58,7 +58,6 @@
                             <th class="product-name">Product</th>
                             <th class="product-name">Price</th>
                             <th class="product-name">Quantity</th>
-                            <th class="product-Tax">Tax</th>
                             <th class="product-subtotal">Total Amount(in Rs.)</th>
                             <th class="product-remove">&nbsp;Remove</th>
                         </tr>
@@ -97,10 +96,7 @@
                                     <input style="width:75px;border:none;" type="number" min="1" max="{{item.stock}}" value="{{ item.quantity }}" onchange="update_item('{{item.id}}')" id="{{item.id}}quantity" />
                                 </div>
                             </td>
-                            <td data-title="Tax">
-                                
-                                <span class="">₹{{item.tax}}</span>
-                            </td>
+                          
 
                             <td data-title="Total" >
                                 ₹{{item.total}}

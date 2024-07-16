@@ -111,14 +111,15 @@
                                           <tr>
                                              <th>Product Variant Id</th>
                                              <th>Product Variant Name</th>
-                                             <th>SKU</th>
+                                          
                                              <th>UPC</th>
                                              <th>Image</th>
                                              <th>Product</th>
                                              <th>Quantity</th>
                                              <th>MRP</th>
                                              <th>Sales Price</th>
- 
+                                             <th>Admin Commission</th>                           
+
                                              <th>Status</th>
                               
                                              <th>Options</th>
@@ -130,7 +131,7 @@
                                              <td><a  data-toggle="modal" data-target="#EditProductModal{{pro.id}}">{{pro.id}}</a></td>
                               
                                              <td> <a data-toggle="modal" data-target="#EditProductModal{{pro.id}}">{{pro.productvariantname|safe }}</a> </td>
-                                             <td>{{ pro.sku|safe }} </td>
+                                            
                                              {% if pro.barcodeimage %}
                                              <td><a href="{{ pro.barcodeimage.url|safe }}" target="_blank">{{ pro.upc|safe }} </a></td>
                                              {% else %}
@@ -148,6 +149,7 @@
                                              <td>{{ pro.quantity|safe }} </td>
                                              <td>{{ pro.mrp|safe }} </td>
                                              <td>{{ pro.price|safe }} </td>                                             
+                                             <td>{{ pro.product.admincommission|safe }} %</td>                                        
 
                                              {% if pro.isactive %}
                                              <td><span class="badge badge-success">Approved</span></td>
@@ -185,7 +187,7 @@
  <div class="modal fade" id="EditProductModal{{pro.id}}" tabindex="-1" role="dialog" aria-labelledby="EditProductModalLabel{{pro.id}}" aria-hidden="true">
    <div class="modal-dialog modal-xl" role="document">
      <div class="modal-content">
-      <form action="/vendor/edit-product-variants/{{pro.id}}" enctype="multipart/form-data"
+      <form action="/admins/edit-product-variants-list/{{pro.id}}" enctype="multipart/form-data"
       method="POST">
       {% csrf_token %}
        <div class="modal-header">
@@ -294,12 +296,24 @@
                </div>
             </div>
 
+            <div class="col-lg-4 col-md-12 col-sm-12">
+               <div class="form-group">
+                  <label>Admin Commission *</label>
+                  <input type="number" class="form-control" name="admincommission"  maxlength="5" step="0.01" 
+                  placeholder="Enter % Commission ...." 
+                  min="0" value="{{pro.product.admincommission}}"
+                  onkeydown="return event.keyCode == 69 ? false : true"
+                  oninput="this.value = this.value < 0 ? 0 : this.value"
+               required>
+               </div>
+            </div>
+
 
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Status</label>
 
-                 {% if x.isactive == True %} <label class="switch">
+                 {% if pro.isactive == True %} <label class="switch">
                      <input type="checkbox" name="isactive" checked>
                      <span class="slider round"></span>
                    </label> {% else %} <label class="switch">

@@ -186,11 +186,11 @@
                         {% if request.user.is_retailer%}
                         <div class="d-flex align-items-baseline">
                             <ins class="font-size-36 text-decoration-none">₹{{productvarint.mrp}}</ins>
-                            <del class="font-size-20 ml-2 text-gray-6">₹{{productvarint.price}}</del>
+                            <del class="font-size-20 ml-2 text-gray-6">₹{{productvarint.saleprice}}</del>
                         </div>
                         {% else%}
                         <div class="d-flex align-items-baseline">
-                            <ins class="font-size-36 text-decoration-none">₹{{productvarint.price}}</ins>
+                            <ins class="font-size-36 text-decoration-none">₹{{productvarint.saleprice}}</ins>
                             <del class="font-size-20 ml-2 text-gray-6">₹{{productvarint.mrp}}</del>
                         </div>
                         {%endif%}

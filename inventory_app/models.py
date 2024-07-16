@@ -199,10 +199,11 @@ class Product(models.Model):
     hsn= models.IntegerField(blank=True, null=True)
     tax= models.FloatField(default=0.00,null=True)
     pv = models.FloatField(default=0.00,null=True)
-    admincommission = models.FloatField(default=0.00,null=True)
+    admincommission = models.FloatField(default=0.00)
     frequentlyboughttogetherproduct=models.ManyToManyField('Product',blank=True,related_name="FrequentlyBoughtTogether")
     isproductrejected=models.BooleanField(default=False,null=True,blank=True)
     reasonforproductrejected=models.TextField(null=True,blank=True)
+    setadmincommission = models.BooleanField(default=False)
     isactive = models.BooleanField(default=False)
     isfeatured = models.BooleanField(default=False)
     isspecialoffer = models.BooleanField(default=False)
@@ -242,7 +243,20 @@ class ProductVariants(models.Model):
         if not self.id:
             self.productimage = compressImage(self.productimage)
         super(ProductVariants, self).save(*args, **kwargs)
-
+    
+    def admincommissionprice(self):
+        if self.price:
+            admincommission=round(((self.price * self.product.admincommission)/100),2)
+        else:
+            admincommission=0
+        return admincommission
+        
+    def saleprice(self):
+        if self.price:
+            saleprices=self.price + round(((self.price * self.product.admincommission)/100),2)
+        else:
+            saleprices=self.price 
+        return saleprices
 
 
 class ProductImages(models.Model):

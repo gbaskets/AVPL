@@ -47,14 +47,16 @@ def get_cart_items(request,user_type):
 	# Initialize list and totals
 	item_list = []
 	total_amount = 0
+	total_admincommission = 0
 	tax_amount = 0
 	subtotal_amount = 0
 
 	# Iterate through cart items and create dictionaries
 	for item in cartobj:
-		price = item.productvariants.price
-		tax = (item.productvariants.product.tax * price) / 100
-		total = (price + tax) * item.quantity
+		price = item.productvariants.saleprice()
+		admincommission=item.productvariants.admincommissionprice()
+		tax = round((((item.productvariants.product.tax * price) / 100) * item.quantity),2)
+		total = round((price * item.quantity),2)
 		
 		item_dict = {
 			'id': item.id,
@@ -67,7 +69,7 @@ def get_cart_items(request,user_type):
 			'tax': tax,
 			'total': total,
             'pv':item.productvariants.product.pv,
-            'admincommission':item.productvariants.product.admincommission,
+            'admincommission':admincommission,
             'product':item.productvariants.product,
 			'product_id': item.productvariants.id,
             'productvariants': item.productvariants,
@@ -78,11 +80,12 @@ def get_cart_items(request,user_type):
 		item_list.append(item_dict)
 		
 		# Update totals
-		subtotal_amount += price * item.quantity
 		tax_amount += tax
+		subtotal_amount += total - tax_amount
+		total_admincommission += admincommission
 		total_amount += total
 
-	dic = {'items':item_list,'tax_amount':tax_amount, "subtotal_amount":subtotal_amount,'total_amount':total_amount}
+	dic = {'items':item_list,'tax_amount':tax_amount,"total_admincommission":total_admincommission, "subtotal_amount":subtotal_amount,'total_amount':total_amount}
 	dic.update(get_cart_len(request,"CUSTOMER"))
 	return dic
 
@@ -91,18 +94,25 @@ def get_wishlist_items(request,user_type):
 		wishlistobj = Wishlist.objects.filter(customer__user=request.user)
 	else:
 		wishlistobj = Wishlist.objects.filter(vendor__user=request.user)
-		
+	
+	total_amount = 0
+	tax_amount = 0
+	subtotal_amount = 0	
 	lt = []
 	for x in wishlistobj:
+		price = x.productvariants.saleprice()
+		tax = round(((x.productvariants.product.tax * price) / 100),2)
+		total = round((price * x.quantity),2)
+		
 		dic = {
 		'id':x.id,
 		'image':x.productvariants.productimage.url,
 		'name':x.productvariants.productvariantname,
 		'quantity':x.quantity,
-		'price':x.productvariants.price,
+		'price':price,
         'mrp':x.productvariants.mrp,
-        'tax':(x.productvariants.product.tax * x.productvariants.price)/100,
-		'total': (x.productvariants.price + ((x.productvariants.product.tax * x.productvariants.price)/100)) * x.quantity,
+        'tax':tax,
+		'total': total,
 		'product_id':x.productvariants.id,}	
 		if x.productvariants.quantity == 0:
 			dic.update({'stock_out':True})
@@ -112,40 +122,6 @@ def get_wishlist_items(request,user_type):
 	dic = {'items':lt, 'wishlist':wishlistobj}
 	dic.update(get_wishlist_len(request,'CUSTOMER'))
 	return dic
-
-def calculate_cart_tax(request):
-	cart = Cart.objects.get(user=request.user)
-	tax = 0.0
-	for item in CartItems.objects.filter(cart=cart):
-		cate_tax = item.product.category.tax
-		print("cate_tax")
-		print(cate_tax)
-		#item_tax = (item.total_cost/100)*cate_tax
-		print("item_tax")
-		print("tax")
-	delivery_charge = 0.0
-	check_user_subscription(request.user)
-	if request.user.usr.subscribed:
-		total = cart.subtotal + ((cart.subtotal*cate_tax)/100)
-		print(total,'3333333')
-		# total = cart.subtotal
-	else:
-		#if cart.subtotal <= 999.0:	
-		for x in DeliveryCharge.objects.all():
-			delivery_charge = x.amount
-		#total = cart.subtotal + tax + delivery_charge
-		if cart.total < 500:
-			if cart.self_pickup == False:
-				total = cart.subtotal  + delivery_charge + ((cart.subtotal*cate_tax)/100)
-				print(total,'3333333333')
-			elif cart.self_pickup == True:
-				total = cart.subtotal + ((cart.subtotal*cate_tax)/100)
-				print(total,'2222222')
-		else:
-			total = cart.subtotal + ((cart.subtotal*cate_tax)/100)
-			print(total,'111111')
-	Cart.objects.filter(user=request.user).update(tax=tax, total=total, delivery_charges=delivery_charge)
-	Cart.objects.filter(user=request.user).update(total=total, delivery_charges=delivery_charge)
 
 
 def fetch_pv(user):

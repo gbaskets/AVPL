@@ -199,7 +199,7 @@ def save_order_items(cartobj, order, customer, ordertype):
 		# tax = 0.0
 		print(x,'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiit')
 		admincommission = x["admincommission"]
-		print('VVVVV____Commm---===>',admincommission)
+		print('admin____Commm---===>',admincommission)
 		orderitemobj = SalesOrderItems()
 		orderitemobj.store = x["store"]
 		order.store=x["store"]
@@ -212,12 +212,8 @@ def save_order_items(cartobj, order, customer, ordertype):
 		orderitemobj.total =  x["total"]
 		orderitemobj.orderstatus ="Pending"
 		orderitemobj.save()
-	
-		save_vendor_commission(x["store"], x["total"], admincommission, ordertype)
-		if x["store"].vendor.isavplvendor == True :
-			print('Vendor_Commission ==>>>>>')
-			per_product_vendor_commission(x["store"],customer, x["total"], admincommission, ordertype)
-		
+        
+
 		if len(Tax.objects.all()) == 0:
 			Tax.objects.create(currenttax = x["tax"])
 		else:
@@ -573,26 +569,6 @@ def save_order_by_wallet(cartobj, address,usertype, user, wallet_transactions):
 	print(wallet_transactions)
 	
 
-def save_vendor_commission(store, amount, percentage, ordertype = 'COD'):
-	if ordertype == 'Online':
-		admin_commission = (amount/100)*percentage
-		remaining_amount = amount - admin_commission
-		# Credited amount to vendor wallet
-		make_wallet_transaction("VENDOR",store.vendor.user, remaining_amount, 'CREDIT')
-		# Credited amount to admin commission wallet
-		admin=User.objects.filter(username="admin").first()
-		make_commission_transaction("ADMIN", admin, admin_commission, 'CREDIT')
-		# if UserVendorRelation.objects.filter(vendor__id=user.id).exists():
-		# 	user__ = UserVendorRelation.objects.filter(vendor=user.id)
-		# 	#user commission 10% of vendor amount
-		# 	user_c = (remaining_amount * 10)/100
-		# 	# credit amount 10% in user wallet
-		# 	make_wallet_transaction(user__.user, user_c, 'CREDIT')
-		# 	print(user.first_name+"Vendor paid User Commission to ")
-		return admin_commission
-	else:
-		admin_commission = (amount/100)*percentage
-		return admin_commission
 
 def make_commission_transaction(usertype,user, amount, transtype):
 	if usertype == "CUSTOMER":
@@ -638,26 +614,6 @@ def make_commission_transaction(usertype,user, amount, transtype):
 		)
 		commissionwallet.currentbalance=round((commissionwallet.currentbalance - amount),2)
 		commissionwallet.save()
-
-def per_product_vendor_commission(store,customer, amount, percentage, ordertype = 'COD'):
-	if ordertype == 'Online':
-		vendor_commission = (amount/100)*percentage
-		remaining_amount = amount - vendor_commission
-		# Credited amount to vendor wallet
-		# make_wallet_transaction(vendor, remaining_amount, 'CREDIT')
-			# Credited amount to admin commission wallet
-		make_commission_transaction("VENDOR",store.vendor.user, vendor_commission, 'CREDIT')
-		# if UserVendorRelation.objects.filter(vendor__id=vendor.id).exists():
-		# 	user__ = UserVendorRelation.objects.filter(vendor=user.id)
-		# 	#user commission 10% of vendor amount
-		# 	user_c = (remaining_amount * 10)/100
-		# 	# credit amount 10% in user wallet
-		# 	make_wallet_transaction(user__.user, user_c, 'CREDIT')
-		# 	print(user.first_name+"Vendor paid User Commission to ")
-		return vendor_commission
-	else:
-		vendor_commission = (amount/100)*percentage
-		return vendor_commission
 
 def sort_products(products, flag):
 	if flag == 3:

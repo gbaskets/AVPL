@@ -337,9 +337,9 @@
                         <div class="d-flex align-items-center justify-content-center mb-3">
                             <del class="font-size-18 mr-2 text-gray-2">₹{{first_variant.mrp}}</del>
                             {%if request.user.is_retailer%}
-                            <ins class="font-size-30 text-red text-decoration-none">₹{{first_variant.price}}</ins>
+                            <ins class="font-size-30 text-red text-decoration-none">₹{{first_variant.saleprice}}</ins>
                             {%else%}
-                            <ins class="font-size-30 text-red text-decoration-none">₹{{first_variant.price}}</ins>
+                            <ins class="font-size-30 text-red text-decoration-none">₹{{first_variant.saleprice}}</ins>
                             {%endif%}
                         </div>
                         <div class="mb-3 mx-2">
@@ -469,7 +469,7 @@
                                                         {% else %}
                                                         <div class="prodcut-price">
                                                             <div class="text-gray-100">
-                                                                ₹{{first_variant.price|floatformat:2}}</div>
+                                                                ₹{{first_variant.saleprice|floatformat:2}}</div>
                                                         </div>
                                                         <div class="flex-center-between mb-1">
                                                             <div class="prodcut-price">
@@ -566,7 +566,7 @@
                                                         {%else%}
                                                         <div class="prodcut-price">
                                                             <div class="text-gray-100">₹
-                                                                {{first_variant.price|floatformat:2}}</div>
+                                                                {{first_variant.saleprice|floatformat:2}}</div>
                                                         </div>
                                                         <div class="flex-center-between mb-1">
                                                             <div class="prodcut-price">
@@ -647,7 +647,7 @@
                                                         {%else%}
                                                         <div class="prodcut-price">
                                                             <div class="text-gray-100">
-                                                                ₹{{first_variant.price|floatformat:2}}</div>
+                                                                ₹{{first_variant.saleprice|floatformat:2}}</div>
                                                         </div>
                                                         {%endif%}
                                                         {%if request.session.store_id%}
@@ -872,7 +872,7 @@
                                             </div>
                                             {%else%}
                                             <div class="prodcut-price">
-                                                <div class="text-gray-100">₹{{first_variant.price|floatformat:2}}</div>
+                                                <div class="text-gray-100">₹{{first_variant.saleprice|floatformat:2}}</div>
                                             </div>
                                             {%endif%}
                                             {% if request.session.store_id%}
@@ -986,7 +986,7 @@
                                     </div>
                                     <div class="flex-center-between mb-1 cart_product">
                                         <div class="prodcut-price">
-                                            <div class="text-gray-100">₹{{ first_variant.price}}</div>
+                                            <div class="text-gray-100">₹{{ first_variant.saleprice}}</div>
                                         </div>
                                         <div class="d-none d-xl-block prodcut-add-cart ">
 
@@ -1089,7 +1089,7 @@
                                     </div>
                                     <div class="flex-center-between mb-1 cart_product">
                                         <div class="prodcut-price">
-                                            <div class="text-gray-100">₹{{ first_variant.price}}</div>
+                                            <div class="text-gray-100">₹{{ first_variant.saleprice}}</div>
                                         </div>
                                         <div class="d-none d-xl-block prodcut-add-cart">
 

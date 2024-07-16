@@ -78,7 +78,7 @@ urlpatterns = [
     
     path('edit-product/<int:id>', admin_edit_product),
     path('product-variants-list/<int:id>', admin_product_variants_list),
-    path('edit-product-variants/<int:id>', admin_edit_product_variants),
+    path('edit-product-variants-list/<int:id>', admin_edit_product_variants),
     
     path('vendorprofile', admin_vendor_profile),
     path('editvendorprofile', admin_edit_vendor_profile),

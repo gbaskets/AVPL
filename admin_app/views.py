@@ -1532,14 +1532,15 @@ def admin_product(request):
 def admin_product_approval(request):
 	if check_user_authentication(request, 'ADMIN'):
 		
-		# if request.method == 'POST':
-		# 	id = request.POST.get('id')
-		# 	vendor_commission = request.POST.get('vendor_commission')
-		# 	prod=Product.objects.filter(id=id).first()
-		# 	prod.vendor_commission = vendor_commission
-		# 	prod.save()
-		# 	messages.success(request, 'New Vendor Commission has been set. ! ')
-		# 	return redirect('/admins/product-approval')
+		if request.method == 'POST':
+			id = request.POST.get('id')
+			admincommission = request.POST.get('admincommission')
+			prod=Product.objects.filter(id=id).first()
+			prod.setadmincommission=True
+			prod.admincommission = admincommission
+			prod.save()
+			messages.success(request, 'New Vendor Commission has been set. ! ')
+			return redirect('/admins/product-approval')
 		
 		dic = {'data':ProductVariants.objects.filter(isactive=False, product__isproductrejected=False),
 			'rejected_product':ProductVariants.objects.filter(isactive=False, product__isproductrejected=True),
@@ -1605,11 +1606,11 @@ def admin_edit_product(request,id):
 					pro.unit = Unit.objects.get(id=unit_id)
 				if hsn:
 					pro.hsn= hsn
-				if hsn:
+				if tax:
 					pro.tax= tax
-				if hsn:
+				if pv:
 					pro.pv =pv
-				if hsn:
+				if admincommission:
 					pro.admincommission =admincommission
 
 				pro.save()
@@ -1660,10 +1661,16 @@ def admin_edit_product_variants(request,id):
 			mrp=request.POST.get('mrp') 
 			purchaseprice=request.POST.get('purchaseprice') 
 			price=request.POST.get('price') 
+			admincommission=request.POST.get('admincommission') 
+            
 	
 			if ProductVariants.objects.filter(id=id).exists():
 				productvariantsobj=ProductVariants.objects.filter(id=id).first()
-	
+				if admincommission:
+					productobj=Product.objects.filter(id=productvariantsobj.product.id).first()
+					productobj.admincommission=admincommission
+					productobj.save()
+
 				if productvariantname :
 					productvariantsobj.productvariantname=productvariantname
 	    

@@ -32,7 +32,7 @@
                                           <tr>
                                              <th>Product Variant</th>
                                              <th>Store</th>
-                                             <th>SKU</th>
+                                    
                                              <th>UPC</th>
                                              <th>Image</th>
                                            
@@ -40,7 +40,8 @@
                                              <th>MRP</th>
                                              <th>Sales Price</th>
                                              <th>Purchase Price</th>
- 
+                                             <th>Admin Commission</th>
+                                             
                                              <th>Options</th>
                                           </tr>
                                        </thead>
@@ -56,7 +57,7 @@
                                              <td>{{ pro.store.storename|safe }} </td>
                                              {% endif %}
 
-                                             <td>{{ pro.sku|safe }} </td>
+                                        
                                              {% if pro.barcodeimage %}
                                              <td><a href="{{ pro.barcodeimage.url|safe }}" target="_blank">{{ pro.upc|safe }} </a></td>
                                              {% else %}
@@ -74,21 +75,20 @@
                                              <td>{{ pro.quantity|safe }} </td>
                                              <td>{{ pro.mrp|safe }} </td>
                                              <td>{{ pro.price|safe }} </td>                                             
-                                             <td>{{ pro.purchaseprice|safe }} </td>                                             
+                                             <td>{{ pro.purchaseprice|safe }} </td>        
+                                             <td>{{ pro.product.admincommission|safe }} %</td>                                        
 
-
+                                             
                                              <td>
-                                                {% if pro.store.vendor.isavplvendor == True  %}
-                                                
-                                               
-                                               <button type="button" class="btn btn-success" data-toggle="modal" data-target="#set_vendorcommission{{pro.id}}"><i class="fa fa-check"></i>Set Vendor Commission </button>
+                                                {% if pro.product.setadmincommission == True  %}
                                                <a  href="/admins/activateproduct?p={{pro.id}}"class="btn btn-info"><i class="fa fa-check"></i>Activate</a>
-                                                         {% else %}
-                                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#set_vendorcommission{{pro.id}}"><i class="fa fa-check"></i>Set Vendor Commission </button>
-                                                <a  href="/admins/activateproduct?p={{pro.id}}"class="btn btn-info"><i class="fa fa-check"></i>Activate</a>
+                                               <a  href="#"class="btn btn-warning" onclick="product_reject('{{pro.id}}')"><i class="fa fa-check"></i> Reject</a>
+                                                {% else %}
+                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#set_vendorcommission{{pro.id}}"><i class="fa fa-check"></i>Set Admin Commission</button>
+                  
                                                 {% endif %}
                                                
-                                                <a  href="#"class="btn btn-warning" onclick="product_reject('{{pro.id}}')"><i class="fa fa-check"></i> Reject</a>
+                   
                                                 
                                              </td>
                                           </tr>
@@ -177,13 +177,13 @@
 
 
 
-            {% for x in data %}
+            {% for pro in data %}
  <!-- Modal -->
- <div class="modal fade" id="set_vendorcommission{{x.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+ <div class="modal fade" id="set_vendorcommission{{pro.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
    <div class="modal-dialog" role="document">
      <div class="modal-content">
        <div class="modal-header">
-         <h5 class="modal-title" id="exampleModalLabel">Product - {{x.name|safe}}</h5>
+         <h5 class="modal-title" id="exampleModalLabel">{{pro.productvariantname|safe}}</h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
            <span aria-hidden="true">&times;</span>
          </button>
@@ -193,19 +193,22 @@
        <div class="modal-body">
          <div class="col-lg-12 col-md-12 col-sm-12">
             <div class="form-group">
-               <div><span class="btn btn-primary" style="font-size:20px;">Current Commission : <span style="font-weight:bold;">{{ x.vendor_commission }} %</span></span></div>
-               <br>
-               <label>New Vendor Commission </label>
-               <input type="hidden" name="id" value="{{x.id}}">
-               <input type="number" name="vendor_commission"  maxlength="5" step="0.01"  placeholder="Enter % Commission ...."  onkeydown="javascript: return event.keyCode == 69 ? false : true"
+               <label>Admin Commission</label>
+               <input type="hidden" name="id" value="{{pro.product.id}}">
+               <div class="col-lg-8">
+               <input type="number" class="form-control" name="admincommission"  maxlength="5" step="0.01" 
+                  placeholder="Enter % Commission ...." 
+                  min="0"
+                  onkeydown="return event.keyCode == 69 ? false : true"
+                  oninput="this.value = this.value < 0 ? 0 : this.value"
                required>
-              
+               </div>
             </div>
          </div>
        </div>
        <div class="modal-footer">
          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-         <button type="submit" class="btn btn-primary">Save changes</button>
+         <button type="submit" class="btn btn-success">Save changes</button>
        </div>
       </form>
      </div>
