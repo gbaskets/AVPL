@@ -55,9 +55,10 @@ def get_cart_items(request,user_type):
 	for item in cartobj:
 		price = item.productvariants.saleprice()
 		admincommission=item.productvariants.admincommissionprice()
-		tax = round((((item.productvariants.product.tax * price) / 100) * item.quantity),2)
+		perproducttax= round( (price) * ((item.productvariants.product.tax/100) / (1 + (item.productvariants.product.tax/100))),2)
+		tax = round((perproducttax * item.quantity),2)
 		total = round((price * item.quantity),2)
-		
+  
 		item_dict = {
 			'id': item.id,
             'store': item.productvariants.store,
@@ -81,7 +82,7 @@ def get_cart_items(request,user_type):
 		
 		# Update totals
 		tax_amount += tax
-		subtotal_amount += total - tax_amount
+		subtotal_amount += round((total - tax_amount),2)
 		total_admincommission += admincommission
 		total_amount += total
 

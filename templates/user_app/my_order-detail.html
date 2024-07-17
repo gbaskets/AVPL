@@ -99,7 +99,11 @@
 
                                             <td>{{first_orderitem.price}}</td>
                                             <td>{{first_orderitem.quantity}}</td>
-                                            <td>{{first_orderitem.tax}}</td>
+                                            {% if first_orderitem.taxtype == "GST" %}
+                                            <td>CGST({{first_orderitem.taxgst}}) +  SGST({{first_orderitem.taxgst}})</td>
+                                            {% else %}
+                                            <td> IGST - {{first_orderitem.tax}}</td>
+                                            {% endif %}
                                             <td>{{first_orderitem.total}}</td>
 
 
@@ -193,7 +197,11 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Tax :</td>
-                                                    <td>Rs {{salesorder.tax}}/-</td>
+                                                    {% if salesorder.taxtype == "GST" %}
+                                                    <td>Rs CGST({{salesorder.taxgst}}) +  SGST({{salesorder.taxgst}}) /-</td>
+                                                    {% else %}
+                                                    <td>Rs IGST({{salesorder.tax}}) /-</td>
+                                                    {% endif %}
                                                 </tr>
                                                 <tr>
                                                     {% if salesorder.ispaymentpaid == True %}

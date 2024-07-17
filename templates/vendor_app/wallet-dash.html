@@ -50,8 +50,9 @@
                                                       <th>Date</th>
                                                       <th>Transaction ID</th>
                                                       <th>Type</th>
-                                                      <th>Transaction Amount</th>
-                                                      <th>Previous Amount</th>
+                                                      <th>Transaction Details</th>
+                                                      <th>Debit Amount</th>
+                                                      <th>Credit Amount</th>
                                                       <th>Remaining Amount</th>
                                                    </tr>
                                                 </thead>
@@ -65,8 +66,10 @@
                                                       {% else %}
                                                       <td><span class="badge badge-danger">{{ x.transactiontype }}</span></td>
                                                       {% endif %}
-                                                      <td><i class="fa fa-inr"></i> {{ x.transactionamount }}</td>
-                                                      <td><i class="fa fa-inr"></i> {{ x.previousamount }}</td>
+                                                      <td>{{ x.transactiondetails|safe }}</td>
+                                                      <td> {% if x.transactiontype == 'DEBIT' %} <i class="fa fa-inr"></i> {{ x.transactionamount }} {%else%} -- {% endif%}</td>
+                                                      <td>{% if x.transactiontype == 'CREDIT' %} <i class="fa fa-inr"></i> {{ x.transactionamount }} {%else%} --  {% endif%}</td>
+                                                     
                                                       <td><i class="fa fa-inr"></i> {{ x.remainingamount }}</td>
                                                    </tr>
                                                    {% endfor %}

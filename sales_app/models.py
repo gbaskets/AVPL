@@ -29,6 +29,7 @@ class SalesOrder(models.Model):
     subtotal = models.FloatField(default=0.00,null=True,blank=True)
     tax = models.FloatField(default=0.00,null=True,blank=True)
     total = models.FloatField(default=0.00,null=True,blank=True)
+    totaladmincommission = models.FloatField(default=0.00,null=True,blank=True)
     pv = models.FloatField(default=0.00)
     selfpickup = models.BooleanField(default=False)
     ispaymentpaid = models.BooleanField(default=False)
@@ -41,8 +42,31 @@ class SalesOrder(models.Model):
             # Generate your order number here
             self.orderno = generate_order_number(self.id)  # You need to implement this function
         super().save(*args, **kwargs)
-
-
+        
+    def taxtype(self):
+        if self.store.state == self.address.state :
+            taxtype='GST'
+        else:
+            taxtype='IGST'
+        return taxtype
+    
+    def vendortotal(self):
+        return round((self.total - self.totaladmincommission),2)
+    def vendorsubtotal(self):
+        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
+        return round((self.total - self.totaladmincommission),2) - perproducttax
+    def vendortax(self):    
+        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
+        return perproducttax
+    
+    def taxgst(self):    
+        perproducttax= self.tax /2
+        return perproducttax
+      
+    def vendortaxgst(self):    
+        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2) / 2
+        return perproducttax
+         
     def __str__(self):
         return 'Order ID  '+str(self.id) + '  ' +str(self.customer)
 
@@ -59,6 +83,7 @@ class SalesOrderItems(models.Model):
     quantity = models.PositiveIntegerField()
     price = models.FloatField(default=0.00,null=True,blank=True)
     tax = models.FloatField(default=0.00,null=True,blank=True)
+    admincommission = models.FloatField(default=0.00,null=True,blank=True)
     total =  models.FloatField(default=0.00,null=True,blank=True)
     orderstatus = models.CharField(max_length=255, default='Pending',null=True,blank=True)
     deliveryexpected = models.DateField(null=True, blank=True)
@@ -68,6 +93,33 @@ class SalesOrderItems(models.Model):
     updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
     cancellationreason = models.CharField(max_length=500, null=True, blank=True)
     cancelledon = models.DateTimeField(null=True, blank=True)
+    
+    def taxtype(self):
+        if self.store.state == self.salesorder.address.state :
+            taxtype='GST'
+        else:
+            taxtype='IGST'
+        return taxtype
+        
+    def vendorprice(self):
+        return round((self.price - self.admincommission),2)
+    
+    def vendortotal(self):
+        return round((self.total - self.admincommission),2)
+    def vendorsubtotal(self):
+        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
+        return round((self.total - self.admincommission),2) - perproducttax
+    def vendortax(self):    
+        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
+        return perproducttax
+    
+    def taxgst(self):    
+        perproducttax= self.tax /2
+        return perproducttax
+    
+    def vendortaxgst(self):    
+        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2) / 2
+        return perproducttax
     
     def __str__(self):
         return self.productvariants.productvariantname + 'order' + str(self.salesorder.id) + 'orderitem' + str(self.id)

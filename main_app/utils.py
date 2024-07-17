@@ -205,6 +205,7 @@ def save_order_items(cartobj, order, customer, ordertype):
 		order.store=x["store"]
 		order.save()
 		orderitemobj.salesorder =order
+		orderitemobj.admincommission = x["admincommission"]
 		orderitemobj.productvariants = x["productvariants"]
 		orderitemobj.quantity =x["quantity"]
 		orderitemobj.price = x["price"]
@@ -378,7 +379,7 @@ def create_cod_order(cartobj, address,usertype, user):
 		total_amount=cartobj['total_amount']
 		tax_amount=cartobj['tax_amount']
 		subtotal_amount=cartobj['subtotal_amount']
-		
+		totaladmincommission=cartobj['total_admincommission']
 		# if cart.self_pickup:
 		# 	total = cart.total - cart.delivery_charges
 
@@ -388,6 +389,7 @@ def create_cod_order(cartobj, address,usertype, user):
 			subtotal = subtotal_amount,
 			tax = tax_amount,
 			total = total_amount,
+            totaladmincommission =totaladmincommission,
             
 			# selfpickup = True
 		)
@@ -405,6 +407,7 @@ def save_order(cartobj, address,usertype, user, razorpaytransaction):
 		total_amount=cartobj['total_amount']
 		tax_amount=cartobj['tax_amount']
 		subtotal_amount=cartobj['subtotal_amount']
+		totaladmincommission=cartobj['total_admincommission']
 	print(razorpaytransaction)
 	paymenttransactionobj=PaymentTransaction.objects.filter(transactionid=razorpaytransaction).first()
 	if paymenttransactionobj.status == True:
@@ -419,7 +422,7 @@ def save_order(cartobj, address,usertype, user, razorpaytransaction):
 		total = total_amount,
         ispaymentpaid=ispaymentpaid,
 		paymenttransaction=paymenttransactionobj,
-		
+		totaladmincommission =totaladmincommission,
 		# selfpickup = True
 	)
 	if order:

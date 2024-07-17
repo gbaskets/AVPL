@@ -130,6 +130,8 @@ class WalletTransaction(models.Model):
 	transactiondate = models.DateTimeField()
 	transactiontype = models.CharField(max_length=20)
 	transactionamount = models.FloatField()
+	transactionrealted= models.CharField(max_length=255,null=True,blank=True)
+	transactiondetails = models.TextField(null=True,blank=True)
 	previousamount = models.FloatField()
 	remainingamount = models.FloatField()
 	isverified = models.BooleanField(default=False)

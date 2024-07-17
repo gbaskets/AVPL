@@ -199,7 +199,7 @@ class Product(models.Model):
     hsn= models.IntegerField(blank=True, null=True)
     tax= models.FloatField(default=0.00,null=True)
     pv = models.FloatField(default=0.00,null=True)
-    admincommission = models.FloatField(default=0.00)
+    admincommission = models.FloatField(default=0.00,null=True)
     frequentlyboughttogetherproduct=models.ManyToManyField('Product',blank=True,related_name="FrequentlyBoughtTogether")
     isproductrejected=models.BooleanField(default=False,null=True,blank=True)
     reasonforproductrejected=models.TextField(null=True,blank=True)
@@ -252,6 +252,7 @@ class ProductVariants(models.Model):
         return admincommission
         
     def saleprice(self):
+        
         if self.price:
             saleprices=self.price + round(((self.price * self.product.admincommission)/100),2)
         else:

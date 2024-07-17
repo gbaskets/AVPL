@@ -82,25 +82,29 @@
                                                       <th>Transaction ID</th>
                                                       <th>User/Vendor</th>
                                                       <th>Type</th>
-                                                      <th>Transaction Amount</th>
-                                                      <th>Previous Amount</th>
+                                                      <th>Transaction Details</th>
+                                                      <th>Debit Amount</th>
+                                                      <th>Credit Amount</th>
                                                       <th>Remaining Amount</th>
                                                    </tr>
                                                 </thead>
                                                 <tbody>
                                                    {% for x in commissiontransactions %}
+                                                   
                                                    <tr>
                                                       <td>{{ x.transactiondate|safe }}</td>
                                                       <td>TRN{{ x.id|safe }}-ADMIN</td>
                                                       <td>{{x.user.username}}</td>
-                                                      {% if x.transaction_type == 'CREDIT' %}
+                                                      {% if x.transactiontype == 'CREDIT' %}
                                                       <td><span class="badge badge-success">{{ x.transactiontype }}</span></td>
                                                       {% else %}
                                                       <td><span class="badge badge-danger">{{ x.transactiontype }}</span></td>
                                                       {% endif %}
-                                                      <td><i class="fa fa-inr"></i> {{ x.transactionamount|floatformat:2 }}</td>
-                                                      <td><i class="fa fa-inr"></i> {{ x.previousamount|floatformat:2 }}</td>
-                                                      <td><i class="fa fa-inr"></i> {{ x.remainingamount|floatformat:2 }}</td>
+                                                      <td>{{ x.transactiondetails|safe }}</td>
+                                                      <td> {% if x.transactiontype == 'DEBIT' %} <i class="fa fa-inr"></i> {{ x.transactionamount }} {%else%} -- {% endif%}</td>
+                                                      <td>{% if x.transactiontype == 'CREDIT' %} <i class="fa fa-inr"></i> {{ x.transactionamount }} {%else%} --  {% endif%}</td>
+                                                     
+                                                      <td><i class="fa fa-inr"></i> {{ x.remainingamount }}</td>
                                                    </tr>
                                                    {% endfor %}
                                                 </tbody>

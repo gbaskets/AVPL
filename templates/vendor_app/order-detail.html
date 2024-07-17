@@ -38,7 +38,7 @@
                                             <th>Order Status</th>
                                             <th>Price</th>
                                             <th>Quantity</th>
-                                            <th>Tax</th>
+                                            <th>Tax </th>
                                             <th>Amount</th>
 
 
@@ -97,11 +97,15 @@
 
                                             </td>
 
-                                            <td>{{first_orderitem.price}}</td>
+                                            <td>{{first_orderitem.vendorprice}}</td>
                                             <td>{{first_orderitem.quantity}}</td>
-                                            <td>{{first_orderitem.tax}}</td>
-                                            <td>{{first_orderitem.total}}</td>
-
+                                            {% if first_orderitem.taxtype == "GST" %}
+                                            <td>CGST({{first_orderitem.vendortaxgst}}) +  SGST({{first_orderitem.vendortaxgst}})</td>
+                                            {% else %}
+                                            <td> IGST - {{first_orderitem.vendortax}}</td>
+                                            {% endif %}
+                                            <td>{{first_orderitem.vendortotal}}</td>
+                                           
 
                                         </tr>
 
@@ -189,23 +193,28 @@
 
                                                 <tr>
                                                     <td>Subtotal :</td>
-                                                    <td>Rs {{salesorder.subtotal}}/-</td>
+                                                    <td>Rs {{salesorder.vendorsubtotal}}/-</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Tax :</td>
-                                                    <td>Rs {{salesorder.tax}}/-</td>
+                                                    {% if salesorder.taxtype == "GST" %}
+                                                    <td>Rs CGST({{salesorder.vendortaxgst}}) +  SGST({{salesorder.vendortaxgst}}) /-</td>
+                                                    {% else %}
+                                                    <td>Rs IGST({{salesorder.vendortax}}) /-</td>
+                                                    {% endif %}
+                                                  
                                                 </tr>
                                                 <tr>
                                                     {% if salesorder.ispaymentpaid == True %}
                                                     <td>
                                                         <h6>TOTAL AMOUNT PAID :</h6>
                                                     </td>
-                                                    <td>Rs {{salesorder.total}}/- <h5 class="badge badge-success">PAID Order</h5></td>
+                                                    <td>Rs {{salesorder.vendortotal}}/- <h5 class="badge badge-success">PAID Order</h5></td>
                                                     {% else %}
                                                     <td>
                                                         <h6>TOTAL AMOUNT TO PAY :</h6>
                                                     </td>
-                                                    <td>Rs {{salesorder.total}}/-   <h5 class="badge badge-warning">COD Order</h5>  </td>
+                                                    <td>Rs {{salesorder.vendortotal}}/-   <h5 class="badge badge-warning">COD Order</h5>  </td>
                                                     {% endif %}
                                                 </tr>
 

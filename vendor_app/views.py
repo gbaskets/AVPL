@@ -118,7 +118,8 @@ def order_status_update(request):
 		
 		if SalesOrderItems .objects.filter(salesorder=order).exists():
 			if delivery_status == 'Delivered':
-                
+				admin=User.objects.filter(username="admin").first()
+				make_commission_transaction('ADMIN',admin, order.totaladmincommission, 'CREDIT')
 				SalesOrderItems .objects.filter(salesorder=order).update(orderstatus=delivery_status, deliveredon=timezone.now())
 			else:
 				SalesOrderItems .objects.filter(salesorder=order).update(orderstatus=delivery_status)
