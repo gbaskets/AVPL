@@ -70,7 +70,7 @@
                                              {% for x in data %}
                                              <tr>
                                                 <td>{{ x.requestdate|safe }}</td>
-                                                <td>WTDR{{ x.id|safe }}</td>
+                                                <td>{{ x.transactionid|default_if_none:"--" }}</td>
                                                 <td><i class="fa fa-inr"></i> {{ x.amount|safe }}</td>
                                                 <td><i class="fa fa-inr"></i> {{ x.creditedamount|safe  }}</td>
                                                 <td><i class="fa fa-inr"></i> {{ x.tds|safe }}</td>

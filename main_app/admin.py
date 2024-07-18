@@ -13,6 +13,9 @@ from django.contrib.auth.admin import UserAdmin
 
 admin.site.register(UserOTP)
 
+admin.site.register(WithdrawMoneyWallet)
+admin.site.register(WithdrawMoneyWalletTransaction)
+
 admin.site.register(WithdrawRequest)
 admin.site.register(TaxLog)
 

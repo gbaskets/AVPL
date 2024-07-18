@@ -26,6 +26,34 @@ import timeago
 import random
 import string
 
+
+def reference_no_transaction(usertype, user):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		traid=customer.id
+		
+	elif usertype == "VENDOR":
+		vendor=Vendor.objects.filter(user=user).first()
+		traid=vendor.id
+		
+	elif usertype == "ADMIN":
+		admin=user
+		traid=user.id
+	
+	if len(WalletTransaction.objects.all()) != 0 :
+		tds=WalletTransaction.objects.filter().last()
+		transid=tds.id
+	else:
+		transid=1
+	start=0000+transid
+	ref_no = str(str(timezone.now()))
+	ref_no = ref_no.upper()
+	ref_no = ref_no[0:4]
+	transactionid=f"TRN{traid}{ref_no}{start}"
+	return transactionid
+
+
+
 def generate_order_number(id):
     prefix = f'ORD{id}'  # Prefix for the order number
     length = 8  # Length of the random part of the order number
@@ -435,9 +463,10 @@ def save_order(cartobj, address,usertype, user, razorpaytransaction):
 
    
 # In case make  Payment by wllet
-def make_wallet_transaction(usertype, user, amount, transtype):
+def make_wallet_transaction(usertype, user, amount, transtype,transactionid,transactionrealted,transactiondetails):
 	if usertype == "CUSTOMER":
 		customer=Customer.objects.filter(user=user).first()
+		traid=customer.id
 		if not Wallet.objects.filter(customer=customer).exists():
 			wallet=Wallet.objects.create(customer=customer,isactive=True)
 		else:
@@ -445,23 +474,28 @@ def make_wallet_transaction(usertype, user, amount, transtype):
       
 	elif usertype == "VENDOR":
 		vendor=Vendor.objects.filter(user=user).first()
+		traid=vendor.id
 		if not Wallet.objects.filter(vendor=vendor).exists():
 			wallet=Wallet.objects.create(vendor=vendor,isactive=True)
 		else:
 			wallet = Wallet.objects.filter(vendor=vendor,isactive=True).first()
 	elif usertype == "ADMIN":
 		admin=user
+		traid=user.id
 		if not Wallet.objects.filter(admin=admin).exists():
 			wallet=Wallet.objects.create(admin=admin,isactive=True)
 		else:
 			wallet = Wallet.objects.filter(admin=admin,isactive=True).first()
-   
+
 	if transtype == 'CREDIT':
+		
 		print('1')
 		wallettransactions = WalletTransaction.objects.create(
 			wallet = wallet,
 			transactiondate = timezone.now(),
-			transactiontype = transtype,
+			transactiontype = transtype, transactionrealted= transactionrealted,
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
 			transactionamount = amount,
 			previousamount = round(wallet.currentbalance, 2),
 			remainingamount = round(wallet.currentbalance,2) + round(amount,2)
@@ -471,10 +505,13 @@ def make_wallet_transaction(usertype, user, amount, transtype):
 
 	elif transtype == 'DEBIT':
 		print(2)
+		
 		wallettransactions = WalletTransaction.objects.create(
 			wallet = wallet,
 			transactiondate = timezone.now(),
-			transactiontype = transtype,
+			transactiontype = transtype, transactionrealted= transactionrealted,
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
 			transactionamount = amount,
 			previousamount = round(wallet.currentbalance, 2),
 			remainingamount = round(wallet.currentbalance, 2) - round(amount,2)
@@ -483,10 +520,71 @@ def make_wallet_transaction(usertype, user, amount, transtype):
 		wallet.save()
 
 
-
-def Make_TDSLogWallet_Transaction(usertype, user, amount, transtype,creditedamount,tdsamount):
+# Credited Money WithdrawMoneyWallet
+def Make_WithdrawMoneyWallet_Transaction(usertype, user, amount, transtype,transactionid,transactionrealted,transactiondetails):
 	if usertype == "CUSTOMER":
 		customer=Customer.objects.filter(user=user).first()
+		traid=customer.id
+		if not WithdrawMoneyWallet.objects.filter(customer=customer).exists():
+			withdrawmoneywallet=WithdrawMoneyWallet.objects.create(customer=customer,isactive=True)
+		else:
+			withdrawmoneywallet = WithdrawMoneyWallet.objects.filter(customer=customer,isactive=True).first()
+      
+	elif usertype == "VENDOR":
+		vendor=Vendor.objects.filter(user=user).first()
+		traid=vendor.id
+		if not WithdrawMoneyWallet.objects.filter(vendor=vendor).exists():
+			withdrawmoneywallet=WithdrawMoneyWallet.objects.create(vendor=vendor,isactive=True)
+		else:
+			withdrawmoneywallet = WithdrawMoneyWallet.objects.filter(vendor=vendor,isactive=True).first()
+	elif usertype == "ADMIN":
+		admin=user
+		traid=user.id
+		if not WithdrawMoneyWallet.objects.filter(admin=admin).exists():
+			withdrawmoneywallet=WithdrawMoneyWallet.objects.create(admin=admin,isactive=True)
+		else:
+			withdrawmoneywallet = WithdrawMoneyWallet.objects.filter(admin=admin,isactive=True).first()
+
+	if transtype == 'CREDIT':
+		
+		print('1')
+		wallettransactions = WithdrawMoneyWalletTransaction.objects.create(
+			withdrawmoneywallet = withdrawmoneywallet,
+			transactiondate = timezone.now(),
+			transactiontype = transtype, transactionrealted= transactionrealted,
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
+			transactionamount = amount,
+			previousamount = round(withdrawmoneywallet.currentbalance, 2),
+			remainingamount = round(withdrawmoneywallet.currentbalance,2) + round(amount,2)
+		)
+		withdrawmoneywallet.currentbalance = round(withdrawmoneywallet.currentbalance, 2) + round(amount, 2)
+		withdrawmoneywallet.save()
+
+	elif transtype == 'DEBIT':
+		print(2)
+		
+		wallettransactions = WithdrawMoneyWalletTransaction.objects.create(
+			withdrawmoneywallet = withdrawmoneywallet,
+			transactiondate = timezone.now(),
+			transactiontype = transtype, transactionrealted= transactionrealted,
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
+			transactionamount = amount,
+			previousamount = round(withdrawmoneywallet.currentbalance, 2),
+			remainingamount = round(withdrawmoneywallet.currentbalance, 2) - round(amount,2)
+		)
+		withdrawmoneywallet.currentbalance = round(withdrawmoneywallet.currentbalance, 2) - round(amount, 2)
+		withdrawmoneywallet.save()
+
+
+
+
+def Make_TDSLogWallet_Transaction(usertype, user, amount, transtype,creditedamount,tdsamount,transactionid,transactionrealted,transactiondetails):
+  
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		
 		if not TDSLogWallet.objects.filter(customer=customer).exists():
 			tdslogwallet=TDSLogWallet.objects.create(customer=customer,isactive=True)
 		else:
@@ -494,17 +592,20 @@ def Make_TDSLogWallet_Transaction(usertype, user, amount, transtype,creditedamou
       
 	elif usertype == "VENDOR":
 		vendor=Vendor.objects.filter(user=user).first()
+
 		if not TDSLogWallet.objects.filter(vendor=vendor).exists():
 			tdslogwallet=TDSLogWallet.objects.create(vendor=vendor,isactive=True)
 		else:
 			tdslogwallet = TDSLogWallet.objects.filter(vendor=vendor,isactive=True).first()
 	elif usertype == "ADMIN":
 		admin=user
+	
 		if not TDSLogWallet.objects.filter(admin=admin).exists():
 			tdslogwallet=TDSLogWallet.objects.create(admin=admin,isactive=True)
 		else:
 			tdslogwallet = TDSLogWallet.objects.filter(admin=admin,isactive=True).first()
-   
+	
+	
 	if transtype == 'CREDIT':
 		print('1')
 		wallettransactions = TDSLogWalletTransaction.objects.create(
@@ -512,11 +613,14 @@ def Make_TDSLogWallet_Transaction(usertype, user, amount, transtype,creditedamou
 			tdslogwallet = tdslogwallet,
 			transactiondate = timezone.now(),
 			transactiontype = transtype,
+		    transactionrealted= transactionrealted,
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
 			amount = amount,creditedamount = creditedamount,tdsamount = tdsamount,
 			previousamount = round(tdslogwallet.currentbalance, 2),
-			remainingamount = round(tdslogwallet.currentbalance,2) + round(amount,2)
+			remainingamount = round(tdslogwallet.currentbalance,2) + round(tdsamount,2)
 		)
-		tdslogwallet.currentbalance = round(tdslogwallet.currentbalance, 2) + round(amount, 2)
+		tdslogwallet.currentbalance = round(tdslogwallet.currentbalance, 2) + round(tdsamount, 2)
 		tdslogwallet.save()
 
 	elif transtype == 'DEBIT':
@@ -525,11 +629,14 @@ def Make_TDSLogWallet_Transaction(usertype, user, amount, transtype,creditedamou
 			tdslogwallet = tdslogwallet,
 			transactiondate = timezone.now(),
 			transactiontype = transtype,
+            transactionrealted= 'WITHDRAW',
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
 			amount = amount,creditedamount = creditedamount,tdsamount = tdsamount,
 			previousamount = round(tdslogwallet.currentbalance, 2),
-			remainingamount = round(tdslogwallet.currentbalance, 2) - round(amount,2)
+			remainingamount = round(tdslogwallet.currentbalance, 2) - round(tdsamount,2)
 		)
-		tdslogwallet.currentbalance = round(tdslogwallet.currentbalance, 2) - round(amount, 2)
+		tdslogwallet.currentbalance = round(tdslogwallet.currentbalance, 2) - round(tdsamount, 2)
 		tdslogwallet.save()
 
 
@@ -737,7 +844,7 @@ def filter_product_by_store(store, products):
 # for Admin comission transaction in case COD
 from vendor_app.models import *
 
-def make_business_limit_transaction(usertype,user, amount, trans_type):
+def make_business_limit_transaction(usertype,user, amount, trans_type,transactionid,transactionrealted,transactiondetails):
 	if usertype == 'VENDOR' :
 		vendor=Vendor.objects.filter(user=user).first()
 	if not BusinessLimitWallet.objects.filter(vendor=vendor).exists():
@@ -747,13 +854,15 @@ def make_business_limit_transaction(usertype,user, amount, trans_type):
 		BusinessLimitWalletTransaction.objects.create(
 		businesslimitwallet = business_limit,
 		transactiondate = timezone.now(),
-		transactiontype = trans_type,
+		transactiontype = trans_type,transactionrealted= transactionrealted,
+		transactiondetails = transactiondetails,
+		transactionid = transactionid,
 		transactionamount = amount,
-		previousamount = business_limit.currentbalance,
-		remainingamount = business_limit.currentbalance + amount
-
+		previousamount = round((business_limit.currentbalance),2),
+		remainingamount = round((business_limit.currentbalance + amount),2)
 		)
-		BusinessLimitWallet.objects.filter(vendor=vendor).update(currentbalance = business_limit.currentbalance + amount)
+	
+		BusinessLimitWallet.objects.filter(vendor=vendor).update(currentbalance = round((business_limit.currentbalance + amount),2))
 	if trans_type == 'DEBIT':
 		print(amount)
 		remaining_amount = business_limit.currentbalance - amount
@@ -761,11 +870,14 @@ def make_business_limit_transaction(usertype,user, amount, trans_type):
 			businesslimitwallet = business_limit,
 			transactiondate = timezone.now(),
 			transactiontype = trans_type,
+            transactionrealted= transactionrealted,
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
 			transactionamount = amount,
-			previousamount = business_limit.currentbalance,
-			remainingamount = remaining_amount
+			previousamount = round((business_limit.currentbalance),2),
+			remainingamount = round((remaining_amount),2)
 		)
-		BusinessLimitWallet.objects.filter(vendor=vendor).update(currentbalance = remaining_amount)
+		BusinessLimitWallet.objects.filter(vendor=vendor).update(currentbalance =round(( remaining_amount),2))
 
 # save pv transaction for Subscription
 def save_pv_transaction2(user, subtotal, plan):

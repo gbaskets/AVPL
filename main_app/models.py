@@ -112,6 +112,7 @@ class PaymentTransaction(models.Model):
 		return 'PaymentTransaction'+str(self.transactionid)
 	
 
+
 class Wallet(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
@@ -132,6 +133,7 @@ class WalletTransaction(models.Model):
 	transactionamount = models.FloatField()
 	transactionrealted= models.CharField(max_length=255,null=True,blank=True)
 	transactiondetails = models.TextField(null=True,blank=True)
+	transactionid = models.CharField(max_length=255,null=True,blank=True)
 	previousamount = models.FloatField()
 	remainingamount = models.FloatField()
 	isverified = models.BooleanField(default=False)
@@ -159,6 +161,9 @@ class BusinessLimitWalletTransaction(models.Model):
 	businesslimitwallet = models.ForeignKey(BusinessLimitWallet, on_delete=models.CASCADE)
 	transactiondate = models.DateTimeField()
 	transactiontype = models.CharField(max_length=20)
+	transactionrealted= models.CharField(max_length=255,null=True,blank=True)
+	transactiondetails = models.TextField(null=True,blank=True)
+	transactionid = models.CharField(max_length=255,null=True,blank=True)
 	transactionamount = models.FloatField()
 	previousamount = models.FloatField()
 	remainingamount = models.FloatField()
@@ -177,12 +182,46 @@ class WithdrawRequest(models.Model):
 	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
 	requestdate = models.DateTimeField()
 	amount = models.FloatField()
+	transactionid = models.CharField(max_length=255,null=True,blank=True)
 	creditedamount = models.FloatField(default=0.0)
 	tds = models.FloatField(default=0.0)
 	isactive = models.PositiveIntegerField(default=0)
 	
 	def __str__(self):
 		return 'Withdraw Request of '+str(self.vendor)
+
+
+class WithdrawMoneyWallet(models.Model):
+	customer = models.ForeignKey(Customer, on_delete=models.CASCADE,blank=True,null=True)
+	vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE,blank=True,null=True)
+	admin = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True,related_name="withdrawadmin")
+	currentbalance = models.FloatField(default=0.00)
+	isactive = models.BooleanField(default=True)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+	def __str__(self):
+		return 'WithdrawMoneyWallet of '+ ' ' + str(self.customer) + ' ' +  str(self.vendor)
+ 
+
+class WithdrawMoneyWalletTransaction(models.Model):
+	withdrawmoneywallet = models.ForeignKey(WithdrawMoneyWallet, on_delete=models.CASCADE)
+	transactiondate = models.DateTimeField()
+	transactiontype = models.CharField(max_length=20)
+	transactionamount = models.FloatField()
+	transactionrealted= models.CharField(max_length=255,null=True,blank=True)
+	transactiondetails = models.TextField(null=True,blank=True)
+	transactionid = models.CharField(max_length=255,null=True,blank=True)
+	previousamount = models.FloatField()
+	remainingamount = models.FloatField()
+	isverified = models.BooleanField(default=False)
+	createdat = models.DateTimeField(auto_now_add=True)
+	updatedon = models.DateTimeField(auto_now=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+	def __str__(self):
+		return 'WithdrawMoneyWallet Transaction ID '+str(self.id)
 
 
 # Wallet	
@@ -205,6 +244,9 @@ class CommissionWalletTransaction(models.Model):
 	commissionwallet = models.ForeignKey(CommissionWallet, on_delete=models.CASCADE)
 	transactiondate = models.DateTimeField()
 	transactiontype = models.CharField(max_length=20)
+	transactionrealted= models.CharField(max_length=255,null=True,blank=True)
+	transactiondetails = models.TextField(null=True,blank=True)
+	transactionid = models.CharField(max_length=255,null=True,blank=True)
 	transactionamount = models.FloatField()
 	previousamount = models.FloatField()
 	remainingamount = models.FloatField()
@@ -244,6 +286,9 @@ class TDSLogWalletTransaction(models.Model):
 	tdslogwallet = models.ForeignKey(TDSLogWallet, on_delete=models.CASCADE,null=True,blank=True)
 	transactiondate = models.DateTimeField(null=True)
 	transactiontype = models.CharField(max_length=255,null=True)
+	transactionrealted= models.CharField(max_length=255,null=True,blank=True)
+	transactiondetails = models.TextField(null=True,blank=True)
+	transactionid = models.CharField(max_length=255,null=True,blank=True)
 	amount = models.FloatField(default=0.00)
 	creditedamount= models.FloatField(default=0.00)
 	tdsamount = models.FloatField(default=0.00)
@@ -275,6 +320,8 @@ class WalletBalanceTransfer(models.Model):
 	sender = models.CharField(max_length=255)
 	receiver = models.CharField(max_length=255)
 	transectionid = models.CharField(max_length=256,unique=True)
+	transactionrealted= models.CharField(max_length=255,null=True,blank=True)
+	transactiondetails = models.TextField(null=True,blank=True)
 	amount = models.IntegerField(default=0.00)
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)

@@ -2636,6 +2636,7 @@ def admin_pvpairvalue(request):
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def admin_withdraw(request):
+ 
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {'users':WithdrawRequest.objects.filter().exclude(customer = None), 'vendors':WithdrawRequest.objects.filter().exclude(vendor = None), 'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
@@ -2656,9 +2657,13 @@ def admin_change_withdraw_status(request):
 			if status == '1':
 				statuschanges= 'Withdraw request has been approved !.'
 			if status == '2':
-
-				Make_TDSLogWallet_Transaction('CUSTOMER', withdraw.customer.user, withdraw.amount, 'CREDIT',withdraw.creditedamount,withdraw.tds)
-				make_wallet_transaction('CUSTOMER', withdraw.customer.user, withdraw.amount, 'DEBIT')
+				transactionid=reference_no_transaction('CUSTOMER',withdraw.customer.user)
+				withdraw.transactionid=transactionid
+				withdraw.save()
+				transactiondetails=f'Withdraw Amount Rs.{withdraw.amount} /- from {withdraw.customer.user.username}'
+				Make_TDSLogWallet_Transaction('CUSTOMER', withdraw.customer.user, withdraw.amount, 'CREDIT',withdraw.creditedamount,withdraw.tds,transactionid,'WITHRAW',transactiondetails)
+				make_wallet_transaction('CUSTOMER', withdraw.customer.user, withdraw.amount, 'DEBIT',transactionid,'WITHRAW',transactiondetails)
+				Make_WithdrawMoneyWallet_Transaction('CUSTOMER', withdraw.customer.user, withdraw.creditedamount, 'CREDIT',transactionid,'WITHRAW',transactiondetails)
 				statuschanges= 'Withdraw Amount has been Credited !.'
 				# notification(withdraw.user, 'Rs'+str(withdraw.amount)+' debited from your wallet.')
 				# notification(withdraw.user, 'Withdraw Request Status Changed.')
@@ -2673,7 +2678,12 @@ def admin_change_withdraw_status(request):
 			if status == '1':
 				statuschanges= 'Withdraw request has been approved !.'
 			if status == '2':
-				make_wallet_transaction('VENDOR', withdraw.vendor.user, withdraw.amount, 'DEBIT')
+				transactionid=reference_no_transaction('VENDOR',withdraw.vendor.user)
+				withdraw.transactionid=transactionid
+				withdraw.save()
+				transactiondetails=f'Withdraw Amount Rs.{withdraw.amount} /- from {withdraw.vendor.user.username}'
+				make_wallet_transaction('VENDOR', withdraw.vendor.user, withdraw.amount, 'DEBIT',transactionid,'WITHRAW',transactiondetails)
+				Make_WithdrawMoneyWallet_Transaction('VENDOR', withdraw.vendor.user, withdraw.amount, 'CREDIT',transactionid,'WITHRAW',transactiondetails)
 				statuschanges='Withdraw Amout has been Credited !.'
 				# notification(withdraw.user, 'Rs'+str(withdraw.amount)+' debited from your wallet.')
 				# notification(withdraw.user, 'Withdraw Request Status Changed.')

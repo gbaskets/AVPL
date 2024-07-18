@@ -1863,8 +1863,11 @@ def vendorselfbalanacetransfer(request):
 			if balance_from == "businesslimit" :
 				business_limit_wallet =BusinessLimitWallet.objects.filter(vendor__user=request.user).first()
 				if business_limit_wallet.currentbalance >= amt :
-					make_business_limit_transaction("VENDOR",request.user, amt,'DEBIT')
-					make_wallet_transaction("VENDOR",request.user, amt,'CREDIT')
+					transactionid=reference_no_transaction("VENDOR",request.user)
+					transactiondetails=f'Withdraw Amount Rs.{amt} /- from BusinessLimitWallet - {request.user.username}'
+					make_business_limit_transaction("VENDOR",request.user, amt,'DEBIT',transactionid,'BALANCETRANSFER',transactiondetails)
+					make_wallet_transaction("VENDOR",request.user, amt, 'CREDIT',transactionid,'BALANCETRANSFER',transactiondetails)
+					
 					messages.success(request, 'Payment transfer has been successfully !')
 					return redirect("/vendor/balanacetransfer")
 				else:
@@ -1942,3 +1945,20 @@ def transfer_amount_vendor(request):
 
 
 
+
+
+@csrf_exempt
+def creditedmoney_user_wallet(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		if not WithdrawMoneyWallet.objects.filter(vendor=vendorobj).exists():
+			WithdrawMoneyWallet.objects.create(vendor=vendorobj)
+		withdrawmoneywallet=WithdrawMoneyWallet.objects.filter(vendor=vendorobj).first()
+		dic = {"vendorobj":vendorobj,'withdrawmoneywallet':withdrawmoneywallet,
+             "withdrawmoneywallettransaction":WithdrawMoneyWalletTransaction.objects.filter(withdrawmoneywallet__vendor=vendorobj)
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/creditedmoney_wallet-dash.html', dic)
+	else:
+		return render(request, '403.html')

@@ -1573,9 +1573,12 @@ def edit_customer_profile(request):
 @csrf_exempt
 def creditedmoney_user_wallet(request):
 	if check_user_authentication(request, 'CUSTOMER'):
-		# if not CreditedMoney.objects.filter(user=request.user).exists():
-		# 	CreditedMoney.objects.create(user=request.user)
-		dic = {"customer_obj":Customer.objects.filter(user=request.user).first(),
+		customerobj=Customer.objects.filter(user=request.user).first()
+		if not WithdrawMoneyWallet.objects.filter(customer=customerobj).exists():
+			WithdrawMoneyWallet.objects.create(customer=customerobj)
+		withdrawmoneywallet=WithdrawMoneyWallet.objects.filter(customer=customerobj).first()
+		dic = {"customer_obj":customerobj,'withdrawmoneywallet':withdrawmoneywallet,
+             "withdrawmoneywallettransaction":WithdrawMoneyWalletTransaction.objects.filter(withdrawmoneywallet__customer=customerobj)
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
