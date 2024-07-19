@@ -20,6 +20,7 @@ from django.http import HttpResponse
 from requests import request
 from inventory_app.models import *
 from sales_app.models import SalesOrderItems
+from purchase_app.models import *
 from vendor_app.models import *
 from main_app.models import *
 from admin_app.models import *
@@ -1315,6 +1316,27 @@ def vendor_orders(request):
 
 
 @csrf_exempt
+def vendor_purchases(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		business_limit = BusinessLimitWallet.objects.get(vendor__user=request.user)
+		dic = {
+			'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
+			'business_limit':business_limit,
+			'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
+			'business_limit':business_limit,
+			'allorder_status':ORDER_STATUS_UPDATE,
+			# 'notification':get_notifications(request.user),
+		}
+		return render(request, 'vendor_app/purchases_orders.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+@csrf_exempt
 def vendor_order_detail(request):	
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user)
@@ -1907,8 +1929,14 @@ def transfer_amount_vendor(request):
 			print('hjhjjjjjjjjjjjj')
 			if Wallet.objects.get(vendor__user=request.user).currentbalance >= request.session['amount']:
 				print('LLLLLLLLLLLLLLLLLLL')
-               
-				make_wallet_transaction("VENDOR",request.user, request.session['amount'],'DEBIT')
+
+				transactionid=reference_no_transaction('ADMIN',request.user)
+				transactionrealted= "BALANCE-TRANSAFER",
+				transactiondetails = f'Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}'
+
+				make_wallet_transaction("VENDOR",request.user, request.session['amount'],'DEBIT',transactionid,transactionrealted,transactiondetails)
+	
+    
 				reciveruser=User.objects.get(username = request.session['recivername'])
 				if reciveruser.groups.filter(name="ADMIN"):
 					group_name="ADMIN"   
@@ -1917,10 +1945,10 @@ def transfer_amount_vendor(request):
 				elif reciveruser.groups.filter(name="CUSTOMER"):
 						group_name="CUSTOMER"  
 				make_wallet_transaction(group_name,User.objects.get(username = request.session['recivername']), 
-					request.session['amount'],'CREDIT')
+					request.session['amount'],'CREDIT',transactionid,transactionrealted,transactiondetails)
 				print(request.session['recivername'])
 				transfer_into_another_account(request.user, request.user.username,
-					request.session['recivername'], request.session['amount'])
+					request.session['recivername'], request.session['amount'],transactionid,transactionrealted,transactiondetails)
 				print('done')
 				messages.success(request,'Successfully Transfered')
 				return redirect('balanacetransfer')

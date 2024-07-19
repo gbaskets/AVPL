@@ -81,7 +81,7 @@
                                                    {% for x in wallettransactions %}
                                                    <tr>
                                                       <td>{{ x.transactiondate|safe }}</td>
-                                                      <td>TRN{{ x.id|safe }}</td>
+                                                      <td>{{ x.transactionid|default_if_none:"--" }}</td>
                                                       {% if x.transactiontype == 'CREDIT' %}
                                                       <td><span class="badge badge-success">{{ x.transactiontype }}</span></td>
                                                       {% else %}

@@ -64,7 +64,7 @@ class Vendor(models.Model):
 
 	
 	def __str__(self):
-		return str(self.user) +' :'+ str(self.firstname)
+		return  str(self.mobile)
 
 
 

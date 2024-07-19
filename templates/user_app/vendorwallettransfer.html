@@ -223,18 +223,18 @@
                                 {% endif %}
                                  
                            
-                                 <form action="/user/vendor-wallet-transfer/" method="POST" enctype="multipart/form-data">{% csrf_token %}
+                                 <form action="/user/balanacetransfer/" method="POST" enctype="multipart/form-data">{% csrf_token %}
                                     <div class="row">
                                        
                                     
                                     
                                        <div class="col-lg-4 col-md-12 col-sm-12" >
                                           <div class="form-group">
-                                             <label>Select Vendor</label>
+                                             <label>Select User</label>
                                              <select class="form-control" name="rvname" id="abc" required>
-                                                <option value="">----select vendor----</option>
-                                                {% for i in vendordata %}
-                                                <option value="{{i.user.username}}">{{i.user.username}} </option>
+                                                <option value="">----select User----</option>
+                                                {% for i in userdata %}
+                                                <option value="{{i.username}}">{{i.username}} </option>
                                                     
                                                 {% endfor %}
                                                 

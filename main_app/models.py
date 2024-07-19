@@ -124,7 +124,12 @@ class Wallet(models.Model):
 	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
 
 	def __str__(self):
-		return 'Wallet of '+ ' ' + str(self.customer) + ' ' +  str(self.vendor)
+		if self.customer :
+			return 'Wallet of '+ ' ' + str(self.customer)
+		elif self.vendor :
+			return 'Wallet of '+ ' ' +  str(self.vendor)
+		else:
+			return 'Wallet of '+ ' ' + str(self.admin)
 
 class WalletTransaction(models.Model):
 	wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)

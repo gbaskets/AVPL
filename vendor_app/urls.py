@@ -29,6 +29,7 @@ urlpatterns = [
     path('update-product/<int:id>/', vendor_update_product_quantity,name='update-product'),
     path('productbasicedit', vendor_product_basic_edit),
     path('orders', vendor_orders),
+    path('purchases', vendor_purchases),
     path('orderdetail', vendor_order_detail),
     path('returndetail', vendor_return_details),
     

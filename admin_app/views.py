@@ -13,6 +13,8 @@ from admin_app.models import *
 from inventory_app.models import *
 from main_app.models import *
 from vendor_app.models import *
+from purchase_app.models import *
+
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate , login , logout
@@ -25,6 +27,8 @@ from admin_app.utils import *
 from django.utils import timezone
 import base64
 from django.core.files.base import ContentFile
+
+from vendor_app.views import ORDER_STATUS_UPDATE
 
 
 @csrf_exempt
@@ -2237,12 +2241,18 @@ def admin_wallet_recharge(request):
 		if request.method == 'POST':
 			amoun = request.POST.get('amount')
 			amount = float(amoun)
+   
+   
+			transactionid=reference_no_transaction('ADMIN',request.user)
+			transactionrealted= "RECHARGE-WALLET"
+			transactiondetails = f'Recharge Wallet Balance Rs.{amount} /- by {request.user.username}'
 
 			WalletTransaction.objects.create(
 			wallet = wallet,
 			transactiondate = timezone.now(),
 			transactiontype = 'CREDIT',
 			transactionamount = amount,
+            transactionid=transactionid,transactionrealted=transactionrealted,transactiondetails=transactiondetails,
 			previousamount = round(wallet.currentbalance, 2) if wallet.currentbalance else 0 ,
 			remainingamount = round(wallet.currentbalance,2) + round(amount,2)
 			)
@@ -2580,12 +2590,14 @@ def admin_delivery_charges(request):
 	if check_user_authentication(request, 'ADMIN'):
 		if request.method == 'POST':
 			charge = request.POST.get('charge')
-			DeliveryCharge.objects.all().delete()
-			DeliveryCharge.objects.create(amount=charge)
+			# DeliveryCharge.objects.all().delete()
+			# DeliveryCharge.objects.create(amount=charge)
 			messages.success(request, 'Charges Updated Successfully')
 			notification(request.user, 'Delivery Charges Changed.')
 			return redirect('/admins/deliverycharges')
-		dic = {'charge':DeliveryCharge.objects.all(),'categories':ProductCategory.objects.all(),
+		dic = {
+            #  'charge':DeliveryCharge.objects.all(),
+            'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
@@ -2606,10 +2618,24 @@ def admin_payment_info(request):
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
+def admin_purchase_orders(request):
+	if check_user_authentication(request, 'ADMIN'):
+		dic = {
+			'purchasesorder':PurchasesOrder.objects.all(),'allorder_status':ORDER_STATUS_UPDATE,
+			'categories':ProductCategory.objects.all(),
+			'notification':get_notifications(request.user,'ADMIN'),
+			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+		}
+		return render(request, 'admin_app/purchaseorders.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
 def admin_orders(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
-			'orders':OrderItems.objects.all(),
+			'salesorder':SalesOrder.objects.all(),'allorder_status':ORDER_STATUS_UPDATE,
 			'categories':ProductCategory.objects.all(),
 			'notification':get_notifications(request.user,'ADMIN'),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
@@ -2617,6 +2643,7 @@ def admin_orders(request):
 		return render(request, 'admin_app/orders.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 
 @csrf_exempt
 def admin_pvpairvalue(request):
@@ -3020,26 +3047,35 @@ def admin_taxation(request):
 @csrf_exempt
 def admin_users(request):
 	if check_user_authentication(request, 'ADMIN'):
-		users = User.objects.filter(isactive=True)
+		users = User.objects.filter(is_active=True)
+
 		lt = []
 		for x in users :
 			print(x,'USSSSSSSSs')
-			roles=Role.objects.filter(user=x).first()
+				
+			if x.groups.filter(name="ADMIN"):
+				group_name="ADMIN"  
+				wallets=Wallet.objects.filter(admin=x).first()
 
-			print(roles,'RRRRRRR')
-			if x.role.level.level == 'User':
-				dic = {'user':x}
-				dic.update(get_user_indecater(x))
-				dic.update(get_user_wallet(x))
+			
+			elif x.groups.filter(name="CUSTOMER"):
+				group_name="CUSTOMER"  
+				wallets=Wallet.objects.filter(customer__user=x).first()
+
+				dic = {'user':x,"group_name":group_name}
+				# dic.update(get_user_indecater(x))
+				dic.update(get_user_wallet("CUSTOMER",x))
 				lt.append(dic)
-			elif x.role.level.level == 'Vendor':
-				dic = {'user':x}
-				dic.update(get_user_wallet(x))
+			elif x.groups.filter(name="VENDOR"):
+				wallets=Wallet.objects.filter(vendor__user=x).first()
+
+				group_name="VENDOR"  
+				dic = {'user':x,"group_name":group_name}
+				dic.update(get_user_wallet("VENDOR",x))
 				lt.append(dic)
 		print(lt,'List')
 
-		wallets=Wallet.objects.filter(user=x).first()
-
+		
 		print(wallets,'WWWWWWWWWWWWWWWWWwwww')
 		
 		return render(request, 'admin_app/users.html',{'users':lt,'wallets':wallets})
@@ -3238,16 +3274,11 @@ def admin_billing_config(request):
 		if request.method == 'POST':
 			admin = request.POST.get('admin')
 			pv = request.POST.get('pv')
-			Billing_Config.objects.all().delete()
-			Billing_Config.objects.create(
-				admin_commission = admin,
-				pv_percent = pv
-			)
+		
 			messages.success(request, 'Billing Config Saved Successfully')
 			return redirect('/admins/billing/config/')
 		dic = {}
-		if len(Billing_Config.objects.all()) > 0:
-			dic = {'data':Billing_Config.objects.get()}
+		
 		return render(request, 'admin_app/billing-config.html', dic)
 	return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -3757,10 +3788,16 @@ def transfer_amount_admin(request):
 			# if senderotp == request.session['senderotp'] and reciverotp == request.session['reciverotp']:
 		if senderotp == request.session['senderotp']:
 			print('hjhjjjjjjjjjjjj')
+         
 			if Wallet.objects.get(admin=request.user).currentbalance >= request.session['amount']:
 				print('LLLLLLLLLLLLLLLLLLL')
                
-				make_wallet_transaction("ADMIN",request.user, request.session['amount'],'DEBIT')
+				transactionid=reference_no_transaction('ADMIN',request.user)
+				transactionrealted= "BALANCE-TRANSAFER",
+				transactiondetails = f'Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}'
+
+				make_wallet_transaction("ADMIN",request.user, request.session['amount'],'DEBIT',transactionid,transactionrealted,transactiondetails)
+	
 				reciveruser=User.objects.get(username = request.session['recivername'])
 				if reciveruser.groups.filter(name="ADMIN"):
 					group_name="ADMIN"   
@@ -3769,10 +3806,10 @@ def transfer_amount_admin(request):
 				elif reciveruser.groups.filter(name="CUSTOMER"):
 						group_name="CUSTOMER"  
 				make_wallet_transaction(group_name,User.objects.get(username = request.session['recivername']), 
-					request.session['amount'],'CREDIT')
+					request.session['amount'],'CREDIT',transactionid,transactionrealted,transactiondetails)
 				print(request.session['recivername'])
 				transfer_into_another_account(request.user, request.user.username,
-					request.session['recivername'], request.session['amount'])
+					request.session['recivername'], request.session['amount'],transactionid,transactionrealted,transactiondetails)
 				print('done')
 				messages.success(request,'Successfully Transfered')
 			

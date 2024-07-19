@@ -1860,34 +1860,28 @@ Thanks!'''
             else:
                 wallet = Wallet.objects.filter(customer=customer,isactive=True).first()
             print(wallet)
-            if trans_type == 'CREDIT':
-                print('1')
-                wallet_transactions = WalletTransaction.objects.create(
+            
+       
+            transactionid=reference_no_transaction('CUSTOMER',request.user)
+            transactionrealted= "PRODUCT-ORDER",
+            transactiondetails = f'Order product Rs.{amount}/- by {request.user.username}'
+            wallet_transactions = WalletTransaction.objects.create(
                     wallet = wallet,
-                    transactiondate = timezone.now(),
-                    transactiontype = trans_type,
-                    transactionamount = amount,
-                    previousamount =  round(wallet.currentbalance, 2),
-                    remainingamount =round(wallet.currentbalance,2) + round(amount,2)        
-                )
-                wallet.currentbalance = round(wallet.currentbalance, 2) + round(amount, 2)
-                wallet.save()
-                save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
-
-            elif trans_type == 'DEBIT':
-                print(2)
-                wallet_transactions = WalletTransaction.objects.create(
-                     wallet = wallet,
-                    transactiondate = timezone.now(),
-                    transactiontype = trans_type,
-                    transactionamount = amount,
-                    previousamount =  round(wallet.currentbalance, 2),
-                    remainingamount =round(wallet.currentbalance,2) - round(amount,2)        
-                )
-                print(wallet)
-                wallet.currentbalance = round(wallet.currentbalance, 2) - round(amount, 2)
-                wallet.save()
-                save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
+                transactiondate = timezone.now(),
+                transactiontype = trans_type,
+                transactionrealted= transactionrealted,
+                transactiondetails = transactiondetails,
+                transactionid = transactionid,
+                transactionamount = amount,
+                previousamount =  round(wallet.currentbalance, 2),
+                remainingamount =round(wallet.currentbalance,2) - round(amount,2)        
+            )
+            print(wallet)
+            wallet.currentbalance = round(wallet.currentbalance, 2) - round(amount, 2)
+            wallet.save()
+            admin=User.objects.filter(username="admin").first()
+            make_wallet_transaction("ADMIN", admin, amount, 'CREDIT',transactionid,transactionrealted,transactiondetails)
+            save_order_by_wallet(cart_obj, address, 'CUSTOMER', user, wallet_transactions)
 
             sub = 'AVPL - Order Placed'
             msg = ''' Hi there!

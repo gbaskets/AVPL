@@ -89,12 +89,13 @@
                                                    </tr>
                                                 </thead>
                                                 <tbody>
-                                                   {% for x in commissiontransactions %}
+                                                   {% for x in wallettransactions %}
                                                    
                                                    <tr>
                                                       <td>{{ x.transactiondate|safe }}</td>
-                                                      <td>TRN{{ x.id|safe }}-ADMIN</td>
-                                                      <td>{{x.user.username}}</td>
+                                                      <td>{{ x.transactionid|default_if_none:"--" }}</td>
+                                                  
+                                                      <td>{{x.wallet}}</td>
                                                       {% if x.transactiontype == 'CREDIT' %}
                                                       <td><span class="badge badge-success">{{ x.transactiontype }}</span></td>
                                                       {% else %}

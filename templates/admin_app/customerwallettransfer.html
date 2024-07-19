@@ -237,9 +237,9 @@
                                     
                                        <div class="col-lg-4 col-md-12 col-sm-12" >
                                           <div class="form-group">
-                                             <label>Select User</label>
+                                             <label>Select Customer</label>
                                              <select class="form-control" name="rvname" id="abc" required>
-                                                <option value="">----select User----</option>
+                                                <option value="">----select Customer----</option>
                                                 {% for i in customerlist %}
                                                 <option value="{{i.user.username}}">{{i.user.username}} </option>
                                                 {% endfor %}

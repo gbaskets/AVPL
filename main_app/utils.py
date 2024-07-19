@@ -651,9 +651,9 @@ def save_order_by_wallet(cartobj, address,usertype, user, wallet_transactions):
 	paymenttransactionobj=PaymentTransaction()
 	paymenttransactionobj.customer = customer
 	paymenttransactionobj.paymentgatway='Wallet'
-	paymenttransactionobj.transactionid =wallet_transactions.id
+	paymenttransactionobj.transactionid =wallet_transactions.transactionid
 	paymenttransactionobj.transactionrealted= 'PRODUCT-ORDER'
-	paymenttransactionobj.transactiondetails = wallet_transactions.id
+	paymenttransactionobj.transactiondetails =wallet_transactions.transactiondetails
 	paymenttransactionobj.amount = wallet_transactions.transactionamount
 	paymenttransactionobj.address = address
 	paymenttransactionobj.status = True
@@ -900,14 +900,12 @@ def check_user_authentication(request, user_type):
 			return True
 	return False
 
-xval = 1
-def transfer_into_another_account(usr,sender,reciver,amount):
-	global xval
-	td = str(sender[:2]).upper() + str(datetime.date.today()).replace('-','') + str(random.randint(1000,9999)) + str(xval)
-	data = WalletBalanceTransfer(sender=sender, receiver = reciver, transectionid =td, amount=amount)
-	if xval == 10000:
-		xval = 1
+
+def transfer_into_another_account(usr,sender,reciver,amount,transactionid,transactionrealted,transactiondetails):
+	
+	data = WalletBalanceTransfer(sender=sender, receiver = reciver, transectionid=transactionid,transactionrealted=transactionrealted,transactiondetails=transactiondetails, amount=amount)
+	
 	try :
 		data.save()
 	except :
-		transfer_into_another_account(usr,sender,reciver,amount)
+		transfer_into_another_account(usr,sender,reciver,amount,transactionid,transactionrealted,transactiondetails)

@@ -191,14 +191,28 @@
 
                      <li class="menu-header">Order App</li>
                      <li class="dropdown">
-                        <a href="#" class="nav-link has-dropdown"><i class="fa fa-shopping-bag"></i><span>Orders</span></a>
+                        <a href="#" class="nav-link has-dropdown"><i class="fa fa-shopping-bag"></i><span>Purchases Orders</span></a>
                         <ul class="dropdown-menu">
-                           <li><a class="nav-link" href="/admins/deliverycharges">Delivery Charges</a></li>
+                           {% comment %} <li><a class="nav-link" href="/admins/deliverycharges">Delivery Charges</a></li>
                           
-                           <li><a class="nav-link" href="/admins/billing/config/">Billing Request Configuration</a></li>
-                           <li><a class="nav-link" href="/admins/orders">All Orders</a></li>
+                           <li><a class="nav-link" href="/admins/billing/config/">Billing Request Configuration</a></li> {% endcomment %}
+                           <li><a class="nav-link" href="/admins/purchases">All Purchases Orders</a></li>
+                          
+                           
                         </ul>
                      </li>
+                     <li class="dropdown">
+                        <a href="#" class="nav-link has-dropdown"><i class="fa fa-shopping-bag"></i><span>Sales Orders</span></a>
+                        <ul class="dropdown-menu">
+                           {% comment %} <li><a class="nav-link" href="/admins/deliverycharges">Delivery Charges</a></li>
+                          
+                           <li><a class="nav-link" href="/admins/billing/config/">Billing Request Configuration</a></li> {% endcomment %}
+                          
+                           <li><a class="nav-link" href="/admins/orders">All Sales Orders</a></li>
+                           
+                        </ul>
+                     </li>
+
                      <li class="dropdown">
                         <a href="#" class="nav-link has-dropdown"><i class="fa fa-money"></i><span>Payments</span></a>
                         <ul class="dropdown-menu">

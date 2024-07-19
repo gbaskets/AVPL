@@ -55,19 +55,19 @@
                                                    {% for x in users %}
 
                                                    {% if not x.user.is_superuser %}
-                                                   {% if x.user.role.level.level == 'User' %}
+                                                   {% if x.group_name == 'CUSTOMER' %}
                                                    <tr>
                                                       <td>{{forloop.counter}}</td>
                                                       <td>{{x.user.date_joined}}</td>
-                                                      <td>{{ x.user.usr.first_name|safe }} {{ x.user.usr.last_name|safe }}</td>
-                                                      <td><span class="badge badge-danger">{{ x.user.role.level.level|safe }}</span></td>
+                                                      <td>{{ x.user.username|safe }} | {{ x.user.first_name|safe }} {{ x.user.last_name|safe }} </td>
+                                                      <td><span class="badge badge-danger">{{ x.group_name|safe }}</span></td>
                                                       <td>
                                                          <span class="badge badge-info">LEFT - {{x.user.userpv.left_pv|floatformat:0}} PV</span>
                                                          <span class="badge badge-info">RIGHT - {{x.user.userpv.right_pv|floatformat:0}} PV</span>
                                                          <span class="badge badge-info">Self - {{x.user.usr.pv|floatformat:0 }} PV</span>
                                                       </td>
                                                     
-                                                      <td><span class="badge badge-info">Rs. {{ x.wallet.current_balance|floatformat:2 }}</span></td>
+                                                      <td><span class="badge badge-info">Rs. {{ x.wallet.currentbalance|floatformat:2 }}</span></td>
                                                       <td>{{ x.user.email|safe }}</td>
 
                                                       {% if x.indicator == 'Stage 0' %}
@@ -95,10 +95,10 @@
                                                       <td>{{forloop.counter}}</td>
                                                       <td>{{x.user.date_joined}}</td>
 
-                                                      <td>{{ x.user.vendor.first_name|safe }} {{ x.user.vendor.last_name|safe }}</td>
-                                                      <td><span class="badge badge-primary">{{ x.user.role.level.level|safe }}</span></td>
+                                                      <td>{{ x.user.username|safe }} | {{ x.user.first_name|safe }} {{ x.user.last_name|safe }}</td>
+                                                      <td><span class="badge badge-primary">{{ x.group_name|safe }}</span></td>
                                                       <td></td>
-                                                      <td><span class="badge badge-info">Rs. {{ x.wallet.current_balance|floatformat:2 }}</span></td>
+                                                      <td><span class="badge badge-info">Rs. {{ x.wallet.currentbalance|floatformat:2 }}</span></td>
                                                       <td>{{ x.user.email|safe }}</td>
                                                       <td><span class="badge badge-info">----------</span></td>
 

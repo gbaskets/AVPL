@@ -30,6 +30,7 @@ urlpatterns = [
     path('store/', include('store_app.urls')),
     path('customer/', include('customer_app.urls')),
     path('inventory/', include('inventory_app.urls')),
+    path('purchases/', include('purchase_app.urls')),
     path('sales/', include('sales_app.urls')),
     path('mlm/', include('mlm_app.urls')),
     path('delivery/', include('delivery_app.urls')),

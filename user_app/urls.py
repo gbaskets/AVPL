@@ -51,7 +51,7 @@ urlpatterns = [
     path('tds_log/', user_tds_withdraw),
     path('referal_transaction/', referal_transaction),
 
-    path('vendor-wallet-transfer/',wallet_transfer_vendor,name='vendor-wallet-transfer'),
+    path('balanacetransfer/',wallet_transfer_vendor,name='balanacetransfer'),
     path('otp-verification/',transfer_amount,name='otp-verification'),
     path('profile', user_profile),
     path('edit-profile', edit_customer_profile),

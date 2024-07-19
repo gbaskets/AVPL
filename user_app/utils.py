@@ -180,12 +180,31 @@ def get_user_indecater(user):
 	else:
 		return {'indicator': 'Stage 0'}
 
-def get_user_wallet(user):
-    
-	if Wallet.objects.filter(user=user).exists:
-		# Wallet.objects.create(user=user)
-		wallet= Wallet.objects.filter(user=user).first()
-		return {'wallet': wallet}
+def get_user_wallet(usertype,user):
+	if usertype == "CUSTOMER":
+		customer=Customer.objects.filter(user=user).first()
+		traid=customer.id
+		if not Wallet.objects.filter(customer=customer).exists():
+			wallet=Wallet.objects.create(customer=customer,isactive=True)
+		else:
+			wallet = Wallet.objects.filter(customer=customer,isactive=True).first()
+      
+	elif usertype == "VENDOR":
+		vendor=Vendor.objects.filter(user=user).first()
+		traid=vendor.id
+		if not Wallet.objects.filter(vendor=vendor).exists():
+			wallet=Wallet.objects.create(vendor=vendor,isactive=True)
+		else:
+			wallet = Wallet.objects.filter(vendor=vendor,isactive=True).first()
+	elif usertype == "ADMIN":
+		admin=user
+		traid=user.id
+		if not Wallet.objects.filter(admin=admin).exists():
+			wallet=Wallet.objects.create(admin=admin,isactive=True)
+		else:
+			wallet = Wallet.objects.filter(admin=admin,isactive=True).first()
+
+	return {'wallet': wallet}
 
 
 def check_user_subscription(user):

@@ -47,7 +47,7 @@ def create_online_order(cartobj, address,usertype, user,paymentgatway):
 	paymenttransactionobj.paymentgatway=paymentgatway
 	paymenttransactionobj.transactionid =razorpay_order_id
 	paymenttransactionobj.transactionrealted= 'PRODUCT-ORDER'
-	paymenttransactionobj.transactiondetails = order_receipt 
+	paymenttransactionobj.transactiondetails =f'Order product Rs.{order_amount}/- by {customer.user.username}'
 	paymenttransactionobj.amount = order_amount
 	paymenttransactionobj.address = address
 	paymenttransactionobj.save()

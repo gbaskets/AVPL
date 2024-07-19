@@ -54,5 +54,5 @@ class Customer(models.Model):
     updatedon = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.id) + ' ' + str(self.mobile)
+        return str(self.mobile)
 

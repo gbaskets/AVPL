@@ -1306,11 +1306,11 @@ def wallet_transfer_vendor(request):
 	
 		
 
-	vandordata = Vendor.objects.filter(verified = True)
+	userdata = User.objects.filter(is_active=True)
 	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
     
 	context = {
-			'vendordata': vandordata,
+			'userdata': userdata,
 			'transectiodetails':transectiondata,
 			'bal':bal,# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -1360,8 +1360,11 @@ def transfer_amount(request):
 			
 			if Wallet.objects.get(customer__user=request.user).currentbalance >= request.session['amount']:
 				print('LLLLLLLLLLLLLLLLLLL')
-               
-				make_wallet_transaction("CUSTOMER",request.user, request.session['amount'],'DEBIT')
+				transactionid=reference_no_transaction('CUSTOMER',request.user)
+				transactionrealted= "BALANCE-TRANSAFER",
+				transactiondetails = f'Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}'
+    
+				make_wallet_transaction("CUSTOMER",request.user, request.session['amount'],'DEBIT',transactionid,transactionrealted,transactiondetails)
 				reciveruser=User.objects.get(username = request.session['recivername'])
 				if reciveruser.groups.filter(name="ADMIN"):
 					group_name="ADMIN"   
@@ -1370,10 +1373,10 @@ def transfer_amount(request):
 				elif reciveruser.groups.filter(name="CUSTOMER"):
 						group_name="CUSTOMER"  
 				make_wallet_transaction(group_name,User.objects.get(username = request.session['recivername']), 
-					request.session['amount'],'CREDIT')
+					request.session['amount'],'CREDIT',transactionid,transactionrealted,transactiondetails)
 				print(request.session['recivername'])
 				transfer_into_another_account(request.user, request.user.username,
-					request.session['recivername'], request.session['amount'])
+					request.session['recivername'], request.session['amount'],transactionid,transactionrealted,transactiondetails)
 				print('done')
 				
 
@@ -1381,20 +1384,20 @@ def transfer_amount(request):
 				# if int(request.session['type012']) == 0:
 				# 	return redirect('transfer_money')
 				# else:
-				return redirect('vendor-wallet-transfer')
+				return redirect('/user/balanacetransfer/')
 
 
 			else :
 				messages.error(request,'Not having sufficient balance')
 				if int(request.session['type012']) == 0:
-					return redirect('transfer_money')
+					return redirect('/user/balanacetransfer/')
 				else:
-					return redirect('vendor-wallet-transfer')
+					return redirect('/user/balanacetransfer/')
 
 		else :
 			messages.error(request,'OTP is not Correct ,Please enter correct OTP !')
 			if int(request.session['type012']) == 0:
-				return redirect('transfer_money')
+				return redirect('/user/balanacetransfer/')
 			else:
 				return redirect('otp-verification')
 		# else:

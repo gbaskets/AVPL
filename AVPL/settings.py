@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'delivery_app',
     'django_cleanup',
     
-
+    'purchase_app',
 
     'rest_framework',
     'rest_framework.authtoken',
