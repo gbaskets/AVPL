@@ -132,7 +132,7 @@
 
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="product_details">
-                                        <h6>Delivery Address :</h6>
+                                        <h6>Customer Delivery Address :</h6>
                                         <table class="table">
 
                                             <tbody>
@@ -145,7 +145,7 @@
                                                         <p>
                                                             <!--Location URL-->
                                                             <span class="badge badge-success"><a
-                                                            href="http://www.google.com/maps/place/{{purchasesorder.address.latitude}},{{salesorder.address.longitude}}"
+                                                            href="http://www.google.com/maps/place/{{purchasesorder.address.latitude}},{{purchasesorder.address.longitude}}"
                                                             target="_blank">Map Location</a></span>
                                                             <br>
                                                             
@@ -177,7 +177,54 @@
 
 
                                     </div>
+
+                                    <div class="product_details">
+                                        <h6>Vendor Address :</h6>
+                                        <table class="table">
+
+                                            <tbody>
+                                                
+
+                                                <tr>
+
+                                                    <td>
+
+                                                        <p>
+                                                            <!--Location URL-->
+                                                            <span class="badge badge-success"><a
+                                                            href="http://www.google.com/maps/place/{{purchasesorder.store.latitude}},{{purchasesorder.store.longitude}}"
+                                                            target="_blank">Map Location</a></span>
+                                                            <br>
+                                                            
+                                                            {{purchasesorder.store.vendor.firstname|default:""}}
+                                                            {{purchasesorder.store.vendor.lastname|default:""}}
+                                                            <span>+91-{{ purchasesorder.store.vendor.mobile}}</span>
+                                                            <br>
+                                            
+                                                            {{purchasesorder.store.streetaddress|default:""}}<strong>-{{purchasesorder.store.pincode|default:""}}</strong>
+                                                            <br>
+                                                            {{purchasesorder.store.storename|default:""}}
+                                                            <br>
+                                                            {{purchasesorder.store.vendor.gstno|default:""}}
+                                                            
+
+
+                                                                
+                                                        </p>
+
+
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+
+
+                                    </div>
                                 </div>
+
+                                
 
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="product_details">
