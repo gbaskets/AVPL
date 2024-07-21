@@ -1362,7 +1362,7 @@ def transfer_amount(request):
 				print('LLLLLLLLLLLLLLLLLLL')
 				transactionid=reference_no_transaction('CUSTOMER',request.user)
 				transactionrealted= "BALANCE-TRANSAFER",
-				transactiondetails = f'Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}'
+				transactiondetails = f"Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}"
     
 				make_wallet_transaction("CUSTOMER",request.user, request.session['amount'],'DEBIT',transactionid,transactionrealted,transactiondetails)
 				reciveruser=User.objects.get(username = request.session['recivername'])

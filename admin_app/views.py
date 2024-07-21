@@ -3831,7 +3831,7 @@ def transfer_amount_admin(request):
                
 				transactionid=reference_no_transaction('ADMIN',request.user)
 				transactionrealted= "BALANCE-TRANSAFER",
-				transactiondetails = f'Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}'
+				transactiondetails = f"Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}"
 
 				make_wallet_transaction("ADMIN",request.user, request.session['amount'],'DEBIT',transactionid,transactionrealted,transactiondetails)
 	

@@ -315,3 +315,10 @@ class ProductVariantsSpecificatonValue(models.Model):
     def __str__(self):
         return str(self.specificationtype) +" "+ str(self.productvariants)
 
+
+
+
+
+
+
+

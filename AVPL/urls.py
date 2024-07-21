@@ -32,6 +32,7 @@ urlpatterns = [
     path('inventory/', include('inventory_app.urls')),
     path('purchases/', include('purchase_app.urls')),
     path('sales/', include('sales_app.urls')),
+    path('accountant/', include('accountant_app.urls')),
     path('mlm/', include('mlm_app.urls')),
     path('delivery/', include('delivery_app.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),

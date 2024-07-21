@@ -26,6 +26,7 @@ from main_app.models import *
 from admin_app.models import *
 from django.http import JsonResponse
 from vendor_app.utils import *
+from accountant_app.models import *
 from main_app.utils import *
 from django.utils import timezone
 
@@ -1932,7 +1933,7 @@ def transfer_amount_vendor(request):
 
 				transactionid=reference_no_transaction('ADMIN',request.user)
 				transactionrealted= "BALANCE-TRANSAFER",
-				transactiondetails = f'Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}'
+				transactiondetails = f"Balance transafer Rs.{request.session['amount']}/- by {request.user.username} to {request.session['recivername']}"
 
 				make_wallet_transaction("VENDOR",request.user, request.session['amount'],'DEBIT',transactionid,transactionrealted,transactiondetails)
 	
@@ -1990,3 +1991,165 @@ def creditedmoney_user_wallet(request):
 		return render(request, 'vendor_app/creditedmoney_wallet-dash.html', dic)
 	else:
 		return render(request, '403.html')
+
+@csrf_exempt
+def account_type_details(request):
+    response_data = {}
+    account_type_group_data = []
+    account_type_groups = AccountTypeGroup.objects.all()
+    for account_type_group in account_type_groups:
+        account_types = list(AccountType.objects.filter(accounttypegroup=account_type_group).values())
+        account_type_group_data.append({
+            'id': account_type_group.id,
+            'name': account_type_group.name,
+            'account_types': account_types
+        })
+    
+    response_data['data'] = account_type_group_data
+    return JsonResponse(response_data)
+
+
+@csrf_exempt
+def chartofaccounts(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+                "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+               "accounttypegroups" :AccountTypeGroup.objects.all(),
+           	# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/chartofaccounts.html', dic)
+	else:
+		return render(request, '403.html')
+
+
+def account_code_by_store(store):
+	storeobj=Store.objects.filter(id=store.id).first()
+	if len(Account.objects.all()) != 0 :
+		tds=Account.objects.filter().last()
+		transid=tds.id
+	else:
+		transid=1
+	start=0000+transid
+	ref_no = str(str(timezone.now()))
+	ref_no = ref_no.upper()
+	ref_no = ref_no[0:4]
+	transactionid=f"{storeobj.id}{ref_no}{start}"
+	return transactionid
+
+
+
+
+@csrf_exempt
+def addchartofaccounts(request):
+	if check_user_authentication(request, 'VENDOR'):    
+		if request.method == 'POST':
+			storeobj=Store.objects.filter(vendor__user=request.user).first()
+			accountype = request.POST.get('accountype')
+			accountname = request.POST.get('accountname')
+			openingbalance = request.POST.get('openingbalance')
+			transctiontype = request.POST.get('transctiontype')
+			print(accountname,'accountname')
+     
+			if not Account.objects.filter(accountname=accountname,accountcode = account_code_by_store(storeobj)).exists():
+				accountobj=Account()
+				accountobj.store = storeobj
+				accountobj.accounttype =AccountType.objects.filter(id=accountype).first()
+				accountobj.accountname = accountname
+				accountobj.accountcode = account_code_by_store(storeobj)
+				accountobj.openingbalance = openingbalance
+				accountobj.transctiontype=transctiontype
+				accountobj.updatedby= request.user
+				accountobj.save()
+				messages.info(request, 'Account Ledger is created successfully !')
+				return redirect("/vendor/chart-of-account")
+			else:
+				messages.warning(request, 'Account Ledger is Already Exists')
+				return redirect("/vendor/chart-of-account")
+	else:
+		return render(request, '403.html')
+
+
+
+
+
+@csrf_exempt
+def editchartofaccounts(request,id):
+	if check_user_authentication(request, 'VENDOR'):    
+		if request.method == 'POST':
+			storeobj=Store.objects.filter(vendor__user=request.user).first()
+			accountype = request.POST.get('accountype')
+			accountname = request.POST.get('accountname')
+			openingbalance = request.POST.get('openingbalance')
+			transctiontype = request.POST.get('transctiontype')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			gstno=request.POST.get('gstno')
+			gstnodoc = request.FILES.get('gstnodoc')
+
+			print(accountname,'accountname')
+     
+			if Account.objects.filter(id=id).exists():
+				accountobj=Account.objects.filter(id=id).first()
+				accountobj.store = storeobj
+				accountobj.accounttype =AccountType.objects.filter(id=accountype).first()
+				accountobj.accountname = accountname
+				accountobj.openingbalance = openingbalance
+				accountobj.transctiontype=transctiontype
+				accountobj.updatedby= request.user
+				if streetaddress:
+					accountobj.streetaddress =  streetaddress
+				if nearbyaddress:
+					accountobj.nearbyaddress =  nearbyaddress
+				if pincode:
+					accountobj.pincode = pincode
+				if city:
+					accountobj.city= city
+				if state:
+					accountobj.state= state
+				if country:
+					accountobj.country= country
+
+				if pancardno:
+					accountobj.pancardno=pancardno
+				if pancarddoc:
+					accountobj.pancarddoc =pancarddoc
+				if gstno:
+					accountobj.gstno=gstno
+				if gstnodoc:
+					accountobj.gstnodoc =gstnodoc
+				accountobj.save()
+				messages.info(request, 'Account Ledger is updated successfully !')
+				return redirect("/vendor/chart-of-account")
+			else:
+				messages.warning(request, 'Account Ledger is not Exists')
+				return redirect("/vendor/chart-of-account")
+	else:
+		return render(request, '403.html')
+
+
+
+@csrf_exempt
+def manualjournal(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+                "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+               "accounttypegroups" :AccountTypeGroup.objects.all(),
+           	# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/manualjournal.html', dic)
+	else:
+		return render(request, '403.html')
+
+

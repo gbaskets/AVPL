@@ -60,5 +60,13 @@ urlpatterns = [
     path('selfbalanacetransfer', vendorselfbalanacetransfer, name='selfbalanacetransfer'),
     path('otpvalidation', transfer_amount_vendor, name='otpvalidation'),
     path('creditedmoney', creditedmoney_user_wallet),
+    
+    path('add-chart-of-account', addchartofaccounts),
+    path('edit-chart-of-account/<int:id>', editchartofaccounts),
+    path('chart-of-account', chartofaccounts),
+    path('manual-journal', manualjournal),
+    
+    
+  
 
 ]

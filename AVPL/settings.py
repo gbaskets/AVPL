@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django_cleanup',
     
     'purchase_app',
+    'accountant_app',
 
     'rest_framework',
     'rest_framework.authtoken',
