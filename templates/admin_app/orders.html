@@ -77,7 +77,7 @@
                                              <tr>
                                                 <td>{{data.id}}</td>
                                                 {% if first_orderitem.orderstatus == 'Pending' %}
-                                                <td><a href="/vendor/orderdetail?i={{data.id}}">{{data.orderno}} <span
+                                                <td><a href="/admins/orderdetail?i={{data.id}}">{{data.orderno}} <span
                                                          class="badge badge-primary"> NEW</span></a></td>
                                                 {% else %}
                                                 <td>{{data.orderno}}</td>
@@ -119,54 +119,9 @@
                                                 </td>
 
 
-                                                {% if data.ispaymentpaid == True %}
-                                                <td>
-                                                   <form action="{% url 'order_status_update'  %}" method="POST">
-                                                      {% csrf_token %}
-                                                      <input type="hidden" name="order_id" value="{{data.id}}">
-                                                      <select name="delivery_status" >
-                                                         {% for i, j in allorder_status %}
-                                                         <option value="{{i}}" {% if i == first_orderitem.orderstatus %}selected{% endif %}>{{j}}
-                                                         </option>
-                                                         {% endfor %}
-                                                      </select>
-                  
-                                                      <button class="btn btn-info btn-sm">Update</button>
-                  
-                                                   </form>
-                  
-                  
-                                                </td>
-                                                {% else %}
-                  
-                  
-                                                {% if data.total <= business_limit.currentbalance %} <td>
-                                                   <form action="{% url 'order_status_update'  %}" method="POST">
-                                                      {% csrf_token %}
-                                                      <input type="hidden" name="order_id" value="{{data.id}}">
-                                                      <select name="delivery_status">
-                                                         {% for i, j in allorder_status %}
-                                                         <option value="{{i}}" {% if i == first_orderitem.orderstatus %}selected{% endif %}>{{j}}
-                                                         </option>
-                                                         {% endfor %}
-                                                      </select>
-                  
-                                                      <button class="btn btn-info btn-sm">Update</button>
-                  
-                                                   </form>
-                  
-                  
-                                                   </td>
-                                                {% else %}
-                                                   <td>
-                                                      <h5>Current Business Limit Balance is insufficient !</h5>
-                                                   </td>
-                                                {% endif %}
-                                                {% endif %}
-                  
                   
                                                 <td><a class="btn btn-primary btn-icon icon-left"
-                                                   href="/vendor/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
+                                                   href="/admins/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                                              </tr>
 
@@ -209,24 +164,25 @@
                                              {% with first_orderitem=data.salesorders.first %}
 
                                              {% if first_orderitem.orderstatus == 'Pending' %}
+ 
 
-                                          
                                              <tr>
                                                 <td>{{data.id}}</td>
                                                 {% if first_orderitem.orderstatus == 'Pending' %}
-                                                <td><a href="/vendor/orderdetail?i={{data.id}}">{{data.orderno}} <span
+                                                <td><a href="/admins/orderdetail?i={{data.id}}">{{data.orderno}} <span
                                                          class="badge badge-primary"> NEW</span></a></td>
                                                 {% else %}
                                                 <td>{{data.orderno}}</td>
                                                 {% endif %}
                                                 <td>{{data.createdat}}</td>
+                                                <td>{{data.store}}</td>
                                                 <td>
                                                    {% for orderitem in data.salesorders.all %}
                                                    {{orderitem.productvariants}}
                                                    <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
                                                    {% endfor %}
                                                 </td>
-                                                <td>{{data.total}}</td>
+                                                <td>{{data.vendortotal}}</td>
                                                 <td> {% if data.ispaymentpaid == True %} <span
                                                       class="badge badge-success"><b>Paid</b></span> {% else %} <span
                                                       class="badge badge-danger"><b>UnPaid</b></span> {% endif %}</td>
@@ -234,6 +190,9 @@
 
                                                    {% if first_orderitem.orderstatus == 'Pending' %}
                                                    <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                                   {% endif %}
+                                                   {% if first_orderitem.orderstatus == 'Order Placed' %}
+                                                   <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
                                                    {% endif %}
                                                    {% if first_orderitem.orderstatus == 'Packed' %}
                                                    <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
@@ -252,58 +211,14 @@
                                                 </td>
 
 
-                                                {% if data.ispaymentpaid == True %}
-                                                <td>
-                                                   <form action="{% url 'order_status_update'  %}" method="POST">
-                                                      {% csrf_token %}
-                                                      <input type="hidden" name="order_id" value="{{data.id}}">
-                                                      <select name="delivery_status" >
-                                                         {% for i, j in allorder_status %}
-                                                         <option value="{{i}}" {% if i == first_orderitem.orderstatus %}selected{% endif %}>{{j}}
-                                                         </option>
-                                                         {% endfor %}
-                                                      </select>
-                  
-                                                      <button class="btn btn-info btn-sm">Update</button>
-                  
-                                                   </form>
-                  
-                  
-                                                </td>
-                                                {% else %}
-                  
-                  
-                                                {% if data.total <= business_limit.currentbalance %} <td>
-                                                   <form action="{% url 'order_status_update'  %}" method="POST">
-                                                      {% csrf_token %}
-                                                      <input type="hidden" name="order_id" value="{{data.id}}">
-                                                      <select name="delivery_status">
-                                                         {% for i, j in allorder_status %}
-                                                         <option value="{{i}}" {% if i == first_orderitem.orderstatus %}selected{% endif %}>{{j}}
-                                                         </option>
-                                                         {% endfor %}
-                                                      </select>
-                  
-                                                      <button class="btn btn-info btn-sm">Update</button>
-                  
-                                                   </form>
-                  
-                  
-                                                   </td>
-                                                {% else %}
-                                                   <td>
-                                                      <h5>Current Business Limit Balance is insufficient !</h5>
-                                                   </td>
-                                                {% endif %}
-                                                {% endif %}
-                  
                   
                                                 <td><a class="btn btn-primary btn-icon icon-left"
-                                                   href="/vendor/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
+                                                   href="/admins/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                                              </tr>
 
 
+                                        
                                              {% endif %}
                                              {% endwith %}
 
@@ -342,17 +257,25 @@
 
                                              {% if first_orderitem.orderstatus == 'Delivered' %}
 
+                                          
+
                                              <tr>
                                                 <td>{{data.id}}</td>
+                                                {% if first_orderitem.orderstatus == 'Pending' %}
+                                                <td><a href="/admins/orderdetail?i={{data.id}}">{{data.orderno}} <span
+                                                         class="badge badge-primary"> NEW</span></a></td>
+                                                {% else %}
                                                 <td>{{data.orderno}}</td>
+                                                {% endif %}
                                                 <td>{{data.createdat}}</td>
+                                                <td>{{data.store}}</td>
                                                 <td>
                                                    {% for orderitem in data.salesorders.all %}
                                                    {{orderitem.productvariants}}
                                                    <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
                                                    {% endfor %}
                                                 </td>
-                                                <td>{{data.total}}</td>
+                                                <td>{{data.vendortotal}}</td>
                                                 <td> {% if data.ispaymentpaid == True %} <span
                                                       class="badge badge-success"><b>Paid</b></span> {% else %} <span
                                                       class="badge badge-danger"><b>UnPaid</b></span> {% endif %}</td>
@@ -360,6 +283,9 @@
 
                                                    {% if first_orderitem.orderstatus == 'Pending' %}
                                                    <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                                   {% endif %}
+                                                   {% if first_orderitem.orderstatus == 'Order Placed' %}
+                                                   <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
                                                    {% endif %}
                                                    {% if first_orderitem.orderstatus == 'Packed' %}
                                                    <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
@@ -376,9 +302,14 @@
 
 
                                                 </td>
-                                                <td><a href="#">View Details</a></td>
+
+
+                  
+                                                <td><a class="btn btn-primary btn-icon icon-left"
+                                                   href="/admins/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                                              </tr>
+
 
                                              {% endif %}
                                              {% endwith %}
@@ -416,17 +347,25 @@
 
                                              {% with first_orderitem=data.salesorders.first %}
                                              {% if first_orderitem.orderstatus == 'Return' %}
+                                           
+
                                              <tr>
                                                 <td>{{data.id}}</td>
+                                                {% if first_orderitem.orderstatus == 'Pending' %}
+                                                <td><a href="/admins/orderdetail?i={{data.id}}">{{data.orderno}} <span
+                                                         class="badge badge-primary"> NEW</span></a></td>
+                                                {% else %}
                                                 <td>{{data.orderno}}</td>
+                                                {% endif %}
                                                 <td>{{data.createdat}}</td>
+                                                <td>{{data.store}}</td>
                                                 <td>
                                                    {% for orderitem in data.salesorders.all %}
                                                    {{orderitem.productvariants}}
                                                    <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
                                                    {% endfor %}
                                                 </td>
-                                                <td>{{data.total}}</td>
+                                                <td>{{data.vendortotal}}</td>
                                                 <td> {% if data.ispaymentpaid == True %} <span
                                                       class="badge badge-success"><b>Paid</b></span> {% else %} <span
                                                       class="badge badge-danger"><b>UnPaid</b></span> {% endif %}</td>
@@ -434,6 +373,9 @@
 
                                                    {% if first_orderitem.orderstatus == 'Pending' %}
                                                    <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                                   {% endif %}
+                                                   {% if first_orderitem.orderstatus == 'Order Placed' %}
+                                                   <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
                                                    {% endif %}
                                                    {% if first_orderitem.orderstatus == 'Packed' %}
                                                    <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
@@ -450,9 +392,14 @@
 
 
                                                 </td>
-                                                <td><a href="#">View Details</a></td>
+
+
+                  
+                                                <td><a class="btn btn-primary btn-icon icon-left"
+                                                   href="/admins/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                                              </tr>
+
 
                                              {% endif %}
                                              {% endwith %}
@@ -492,17 +439,25 @@
                                              {% with first_orderitem=data.salesorders.first %}
                                              {% if first_orderitem.orderstatus == 'Cancelled' %}
 
+                                           
+
                                              <tr>
                                                 <td>{{data.id}}</td>
+                                                {% if first_orderitem.orderstatus == 'Pending' %}
+                                                <td><a href="/admins/orderdetail?i={{data.id}}">{{data.orderno}} <span
+                                                         class="badge badge-primary"> NEW</span></a></td>
+                                                {% else %}
                                                 <td>{{data.orderno}}</td>
+                                                {% endif %}
                                                 <td>{{data.createdat}}</td>
+                                                <td>{{data.store}}</td>
                                                 <td>
                                                    {% for orderitem in data.salesorders.all %}
                                                    {{orderitem.productvariants}}
                                                    <!-- <img style="height: 50px; width:50px;" src="{{orderitem.productvariants.productimage.url}}"> -->
                                                    {% endfor %}
                                                 </td>
-                                                <td>{{data.total}}</td>
+                                                <td>{{data.vendortotal}}</td>
                                                 <td> {% if data.ispaymentpaid == True %} <span
                                                       class="badge badge-success"><b>Paid</b></span> {% else %} <span
                                                       class="badge badge-danger"><b>UnPaid</b></span> {% endif %}</td>
@@ -510,6 +465,9 @@
 
                                                    {% if first_orderitem.orderstatus == 'Pending' %}
                                                    <span class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                                   {% endif %}
+                                                   {% if first_orderitem.orderstatus == 'Order Placed' %}
+                                                   <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
                                                    {% endif %}
                                                    {% if first_orderitem.orderstatus == 'Packed' %}
                                                    <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
@@ -526,9 +484,14 @@
 
 
                                                 </td>
-                                                <td><a href="#">View Details</a></td>
+
+
+                  
+                                                <td><a class="btn btn-primary btn-icon icon-left"
+                                                   href="/admins/orderdetail?i={{data.id}}"><i class="far fa-eye"></i></a></td>
 
                                              </tr>
+
 
                                              {% endif %}
                                              {% endwith %}

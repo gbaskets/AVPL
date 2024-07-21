@@ -2632,6 +2632,24 @@ def admin_purchase_orders(request):
 
 
 @csrf_exempt
+def admin_purchaseorder_detail(request):	
+	if check_user_authentication(request, 'ADMIN'):
+		vendor = Vendor.objects.filter(user=request.user)
+		order_id = request.GET.get('i')
+		dic = {
+			'vendor':vendor,
+            "purchasesorder":PurchasesOrder.objects.filter(id=order_id).first()
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		
+		return render(request, 'admin_app/purchaseorders-detail.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+@csrf_exempt
 def admin_orders(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
@@ -2643,6 +2661,25 @@ def admin_orders(request):
 		return render(request, 'admin_app/orders.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+@csrf_exempt
+def admin_order_detail(request):	
+	if check_user_authentication(request, 'ADMIN'):
+		vendor = Vendor.objects.filter(user=request.user)
+		order_id = request.GET.get('i')
+		dic = {
+			'vendor':vendor,
+            "salesorder":SalesOrder.objects.filter(id=order_id).first()
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		
+		return render(request, 'admin_app/order-detail.html', dic)
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 
 
 @csrf_exempt

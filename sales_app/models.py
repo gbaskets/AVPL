@@ -27,8 +27,11 @@ class SalesOrder(models.Model):
     address = models.ForeignKey(Address,on_delete=models.CASCADE)
     shippingcharges = models.FloatField(default=0.00,null=True,blank=True)
     subtotal = models.FloatField(default=0.00,null=True,blank=True)
+    vendorsubtotal = models.FloatField(default=0.00,null=True,blank=True)
     tax = models.FloatField(default=0.00,null=True,blank=True)
+    vendortax = models.FloatField(default=0.00,null=True,blank=True)
     total = models.FloatField(default=0.00,null=True,blank=True)
+    vendortotal= models.FloatField(default=0.00,null=True,blank=True)
     totaladmincommission = models.FloatField(default=0.00,null=True,blank=True)
     pv = models.FloatField(default=0.00)
     selfpickup = models.BooleanField(default=False)
@@ -50,21 +53,21 @@ class SalesOrder(models.Model):
             taxtype='IGST'
         return taxtype
     
-    def vendortotal(self):
-        return round((self.total - self.totaladmincommission),2)
-    def vendorsubtotal(self):
-        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
-        return round((self.total - self.totaladmincommission),2) - perproducttax
-    def vendortax(self):    
-        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
-        return perproducttax
+    # def vendortotal(self):
+    #     return round((self.total - self.totaladmincommission),2)
+    # def vendorsubtotal(self):
+    #     perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
+    #     return round((self.total - self.totaladmincommission),2) - perproducttax
+    # def vendortax(self):    
+    #     perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
+    #     return perproducttax
     
     def taxgst(self):    
-        perproducttax= self.tax /2
+        perproducttax= round((self.tax /2),2)
         return perproducttax
       
     def vendortaxgst(self):    
-        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2) / 2
+        perproducttax= round((self.vendortax /2),2)
         return perproducttax
          
     def __str__(self):
@@ -82,9 +85,12 @@ class SalesOrderItems(models.Model):
     productvariants = models.ForeignKey(ProductVariants, on_delete=models.CASCADE,blank=True,null=True)
     quantity = models.PositiveIntegerField()
     price = models.FloatField(default=0.00,null=True,blank=True)
+    vendorprice = models.FloatField(default=0.00,null=True,blank=True)
     tax = models.FloatField(default=0.00,null=True,blank=True)
+    vendortax = models.FloatField(default=0.00,null=True,blank=True)
     admincommission = models.FloatField(default=0.00,null=True,blank=True)
     total =  models.FloatField(default=0.00,null=True,blank=True)
+    vendortotal =  models.FloatField(default=0.00,null=True,blank=True)
     orderstatus = models.CharField(max_length=255, default='Pending',null=True,blank=True)
     deliveryexpected = models.DateField(null=True, blank=True)
     deliveredon=models.DateTimeField(null=True, blank=True)
@@ -101,24 +107,24 @@ class SalesOrderItems(models.Model):
             taxtype='IGST'
         return taxtype
         
-    def vendorprice(self):
-        return round((self.price - self.admincommission),2)
+    # def vendorprice(self):
+    #     return round((self.price - self.admincommission),2)
     
-    def vendortotal(self):
-        return round((self.total - self.admincommission),2)
-    def vendorsubtotal(self):
-        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
-        return round((self.total - self.admincommission),2) - perproducttax
-    def vendortax(self):    
-        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
-        return perproducttax
+    # def vendortotal(self):
+    #     return round((self.total - self.admincommission),2)
+    # def vendorsubtotal(self):
+    #     perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
+    #     return round((self.total - self.admincommission),2) - perproducttax
+    # def vendortax(self):    
+    #     perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
+    #     return perproducttax
     
     def taxgst(self):    
-        perproducttax= self.tax /2
+        perproducttax= round((self.tax /2),2)
         return perproducttax
     
     def vendortaxgst(self):    
-        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2) / 2
+        perproducttax= round((self.vendortax / 2),2)
         return perproducttax
     
     def __str__(self):

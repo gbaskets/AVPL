@@ -51,6 +51,11 @@ def get_cart_items(request,user_type):
 	tax_amount = 0
 	subtotal_amount = 0
 
+	vendortotal_amount = 0
+	vendortax_amount = 0
+	vendorsubtotal_amount = 0
+    
+
 	# Iterate through cart items and create dictionaries
 	for item in cartobj:
 		price = item.productvariants.saleprice()
@@ -58,6 +63,11 @@ def get_cart_items(request,user_type):
 		perproducttax= round( (price) * ((item.productvariants.product.tax/100) / (1 + (item.productvariants.product.tax/100))),2)
 		tax = round((perproducttax * item.quantity),2)
 		total = round((price * item.quantity),2)
+		vendorprice = item.productvariants.price
+		vendorperproducttax= round( (vendorprice) * ((item.productvariants.product.tax/100) / (1 + (item.productvariants.product.tax/100))),2)
+		vendortax = round((vendorperproducttax * item.quantity),2)
+		vendortotal = round((vendorprice * item.quantity),2)
+  
   
 		item_dict = {
 			'id': item.id,
@@ -66,9 +76,12 @@ def get_cart_items(request,user_type):
 			'name': item.productvariants.productvariantname,
 			'quantity': item.quantity,
 			'price': price,
+            'vendorprice': vendorprice,
 			'mrp': item.productvariants.mrp,
 			'tax': tax,
 			'total': total,
+            'vendortax': vendortax,
+			'vendortotal': vendortotal,
             'pv':item.productvariants.product.pv,
             'admincommission':admincommission,
             'product':item.productvariants.product,
@@ -82,11 +95,14 @@ def get_cart_items(request,user_type):
 		
 		# Update totals
 		tax_amount += tax
+		vendortax_amount += vendortax
 		subtotal_amount += round((total - tax_amount),2)
+		vendorsubtotal_amount += round((vendortotal - vendortax_amount),2)
 		total_admincommission += admincommission
 		total_amount += total
+		vendortotal_amount += vendortotal
 
-	dic = {'items':item_list,'tax_amount':tax_amount,"total_admincommission":total_admincommission, "subtotal_amount":subtotal_amount,'total_amount':total_amount}
+	dic = {'items':item_list,'vendortax_amount':vendortax_amount,'tax_amount':tax_amount,"total_admincommission":total_admincommission,"vendorsubtotal_amount":vendorsubtotal_amount,'vendortotal_amount':vendortotal_amount, "subtotal_amount":subtotal_amount,'total_amount':total_amount}
 	dic.update(get_cart_len(request,"CUSTOMER"))
 	return dic
 

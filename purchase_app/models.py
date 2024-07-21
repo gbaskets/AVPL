@@ -51,23 +51,12 @@ class PurchasesOrder(models.Model):
             taxtype='IGST'
         return taxtype
     
-    def vendortotal(self):
-        return round((self.total - self.totaladmincommission),2)
-    def vendorsubtotal(self):
-        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
-        return round((self.total - self.totaladmincommission),2) - perproducttax
-    def vendortax(self):    
-        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
-        return perproducttax
     
     def taxgst(self):    
-        perproducttax= self.tax /2
+        perproducttax= round((self.tax /2),2)
         return perproducttax
       
-    def vendortaxgst(self):    
-        perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2) / 2
-        return perproducttax
-         
+  
     def __str__(self):
         return 'Order ID  '+str(self.id) + '  ' +str(self.customer)
 
@@ -102,25 +91,11 @@ class PurchasesOrderItems(models.Model):
             taxtype='IGST'
         return taxtype
         
-    def vendorprice(self):
-        return round((self.price - self.admincommission),2)
-    
-    def vendortotal(self):
-        return round((self.total - self.admincommission),2)
-    def vendorsubtotal(self):
-        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
-        return round((self.total - self.admincommission),2) - perproducttax
-    def vendortax(self):    
-        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
-        return perproducttax
     
     def taxgst(self):    
-        perproducttax= self.tax /2
+        perproducttax= round((self.tax /2),2)
         return perproducttax
     
-    def vendortaxgst(self):    
-        perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2) / 2
-        return perproducttax
-    
+  
     def __str__(self):
         return self.productvariants.productvariantname + 'purchasesorder' + str(self.purchasesorder.id) + 'purchasesorderitem' + str(self.id)

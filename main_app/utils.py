@@ -19,6 +19,7 @@ from geopy.distance import geodesic
 from user_app.models import *
 from user_app.utils import *
 from admin_app.models import *
+from purchase_app.models import *
 from django.utils import timezone
 from .models import *
 import datetime
@@ -221,8 +222,11 @@ def get_dic(request):
 	dic.update(get_wishlist_len(request, 'CUSTOMER'))
 	return dic
 
-def save_order_items(cartobj, order, customer, ordertype):
+
+def save_order_items(cartobj, order, customer,purchase, ordertype):
 	order=SalesOrder.objects.filter(id=order.id).first()
+	purchasesorder=PurchasesOrder.objects.filter(id=purchase.id).first()
+ 
 	for x in cartobj["items"]:
 		# tax = 0.0
 		print(x,'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiit')
@@ -239,8 +243,27 @@ def save_order_items(cartobj, order, customer, ordertype):
 		orderitemobj.price = x["price"]
 		orderitemobj.tax = x["tax"]
 		orderitemobj.total =  x["total"]
+		orderitemobj.vendorprice = x["vendorprice"]
+		orderitemobj.vendortax = x["vendortax"]
+		orderitemobj.vendortotal =  x["vendortotal"]
 		orderitemobj.orderstatus ="Pending"
 		orderitemobj.save()
+  
+		purorderitemobj = PurchasesOrderItems()
+		purorderitemobj.store = x["store"]
+		purchasesorder.store=x["store"]
+		purchasesorder.vendor=x["store"].vendor
+		purchasesorder.save()
+		purorderitemobj.purchasesorder =purchasesorder
+		purorderitemobj.admincommission = x["admincommission"]
+		purorderitemobj.productvariants = x["productvariants"]
+		purorderitemobj.quantity =x["quantity"]
+		purorderitemobj.price = x["vendorprice"]
+		purorderitemobj.tax = x["vendortax"]
+		purorderitemobj.total =  x["vendortotal"]
+		purorderitemobj.orderstatus ="Pending"
+		purorderitemobj.save()
+        
         
 
 		if len(Tax.objects.all()) == 0:
@@ -399,6 +422,8 @@ def get_product_thumb(product):
 		dic = {'product':None, 'image':None,rating:None,fake_price:None,pv:None}
 	return dic
 
+
+
 # In case Case on delivey
 def create_cod_order(cartobj, address,usertype, user):
 	if usertype == "CUSTOMER":
@@ -407,7 +432,12 @@ def create_cod_order(cartobj, address,usertype, user):
 		total_amount=cartobj['total_amount']
 		tax_amount=cartobj['tax_amount']
 		subtotal_amount=cartobj['subtotal_amount']
+		vendortotal_amount=cartobj['vendortotal_amount']
+		vendortax_amount=cartobj['vendortax_amount']
+		vendorsubtotal_amount=cartobj['vendorsubtotal_amount']
 		totaladmincommission=cartobj['total_admincommission']
+		
+  
 		# if cart.self_pickup:
 		# 	total = cart.total - cart.delivery_charges
 
@@ -417,6 +447,9 @@ def create_cod_order(cartobj, address,usertype, user):
 			subtotal = subtotal_amount,
 			tax = tax_amount,
 			total = total_amount,
+            vendorsubtotal = vendorsubtotal_amount,
+			vendortax = vendortax_amount,
+			vendortotal = vendortotal_amount,
             totaladmincommission =totaladmincommission,
             
 			# selfpickup = True
@@ -424,7 +457,19 @@ def create_cod_order(cartobj, address,usertype, user):
 		if order:
 			order.orderno=generate_order_number(order.id)
 			order.save()
-		save_order_items(cartobj, order, customer, 'COD')
+   
+		purchase=PurchasesOrder.objects.create(
+		customer = customer,
+		address = address,
+		orderno=order.orderno,
+		subtotal = vendorsubtotal_amount,
+		tax = vendortax_amount,
+		total = vendortotal_amount,
+		totaladmincommission =totaladmincommission,
+
+		)
+
+		save_order_items(cartobj, order, customer,purchase, 'COD')
 
 		Cart.objects.filter(customer=customer).delete()
 		
@@ -435,6 +480,9 @@ def save_order(cartobj, address,usertype, user, razorpaytransaction):
 		total_amount=cartobj['total_amount']
 		tax_amount=cartobj['tax_amount']
 		subtotal_amount=cartobj['subtotal_amount']
+		vendortotal_amount=cartobj['vendortotal_amount']
+		vendortax_amount=cartobj['vendortax_amount']
+		vendorsubtotal_amount=cartobj['vendorsubtotal_amount']
 		totaladmincommission=cartobj['total_admincommission']
 	print(razorpaytransaction)
 	paymenttransactionobj=PaymentTransaction.objects.filter(transactionid=razorpaytransaction).first()
@@ -448,6 +496,10 @@ def save_order(cartobj, address,usertype, user, razorpaytransaction):
 		subtotal = subtotal_amount,
 		tax = tax_amount,
 		total = total_amount,
+		vendorsubtotal = vendorsubtotal_amount,
+		vendortax = vendortax_amount,
+		vendortotal = vendortotal_amount,
+
         ispaymentpaid=ispaymentpaid,
 		paymenttransaction=paymenttransactionobj,
 		totaladmincommission =totaladmincommission,
@@ -456,7 +508,22 @@ def save_order(cartobj, address,usertype, user, razorpaytransaction):
 	if order:
 		order.orderno=generate_order_number(order.id)
 		order.save()
-	save_order_items(cartobj, order, customer, 'Online')
+    
+	purchase=PurchasesOrder.objects.create(
+	customer = customer,
+	address = address,
+	orderno=order.orderno,
+	subtotal = vendorsubtotal_amount,
+	tax = vendortax_amount,
+	total = vendortotal_amount,
+	paymenttransaction=paymenttransactionobj,
+	ispaymentpaid=ispaymentpaid,
+	totaladmincommission =totaladmincommission,
+
+	)
+
+   
+	save_order_items(cartobj, order, customer,purchase, 'Online')
 
 	Cart.objects.filter(customer=customer).delete()
  
@@ -646,6 +713,10 @@ def save_order_by_wallet(cartobj, address,usertype, user, wallet_transactions):
 		total_amount=cartobj['total_amount']
 		tax_amount=cartobj['tax_amount']
 		subtotal_amount=cartobj['subtotal_amount']
+		vendortotal_amount=cartobj['vendortotal_amount']
+		vendortax_amount=cartobj['vendortax_amount']
+		vendorsubtotal_amount=cartobj['vendorsubtotal_amount']
+		totaladmincommission=cartobj['total_admincommission']
 	print(wallet_transactions)
   
 	paymenttransactionobj=PaymentTransaction()
@@ -665,14 +736,35 @@ def save_order_by_wallet(cartobj, address,usertype, user, wallet_transactions):
 		subtotal = subtotal_amount,
 		tax = tax_amount,
 		total = total_amount,
+        vendorsubtotal = vendorsubtotal_amount,
+		vendortax = vendortax_amount,
+		vendortotal = vendortotal_amount,
 		paymenttransaction=paymenttransactionobj,
 		ispaymentpaid=True,
+        totaladmincommission =totaladmincommission,
 		# selfpickup = True
 	)
+ 
+   
 	if order:
 		order.orderno=generate_order_number(order.id)
 		order.save()
-	save_order_items(cartobj, order, customer, 'Online')
+    
+	purchase=PurchasesOrder.objects.create(
+	customer = customer,
+	address = address,
+	orderno=order.orderno,
+	subtotal = vendorsubtotal_amount,
+	tax = vendortax_amount,
+	total = vendortotal_amount,
+	paymenttransaction=paymenttransactionobj,
+	ispaymentpaid=True,
+	totaladmincommission =totaladmincommission,
+
+	)
+
+  
+	save_order_items(cartobj, order, customer,purchase ,'Online')
 
 	Cart.objects.filter(customer=customer).delete()
     

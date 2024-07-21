@@ -112,7 +112,10 @@ urlpatterns = [
     
     path('paymentinfo', admin_payment_info),
     path('purchases', admin_purchase_orders),
+    path('purchaseorderdetail', admin_purchaseorder_detail),
+    
     path('orders', admin_orders),
+    path('orderdetail', admin_order_detail),
     path('setpvpair', admin_pvpairvalue),
     path('leadershipbonus', admin_leadership_bonus_set),
     path('housefund', admin_house_fund_set),

@@ -1,0 +1,238 @@
+﻿{% extends 'admin_app/base.html' %}
+{% load static %}
+{% block title %}Sales Orders Details{{salesorder.orderno}}{% endblock %}
+{% block main %}
+<!-- Main Content -->
+<div class="main-content">
+    <section class="section">
+        <div class="section-header">
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="section-header-breadcrumb-content">
+                        <h1>Orders Details</h1>
+                        <div class="section-header-breadcrumb">
+                            <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
+                            <div class="breadcrumb-item"><span>{{salesorder.orderno}} {{salesorder.createdat}} </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12">
+
+
+                    <div class="card">
+                        <div class="card-body">
+                           
+                            <div class="table-responsive">
+                                <table class="table table-hover" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Product Name</th>
+                                            <th>Product Image</th>
+                                            <th>Payment Status</th>
+                                            <th>Order Status</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th>Tax </th>
+                                            <th>Amount</th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                        {% for first_orderitem in salesorder.salesorders.all %}
+
+
+                                        <tr>
+                                            <td>{{first_orderitem.id}}</td>
+                                            <td>
+
+                                                {{first_orderitem.productvariants}}
+
+                                            </td>
+
+                                            <td>
+
+
+                                                <img style="height: 50px; width:50px;"
+                                                    src="{{first_orderitem.productvariants.productimage.url}}">
+
+                                            </td>
+
+                                            <td> {% if salesorder.ispaymentpaid == True %} <span
+                                                    class="badge badge-success"><b>Paid</b></span> {% else %}
+                                                <span class="badge badge-danger"><b>UnPaid</b></span> 
+                                                {% endif %}</td>
+                                            <td>
+
+                                                {% if first_orderitem.orderstatus == 'Pending' %}
+                                                <span
+                                                    class="badge badge-info">{{first_orderitem.orderstatus}}</span>
+                                                {% endif %}
+                                                {% if first_orderitem.orderstatus == 'Order Placed' %}
+                                                <span class="badge badge-success">{{first_orderitem.orderstatus}}</span>
+                                                {% endif %}
+                                                {% if first_orderitem.orderstatus == 'Packed' %}
+                                                <span
+                                                    class="badge badge-success">{{first_orderitem.orderstatus}}</span>
+                                                {% endif %}
+                                                {% if first_orderitem.orderstatus == 'Shipped' %}
+                                                <span
+                                                    class="badge badge-danger">{{first_orderitem.orderstatus}}</span>
+                                                {% endif %}
+                                                {% if first_orderitem.orderstatus == 'Delivered' %}
+                                                <h5>Delivered on {{first_orderitem.deliveredon}}</h5>
+                                                {% endif %}
+                                                {% if first_orderitem.orderstatus == 'Cancelled' %}
+                                                <h5>Cancelled on {{first_orderitem.cancelledon}}</h5>
+                                                {% endif %}
+
+
+                                            </td>
+
+                                            <td>{{first_orderitem.vendorprice}}</td>
+                                            <td>{{first_orderitem.quantity}}</td>
+                                            {% if first_orderitem.taxtype == "GST" %}
+                                            <td>CGST({{first_orderitem.vendortaxgst}}) +  SGST({{first_orderitem.vendortaxgst}})</td>
+                                            {% else %}
+                                            <td> IGST - {{first_orderitem.vendortax}}</td>
+                                            {% endif %}
+                                            <td>{{first_orderitem.vendortotal}}</td>
+                                           
+
+                                        </tr>
+
+
+                                        {% endfor %}
+
+
+
+
+
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                         
+                            <div class="row">
+
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="product_details">
+                                        <h6>Delivery Address :</h6>
+                                        <table class="table">
+
+                                            <tbody>
+                                                
+
+                                                <tr>
+
+                                                    <td>
+
+                                                        <p>
+                                                            <!--Location URL-->
+                                                            <span class="badge badge-success"><a
+                                                            href="http://www.google.com/maps/place/{{salesorder.address.latitude}},{{salesorder.address.longitude}}"
+                                                            target="_blank">Map Location</a></span>
+                                                            <br>
+                                                            
+                                                            {{salesorder.address.firstname|default:""}}
+                                                            {{salesorder.address.lastname|default:""}}
+                                                            <span>+91-{{ salesorder.address.mobile}}</span>
+                                                            <br>
+                                                            <strong>
+                                                                {{salesorder.address.addresstype|default:""}}</strong>
+                                                            <br>
+                                                            {{salesorder.address.streetaddress|default:""}}<strong>-{{salesorder.address.pincode|default:""}}</strong>
+                                                            <br>
+                                                            {{salesorder.address.companyname|default:""}}
+                                                            <br>
+                                                            {{salesorder.address.gstno|default:""}}
+                                                            
+
+
+                                                                
+                                                        </p>
+
+
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="product_details">
+                                        <h6>Order Invoice Details :</h6>
+                                        <table class="table">
+                                            <tbody>
+
+                                                <tr>
+                                                    <td>Date :</td>
+                                                    <td>{{salesorder.createdat}}</td>
+                                                </tr>
+
+
+                                                <tr>
+                                                    <td>Subtotal :</td>
+                                                    <td>Rs {{salesorder.vendorsubtotal}}/-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tax :</td>
+                                                    {% if salesorder.taxtype == "GST" %}
+                                                    <td>Rs CGST({{salesorder.vendortaxgst}}) +  SGST({{salesorder.vendortaxgst}}) /-</td>
+                                                    {% else %}
+                                                    <td>Rs IGST({{salesorder.vendortax}}) /-</td>
+                                                    {% endif %}
+                                                  
+                                                </tr>
+                                                <tr>
+                                                    {% if salesorder.ispaymentpaid == True %}
+                                                    <td>
+                                                        <h6>TOTAL AMOUNT PAID :</h6>
+                                                    </td>
+                                                    <td>Rs {{salesorder.vendortotal}}/- <h5 class="badge badge-success">PAID Order</h5></td>
+                                                    {% else %}
+                                                    <td>
+                                                        <h6>TOTAL AMOUNT TO PAY :</h6>
+                                                    </td>
+                                                    <td>Rs {{salesorder.vendortotal}}/-   <h5 class="badge badge-warning">COD Order</h5>  </td>
+                                                    {% endif %}
+                                                </tr>
+
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                                         
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
