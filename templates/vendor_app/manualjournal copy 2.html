@@ -426,9 +426,8 @@
                              </label>
                            </td>
                            <td>
-                            
                              <label class="form-group has-float-label">
-                               <select class="form-control account-class" name="transactiontype1" data-width="100%"  id="transaction1" onchange="inputTransaction(1);">
+                               <select class="form-control account-class" name="transactiontype1" data-width="100%" id="transaction1" onchange="inputTransaction(1);">
                                  <option style="font-size:16px;" value="">----Select Transaction Type----</option>
                                  <option style="font-size:16px;" value="DEBIT">DEBIT</option>
                                  <option style="font-size:16px;" value="CREDIT">CREDIT</option>
@@ -465,180 +464,124 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-
-<script type="text/javascript">
-  document.getElementById('remove_account').disabled = true;
-  
-  function addAccount() {
-      let table = document.getElementById('accountTable');
-      let item = document.getElementById('itemValue').value;
-      document.getElementById('itemValue').value = Number(item) + 1;
-      let row = table.insertRow();
-      let account = row.insertCell(0);
-      let transactiontype = row.insertCell(1);
-      let debit = row.insertCell(2);
-      let credit = row.insertCell(3);
-  
-      account.innerHTML = `<label class="form-group has-float-label">
-                           <select class="form-control account-class" name="account${item}" id="selectedServiceId${item}" data-width="100%" required style="width: 150%;height: 44px;font-size: 14px;" onchange="selectsService();">
-                             <option value="">-----Select Account-----</option>
-                             {% for accountype in accounttypegroups %}
-                             <optgroup style="font-size:16px;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
-                             {% for first in accountype.accounttypegroups.all %}
-                             <option style="font-size:16px;" value="{{first.id}}">{{first.name}}</option>
-                             {% endfor %}
-                             {% endfor %}
-                           </select>
-                          </label>`;
-  
-      transactiontype.innerHTML = `<label class="form-group has-float-label">
-                                   <select class="form-control account-class" name="transactiontype${item}" data-width="100%" style="width: 115px; position: relative; left: 100%; top:-4px;" id="transaction${item}" onchange="inputTransaction(${item});">
-                                     <option style="font-size:16px;" value="">----Select Transaction Type----</option>
-                                     <option style="font-size:16px;" value="DEBIT">DEBIT</option>
-                                     <option style="font-size:16px;" value="CREDIT">CREDIT</option>
-                                   </select>
-                                  </label>`;
-  
-      debit.innerHTML = `<input name="deb${item}" class="form-control input-debit" style="width: 115px; position: relative; left: 125%; top:-4px;" type="number" id="deb${item}" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
-      credit.innerHTML = `<input name="cre${item}" class="form-control input-credit" style="width: 115px; position: relative; left: 85%; top:-4px;" type="number" id="cre${item}" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
-  
-      document.getElementById('remove_account').disabled = false;
-  }
-  
-  function removeAccount() {
-      let table = document.getElementById('accountTable');
-      let itemCount = Number(document.getElementById('itemValue').value);
-  
-      if (itemCount > 1) {
-          document.getElementById('itemValue').value = itemCount - 1;
-          table.deleteRow(-1); // Remove the last row
-  
-          // Re-enable the add button if there are still rows
-          document.getElementById('remove_account').disabled = false;
-      }
-  
-      if (itemCount === 2) {
-          document.getElementById('remove_account').disabled = true; // Disable if only one row is left
-      }
-  
-      totalDebit();
-      totalCredit();
-  }
-  
-  function inputTransaction(id) {
-      let transactionType = document.getElementById(`transaction${id}`).value;
-      let debit = document.getElementById(`deb${id}`);
-      let credit = document.getElementById(`cre${id}`);
-  
-      if (transactionType === 'DEBIT') {
-          credit.disabled = true;
-          debit.disabled = false;
-          credit.value = '';
-      } else if (transactionType === 'CREDIT') {
-          debit.disabled = true;
-          credit.disabled = false;
-          debit.value = '';
-      } else {
-          debit.disabled = false;
-          credit.disabled = false;
-      }
-  
-      autoFillRows();
-      totalDebit();
-      totalCredit();
-  }
-  
-  function autoFillRows() {
-      let rows = document.getElementById('accountTable').rows;
-      let totalDebit = 0;
-      let totalCredit = 0;
-      let debitFilled = false;
-      let creditFilled = false;
-  
-      for (let i = 0; i < rows.length; i++) {
-          let transactionType = document.getElementById(`transaction${i}`).value;
-  
-          if (transactionType === 'DEBIT') {
-              totalDebit += Number(document.getElementById(`deb${i}`).value);
-              debitFilled = true;
-          } else if (transactionType === 'CREDIT') {
-              totalCredit += Number(document.getElementById(`cre${i}`).value);
-              creditFilled = true;
-          }
-      }
-  
-      for (let i = 1; i < rows.length; i++) {
-          let transactionType = document.getElementById(`transaction${i}`).value;
-          let debit = document.getElementById(`deb${i}`);
-          let credit = document.getElementById(`cre${i}`);
-  
-          if (debitFilled && transactionType !== 'DEBIT') {
-              debit.disabled = true;
-              credit.disabled = false;
-              credit.value = totalDebit;
-          } else if (creditFilled && transactionType !== 'CREDIT') {
-              credit.disabled = true;
-              debit.disabled = false;
-              debit.value = totalCredit;
-          }
-      }
-  }
-  
-  function totalDebit() {
-      let totalDebit = 0;
-      let debit = document.getElementsByClassName('input-debit');
-      for (let i = 0; i < debit.length; i++) {
-          totalDebit += Number(debit[i].value);
-      }
-      document.getElementById('tDebit').innerHTML = `₹${totalDebit.toFixed(2)}`;
-  }
-  
-
-
-  function totalCredit() {
-      let totalCredit = 0;
-      let credit = document.getElementsByClassName('input-credit');
-      for (let i = 0; i < credit.length; i++) {
-          totalCredit += Number(credit[i].value);
-      }
-      document.getElementById('tCredit').innerHTML = `₹${totalCredit.toFixed(2)}`;
-  }
-  
-  function submitForm() {
-      let debit = document.getElementById('tDebit').innerHTML;
-      let credit = document.getElementById('tCredit').innerHTML;
-      let manual_form = document.forms['manual_journal_form'];
-      let account_counter = 0;
-      let account_class = document.getElementsByClassName('account-class');
-  
-      if (account_class.length > 0) {
-          for (let i = 0; i < account_class.length; i++) {
-              if (account_class[i].value === '') {
-                  account_counter += 1;
-              }
-          }
-      }
-  
-      if (account_counter > 0) {
-          document.getElementById('selectAccount').innerHTML = 'Please select an account';
-      } else if (manual_form['journal_date'].value === '') {
-          document.getElementById('journal_date_mgs').innerHTML = 'Please select a date';
-          document.getElementById('selectAccount').innerHTML = '';
-      } else if ((Number(debit.substr(1)) === Number(credit.substr(1))) && (Number(debit.substr(1)) > 0) && (Number(credit.substr(1)) > 0)) {
-          document.getElementById('journal_message').innerHTML = '';
-          manual_form.submit();
-          document.getElementById('journal_date_mgs').innerHTML = '';
-          document.getElementById('selectAccount').innerHTML = '';
-      } else {
-          document.getElementById('journal_message').innerHTML = 'Please ensure debits and credits are equal and greater than zero.';
-          document.getElementById('journal_date_mgs').innerHTML = '';
-          document.getElementById('selectAccount').innerHTML = '';
-      }
-  }
-  </script>
-  
-  
  
-
+ <script type="text/javascript">
+ 
+ document.getElementById('remove_account').disabled = true;
+ 
+ function addAccount() {
+   let table = document.getElementById('accountTable');
+   let item = document.getElementById('itemValue').value;
+   document.getElementById('itemValue').value = Number(item) + 1;
+   let row = table.insertRow();
+   let account = row.insertCell(0);
+   let transactiontype = row.insertCell(1);
+   let debit = row.insertCell(2);
+   let credit = row.insertCell(3);
+ 
+   account.innerHTML = `<label class="form-group has-float-label">
+                         <select class="form-control account-class" name="account${item}" id="selectedServiceId${item}" data-width="100%" required style="width: 150%;height: 44px;font-size: 14px;" onchange="selectsService();">
+                           <option value="">-----Select Account-----</option>
+                           {% for accountype in accounttypegroups %}
+                           <optgroup style="font-size:16px;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
+                           {% for first in accountype.accounttypegroups.all %}
+                           <option style="font-size:16px;" value="{{first.id}}">{{first.name}}</option>
+                           {% endfor %}
+                           {% endfor %}
+                         </select>
+                        </label>`;
+ 
+   transactiontype.innerHTML = `<label class="form-group has-float-label">
+                                 <select class="form-control account-class" name="transactiontype${item}" data-width="100%" style="width: 115px; position: relative; left: 100%; top:-4px;" id="transaction${item}" onchange="inputTransaction(${item});">
+                                   <option style="font-size:16px;" value="">----Select Transaction Type----</option>
+                                   <option style="font-size:16px;" value="DEBIT">DEBIT</option>
+                                   <option style="font-size:16px;" value="CREDIT">CREDIT</option>
+                                 </select>
+                                </label>`;
+ 
+   debit.innerHTML = `<input name="deb${item}" class="form-control input-debit" style="width: 115px; position: relative; left: 125%; top:-4px;" type="number" id="deb${item}" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
+   credit.innerHTML = `<input name="cre${item}" class="form-control input-credit" style="width: 115px; position: relative; left: 85%; top:-4px;" type="number" id="cre${item}" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
+ 
+   document.getElementById('remove_account').disabled = false;
+ }
+ 
+ function removeAccount() {
+   let table = document.getElementById('accountTable');
+   document.getElementById('itemValue').value = Number(document.getElementById('itemValue').value) - 1;
+   table.removeChild(table.lastElementChild);
+   if (document.getElementById('itemValue').value == '1') {
+     document.getElementById('remove_account').disabled = true;
+   }
+ }
+ 
+ function inputTransaction(id) {
+   let transactionType = document.getElementById(`transaction${id}`).value;
+   if (transactionType == 'DEBIT') {
+     document.getElementById(`cre${id}`).disabled = true;
+     document.getElementById(`deb${id}`).disabled = false;
+     document.getElementById(`cre${id}`).value = '';
+   } else if (transactionType == 'CREDIT') {
+     document.getElementById(`deb${id}`).disabled = true;
+     document.getElementById(`cre${id}`).disabled = false;
+     document.getElementById(`deb${id}`).value = '';
+   } else {
+     document.getElementById(`deb${id}`).disabled = false;
+     document.getElementById(`cre${id}`).disabled = false;
+   }
+   totalDebit();
+   totalCredit();
+ }
+ 
+ function totalDebit() {
+   let totalDebit = 0;
+   let debit = document.getElementsByClassName('input-debit');
+   for (let i = 0; i < debit.length; i++) {
+     totalDebit += Number(debit[i].value);
+   }
+   document.getElementById('tDebit').innerHTML = `₹${totalDebit.toFixed(2)}`;
+ }
+ 
+ function totalCredit() {
+   let totalCredit = 0;
+   let credit = document.getElementsByClassName('input-credit');
+   for (let i = 0; i < credit.length; i++) {
+     totalCredit += Number(credit[i].value);
+   }
+   document.getElementById('tCredit').innerHTML = `₹${totalCredit.toFixed(2)}`;
+ }
+ 
+ function submitForm() {
+   let debit = document.getElementById('tDebit').innerHTML;
+   let credit = document.getElementById('tCredit').innerHTML;
+   let manual_form = document.forms['manual_journal_form'];
+   let account_counter = 0;
+   let account_class = document.getElementsByClassName('account-class');
+ 
+   if (account_class.length > 0) {
+     for (let i = 0; i < account_class.length; i++) {
+       if (account_class[i].value == '') {
+         account_counter += 1;
+       }
+     }
+   }
+ 
+   if (account_counter > 0) {
+     document.getElementById('selectAccount').innerHTML = 'Please select an account';
+   } else if (manual_form['journal_date'].value == '') {
+     document.getElementById('journal_date_mgs').innerHTML = 'Please select a date';
+     document.getElementById('selectAccount').innerHTML = '';
+   } else if ((Number(debit.substr(1)) == Number(credit.substr(1))) && (Number(debit.substr(1)) > 0) && (Number(credit.substr(1)) > 0)) {
+     document.getElementById('journal_message').innerHTML = '';
+     manual_form.submit();
+     document.getElementById('journal_date_mgs').innerHTML = '';
+     document.getElementById('selectAccount').innerHTML = '';
+   } else {
+     document.getElementById('journal_message').innerHTML = 'Please ensure debits and credits are equal and greater than zero.';
+     document.getElementById('journal_date_mgs').innerHTML = '';
+     document.getElementById('selectAccount').innerHTML = '';
+   }
+ }
+ </script>
+ 
 
 {% endblock %}
