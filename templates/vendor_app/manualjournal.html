@@ -34,21 +34,7 @@
       border: 1px solid; border-style:ridge; 
       padding: 7px;
    }
-   #accountTable tr td{
-      width: 300px;
-      padding-left: 85px;
-   }
-   #newAccountTable{
-      position: relative;
-      right: 20px;
-       border-collapse: collapse;
-       /* border: 1px solid gray; */
-       width: 94%;
-       float: left;
-       top: -18px;
-       /* margin: 10px; */
-   
-   }
+  
    
    </style>
    
@@ -330,138 +316,136 @@
 
 {% endfor %}
 
-
- <!-- Modal -->
- <div class="modal fade" id="AddProductModal" tabindex="-1" role="dialog" aria-labelledby="AddProductModalLabel" aria-hidden="true">
-   <div class="modal-dialog  modal-xl" role="document">
-     <div class="modal-content">
-       <!-- Modal content-->
-       <div class="modal-content">
-         <div class="modal-header">
-             <h4 class="modal-title">Add </h4>
-             <button type="button" class="close" data-dismiss="modal">&times;</button>
-         </div>
-         <div class="modal-body">
-            <form method="POST" id="manual_journal_form" enctype="multipart/form-data">
-               {% csrf_token %}
-               <input type="hidden" name="hidden" value="2" id="itemValue">
-               <input type="hidden" name="lead_id1" value="{{lead}}">
-               <div class="row">
-                 <div class="col-lg-4 col-md-6 col-sm-12">
-                   <div class="form-group position-relative error-l-50">
-                     <div class="row">
-                       <span style="color: red;" id="journal_date_mgs"></span>
-                       <div class="col-lg-12 col-md-12 col-sm-12">
-                         <div class="form-group">
-                           <label>Date</label>
-                           <input type="date" class="form-control" name="journal_date" required>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-                 </div>
-               </div>
-               <div class="row mt-4">
-                 <div class="col-sm-12 col-lg-12">
-                   <div class="estimate-button-div">
-                     <div>
-                       <span><strong style="font-size: 18px;">Account</strong></span>
-                       <span id="journal_message" style="color: red; position: relative; left: 20px;"></span>
-                     </div>
-                     <div>
-                       <span><button type="button" class="estimate-button" onclick="addAccount();"><i class="fa fa-plus-circle" style="padding: 5px 0px 0px 0px;"></i></button></span>
-                       <span><button type="button" class="estimate-button" onclick="removeAccount();" id="remove_account"><i class="fa fa-minus-circle" style="padding: 5px 0px 0px 0px;"></i></button></span>
-                     </div>
-                   </div>
-                   <div class="table-responsive" style="background-color: #f0f0f0;">
-                     <span class="badge badge-success" id="serviePriceUpdateMgs"></span>
-                     <table class="table table-hover data-table responsive nowrap" style="text-align: center;">
-                       <thead>
-                         <tr>
-                           <th>Account</th>
-                           <th>Transaction Type</th>
-                           <th>Debit</th>
-                           <th>Credit</th>
-                         </tr>
-                       </thead>
-                       <tbody id="accountTable">
-                         <tr>
-                           <td>
-                             <label class="form-group has-float-label">
-                               <select class="form-control account-class" name="account0" data-width="100%" id="selectedServiceId0" onchange="selectsService();">
-                                 <option value="">-----Select Account-----</option>
-                                 {% for accountype in accounttypegroups %}
-                                 <optgroup style="font-size:16px;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
-                                 {% for first in accountype.accounttypegroups.all %}
-                                 <option style="font-size:16px;" value="{{first.id}}">{{first.name}}</option>
-                                 {% endfor %}
-                                 {% endfor %}
-                               </select>
-                             </label>
-                           </td>
-                           <td>
-                             <label class="form-group has-float-label">
-                               <select class="form-control account-class" name="transactiontype0" data-width="100%" id="transaction0" onchange="inputTransaction(0);">
-                                 <option style="font-size:16px;" value="">----Select Transaction Type----</option>
-                                 <option style="font-size:16px;" value="DEBIT">DEBIT</option>
-                                 <option style="font-size:16px;" value="CREDIT">CREDIT</option>
-                               </select>
-                             </label>
-                           </td>
-                           <td><input name="deb0" class="form-control input-debit" style="width: 115px;" type="number" id="deb0" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
-                           <td><input name="cre0" class="form-control input-credit" style="width: 115px;" type="number" id="cre0" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
-                         </tr>
-                         <tr>
-                           <td>
-                             <label class="form-group has-float-label">
-                               <select class="form-control account-class" name="account1" data-width="100%" id="selectedServiceId1" onchange="selectsService();">
-                                 <option value="">-----Select Account-----</option>
-                                 {% for accountype in accounttypegroups %}
-                                 <optgroup style="font-size:16px;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
-                                 {% for first in accountype.accounttypegroups.all %}
-                                 <option style="font-size:16px;" value="{{first.id}}">{{first.name}}</option>
-                                 {% endfor %}
-                                 {% endfor %}
-                               </select>
-                             </label>
-                           </td>
-                           <td>
-                            
-                             <label class="form-group has-float-label">
-                               <select class="form-control account-class" name="transactiontype1" data-width="100%"  id="transaction1" onchange="inputTransaction(1);">
-                                 <option style="font-size:16px;" value="">----Select Transaction Type----</option>
-                                 <option style="font-size:16px;" value="DEBIT">DEBIT</option>
-                                 <option style="font-size:16px;" value="CREDIT">CREDIT</option>
-                               </select>
-                             </label>
-                           </td>
-                           <td><input name="deb1" class="form-control input-debit" style="width: 115px;" type="number" id="deb1" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
-                           <td><input name="cre1" class="form-control input-credit" style="width: 115px;" type="number" id="cre1" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
-                         </tr>
-                       </tbody>
-                     </table>
-                   </div>
-                 </div>
-               </div>
-               <div class="row" style="margin-bottom: 20px;">
-                 <div style="height: 114px;width: 861px; position: relative;left: 250px;">
-                   <div style="padding: 46px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
-                     <span style="position: relative;left: 56px;"><strong>Total&nbsp;(₹)</strong></span>
-                     <span style="position: relative;left: 88px;"><strong id="tDebit">0.00</strong></span>
-                     <span style="position: relative;left: -5px;"><strong id="tCredit">0.00</strong></span>
-                   </div>
-                 </div>
-               </div>
-               <button class="btn btn-primary" type="button" name="button" form="manual_journal_form" onclick="submitForm();">Add Journal</button>
-             </form>
-            
-         </div>
+<!-- Modal -->
+<div class="modal fade" id="AddProductModal" tabindex="-1" role="dialog" aria-labelledby="AddProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <!-- Modal content-->
+      <div class="modal-header">
+        <h4 class="modal-title">Add Journal</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
-   </div>
+      <div class="modal-body">
+        <form method="POST" id="manual_journal_form" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="hidden" value="2" id="itemValue">
+          <input type="hidden" name="lead_id1" value="{{lead}}">
+          <div class="row">
+            <span style="color: red;" id="journal_date_mgs"></span>
+            <div class="col-lg-4  col-sm-12">
+                <div class="form-group">
+                  <label>Date</label>
+                  <input type="date" class="form-control" name="journal_date" required>
+                </div>
+            </div>
+            <div class="col-lg-4  col-sm-12">
+              <div class="form-group">
+                <label>Decription</label>
+                <input type="text" class="form-control" name="description" >
+              </div>
+          </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-sm-12 col-lg-12">
+              <div class="estimate-button-div">
+                <div>
+                  <strong style="font-size: 18px;">Account</strong>
+                  <span id="journal_message" style="color: red; position: relative; left: 20px;"></span>
+                </div>
+                <div>
+                  <button type="button" class="estimate-button" onclick="addAccount();">
+                    <i class="fa fa-plus-circle"></i>
+                  </button>
+                  <button type="button" class="estimate-button" onclick="removeAccount();" id="remove_account">
+                    <i class="fa fa-minus-circle"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="table-responsive" style="background-color: #f0f0f0;">
+                <span class="badge badge-success" id="serviePriceUpdateMgs"></span>
+                <table class="table table-hover data-table responsive nowrap" style="text-align: center;">
+                  <thead>
+                    <tr>
+                      <th>Transaction Type</th>
+                      <th>Account</th>
+                      <th>Debit</th>
+                      <th>Credit</th>
+                    </tr>
+                  </thead>
+                  <tbody id="accountTable">
+                    <tr>
+                      <td>
+                        <label class="form-group has-float-label">
+                          <select class="form-control account-class" name="transactiontype0" data-width="100%" id="transaction0" onchange="inputTransaction(0);">
+                            <option style="font-size:16px;" value="">----Select Transaction Type----</option>
+                            <option style="font-size:16px;" value="DEBIT">DEBIT</option>
+                            <option style="font-size:16px;" value="CREDIT">CREDIT</option>
+                          </select>
+                        </label>
+                      </td>
+  
+                      <td>
+                        <label class="form-group has-float-label">
+                          <select class="form-control account-class" name="account0" data-width="100%" id="selectedServiceId0" onchange="selectsService();">
+                            <option value="">-----Select Account-----</option>
+                            {% for accountype in accountledgerlist %}
+                             
+                            <option style="font-size:16px;" value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
+                           
+                            {% endfor %}
+                          </select>
+                        </label>
+                      </td>
+                      <td><input name="deb0" class="form-control input-debit" style="width: 115px;" type="number" id="deb0" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
+                      <td><input name="cre0" class="form-control input-credit" style="width: 115px;" type="number" id="cre0" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="form-group has-float-label">
+                          <select class="form-control account-class" name="transactiontype1" data-width="100%" id="transaction1" onchange="inputTransaction(1);">
+                            <option style="font-size:16px;" value="">----Select Transaction Type----</option>
+                            <option style="font-size:16px;" value="DEBIT">DEBIT</option>
+                            <option style="font-size:16px;" value="CREDIT">CREDIT</option>
+                          </select>
+                        </label>
+                      </td>
+
+                      <td>
+                        <label class="form-group has-float-label">
+                          <select class="form-control account-class" name="account1" data-width="100%" id="selectedServiceId1" onchange="selectsService();">
+                            <option value="">-----Select Account-----</option>
+                            {% for accountype in accountledgerlist %}
+                             
+                            <option style="font-size:16px;" value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
+                           
+                            {% endfor %}
+                          </select>
+                        </label>
+                      </td>
+                     
+                      <td><input name="deb1" class="form-control input-debit" style="width: 115px;" type="number" id="deb1" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
+                      <td><input name="cre1" class="form-control input-credit" style="width: 115px;" type="number" id="cre1" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="margin-bottom: 20px;">
+            <div style="height: 114px;width: 861px; position: relative;left: 250px;">
+              <div style="padding: 46px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
+                <span style="position: relative;left: 56px;"><strong>Total&nbsp;(₹)</strong></span>
+                <span style="position: relative;left: 88px;"><strong id="tDebit">0.00</strong></span>
+                <span style="position: relative;left: -5px;"><strong id="tCredit">0.00</strong></span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="button" name="button" form="manual_journal_form" onclick="submitForm();">Add Journal</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
-        
-
-
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
@@ -470,181 +454,145 @@
   document.getElementById('remove_account').disabled = true;
   
   function addAccount() {
-      let table = document.getElementById('accountTable');
-      let item = document.getElementById('itemValue').value;
-      document.getElementById('itemValue').value = Number(item) + 1;
-      let row = table.insertRow();
-      let account = row.insertCell(0);
-      let transactiontype = row.insertCell(1);
-      let debit = row.insertCell(2);
-      let credit = row.insertCell(3);
+    let table = document.getElementById('accountTable');
+    let itemValue = document.getElementById('itemValue');
+    let item = itemValue.value;
+    itemValue.value = Number(item) + 1;
+    let row = table.insertRow();
+    let transactiontype = row.insertCell(0);
+    let account = row.insertCell(1);
+    let debit = row.insertCell(2);
+    let credit = row.insertCell(3);
+
+    transactiontype.innerHTML = `
+    <label class="form-group has-float-label">
+      <select class="form-control account-class" name="transactiontype${item}" data-width="100%" style="width: 234px; position: relative; left: 0%; top:-4px;" id="transaction${item}" onchange="inputTransaction(${item});">
+        <option style="font-size:16px;" value="">----Select Transaction Type----</option>
+        <option style="font-size:16px;" value="DEBIT">DEBIT</option>
+        <option style="font-size:16px;" value="CREDIT">CREDIT</option>
+      </select>
+    </label>`;
   
-      account.innerHTML = `<label class="form-group has-float-label">
-                           <select class="form-control account-class" name="account${item}" id="selectedServiceId${item}" data-width="100%" required style="width: 150%;height: 44px;font-size: 14px;" onchange="selectsService();">
-                             <option value="">-----Select Account-----</option>
-                             {% for accountype in accounttypegroups %}
-                             <optgroup style="font-size:16px;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
-                             {% for first in accountype.accounttypegroups.all %}
-                             <option style="font-size:16px;" value="{{first.id}}">{{first.name}}</option>
-                             {% endfor %}
-                             {% endfor %}
-                           </select>
-                          </label>`;
+    account.innerHTML = `
+      <label class="form-group has-float-label">
+        <select class="form-control account-class" name="account${item}" id="selectedServiceId${item}" data-width="100%" required style="width: 100%;height: 44px;font-size: 14px;" onchange="selectsService();">
+          <option value="">-----Select Account-----</option>
+          {% for accountype in accountledgerlist %}          
+          <option style="font-size:16px;" value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
+          {% endfor %}
+        </select>
+      </label>`;
   
-      transactiontype.innerHTML = `<label class="form-group has-float-label">
-                                   <select class="form-control account-class" name="transactiontype${item}" data-width="100%" style="width: 115px; position: relative; left: 100%; top:-4px;" id="transaction${item}" onchange="inputTransaction(${item});">
-                                     <option style="font-size:16px;" value="">----Select Transaction Type----</option>
-                                     <option style="font-size:16px;" value="DEBIT">DEBIT</option>
-                                     <option style="font-size:16px;" value="CREDIT">CREDIT</option>
-                                   </select>
-                                  </label>`;
+    debit.innerHTML = `<input name="deb${item}" class="form-control input-debit" style="width: 115px; position: relative; left: 0%; top:-4px;" type="number" id="deb${item}" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
+    credit.innerHTML = `<input name="cre${item}" class="form-control input-credit" style="width: 115px; position: relative; left: 0%; top:-4px;" type="number" id="cre${item}" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
   
-      debit.innerHTML = `<input name="deb${item}" class="form-control input-debit" style="width: 115px; position: relative; left: 125%; top:-4px;" type="number" id="deb${item}" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
-      credit.innerHTML = `<input name="cre${item}" class="form-control input-credit" style="width: 115px; position: relative; left: 85%; top:-4px;" type="number" id="cre${item}" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
-  
-      document.getElementById('remove_account').disabled = false;
+    document.getElementById('remove_account').disabled = false;
   }
   
   function removeAccount() {
-      let table = document.getElementById('accountTable');
-      let itemCount = Number(document.getElementById('itemValue').value);
-  
-      if (itemCount > 1) {
-          document.getElementById('itemValue').value = itemCount - 1;
-          table.deleteRow(-1); // Remove the last row
-  
-          // Re-enable the add button if there are still rows
-          document.getElementById('remove_account').disabled = false;
-      }
-  
-      if (itemCount === 2) {
-          document.getElementById('remove_account').disabled = true; // Disable if only one row is left
-      }
-  
-      totalDebit();
-      totalCredit();
+    let table = document.getElementById('accountTable');
+    let itemValue = document.getElementById('itemValue');
+    if (itemValue.value > 1) {
+      table.deleteRow(-1);
+      itemValue.value = Number(itemValue.value) - 1;
+    }
+    if (itemValue.value == 1) {
+      document.getElementById('remove_account').disabled = true;
+    }
   }
   
-  function inputTransaction(id) {
-      let transactionType = document.getElementById(`transaction${id}`).value;
-      let debit = document.getElementById(`deb${id}`);
-      let credit = document.getElementById(`cre${id}`);
   
-      if (transactionType === 'DEBIT') {
-          credit.disabled = true;
-          debit.disabled = false;
-          credit.value = '';
-      } else if (transactionType === 'CREDIT') {
-          debit.disabled = true;
-          credit.disabled = false;
-          debit.value = '';
-      } else {
-          debit.disabled = false;
-          credit.disabled = false;
+function inputTransaction(id) {
+  let transactionType = document.getElementById(`transaction${id}`).value;
+  let debitField = document.getElementById(`deb${id}`);
+  let creditField = document.getElementById(`cre${id}`);
+  if (transactionType == 'DEBIT') {
+      creditField.disabled = true;
+      creditField.value = '';
+      debitField.disabled = false;
+      if (id == 0) {
+          debitField.value = '';
       }
-  
-      autoFillRows();
-      totalDebit();
-      totalCredit();
+  } else if (transactionType == 'CREDIT') {
+      debitField.disabled = true;
+      debitField.value = '';
+      creditField.disabled = false;
+      if (id == 0) {
+          creditField.value = '';
+      }
+  } else {
+      debitField.disabled = false;
+      creditField.disabled = false;
   }
-  
-  function autoFillRows() {
-      let rows = document.getElementById('accountTable').rows;
-      let totalDebit = 0;
-      let totalCredit = 0;
-      let debitFilled = false;
-      let creditFilled = false;
-  
-      for (let i = 0; i < rows.length; i++) {
-          let transactionType = document.getElementById(`transaction${i}`).value;
-          console.log(transactionType,i,'transactionType')
-          if (transactionType === 'DEBIT') {
-              totalDebit += Number(document.getElementById(`deb${i}`).value);
-              console.log(totalDebit,i,'totalDebit444444444444')
-              debitFilled = true;
-          } else if (transactionType === 'CREDIT') {
-              totalCredit += Number(document.getElementById(`cre${i}`).value);
-              console.log(totalCredit,i,'totalCredit5555555555555555')
-              creditFilled = true;
-          }
-      }
-  
-      for (let i = 1; i < rows.length; i++) {
-          let transactionType = document.getElementById(`transaction${i}`).value;
-          let debit = document.getElementById(`deb${i}`);
-          let credit = document.getElementById(`cre${i}`);
-       
-          if (debitFilled && transactionType !== 'DEBIT') {
-              debit.disabled = true;
-              credit.disabled = false;
-              credit.value = totalDebit;
-              console.log(totalDebit,i,'totalDebit33333333333')
-          } else if (creditFilled && transactionType !== 'CREDIT') {
-              credit.disabled = true;
-              debit.disabled = false;
-              debit.value = totalCredit;
-              console.log(totalCredit,i,'totalCredit33333333333')
-          }
-      }
-  }
-  
-  function totalDebit() {
-      let totalDebit = 0;
-      let debit = document.getElementsByClassName('input-debit');
-     
-      for (let i = 0; i < debit.length; i++) {
-          totalDebit += Number(debit[i].value);
-      }
-      document.getElementById('tDebit').innerHTML = `₹${totalDebit.toFixed(2)}`;
-  }
-  
+  autoFillAmounts();
+  totalDebit();
+  totalCredit();
+}
 
+function autoFillAmounts() {
+  let rows = document.getElementById('accountTable').rows;
+  let totalDebit = 0;
+  let totalCredit = 0;
 
-  function totalCredit() {
-      let totalCredit = 0;
-      let credit = document.getElementsByClassName('input-credit');
-   
-      for (let i = 0; i < credit.length; i++) {
-          totalCredit += Number(credit[i].value);
+  for (let i = 0; i < rows.length; i++) {
+      let transactionType = document.getElementById(`transaction${i}`).value;
+      let debitField = document.getElementById(`deb${i}`);
+      let creditField = document.getElementById(`cre${i}`);
+      if (transactionType == 'DEBIT') {
+          totalDebit += Number(debitField.value || 0);
+      } else if (transactionType == 'CREDIT') {
+          totalCredit += Number(creditField.value || 0);
       }
-      document.getElementById('tCredit').innerHTML = `₹${totalCredit.toFixed(2)}`;
   }
-  
+
+  let lastRow = rows[rows.length - 1];
+  if (lastRow) {
+      let lastTransactionType = document.getElementById(`transaction${rows.length - 1}`).value;
+      if (lastTransactionType == 'CREDIT') {
+          document.getElementById(`cre${rows.length - 1}`).value = totalDebit;
+      } else if (lastTransactionType == 'DEBIT') {
+          document.getElementById(`deb${rows.length - 1}`).value = totalCredit;
+      }
+  }
+}
+
+function totalDebit() {
+  let totalDebit = Array.from(document.getElementsByClassName('input-debit'))
+      .reduce((sum, input) => sum + Number(input.value || 0), 0);
+  document.getElementById('tDebit').innerHTML = `₹${totalDebit.toFixed(2)}`;
+}
+
+function totalCredit() {
+  let totalCredit = Array.from(document.getElementsByClassName('input-credit'))
+      .reduce((sum, input) => sum + Number(input.value || 0), 0);
+  document.getElementById('tCredit').innerHTML = `₹${totalCredit.toFixed(2)}`;
+}
   function submitForm() {
-      let debit = document.getElementById('tDebit').innerHTML;
-      let credit = document.getElementById('tCredit').innerHTML;
-      let manual_form = document.forms['manual_journal_form'];
-      let account_counter = 0;
-      let account_class = document.getElementsByClassName('account-class');
+    let debit = document.getElementById('tDebit').innerHTML;
+    let credit = document.getElementById('tCredit').innerHTML;
+    let manual_form = document.forms['manual_journal_form'];
+    let account_class = document.getElementsByClassName('account-class');
   
-      if (account_class.length > 0) {
-          for (let i = 0; i < account_class.length; i++) {
-              if (account_class[i].value === '') {
-                  account_counter += 1;
-              }
-          }
-      }
+    let account_counter = Array.from(account_class).filter(acc => !acc.value).length;
   
-      if (account_counter > 0) {
-          document.getElementById('selectAccount').innerHTML = 'Please select an account';
-      } else if (manual_form['journal_date'].value === '') {
-          document.getElementById('journal_date_mgs').innerHTML = 'Please select a date';
-          document.getElementById('selectAccount').innerHTML = '';
-      } else if ((Number(debit.substr(1)) === Number(credit.substr(1))) && (Number(debit.substr(1)) > 0) && (Number(credit.substr(1)) > 0)) {
-          document.getElementById('journal_message').innerHTML = '';
-          manual_form.submit();
-          document.getElementById('journal_date_mgs').innerHTML = '';
-          document.getElementById('selectAccount').innerHTML = '';
-      } else {
-          document.getElementById('journal_message').innerHTML = 'Please ensure debits and credits are equal and greater than zero.';
-          document.getElementById('journal_date_mgs').innerHTML = '';
-          document.getElementById('selectAccount').innerHTML = '';
-      }
+    if (account_counter > 0) {
+      document.getElementById('journal_message').innerHTML = 'Please select all accounts';
+    } else if (!manual_form['journal_date'].value) {
+      document.getElementById('journal_date_mgs').innerHTML = 'Please select a date';
+      document.getElementById('journal_message').innerHTML = '';
+    } else if ((Number(debit.substr(1)) === Number(credit.substr(1))) && Number(debit.substr(1)) > 0) {
+      document.getElementById('journal_message').innerHTML = '';
+      document.getElementById('journal_date_mgs').innerHTML = '';
+      manual_form.submit();
+    } else {
+      document.getElementById('journal_message').innerHTML = 'Please ensure debits and credits are equal and greater than zero.';
+      document.getElementById('journal_date_mgs').innerHTML = '';
+    }
   }
   </script>
   
-  
- 
+
+
 
 
 {% endblock %}
