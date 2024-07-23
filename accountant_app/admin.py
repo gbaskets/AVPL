@@ -6,3 +6,5 @@ from .models import *
 admin.site.register(AccountTypeGroup)
 admin.site.register(AccountType)
 admin.site.register(Account)
+admin.site.register(ManualJournalVoucher)
+admin.site.register(AccountEntry)

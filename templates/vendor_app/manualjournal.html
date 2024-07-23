@@ -326,7 +326,7 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
-        <form method="POST" id="manual_journal_form" enctype="multipart/form-data">
+        <form method="POST" action="/vendor/add-manual-journal" id="manual_journal_form" enctype="multipart/form-data">
           {% csrf_token %}
           <input type="hidden" name="hidden" value="2" id="itemValue">
           <input type="hidden" name="lead_id1" value="{{lead}}">
@@ -376,7 +376,7 @@
                     <tr>
                       <td>
                         <label class="form-group has-float-label">
-                          <select class="form-control account-class" name="transactiontype0" data-width="100%" id="transaction0" onchange="inputTransaction(0);">
+                          <select class="form-control account-class" name="transaction0" data-width="100%" id="transaction0" onchange="inputTransaction(0);">
                             <option style="font-size:16px;" value="">----Select Transaction Type----</option>
                             <option style="font-size:16px;" value="DEBIT">DEBIT</option>
                             <option style="font-size:16px;" value="CREDIT">CREDIT</option>
@@ -402,7 +402,7 @@
                     <tr>
                       <td>
                         <label class="form-group has-float-label">
-                          <select class="form-control account-class" name="transactiontype1" data-width="100%" id="transaction1" onchange="inputTransaction(1);">
+                          <select class="form-control account-class" name="transaction1" data-width="100%" id="transaction1" onchange="inputTransaction(1);">
                             <option style="font-size:16px;" value="">----Select Transaction Type----</option>
                             <option style="font-size:16px;" value="DEBIT">DEBIT</option>
                             <option style="font-size:16px;" value="CREDIT">CREDIT</option>
@@ -466,7 +466,7 @@
 
     transactiontype.innerHTML = `
     <label class="form-group has-float-label">
-      <select class="form-control account-class" name="transactiontype${item}" data-width="100%" style="width: 234px; position: relative; left: 0%; top:-4px;" id="transaction${item}" onchange="inputTransaction(${item});">
+      <select class="form-control account-class" name="transaction${item}" data-width="100%" style="width: 234px; position: relative; left: 0%; top:-4px;" id="transaction${item}" onchange="inputTransaction(${item});">
         <option style="font-size:16px;" value="">----Select Transaction Type----</option>
         <option style="font-size:16px;" value="DEBIT">DEBIT</option>
         <option style="font-size:16px;" value="CREDIT">CREDIT</option>
@@ -578,15 +578,15 @@ function totalCredit() {
     if (account_counter > 0) {
       document.getElementById('journal_message').innerHTML = 'Please select all accounts';
     } else if (!manual_form['journal_date'].value) {
-      document.getElementById('journal_date_mgs').innerHTML = 'Please select a date';
-      document.getElementById('journal_message').innerHTML = '';
+      document.getElementById('journal_message').innerHTML = 'Please select a date';
+ 
     } else if ((Number(debit.substr(1)) === Number(credit.substr(1))) && Number(debit.substr(1)) > 0) {
       document.getElementById('journal_message').innerHTML = '';
-      document.getElementById('journal_date_mgs').innerHTML = '';
+    
       manual_form.submit();
     } else {
       document.getElementById('journal_message').innerHTML = 'Please ensure debits and credits are equal and greater than zero.';
-      document.getElementById('journal_date_mgs').innerHTML = '';
+    
     }
   }
   </script>

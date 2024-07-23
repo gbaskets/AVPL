@@ -2153,3 +2153,74 @@ def manualjournal(request):
 		return render(request, '403.html')
 
 
+
+@csrf_exempt
+def add_manualjournal(request):
+	if check_user_authentication(request, 'VENDOR'):
+		if request.method=="POST":
+			vendorobj=Vendor.objects.filter(user=request.user).first()
+			storeobj=Store.objects.filter(vendor=vendorobj).first()
+			value=request.POST.get('hidden')
+			description=request.POST.get('description')
+			date=request.POST.get('journal_date')
+   
+			ref_no = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(timezone.now())+'JOURNAL'))
+			ref_no = ref_no.upper()
+			referenceno = ref_no[0:8]
+            
+			manualjournalvoucher=ManualJournalVoucher.objects.create(store=storeobj,referenceno=referenceno,createddate=date,description=description)
+			total_amount=0.0
+			total_debit=0.0
+			total_credit=0.0
+   
+			for i in range(int(value)):
+				t='transaction'+str(i)
+				a='account'+str(i)
+				deb='deb'+str(i)
+				cre='cre'+str(i)
+				account_name=request.POST.get(a)
+				transactiontype=request.POST.get(t)
+				debit=request.POST.get(deb)
+				credit=request.POST.get(cre)
+
+
+				if account_name.isnumeric() == True:
+					account=Account.objects.get(id=account_name)
+					
+					if debit!='':
+						total_debit=total_debit+float(debit)
+						total_amount=total_amount+float(debit)
+						account_entry=AccountEntry.objects.create(manualjournalvoucher=manualjournalvoucher,transactiontype=transactiontype,totaldebit=float(debit),account=account)
+			
+					if credit!='':
+						total_credit=total_credit+float(credit)
+						# total_amount=total_amount+float(credit)
+						account_entry=AccountEntry.objects.create(manualjournalvoucher=manualjournalvoucher,transactiontype=transactiontype,totalcredit=float(credit),account=account)
+						
+				else:
+
+					if Account.objects.get(accountname=account_name).exists():
+						account=Account.objects.get(accountname=account_name).first()
+			
+						if debit!='':
+							total_debit=total_debit+float(debit)
+							total_amount=total_amount+float(debit)
+							account_entry=AccountEntry.objects.create(manualjournalvoucher=manualjournalvoucher,transactiontype=transactiontype,totaldebit=float(debit),account=account)
+				
+						if credit!='':
+							total_credit=total_credit+float(credit)
+							# total_amount=total_amount+float(credit)
+							account_entry=AccountEntry.objects.create(manualjournalvoucher=manualjournalvoucher,transactiontype=transactiontype,totalcredit=float(credit),account=account)
+					
+				
+	
+			manualjournalvoucher.totalcredit=total_credit
+			manualjournalvoucher.totaldebit=total_debit
+			manualjournalvoucher.amount=total_amount
+			manualjournalvoucher.save()
+		   
+		return redirect("/vendor/manual-journal")
+	else:
+		return render(request, '403.html')
+
+

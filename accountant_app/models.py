@@ -41,47 +41,39 @@ class Account(models.Model):
         return self.accountname + " " + str(self.id)
 
 
-# class MannualJournal(models.Model):
-# 	store = models.ForeignKey(Store, on_delete = models.CASCADE,null = True, blank = True)
-# 	payment_receive = models.IntegerField( null=True, blank=True)
-# 	billpayment = models.IntegerField( null=True, blank=True)
+class ManualJournalVoucher(models.Model):
+    store = models.ForeignKey("store_app.Store", on_delete = models.CASCADE, null = True, blank = True)
+    admin = models.ForeignKey(User, on_delete = models.CASCADE, null = True, blank = True,related_name="juurnaladmins")
+    referenceno = models.CharField(max_length = 255, null = True, blank = True)
+    createddate= models.DateField(null = True, blank = True)
+    transactiontype=models.CharField(max_length = 255, null = True, blank = True)
+    description=models.TextField( null = True, blank = True)
+    totaldebit  = models.FloatField( default = 0.00, null =True, blank = True)
+    totalcredit = models.FloatField( default = 0.00, null = True, blank = True)
+    amount = models.FloatField( default = 0.00, null = True, blank = True)
+    createdat = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+    updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
 
-# 	invoiceid  = models.IntegerField( blank = True, null = True)
-# 	purshaseinvoiceid  = models.IntegerField(blank = True, null = True)
-
-# 	createdby   = models.ForeignKey(User,on_delete = models.CASCADE, blank = True, null = True)
-# 	createddate = models.DateField(null = True, blank = True)
-# 	referenceno = models.CharField(max_length = 255, null = True, blank = True)
-# 	status       = models.BooleanField(default = False)
-# 	totalcredit = models.DecimalField(max_digits = 10, decimal_places = 2, default = 0.00, null = True, blank = True)
-# 	totaldebit  = models.DecimalField(max_digits = 10, decimal_places = 2, default = 0.00, null =True, blank = True)
-# 	amount       = models.DecimalField(max_digits = 10, decimal_places = 2, null = True, blank = True)
-# 	journaltype=models.CharField(max_length = 100, null = True, blank = True)
-	
-# 	def __str__(self):
-# 		return str(self.id) + ' ' +str(self.store.store_name)
+def __str__(self):
+        return str(self.id) + ' ' +str(self.store)
 
 
-
-
-# class AccountEntry(models.Model):
-# 	account         = models.ForeignKey(Account, on_delete = models.CASCADE, null = True, blank = True)
-# 	expense_id      = models.IntegerField(null = True, blank = True) #use expense_id to store, id of expense model.
-# 	store_id        = models.IntegerField(null = True, blank = True) #use store_id to store, id of store model.
-# 	date            = models.DateTimeField(auto_now= True)
-# 	transaction_user=models.CharField(max_length = 100,null = True, blank = True)
-# 	entrytype      = models.CharField(max_length = 50)
-# 	title           = models.CharField(max_length = 255, default ='No-Title')
-# 	ismatched      = models.BooleanField(default=False)
-# 	amount          = models.DecimalField(max_digits = 10, decimal_places = 2, null = True, blank = True)
-# 	balance         = models.DecimalField(max_digits = 10, decimal_places = 2, default = 0.00,null = True, blank = True)
-# 	totalcredit    = models.DecimalField(max_digits = 10, decimal_places = 2, default = 0.00,null = True, blank = True)
-# 	totaldebit     = models.DecimalField(max_digits = 10, decimal_places = 2, default = 0.00,null = True, blank = True)
-# 	attechfile     = models.FileField(upload_to ='ledger_file', null = True, blank = True)
-# 	description     = models.TextField(null = True, blank = True)
- 
-# 	def __str__(self):
-# 		return str(self.id)
+class AccountEntry(models.Model):
+    manualjournalvoucher= models.ForeignKey(ManualJournalVoucher, on_delete=models.CASCADE, null=True, blank=True)
+    account= models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
+    transactiontype=models.CharField(max_length = 255, null = True, blank = True)
+    totaldebit  = models.FloatField( default = 0.00, null =True, blank = True)
+    totalcredit = models.FloatField( default = 0.00, null = True, blank = True)
+    amount = models.FloatField( default = 0.00, null = True, blank = True)
+    balance         =  models.FloatField( default = 0.00, null = True, blank = True)
+    ismatched      = models.BooleanField(default=False,null = True, blank = True)
+    createdat = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+    updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+    
+    def __str__(self):
+        return str(self.id)
 
 
 
