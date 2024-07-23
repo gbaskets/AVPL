@@ -75,28 +75,27 @@
                                     <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
                                        <thead>
                                           <tr>
-                                             <th>Sr.</th>
-                                             <th>Account Code</th>
-                                            
-                                             <th>Account Name</th>
-                                             <th>Account Type</th>
-                                             
-                                             <th>Current Balance</th>
-                                             <th>Action</th>
+                                            <th>Sr.</th>
+                                            <th>Date</th>
+                                            <th>Reference No</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                            <th>Created By</th>
+                                            <th>Action</th>
                                           </tr>
                                        </thead>
                                        <tbody>
-                                          {% for list in accountledgerlist %}
+                                          {% for list in manualjournalvoucher %}
                                           <tr>
                                              <td>{{ list.id|safe }}</td>
-                                             <td>{{ list.accountcode|safe }}</td>
-                                             <td>{{ list.accountname|safe }}</td>
-                                             <td>{{ list.accounttype.name|safe }}</td>
-                                             <td>{{ list.openingbalance|safe }} {% if list.transctiontype == "CREDIT" %} CR {% else %} DR {% endif %}</td>
-                                              
-                                             <td ><a class="btn btn-success btn-icon icon-left" data-toggle="modal" data-target="#EditAccountModal{{list.id}}"><i class="far fa-edit"></i>Edit</a>
-                                    
-                                          
+                                             <td>{{ list.createddate|safe }}</td>
+                                             <td>{{ list.referenceno|safe }}</td>
+                                             <td>{{ list.description|safe }}</td>
+                                             <td>{{ list.amount|safe }}</td>
+                                             <td>{{ list.updatedby|safe }}</td>
+                                            
+                                             <td ><a href="/vendor/view-manual-journal/{{list.id}}" class="btn btn-success btn-icon icon-left"><i class="far fa-eye"></i>View</a>
+                                             </td>
                                           </tr>
                                           {% endfor %}
                                        </tbody>
@@ -111,210 +110,8 @@
               
             </div>
 
-
-
-
-
-{% for list in accountledgerlist %}
-
- <!-- Modal -->
- <div class="modal fade" id="EditAccountModal{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="EditProductModalLabel{{list.id}}" aria-hidden="true">
-   <div class="modal-dialog modal-xl" role="document">
-     <div class="modal-content">
-      <form action="/vendor/edit-chart-of-account/{{list.id}}" enctype="multipart/form-data"
-      method="POST">
-      {% csrf_token %}
-       <div class="modal-header">
-         <h5 class="modal-title" id="EditProductModalLabel{{list.id}}">Edit Account Ledger - {{list.id}}</h5>
-      
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-           <span aria-hidden="true">&times;</span>
-         </button>
-       </div>
-       <div class="modal-body">
-     
-         <div class="row">
-                                       
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Select Accoun Type</label>
-
-                  <select class="form-control" name="accountype">
-                     <option value="">----Select Account----</option>
-                     {% for accountype  in accounttypegroups %}
-                     <optgroup style="font-size:16px;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
-                     
-                     {% for first in accountype.accounttypegroups.all %}
-                   
-                     <option style="font-size:16px;" value="{{first.id}}" {% if list.accounttype.id == first.id %} selected {% else %} {%endif %}>{{first.name}}</option>
-                     {% endfor %}
-                     {% endfor %}
-                  </select>
-               </div>
-            
-            </div>
-            
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Account Code</label>
-                  <input type="text" class="form-control" value="{{list.accountcode}}" disabled>
-               </div>   
-            </div>
-          
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Account Name</label>
-                  <input type="text" class="form-control" placeholder="Enter Here...." name="accountname" value="{{list.accountname}}" required>
-               </div>   
-            </div>
-
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Select Transction Type</label>
-                  <select class="form-control" name="transctiontype">
-                     <option value="">----Select Transction Type----</option>
-                     <option value="DEBIT" {% if list.transctiontype == "DEBIT" %} selected {% else%} {%endif%}>DEBIT</option>
-                     <option value="CREDIT"  {% if list.transctiontype == "CREDIT" %} selected {% else%} {%endif%} >CREDIT</option>
-                 
-                  </select>
-               </div>
-            </div>
-          
-           
-            <div class="col-lg-4 col-md-12 col-sm-12">
-               <div class="form-group">
-                  <label>Opening Balance</label>
-                  <input type="text" class="form-control" name="openingbalance" value="{{list.openingbalance}}" required>
-               </div>
-            </div>
           
 
-            <div class="col-lg-4 col-md-12 col-sm-12">
-
-            <div class="form-group">
-               <label>Street Address</label>
-               <input type="text" class="form-control" placeholder="Enter Street Address *"
-                   id="address" title="Only (a-z) letters are allowed." 
-                   name="streetaddress" value="{{list.streetaddress|default:''}}" />
-           </div>
-           </div>
-           <div class="col-lg-4 col-md-12 col-sm-12">
-           <div class="form-group">
-               <label>Near by Address</label>
-               <input type="text" class="form-control"
-                   placeholder="Enter Near by Address *" id='nearbyaddress'
-                   title="Only (a-z) letters are allowed."  name="nearbyaddress"
-                   value="{{list.nearbyaddress|default:''}}" />
-           </div>
-         </div>
-         <div class="col-lg-4 col-md-12 col-sm-12">
-           <div class="form-group">
-               <label>City</label>
-               <input type="text" class="form-control" placeholder="Enter City *" id='city'
-                   title="Only (a-z) letters are allowed."  name="city"
-                   value="{{list.city|default:''}}" />
-           </div>
-
-         </div>
-         <div class="col-lg-4 col-md-12 col-sm-12">
-           <div class="form-group">
-               <label>State</label>
-               <input type="text" class="form-control" placeholder="Enter State *"
-                   id='state' title="Only (a-z) letters are allowed."  name="state"
-                   value="{{list.state|default:''}}" />
-           </div>
-
-         </div>
-         <div class="col-lg-4 col-md-12 col-sm-12">
-           <div class="form-group">
-               <label>Country</label>
-               <input type="text" class="form-control" placeholder="Enter Country *"
-                   id='country' title="Only (a-z) letters are allowed." 
-                   name="country" value="{{list.country|default:''}}" />
-           </div>
-
-         </div>
-         <div class="col-lg-4 col-md-12 col-sm-12">
-
-           <div class="form-group">
-               <label>Pincode</label>
-               <input type="text" placeholder="Enter Pincode *" id='pincode'
-                   class="form-control" minlength="6" maxlength="6" name="pincode"
-                   value="{{list.pincode|default:''}}" />
-           </div>
-         </div>
-         <div class="col-lg-4 col-md-12 col-sm-12">
-
-
-            
-            <div class="form-group">
-               <label>PAN Card No</label>
-               <input type="text" class="form-control" placeholder="PAN Number *"
-                   pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
-                   title="Please enter the correct PAN number." name="pancardno"
-                   value="{{list.pancardno|default:''}}" />
-           </div>
-
-         </div>
-         <div class="col-lg-4 col-md-12 col-sm-12">
-
-
-           <div class="form-group">
-               <label>PAN Card Image </label>
-               {% if list.pancarddoc %}
-               <a href="{{list.pancarddoc.url}}"> <img alt="image"
-                       src="{{list.pancarddoc.url}}" height="50" weight="50" /></a>
-               {% else %}
-               {% endif %}
-               <input type="file" class="form-control" accept="application/pdf, image/*"
-                   name="pancarddoc" />
-           </div>
-
-         </div>
-         <div class="col-lg-4 col-md-12 col-sm-12">
-            <div class="form-group">
-               <label>GST No</label>
-               <input type="text" class="form-control" placeholder="GST NO *"
-                   title="Please enter the correct gstno number." name="gstno"
-                   value="{{list.gstno|default:''}}" />
-           </div>
-         </div>
-         <div class="col-lg-4 col-md-12 col-sm-12">
-
-           <div class="form-group">
-               <label>GST Image</label>
-               {% if storeobj.gstnodoc %}
-               <a href="{{list.gstnodoc.url}}"> <img alt="image"
-                       src="{{list.gstnodoc.url}}" height="50" weight="50" /></a>
-               {% else %}
-               {% endif %}
-               <input type="file" class="form-control" accept="application/pdf, image/*"
-                   name="gstnodoc" />
-           </div>
-
-           <input type="hidden" placeholder="latitude *" id='latitude' class="form-control"
-           name="latitude"  />
-       <input type="hidden" placeholder="longitude *" id='longitude'
-           class="form-control" name="longitude"
-           />
-         </div>
-
-
-           
-           
-         </div>
-                    
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-         <button type="submit" class="btn btn-success">Save changes</button>
-       </div>
-      </form>
-     </div>
-   </div>
- </div>
-
-{% endfor %}
 
 <!-- Modal -->
 <div class="modal fade" id="AddProductModal" tabindex="-1" role="dialog" aria-labelledby="AddProductModalLabel" aria-hidden="true">
@@ -323,7 +120,7 @@
       <!-- Modal content-->
       <div class="modal-header">
         <h4 class="modal-title">Add Journal</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
         <form method="POST" action="/vendor/add-manual-journal" id="manual_journal_form" enctype="multipart/form-data">
@@ -332,18 +129,18 @@
           <input type="hidden" name="lead_id1" value="{{lead}}">
           <div class="row">
             <span style="color: red;" id="journal_date_mgs"></span>
-            <div class="col-lg-4  col-sm-12">
-                <div class="form-group">
-                  <label>Date</label>
-                  <input type="date" class="form-control" name="journal_date" required>
-                </div>
-            </div>
-            <div class="col-lg-4  col-sm-12">
+            <div class="col-lg-4 col-sm-12">
               <div class="form-group">
-                <label>Decription</label>
-                <input type="text" class="form-control" name="description" >
+                <label for="journal_date">Date</label>
+                <input type="date" class="form-control" name="journal_date" id="journal_date" required>
               </div>
-          </div>
+            </div>
+            <div class="col-lg-4 col-sm-12">
+              <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" class="form-control" name="description" id="description">
+              </div>
+            </div>
           </div>
           <div class="row mt-4">
             <div class="col-sm-12 col-lg-12">
@@ -383,21 +180,18 @@
                           </select>
                         </label>
                       </td>
-  
                       <td>
                         <label class="form-group has-float-label">
                           <select class="form-control account-class" name="account0" data-width="100%" id="selectedServiceId0" onchange="selectsService();">
                             <option value="">-----Select Account-----</option>
                             {% for accountype in accountledgerlist %}
-                             
-                            <option style="font-size:16px;" value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
-                           
+                              <option style="font-size:16px;" value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
                             {% endfor %}
                           </select>
                         </label>
                       </td>
-                      <td><input name="deb0" class="form-control input-debit" style="width: 115px;" type="number" id="deb0" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
-                      <td><input name="cre0" class="form-control input-credit" style="width: 115px;" type="number" id="cre0" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
+                      <td><input name="deb0" class="form-control input-debit" style="width: 115px;" type="number" id="deb0" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)"></td>
+                      <td><input name="cre0" class="form-control input-credit" style="width: 115px;" type="number" id="cre0" min="0" onchange="totalCredit();" onkeypress="return validateInput(event)"></td>
                     </tr>
                     <tr>
                       <td>
@@ -409,22 +203,18 @@
                           </select>
                         </label>
                       </td>
-
                       <td>
                         <label class="form-group has-float-label">
                           <select class="form-control account-class" name="account1" data-width="100%" id="selectedServiceId1" onchange="selectsService();">
                             <option value="">-----Select Account-----</option>
                             {% for accountype in accountledgerlist %}
-                             
-                            <option style="font-size:16px;" value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
-                           
+                              <option style="font-size:16px;" value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
                             {% endfor %}
                           </select>
                         </label>
                       </td>
-                     
-                      <td><input name="deb1" class="form-control input-debit" style="width: 115px;" type="number" id="deb1" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
-                      <td><input name="cre1" class="form-control input-credit" style="width: 115px;" type="number" id="cre1" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57"></td>
+                      <td><input name="deb1" class="form-control input-debit" style="width: 115px;" type="number" id="deb1" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)"></td>
+                      <td><input name="cre1" class="form-control input-credit" style="width: 115px;" type="number" id="cre1" min="0" onchange="totalCredit();" onkeypress="return validateInput(event)"></td>
                     </tr>
                   </tbody>
                 </table>
@@ -435,8 +225,8 @@
             <div style="height: 114px;width: 861px; position: relative;left: 250px;">
               <div style="padding: 46px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
                 <span style="position: relative;left: 56px;"><strong>Total&nbsp;(₹)</strong></span>
-                <span style="position: relative;left: 88px;"><strong id="tDebit">0.00</strong></span>
-                <span style="position: relative;left: -5px;"><strong id="tCredit">0.00</strong></span>
+                <span style="position: relative;left: 88px;"><strong id="tDebit">₹0.00</strong></span>
+                <span style="position: relative;left: -5px;"><strong id="tCredit">₹0.00</strong></span>
               </div>
             </div>
           </div>
@@ -449,8 +239,24 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-
 <script type="text/javascript">
+  function validateInput(event) {
+    let charCode = (event.which) ? event.which : event.keyCode;
+    
+    // Allow backspace (8), delete (46), and the decimal point (46)
+    if (charCode == 8 || charCode == 46 || charCode == 110 || charCode == 190) {
+      return true;
+    }
+    
+    // Ensure the entered value is a number
+    if (charCode < 48 || charCode > 57) {
+      return false;
+    }
+
+    return true;
+  }
+
+
   document.getElementById('remove_account').disabled = true;
   
   function addAccount() {
@@ -483,8 +289,8 @@
         </select>
       </label>`;
   
-    debit.innerHTML = `<input name="deb${item}" class="form-control input-debit" style="width: 115px; position: relative; left: 0%; top:-4px;" type="number" id="deb${item}" min="0" onchange="totalDebit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
-    credit.innerHTML = `<input name="cre${item}" class="form-control input-credit" style="width: 115px; position: relative; left: 0%; top:-4px;" type="number" id="cre${item}" min="0" onchange="totalCredit();" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">`;
+    debit.innerHTML = `<input name="deb${item}" class="form-control input-debit" style="width: 115px; position: relative; left: 0%; top:-4px;" type="number" id="deb${item}" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)">`;
+    credit.innerHTML = `<input name="cre${item}" class="form-control input-credit" style="width: 115px; position: relative; left: 0%; top:-4px;" type="number" id="cre${item}" min="0" onchange="totalCredit();" onkeypress="return validateInput(event)">`;
   
     document.getElementById('remove_account').disabled = false;
   }
@@ -499,97 +305,98 @@
     if (itemValue.value == 1) {
       document.getElementById('remove_account').disabled = true;
     }
+    autoFillAmounts();
+    totalDebit();
+    totalCredit();
   }
   
-  
-function inputTransaction(id) {
-  let transactionType = document.getElementById(`transaction${id}`).value;
-  let debitField = document.getElementById(`deb${id}`);
-  let creditField = document.getElementById(`cre${id}`);
-  if (transactionType == 'DEBIT') {
+  function inputTransaction(id) {
+    let transactionType = document.getElementById(`transaction${id}`).value;
+    let debitField = document.getElementById(`deb${id}`);
+    let creditField = document.getElementById(`cre${id}`);
+    if (transactionType == 'DEBIT') {
       creditField.disabled = true;
       creditField.value = '';
       debitField.disabled = false;
       if (id == 0) {
-          debitField.value = '';
+        debitField.value = '';
       }
-  } else if (transactionType == 'CREDIT') {
+    } else if (transactionType == 'CREDIT') {
       debitField.disabled = true;
       debitField.value = '';
       creditField.disabled = false;
       if (id == 0) {
-          creditField.value = '';
+        creditField.value = '';
       }
-  } else {
+    } else {
       debitField.disabled = false;
       creditField.disabled = false;
+    }
+    autoFillAmounts();
+    totalDebit();
+    totalCredit();
   }
-  autoFillAmounts();
-  totalDebit();
-  totalCredit();
-}
 
-function autoFillAmounts() {
-  let rows = document.getElementById('accountTable').rows;
-  let totalDebit = 0;
-  let totalCredit = 0;
+  function autoFillAmounts() {
+    let rows = document.getElementById('accountTable').rows;
+    let totalDebit = 0;
+    let totalCredit = 0;
 
-  for (let i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       let transactionType = document.getElementById(`transaction${i}`).value;
       let debitField = document.getElementById(`deb${i}`);
       let creditField = document.getElementById(`cre${i}`);
       if (transactionType == 'DEBIT') {
-          totalDebit += Number(debitField.value || 0);
+        totalDebit += Number(debitField.value || 0);
       } else if (transactionType == 'CREDIT') {
-          totalCredit += Number(creditField.value || 0);
+        totalCredit += Number(creditField.value || 0);
       }
-  }
+    }
 
-  let lastRow = rows[rows.length - 1];
-  if (lastRow) {
+    let lastRow = rows[rows.length - 1];
+    if (lastRow) {
       let lastTransactionType = document.getElementById(`transaction${rows.length - 1}`).value;
       if (lastTransactionType == 'CREDIT') {
-          document.getElementById(`cre${rows.length - 1}`).value = totalDebit;
+        document.getElementById(`cre${rows.length - 1}`).value = totalDebit;
       } else if (lastTransactionType == 'DEBIT') {
-          document.getElementById(`deb${rows.length - 1}`).value = totalCredit;
+        document.getElementById(`deb${rows.length - 1}`).value = totalCredit;
       }
+    }
   }
-}
 
-function totalDebit() {
-  let totalDebit = Array.from(document.getElementsByClassName('input-debit'))
+  function totalDebit() {
+    let totalDebit = Array.from(document.getElementsByClassName('input-debit'))
       .reduce((sum, input) => sum + Number(input.value || 0), 0);
-  document.getElementById('tDebit').innerHTML = `₹${totalDebit.toFixed(2)}`;
-}
+    document.getElementById('tDebit').innerHTML = `₹${totalDebit.toFixed(2)}`;
+  }
 
-function totalCredit() {
-  let totalCredit = Array.from(document.getElementsByClassName('input-credit'))
+  function totalCredit() {
+    let totalCredit = Array.from(document.getElementsByClassName('input-credit'))
       .reduce((sum, input) => sum + Number(input.value || 0), 0);
-  document.getElementById('tCredit').innerHTML = `₹${totalCredit.toFixed(2)}`;
-}
+    document.getElementById('tCredit').innerHTML = `₹${totalCredit.toFixed(2)}`;
+  }
+
   function submitForm() {
     let debit = document.getElementById('tDebit').innerHTML;
     let credit = document.getElementById('tCredit').innerHTML;
     let manual_form = document.forms['manual_journal_form'];
     let account_class = document.getElementsByClassName('account-class');
-  
+
     let account_counter = Array.from(account_class).filter(acc => !acc.value).length;
-  
+
     if (account_counter > 0) {
       document.getElementById('journal_message').innerHTML = 'Please select all accounts';
     } else if (!manual_form['journal_date'].value) {
       document.getElementById('journal_message').innerHTML = 'Please select a date';
- 
     } else if ((Number(debit.substr(1)) === Number(credit.substr(1))) && Number(debit.substr(1)) > 0) {
       document.getElementById('journal_message').innerHTML = '';
-    
       manual_form.submit();
     } else {
       document.getElementById('journal_message').innerHTML = 'Please ensure debits and credits are equal and greater than zero.';
-    
     }
   }
-  </script>
+</script>
+
   
 
 

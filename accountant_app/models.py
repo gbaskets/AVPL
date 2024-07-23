@@ -60,7 +60,7 @@ def __str__(self):
 
 
 class AccountEntry(models.Model):
-    manualjournalvoucher= models.ForeignKey(ManualJournalVoucher, on_delete=models.CASCADE, null=True, blank=True)
+    manualjournalvoucher= models.ForeignKey(ManualJournalVoucher, on_delete=models.CASCADE, null=True, blank=True,related_name="manualjournalvouchers")
     account= models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
     transactiontype=models.CharField(max_length = 255, null = True, blank = True)
     totaldebit  = models.FloatField( default = 0.00, null =True, blank = True)

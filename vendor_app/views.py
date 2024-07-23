@@ -2145,6 +2145,8 @@ def manualjournal(request):
 		dic = {"vendorobj":vendorobj,
                 "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
+                 "manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
+               
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -2153,74 +2155,95 @@ def manualjournal(request):
 		return render(request, '403.html')
 
 
+from django.shortcuts import redirect, render
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+import uuid
 
 @csrf_exempt
 def add_manualjournal(request):
+    if check_user_authentication(request, 'VENDOR'):
+        if request.method == "POST":
+            vendorobj = Vendor.objects.filter(user=request.user).first()
+            storeobj = Store.objects.filter(vendor=vendorobj).first()
+            value = request.POST.get('hidden')
+            description = request.POST.get('description')
+            date = request.POST.get('journal_date')
+
+            ref_no = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(timezone.now()) + 'JOURNAL'))
+            ref_no = ref_no.upper()
+            referenceno = ref_no[0:8]
+
+            manualjournalvoucher = ManualJournalVoucher.objects.create(
+                store=storeobj, referenceno=referenceno, createddate=date, description=description
+            )
+
+            total_amount = 0.0
+            total_debit = 0.0
+            total_credit = 0.0
+
+            for i in range(int(value)):
+                t = 'transaction' + str(i)
+                a = 'account' + str(i)
+                deb = 'deb' + str(i)
+                cre = 'cre' + str(i)
+                account_name = request.POST.get(a)
+                transactiontype = request.POST.get(t)
+                debit = request.POST.get(deb)
+                credit = request.POST.get(cre)
+
+                try:
+                    if account_name.isnumeric():
+                        account = Account.objects.get(id=account_name)
+                    else:
+                        account = Account.objects.filter(accountname=account_name).first()
+                    
+                    if not account:
+                        continue  # Skip this iteration if account is not found
+
+                    if debit:
+                        total_debit += float(debit)
+                        total_amount += float(debit)
+                        AccountEntry.objects.create(
+                            manualjournalvoucher=manualjournalvoucher, transactiontype=transactiontype,
+                            totaldebit=float(debit), account=account,updatedby=request.user
+                        )
+
+                    if credit:
+                        total_credit += float(credit)
+                        AccountEntry.objects.create(
+                            manualjournalvoucher=manualjournalvoucher, transactiontype=transactiontype,
+                            totalcredit=float(credit), account=account,updatedby=request.user
+                        )
+
+                except Account.DoesNotExist:
+                    continue  # Skip this iteration if account does not exist
+
+            manualjournalvoucher.totalcredit = total_credit
+            manualjournalvoucher.totaldebit = total_debit
+            manualjournalvoucher.amount = total_amount
+            manualjournalvoucher.updatedby=request.user
+            manualjournalvoucher.save()
+
+        return redirect("/vendor/manual-journal")
+    else:
+        return render(request, '403.html')
+
+
+
+
+@csrf_exempt
+def view_manualjournal(request,id):
 	if check_user_authentication(request, 'VENDOR'):
-		if request.method=="POST":
-			vendorobj=Vendor.objects.filter(user=request.user).first()
-			storeobj=Store.objects.filter(vendor=vendorobj).first()
-			value=request.POST.get('hidden')
-			description=request.POST.get('description')
-			date=request.POST.get('journal_date')
-   
-			ref_no = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(timezone.now())+'JOURNAL'))
-			ref_no = ref_no.upper()
-			referenceno = ref_no[0:8]
-            
-			manualjournalvoucher=ManualJournalVoucher.objects.create(store=storeobj,referenceno=referenceno,createddate=date,description=description)
-			total_amount=0.0
-			total_debit=0.0
-			total_credit=0.0
-   
-			for i in range(int(value)):
-				t='transaction'+str(i)
-				a='account'+str(i)
-				deb='deb'+str(i)
-				cre='cre'+str(i)
-				account_name=request.POST.get(a)
-				transactiontype=request.POST.get(t)
-				debit=request.POST.get(deb)
-				credit=request.POST.get(cre)
-
-
-				if account_name.isnumeric() == True:
-					account=Account.objects.get(id=account_name)
-					
-					if debit!='':
-						total_debit=total_debit+float(debit)
-						total_amount=total_amount+float(debit)
-						account_entry=AccountEntry.objects.create(manualjournalvoucher=manualjournalvoucher,transactiontype=transactiontype,totaldebit=float(debit),account=account)
-			
-					if credit!='':
-						total_credit=total_credit+float(credit)
-						# total_amount=total_amount+float(credit)
-						account_entry=AccountEntry.objects.create(manualjournalvoucher=manualjournalvoucher,transactiontype=transactiontype,totalcredit=float(credit),account=account)
-						
-				else:
-
-					if Account.objects.get(accountname=account_name).exists():
-						account=Account.objects.get(accountname=account_name).first()
-			
-						if debit!='':
-							total_debit=total_debit+float(debit)
-							total_amount=total_amount+float(debit)
-							account_entry=AccountEntry.objects.create(manualjournalvoucher=manualjournalvoucher,transactiontype=transactiontype,totaldebit=float(debit),account=account)
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+				"accounttypegroups" :AccountTypeGroup.objects.all(),
+					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj,id=id),
 				
-						if credit!='':
-							total_credit=total_credit+float(credit)
-							# total_amount=total_amount+float(credit)
-							account_entry=AccountEntry.objects.create(manualjournalvoucher=manualjournalvoucher,transactiontype=transactiontype,totalcredit=float(credit),account=account)
-					
-				
-	
-			manualjournalvoucher.totalcredit=total_credit
-			manualjournalvoucher.totaldebit=total_debit
-			manualjournalvoucher.amount=total_amount
-			manualjournalvoucher.save()
-		   
-		return redirect("/vendor/manual-journal")
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/manualjournalupdated.html', dic)
 	else:
 		return render(request, '403.html')
-
-

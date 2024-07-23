@@ -1,0 +1,351 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Manual Journal Voucher{% endblock %}
+{% block main %}
+
+<style>
+
+   .separator{
+     display:flex;
+     align-items: center; 
+     border-bottom: none;
+   }
+   
+   .separator .line{
+     height: 1px;
+     flex: 1;
+     background-color: rgba(0, 0, 0, 0.295);
+     border-bottom: none;
+   }
+   
+   .separator h2{
+     padding: 0 2rem;
+     border-bottom: none;
+     font-size: 12px;
+   }
+   .estimate-button{
+      background-color:#00365a;
+      color: white; 
+      border: none;
+   }
+   .estimate-button-div{
+      display: flex ;
+      justify-content:space-between; 
+      border: 1px solid; border-style:ridge; 
+      padding: 7px;
+   }
+  
+   
+   </style>
+   
+
+            <!-- Main Content -->
+            <div class="main-content">
+               <section class="section">
+                  <div class="section-header">
+                     <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                           <div class="section-header-breadcrumb-content">
+                              <h1>Manual Journal Voucher</h1>
+                              <div class="section-header-breadcrumb">
+                                 <div class="breadcrumb-item active"><a href="/vendor/manual-journal"><i class="fas fa-home"></i></a></div>
+                                 <div class="breadcrumb-item"><a href="#">Manual Journal Voucher</a></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="section-body">
+                     <div class="row">
+                      
+                        <div class="col-12">
+                           <div class="card">
+                              <div class="card-header">
+                                 <div class="col-8">
+                                    <h4>Manual Journal Voucher List</h4>
+                                 </div>
+                                  
+                              
+                                     
+                              </div>
+                              <div class="card-body">
+                                {% for list in manualjournalvoucher %}
+                              
+                                    
+                                       <form method="POST" id="manual_journal_form" enctype="multipart/form-data">
+                                         {% csrf_token %}
+                                         <input type="hidden" name="hidden" value="2" id="itemValue">
+                                         <input type="hidden" name="lead_id1" value="{{lead}}">
+                                         <div class="row">
+                                           <span style="color: red;" id="journal_date_mgs"></span>
+                                           <div class="col-lg-4 col-sm-12">
+                                             <div class="form-group">
+                                               <label for="journal_date">Date</label>
+                                               <input type="date" class="form-control" name="journal_date" id="journal_date" value="{{list.createddate|date:'Y-m-d'|default:'' }}" required>
+                                             </div>
+                                           </div>
+                                           <div class="col-lg-4 col-sm-12">
+                                             <div class="form-group">
+                                               <label for="referenceno">Reference No</label>
+                                               <input type="text" class="form-control" name="referenceno" id="referenceno" value="{{list.referenceno}}">
+                                             </div>
+                                           </div>
+                                           <div class="col-lg-4 col-sm-12">
+                                             <div class="form-group">
+                                               <label for="description">Description</label>
+                                               <input type="text" class="form-control" name="description" id="description" value="{{list.description}}">
+                                             </div>
+                                           </div>
+                                         </div>
+                                         <div class="row mt-4">
+                                           <div class="col-sm-12 col-lg-12">
+                                             <div class="estimate-button-div">
+                                               <div>
+                                                 <strong style="font-size: 18px;">Account</strong>
+                                                 <span id="journal_message" style="color: red; position: relative; left: 20px;"></span>
+                                               </div>
+                                               <div>
+                                                 <button type="button" class="estimate-button" onclick="addAccount();" disabled>
+                                                   <i class="fa fa-plus-circle"></i>
+                                                 </button>
+                                                 <button type="button" class="estimate-button" onclick="removeAccount();" id="remove_account" disabled>
+                                                   <i class="fa fa-minus-circle"></i>
+                                                 </button>
+                                               </div>
+                                             </div>
+                                             <div class="table-responsive" style="background-color: #f0f0f0;">
+                                               <span class="badge badge-success" id="serviePriceUpdateMgs"></span>
+                                               <table class="table table-hover data-table responsive nowrap" style="text-align: center;">
+                                                 <thead>
+                                                   <tr>
+                                                     <th>Transaction Type</th>
+                                                     <th>Account</th>
+                                                     <th>Debit</th>
+                                                     <th>Credit</th>
+                                                   </tr>
+                                                 </thead>
+                                                 <tbody id="accountTable">
+                                                   {% for data in list.manualjournalvouchers.all %}
+                                                   <tr>
+                                                     <td>
+                                                       <label class="form-group has-float-label">
+                                                         <select class="form-control account-class" name="transaction{{data.id}}" data-width="100%" id="transaction{{data.id}}" onchange="inputTransaction({{data.id}});">
+                                                           <option style="font-size:16px;" value="">----Select Transaction Type----</option>
+                                                           <option style="font-size:16px;" value="DEBIT" {% if data.transactiontype == "DEBIT" %} selected {% else %} {% endif %}>DEBIT</option>
+                                                           <option style="font-size:16px;" value="CREDIT" {% if data.transactiontype == "CREDIT" %} selected {% else %} {% endif %}>CREDIT</option>
+                                                         </select>
+                                                       </label>
+                                                     </td>
+                                                     <td>
+                                                       <label class="form-group has-float-label">
+                                                         <select class="form-control account-class" name="account{{data.id}}" data-width="100%" id="selectedServiceId{{data.id}}" onchange="selectsService();">
+                                                           <option value="">-----Select Account-----</option>
+                                                           {% for accountype in accountledgerlist %}
+                                                             <option style="font-size:16px;" {% if data.account.id == accountype.id %} selected {% else %} {% endif %} value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
+                                                           {% endfor %}
+                                                         </select>
+                                                       </label>
+                                                     </td>
+                                                     <td><input name="deb{{data.id}}" class="form-control input-debit" style="width: 115px;" type="number" value="{{data.totaldebit}}" id="deb{{data.id}}" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)"></td>
+                                                     <td><input name="cre{{data.id}}" class="form-control input-credit" style="width: 115px;" type="number"  value="{{data.totalcredit}}" id="cre{{data.id}}" min="0" onchange="totalCredit();" onkeypress="return validateInput(event)"></td>
+                                                   </tr>
+                                                   {% endfor %}
+                                                   
+                                                 </tbody>
+                                               </table>
+                                             </div>
+                                           </div>
+                                         </div>
+                                         <div class="row" style="margin-bottom: 20px;">
+                                           <div style="height: 114px;width: 861px; position: relative;left: 141px;">
+                                             <div style="padding: 46px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
+                                               <span style="position: relative;left: 56px;"><strong>Total&nbsp;(₹)</strong></span>
+                                               <span style="position: relative;left: 88px;"><strong id="tDebit">₹{{list.totaldebit}}</strong></span>
+                                               <span style="position: relative;left: -5px;"><strong id="tCredit">₹{{list.totalcredit}}</strong></span>
+                                             </div>
+                                           </div>
+                                         </div>
+                                         
+                                       </form>
+                                     </div>
+                                   
+                               
+                               {% endfor %}
+                               
+                             
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+              
+            </div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+  function validateInput(event) {
+    let charCode = (event.which) ? event.which : event.keyCode;
+    
+    // Allow backspace (8), delete (46), and the decimal point (46)
+    if (charCode == 8 || charCode == 46 || charCode == 110 || charCode == 190) {
+      return true;
+    }
+    
+    // Ensure the entered value is a number
+    if (charCode < 48 || charCode > 57) {
+      return false;
+    }
+
+    return true;
+  }
+
+
+  document.getElementById('remove_account').disabled = true;
+  
+  function addAccount() {
+    let table = document.getElementById('accountTable');
+    let itemValue = document.getElementById('itemValue');
+    let item = itemValue.value;
+    itemValue.value = Number(item) + 1;
+    let row = table.insertRow();
+    let transactiontype = row.insertCell(0);
+    let account = row.insertCell(1);
+    let debit = row.insertCell(2);
+    let credit = row.insertCell(3);
+
+    transactiontype.innerHTML = `
+    <label class="form-group has-float-label">
+      <select class="form-control account-class" name="transaction${item}" data-width="100%" style="width: 234px; position: relative; left: 0%; top:-4px;" id="transaction${item}" onchange="inputTransaction(${item});">
+        <option style="font-size:16px;" value="">----Select Transaction Type----</option>
+        <option style="font-size:16px;" value="DEBIT">DEBIT</option>
+        <option style="font-size:16px;" value="CREDIT">CREDIT</option>
+      </select>
+    </label>`;
+  
+    account.innerHTML = `
+      <label class="form-group has-float-label">
+        <select class="form-control account-class" name="account${item}" id="selectedServiceId${item}" data-width="100%" required style="width: 100%;height: 44px;font-size: 14px;" onchange="selectsService();">
+          <option value="">-----Select Account-----</option>
+          {% for accountype in accountledgerlist %}          
+          <option style="font-size:16px;" value="{{accountype.id}}">{{accountype.accountname}} ({{accountype.accountcode}})</option>
+          {% endfor %}
+        </select>
+      </label>`;
+  
+    debit.innerHTML = `<input name="deb${item}" class="form-control input-debit" style="width: 115px; position: relative; left: 0%; top:-4px;" type="number" id="deb${item}" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)">`;
+    credit.innerHTML = `<input name="cre${item}" class="form-control input-credit" style="width: 115px; position: relative; left: 0%; top:-4px;" type="number" id="cre${item}" min="0" onchange="totalCredit();" onkeypress="return validateInput(event)">`;
+  
+    document.getElementById('remove_account').disabled = false;
+  }
+  
+  function removeAccount() {
+    let table = document.getElementById('accountTable');
+    let itemValue = document.getElementById('itemValue');
+    if (itemValue.value > 1) {
+      table.deleteRow(-1);
+      itemValue.value = Number(itemValue.value) - 1;
+    }
+    if (itemValue.value == 1) {
+      document.getElementById('remove_account').disabled = true;
+    }
+    autoFillAmounts();
+    totalDebit();
+    totalCredit();
+  }
+  
+  function inputTransaction(id) {
+    let transactionType = document.getElementById(`transaction${id}`).value;
+    let debitField = document.getElementById(`deb${id}`);
+    let creditField = document.getElementById(`cre${id}`);
+    if (transactionType == 'DEBIT') {
+      creditField.disabled = true;
+      creditField.value = '';
+      debitField.disabled = false;
+      if (id == 0) {
+        debitField.value = '';
+      }
+    } else if (transactionType == 'CREDIT') {
+      debitField.disabled = true;
+      debitField.value = '';
+      creditField.disabled = false;
+      if (id == 0) {
+        creditField.value = '';
+      }
+    } else {
+      debitField.disabled = false;
+      creditField.disabled = false;
+    }
+    autoFillAmounts();
+    totalDebit();
+    totalCredit();
+  }
+
+  function autoFillAmounts() {
+    let rows = document.getElementById('accountTable').rows;
+    let totalDebit = 0;
+    let totalCredit = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+      let transactionType = document.getElementById(`transaction${i}`).value;
+      let debitField = document.getElementById(`deb${i}`);
+      let creditField = document.getElementById(`cre${i}`);
+      if (transactionType == 'DEBIT') {
+        totalDebit += Number(debitField.value || 0);
+      } else if (transactionType == 'CREDIT') {
+        totalCredit += Number(creditField.value || 0);
+      }
+    }
+
+    let lastRow = rows[rows.length - 1];
+    if (lastRow) {
+      let lastTransactionType = document.getElementById(`transaction${rows.length - 1}`).value;
+      if (lastTransactionType == 'CREDIT') {
+        document.getElementById(`cre${rows.length - 1}`).value = totalDebit;
+      } else if (lastTransactionType == 'DEBIT') {
+        document.getElementById(`deb${rows.length - 1}`).value = totalCredit;
+      }
+    }
+  }
+
+  function totalDebit() {
+    let totalDebit = Array.from(document.getElementsByClassName('input-debit'))
+      .reduce((sum, input) => sum + Number(input.value || 0), 0);
+    document.getElementById('tDebit').innerHTML = `₹${totalDebit.toFixed(2)}`;
+  }
+
+  function totalCredit() {
+    let totalCredit = Array.from(document.getElementsByClassName('input-credit'))
+      .reduce((sum, input) => sum + Number(input.value || 0), 0);
+    document.getElementById('tCredit').innerHTML = `₹${totalCredit.toFixed(2)}`;
+  }
+
+  function submitForm() {
+    let debit = document.getElementById('tDebit').innerHTML;
+    let credit = document.getElementById('tCredit').innerHTML;
+    let manual_form = document.forms['manual_journal_form'];
+    let account_class = document.getElementsByClassName('account-class');
+
+    let account_counter = Array.from(account_class).filter(acc => !acc.value).length;
+
+    if (account_counter > 0) {
+      document.getElementById('journal_message').innerHTML = 'Please select all accounts';
+    } else if (!manual_form['journal_date'].value) {
+      document.getElementById('journal_message').innerHTML = 'Please select a date';
+    } else if ((Number(debit.substr(1)) === Number(credit.substr(1))) && Number(debit.substr(1)) > 0) {
+      document.getElementById('journal_message').innerHTML = '';
+      manual_form.submit();
+    } else {
+      document.getElementById('journal_message').innerHTML = 'Please ensure debits and credits are equal and greater than zero.';
+    }
+  }
+</script>
+
+  
+
+
+
+
+{% endblock %}
