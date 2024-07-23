@@ -557,12 +557,14 @@
   
       for (let i = 0; i < rows.length; i++) {
           let transactionType = document.getElementById(`transaction${i}`).value;
-  
+          console.log(transactionType,i,'transactionType')
           if (transactionType === 'DEBIT') {
               totalDebit += Number(document.getElementById(`deb${i}`).value);
+              console.log(totalDebit,i,'totalDebit444444444444')
               debitFilled = true;
           } else if (transactionType === 'CREDIT') {
               totalCredit += Number(document.getElementById(`cre${i}`).value);
+              console.log(totalCredit,i,'totalCredit5555555555555555')
               creditFilled = true;
           }
       }
@@ -571,15 +573,17 @@
           let transactionType = document.getElementById(`transaction${i}`).value;
           let debit = document.getElementById(`deb${i}`);
           let credit = document.getElementById(`cre${i}`);
-  
+       
           if (debitFilled && transactionType !== 'DEBIT') {
               debit.disabled = true;
               credit.disabled = false;
               credit.value = totalDebit;
+              console.log(totalDebit,i,'totalDebit33333333333')
           } else if (creditFilled && transactionType !== 'CREDIT') {
               credit.disabled = true;
               debit.disabled = false;
               debit.value = totalCredit;
+              console.log(totalCredit,i,'totalCredit33333333333')
           }
       }
   }
@@ -587,6 +591,7 @@
   function totalDebit() {
       let totalDebit = 0;
       let debit = document.getElementsByClassName('input-debit');
+     
       for (let i = 0; i < debit.length; i++) {
           totalDebit += Number(debit[i].value);
       }
@@ -598,6 +603,7 @@
   function totalCredit() {
       let totalCredit = 0;
       let credit = document.getElementsByClassName('input-credit');
+   
       for (let i = 0; i < credit.length; i++) {
           totalCredit += Number(credit[i].value);
       }
