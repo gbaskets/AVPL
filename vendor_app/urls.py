@@ -68,6 +68,9 @@ urlpatterns = [
     path('add-manual-journal', add_manualjournal),
     path('view-manual-journal/<int:id>', view_manualjournal),
     
+    path('report/trial-balance', viewtrialBalance),
+    path('report/balance-sheet', viewbalancesheet),
+    
     
   
 

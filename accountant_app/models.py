@@ -17,7 +17,7 @@ class AccountType(models.Model):
 class Account(models.Model):
     store = models.ForeignKey("store_app.Store", on_delete = models.CASCADE, null = True, blank = True)
     admin = models.ForeignKey(User, on_delete = models.CASCADE, null = True, blank = True,related_name="admins")
-    accounttype = models.ForeignKey(AccountType, on_delete=models.CASCADE, null=True, blank=True)
+    accounttype = models.ForeignKey(AccountType, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypes")
     accountname = models.CharField(max_length = 255)
     accountcode = models.CharField(max_length = 255, null = True, blank = True)
     openingbalance = models.FloatField(default =0.00)

@@ -2247,3 +2247,44 @@ def view_manualjournal(request,id):
 		return render(request, 'vendor_app/accountant_app/manualjournalupdated.html', dic)
 	else:
 		return render(request, '403.html')
+
+
+
+
+
+@csrf_exempt
+def viewtrialBalance(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+                
+				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+				"accounttypegroups" :AccountTypeGroup.objects.all(),
+					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
+				
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/report/trialbalance.html', dic)
+	else:
+		return render(request, '403.html')
+
+
+
+
+
+@csrf_exempt
+def viewbalancesheet(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+				"accounttypegroups" :AccountTypeGroup.objects.all(),
+					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj,id=id),
+				
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/report/trialbalance.html', dic)
+	else:
+		return render(request, '403.html')
