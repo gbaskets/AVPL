@@ -1311,7 +1311,7 @@ def vendor_orders(request):
 			'allorder_status':ORDER_STATUS_UPDATE,
 			# 'notification':get_notifications(request.user),
 		}
-		return render(request, 'vendor_app/orders.html', dic)
+		return render(request, 'vendor_app/order_app/orders.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -1331,7 +1331,7 @@ def vendor_purchases(request):
 			'allorder_status':ORDER_STATUS_UPDATE,
 			# 'notification':get_notifications(request.user),
 		}
-		return render(request, 'vendor_app/purchases_orders.html', dic)
+		return render(request, 'vendor_app/order_app/purchases_orders.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -1349,7 +1349,7 @@ def vendor_order_detail(request):
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		
-		return render(request, 'vendor_app/order-detail.html', dic)
+		return render(request, 'vendor_app/order_app/order-detail.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -1462,7 +1462,7 @@ def vendor_brand(request):
 				# 'notification':get_notifications(request.user),
 				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 			}
-			return render(request, 'vendor_app/brand.html', dic)
+			return render(request, 'vendor_app/product/brand.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
@@ -2019,7 +2019,7 @@ def chartofaccounts(request):
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
-		return render(request, 'vendor_app/chartofaccounts.html', dic)
+		return render(request, 'vendor_app/accountant_app/chartofaccounts.html', dic)
 	else:
 		return render(request, '403.html')
 
@@ -2150,7 +2150,7 @@ def manualjournal(request):
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
-		return render(request, 'vendor_app/manualjournal.html', dic)
+		return render(request, 'vendor_app/accountant_app/manualjournal.html', dic)
 	else:
 		return render(request, '403.html')
 
@@ -2244,6 +2244,6 @@ def view_manualjournal(request,id):
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
-		return render(request, 'vendor_app/manualjournalupdated.html', dic)
+		return render(request, 'vendor_app/accountant_app/manualjournalupdated.html', dic)
 	else:
 		return render(request, '403.html')
