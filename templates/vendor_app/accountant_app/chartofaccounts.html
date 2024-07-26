@@ -52,7 +52,7 @@
                                           {% for list in accountledgerlist %}
                                           <tr>
                                              <td>{{ list.id|safe }}</td>
-                                             <td>{{ list.accountcode|safe }}</td>
+                                             <td><a href="/vendor/account-ledger-transactions-history/{{list.id}}">{{ list.accountcode|safe }}</a></td>
                                              <td>{{ list.accountname|safe }}</td>
                                              <td>{{ list.accounttype.name|safe }}</td>
                                              <td>{{ list.openingbalance|safe }} {% if list.transctiontype == "CREDIT" %} CR {% else %} DR {% endif %}</td>

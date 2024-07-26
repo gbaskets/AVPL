@@ -1,6 +1,7 @@
 from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
+from accountant_app.models import Account, AccountTransaction
 from inventory_app.models import Product, ProductCategory, ProductImages, ProductSubCategory, ProductSubSubCategory
 from xhtml2pdf import pisa
 from django.db.models import *
@@ -1001,3 +1002,41 @@ def transfer_into_another_account(usr,sender,reciver,amount,transactionid,transa
 		data.save()
 	except :
 		transfer_into_another_account(usr,sender,reciver,amount,transactionid,transactionrealted,transactiondetails)
+
+
+
+   
+# In case make  Payment by account ledger
+def make_account_ledger_transaction( account, amount, transtype,transactionid,transactionrealted,transactiondetails):
+	account=Account.objects.filter(id=account.id).first
+	if transtype == 'CREDIT':
+		
+		print('1')
+		accounttransactions = AccountTransaction.objects.create(
+			account = account,
+			transactiondate = timezone.now(),
+			transactiontype = transtype, transactionrealted= transactionrealted,
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
+			transactionamount = amount,
+			previousamount = round(account.openingbalance, 2),
+			remainingamount = round(account.openingbalance,2) + round(amount,2)
+		)
+		account.openingbalance = round(account.openingbalance, 2) + round(amount, 2)
+		account.save()
+
+	elif transtype == 'DEBIT':
+		print(2)
+		
+		accounttransactions = AccountTransaction.objects.create(
+			account = account,
+			transactiondate = timezone.now(),
+			transactiontype = transtype, transactionrealted= transactionrealted,
+			transactiondetails = transactiondetails,
+			transactionid = transactionid,
+			transactionamount = amount,
+			previousamount = round(account.openingbalance, 2),
+			remainingamount = round(account.openingbalance, 2) - round(amount,2)
+		)
+		account.openingbalance = round(account.openingbalance, 2) - round(amount, 2)
+		account.save()

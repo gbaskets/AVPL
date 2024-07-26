@@ -39,6 +39,26 @@ class Account(models.Model):
     def __str__(self):
 
         return self.accountname + " " + str(self.id)
+    
+
+class AccountTransaction(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE,related_name="accountstransaction")
+    transactiondate = models.DateTimeField()
+    transactiontype = models.CharField(max_length=20)
+    transactionamount = models.FloatField()
+    transactionrealted= models.CharField(max_length=255,null=True,blank=True)
+    transactiondetails = models.TextField(null=True,blank=True)
+    transactionid = models.CharField(max_length=255,null=True,blank=True)
+    previousprtransactiontype = models.CharField(max_length=20,null=True)
+    previousamount = models.FloatField()
+    remainingamount = models.FloatField()
+    isverified = models.BooleanField(default=False)
+    createdat = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+    updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+
+    def __str__(self):
+        return 'Wallet Transaction ID '+str(self.id)
 
 
 class ManualJournalVoucher(models.Model):

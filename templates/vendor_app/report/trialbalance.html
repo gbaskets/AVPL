@@ -4,9 +4,8 @@
 {% block main %}
 <!-- Main Content -->
 <style>
-   
    .hiddenRow {
-       padding: 0 !important;
+      padding: 0 !important;
    }
 </style>
 
@@ -35,162 +34,129 @@
                      <div class="col-8">
                         <h4>Trial Balance List</h4>
                      </div>
-                     
+
                   </div>
                   <div class="card-body">
                      <div class="container">
-                    
+
                         <table class="table table-condensed table">
-                         <thead>
-                             <tr>
-                              <th></th>
-                               <th>Account Group</th>
-                               <th>Account Code</th>
-                               <th>NET DEBIT</th>
-                               <th>NET CREDIT</th>
-                           
-                             </tr>
-                         </thead>
-                     
-                         <tbody>
-                           {% for list in accounttypegroups %}
-                             <tr data-toggle="collapse" data-target="#demo{{list.id}}" class="accordion-toggle">
-                                <td><button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-eye-open"><i class="far fa-eye"></i></span></button></td>
-                              
-                                <td style="font-size:16px;">{{list.name}}</td>
-   
-                                 
-                             <tr>
-                              <td colspan="12" class="hiddenRow">
-                                       <div class="accordian-body collapse" id="demo{{list.id}}"> 
-                                <table class="table table-striped">
-                                        <thead>
-               
-                                                       
-                                                   </thead>	
-                                                  
-                                                   <tbody>
-                                                      
-                                          {% for first in list.accounttypegroups.all %}
-                                         
-                       
-                                          <tr data-toggle="collapse"  class="accordion-toggle" data-target="#demo2{{first.id}}">
+                           <thead>
+                              <tr>
+                                 <th></th>
+                                 <th>Account Group</th>
+                                 <th>Account Code</th>
+                                 <th>NET DEBIT</th>
+                                 <th>NET CREDIT</th>
+
+                              </tr>
+                           </thead>
+
+                           <tbody>
+                              {% for list in accounttypegroups %}
+                              <tr data-toggle="collapse" data-target="#demo{{list.id}}" class="accordion-toggle">
+                                 <td><button class="btn btn-default btn-xs"><span
+                                          class="glyphicon glyphicon-eye-open"><i
+                                             class="far fa-eye"></i></span></button></td>
+
+                                 <td style="font-size:16px;">{{list.name}}</td>
+
+
+                              <tr>
+                                 <td colspan="12" class="hiddenRow">
+                                    <div class="accordian-body collapse" id="demo{{list.id}}">
+                                       <table class="table table-striped">
+                                          <thead>
+
+
+                                          </thead>
+
+                                          <tbody>
+
+                                             {% for first in list.accounttypegroups.all %}
+
+
+                                             <tr data-toggle="collapse" class="accordion-toggle"
+                                                data-target="#demo2{{first.id}}">
                                                 <td> <a href="#"></a></td>
                                                 <td style="font-size:14px;">{{first.name}}</td>
 
-                                                <tr>
-                                                   <td colspan="12" class="hiddenRow">
-                                                            <div class="accordian-body collapse" id="demo2{{first.id}}"> 
-                                                     <table class="table table-striped">
-                                                             <thead>
-                                                              
-                                                             </thead>
-                                                             <tbody>
-                                                               {% for fir in first.accounttypes.all %}
-                                         
-                                                               <tr>
-                                                                              <td></td>
-                                                                              <td></td>
-                                                                              <td>{{fir.accountname}}</td>
-                                                                              <td></td>
-                                                                              <td>{{fir.accountcode}}</td>
-                                                                              {% if fir.transctiontype == "DEBIT" %}
-                                                                              <td>{{fir.openingbalance}}</td>
-                                                                              <td>0.0</td>
-                                                                               {% else %}
-                                                                               <td>0.0</td>
-                                                                               <td>{{fir.openingbalance}}</td>
-                                                                               {% endif %}
-                                                                           </tr>
-                                                                           {% endfor %}
-                                                          </tbody>
-                                                        
-                                        </tbody>
+                                             <tr>
+                                                <td colspan="12" class="hiddenRow">
+                                                   <div class="accordian-body collapse" id="demo2{{first.id}}">
+                                                      <table class="table table-striped">
+                                                         <thead>
+
+                                                         </thead>
+                                                         <tbody>
+                                                            {% for fir in first.accounttypes.all %}
+
+                                                            <tr>
+                                                               <td></td>
+                                                               <td></td>
+                                                               <td>{{fir.accountname}}</td>
+                                                               <td></td>
+                                                               <td>{{fir.accountcode}}</td>
+                                                               {% if fir.transctiontype == "DEBIT" %}
+                                                               <td>{{fir.openingbalance}}</td>
+                                                               <td>0.0</td>
+                                                               {% else %}
+                                                               <td>0.0</td>
+                                                               <td>{{fir.openingbalance}}</td>
+                                                               {% endif %}
+                                                            </tr>
+                                                            {% endfor %}
+                                                         </tbody>
+
+                                          </tbody>
                                        </table>
-                                          </tr>
-
-                                          
-
-                                          {% endfor %}
-                                                      
-                                                                                        
-                                    </table>
-                                
-                                </div> 
-                            </td>
-                          </tr>
-                                                                                                
-                                    
-                                                            
-                                      
-                                
-                                </div> 
-                            </td>
-                          </tr>
-
-
-                             </tr>
-                              {% endfor %}
-                            
-                           
-                           
-                              
-                     
-                         </tbody>
-                     </table>
-                        </div>
-                     
-                        </div> 
-                     
-                  </div>
-               </div>
-                            
-                     
-                  
-
-                     <div class="table-responsive">
-                        <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
-                           <thead>
-                              <tr>
-                                 <th>Sr.</th>
-                                 <th>Account Group</th>
-                                 <th>Account Name</th>
-                                 <th>Account Code</th>
-
-                                 <th>NET DEBIT</th>
-                                 <th>NET CREDIT</th>
-                                 <th>Action</th>
-                              </tr>
-                           </thead>
-                           <tbody>
-                              {% for list in accounttypegroups %}
-                              <tr>
-                                 <td>{{ list.id|safe }}</td>
-                                 <td style="font-size:16px;">{{list.name}}</td>
-                                 <td colspan="4">&nbsp;</td>
-                                 {% for first in list.accounttypegroups.all %}
-                                 <tr>
-                                 <td style="font-size:14px;">{{first.name}}</td>
-
-                                 </tr>
-                                 {% endfor %}
-
-
-
-
                               </tr>
 
 
+
                               {% endfor %}
-                           </tbody>
+
+
                         </table>
+
                      </div>
+                     </td>
+                     </tr>
+
+
+
+
+
                   </div>
+                  </td>
+                  </tr>
+
+
+                  </tr>
+                  {% endfor %}
+
+
+
+
+
+                  </tbody>
+                  </table>
                </div>
+
             </div>
+
          </div>
       </div>
-   </section>
+
+
+
+
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 
 </div>
 
