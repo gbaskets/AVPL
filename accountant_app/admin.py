@@ -5,6 +5,7 @@ from .models import *
 # Register your models here.
 admin.site.register(AccountTypeGroup)
 admin.site.register(AccountType)
+admin.site.register(AccountTypeList)
 admin.site.register(Account)
 admin.site.register(ManualJournalVoucher)
 admin.site.register(AccountEntry)
