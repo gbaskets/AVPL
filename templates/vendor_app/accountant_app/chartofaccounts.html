@@ -42,7 +42,7 @@
                                              <th>Account Code</th>
                                             
                                              <th>Account Name</th>
-                                             <th>Account Type</th>
+                                             <th>Account Type List</th>
                                              
                                              <th>Current Balance</th>
                                              <th>Action</th>
@@ -54,7 +54,7 @@
                                              <td>{{ list.id|safe }}</td>
                                              <td><a href="/vendor/account-ledger-transactions-history/{{list.id}}">{{ list.accountcode|safe }}</a></td>
                                              <td>{{ list.accountname|safe }}</td>
-                                             <td>{{ list.accounttype.name|safe }}</td>
+                                             <td>{{ list.accounttypelist.name|safe }}</td>
                                              <td>{{ list.openingbalance|safe }} {% if list.transctiontype == "CREDIT" %} CR {% else %} DR {% endif %}</td>
                                               
                                              <td ><a class="btn btn-success btn-icon icon-left" data-toggle="modal" data-target="#EditAccountModal{{list.id}}"><i class="far fa-edit"></i>Edit</a>
@@ -100,16 +100,20 @@
                                        
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
-                  <label>Select Accoun Type</label>
+                  <label>Select Accoun Type List</label>
 
-                  <select class="form-control" name="accountype">
-                     <option value="">----Select Account----</option>
+                  <select class="form-control" name="accountypelist">
+                     <option value="">----Select Account Type List----</option>
+            
                      {% for accountype  in accounttypegroups %}
-                     <optgroup style="font-size:16px;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
+                     <optgroup style="font-size:16px;color: coral;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
                      
-                     {% for first in accountype.accounttypegroups.all %}
-                   
-                     <option style="font-size:16px;" value="{{first.id}}" {% if list.accounttype.id == first.id %} selected {% else %} {%endif %}>{{first.name}}</option>
+                     {% for group in accountype.accounttypegroups.all %}
+                     <optgroup style="font-size:14px;" label="{{group.name}}">{{group.name}}</optgroup>
+                     {% for first in group.accounttypes.all %}
+                     <option style="font-size:16px;" value="{{first.id}}" {% if list.accounttypelist.id == first.id %} selected {% else %} {%endif %}>{{first.name}}</option>
+                     {% endfor %}
+
                      {% endfor %}
                      {% endfor %}
                   </select>
@@ -299,13 +303,17 @@
                   <div class="col-lg-12 col-md-12 col-sm-12">
                      <div class="form-group">
                         <label>Select Accoun Type</label>
-                        <select class="form-control" name="accountype">
+                        <select class="form-control" name="accountypelist">
                            <option value="">----Select Account----</option>
                            {% for accountype  in accounttypegroups %}
-                           <optgroup style="font-size:16px;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
+                           <optgroup style="font-size:16px;color: coral;" label="{{accountype.name}}">{{accountype.name}}</optgroup>
                            
-                           {% for first in accountype.accounttypegroups.all %}
-                           <option style="font-size:16px;" value="{{first.id}}">{{first.name}}</option>
+                           {% for group in accountype.accounttypegroups.all %}
+                           <optgroup style="font-size:14px;" label="{{group.name}}">{{group.name}}</optgroup>
+                           {% for first in group.accounttypes.all %}
+                           <option style="font-size:16px;" value="{{first.id}}" {% if list.accounttypelist.id == first.id %} selected {% else %} {%endif %}>{{first.name}}</option>
+                           {% endfor %}
+      
                            {% endfor %}
                            {% endfor %}
                         </select>
