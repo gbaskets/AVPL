@@ -2016,6 +2016,7 @@ def chartofaccounts(request):
 		dic = {"vendorobj":vendorobj,
                 "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
+		
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -2069,7 +2070,7 @@ def addchartofaccounts(request):
 	if check_user_authentication(request, 'VENDOR'):    
 		if request.method == 'POST':
 			storeobj=Store.objects.filter(vendor__user=request.user).first()
-			accountype = request.POST.get('accountype')
+			accountypelist = request.POST.get('accountypelist')
 			accountname = request.POST.get('accountname')
 			openingbalance = request.POST.get('openingbalance')
 			transctiontype = request.POST.get('transctiontype')
@@ -2078,7 +2079,7 @@ def addchartofaccounts(request):
 			if not Account.objects.filter(accountname=accountname,accountcode = account_code_by_store(storeobj)).exists():
 				accountobj=Account()
 				accountobj.store = storeobj
-				accountobj.accounttype =AccountType.objects.filter(id=accountype).first()
+				accountobj.accounttypelist =AccountTypeList.objects.filter(id=accountypelist).first()
 				accountobj.accountname = accountname
 				accountobj.accountcode = account_code_by_store(storeobj)
 				accountobj.openingbalance = openingbalance
@@ -2102,7 +2103,7 @@ def editchartofaccounts(request,id):
 	if check_user_authentication(request, 'VENDOR'):    
 		if request.method == 'POST':
 			storeobj=Store.objects.filter(vendor__user=request.user).first()
-			accountype = request.POST.get('accountype')
+			accountypelist = request.POST.get('accountypelist')
 			accountname = request.POST.get('accountname')
 			openingbalance = request.POST.get('openingbalance')
 			transctiontype = request.POST.get('transctiontype')
@@ -2124,7 +2125,7 @@ def editchartofaccounts(request,id):
 			if Account.objects.filter(id=id).exists():
 				accountobj=Account.objects.filter(id=id).first()
 				accountobj.store = storeobj
-				accountobj.accounttype =AccountType.objects.filter(id=accountype).first()
+				accountobj.accounttypelist =AccountTypeList.objects.filter(id=accountypelist).first()
 				accountobj.accountname = accountname
 				accountobj.openingbalance = openingbalance
 				accountobj.transctiontype=transctiontype
@@ -2168,7 +2169,7 @@ def manualjournal(request):
 		dic = {"vendorobj":vendorobj,
                 "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
-                 "manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
+                  "manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
                
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
