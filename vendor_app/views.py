@@ -2063,7 +2063,6 @@ def account_code_by_store(store):
 	return transactionid
 
 
-#####
 
 @csrf_exempt
 def addchartofaccounts(request):
