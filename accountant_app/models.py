@@ -3,11 +3,15 @@ from django.contrib.auth.models import User, AbstractUser
 # Create your models here.
 
 
+
+
 class AccountTypeGroup(models.Model):
 	name  = models.CharField(max_length=255, null=True, blank=True)
 
 	def __str__(self):
 		return self.name
+
+        
 
         
 class AccountType(models.Model):
@@ -29,6 +33,7 @@ class AccountTypeList(models.Model):
 class Account(models.Model):
     store = models.ForeignKey("store_app.Store", on_delete = models.CASCADE, null = True, blank = True)
     admin = models.ForeignKey(User, on_delete = models.CASCADE, null = True, blank = True,related_name="admins")
+    accounttypelist = models.ForeignKey(AccountTypeList, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypelists")
     accounttypelist = models.ForeignKey(AccountTypeList, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypelists")
     accountname = models.CharField(max_length = 255)
     accountcode = models.CharField(max_length = 255, null = True, blank = True)
