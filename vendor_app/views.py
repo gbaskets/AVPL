@@ -2013,6 +2013,8 @@ def account_type_details(request):
 def chartofaccounts(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendorobj=Vendor.objects.filter(user=request.user).first()
+       
+         
 		dic = {"vendorobj":vendorobj,
                 "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
@@ -2023,6 +2025,8 @@ def chartofaccounts(request):
 		return render(request, 'vendor_app/accountant_app/chartofaccounts.html', dic)
 	else:
 		return render(request, '403.html')
+
+
 
 
 
@@ -2045,6 +2049,8 @@ def  accountledgertransactionshistory(request,id):
 		return render(request, 'vendor_app/accountant_app/accounttransactionshistory.html', dic)
 	else:
 		return render(request, '403.html')
+
+
 
 
 
@@ -2388,6 +2394,215 @@ def view_manualjournal(request,id):
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/accountant_app/manualjournalupdated.html', dic)
+	else:
+		return render(request, '403.html')
+
+
+
+@csrf_exempt
+def Purchase_Vouchers(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+                "sellerledgerlist" :Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Seller"),
+                "purchaseledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Purchase Entery").first(),
+               "accounttypegroups" :AccountTypeGroup.objects.all(),
+               'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
+		
+           	# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/accountant_app/inventoryvouchers.html', dic)
+	else:
+		return render(request, '403.html')
+
+
+@csrf_exempt
+def Add_Purchase_Vouchers(request):
+	if check_user_authentication(request, 'VENDOR'):
+		if request.method == "POST":
+			vendorobj = Vendor.objects.filter(user=request.user).first()
+			storeobj = Store.objects.filter(vendor=vendorobj).first()
+			value = request.POST.get('hidden')
+			description = request.POST.get('description')
+			date = request.POST.get('journal_date')
+
+			ref_no = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(timezone.now()) + 'JOURNAL'))
+			ref_no = ref_no.upper()
+			referenceno = ref_no[0:8]
+
+			manualjournalvoucher = ManualJournalVoucher.objects.create(
+				store=storeobj, referenceno=referenceno, createddate=date, description=description
+			)
+
+			total_amount = 0.0
+			total_debit = 0.0
+			total_credit = 0.0
+
+			for i in range(int(value)):
+				t = 'transaction' + str(i)
+				a = 'account' + str(i)
+				deb = 'deb' + str(i)
+				cre = 'cre' + str(i)
+				account_name = request.POST.get(a)
+				transactiontype = request.POST.get(t)
+				debit = request.POST.get(deb)
+				credit = request.POST.get(cre)
+
+				try:
+					if account_name.isnumeric():
+						account = Account.objects.get(id=account_name)
+					else:
+						account = Account.objects.filter(accountname=account_name).first()
+					
+					if not account:
+						continue  # Skip this iteration if account is not found
+
+					if debit:
+						debit=float(debit)
+						total_debit += float(debit)
+						total_amount += float(debit)
+						AccountEntry.objects.create(
+							manualjournalvoucher=manualjournalvoucher, transactiontype=transactiontype,
+							totaldebit=float(debit), account=account,updatedby=request.user,
+						)
+      
+      
+						if account.transctiontype=="DEBIT":
+							currentopeningbalance=account.openingbalance
+							if description:
+								transactiondetails=description
+							else:
+								transactiondetails=f'Amount has been debit Rs.{debit}/-'
+							accounttransactions = AccountTransaction.objects.create(
+								account = account,previousprtransactiontype="DEBIT",
+								transactiondate = timezone.now(),
+								transactiontype = 'DEBIT', transactionrealted= "MANUAL-JOURNAL",
+								transactiondetails = transactiondetails,
+								transactionid = referenceno,
+								transactionamount = debit,
+								previousamount = round(account.openingbalance, 2),
+								remainingamount =round(( round(account.openingbalance,2) + round(debit,2)),2)
+							)
+							account.openingbalance = round((currentopeningbalance + float(debit)),2)
+							account.save()
+						else:
+							currentopeningbalance=account.openingbalance
+							if currentopeningbalance < debit :
+								if description:
+									transactiondetails=description
+								else:
+									transactiondetails=f'Amount has been debit Rs.{debit}/-'
+								accounttransactions = AccountTransaction.objects.create(
+									account = account,
+									transactiondate = timezone.now(),
+									transactiontype = 'DEBIT', transactionrealted= "MANUAL-JOURNAL",
+									transactiondetails = transactiondetails,
+									transactionid = referenceno,previousprtransactiontype="DEBIT",
+									transactionamount = debit,
+									previousamount = round(account.openingbalance, 2),
+									remainingamount = round(( round(debit,2)- round(account.openingbalance,2)),2)
+								)
+								account.openingbalance = round((float(debit - currentopeningbalance)),2)
+								account.transctiontype="DEBIT"
+								account.save()
+								
+							else:
+								if description:
+									transactiondetails=description
+								else:
+									transactiondetails=f'Amount has been debit Rs.{debit}/-'
+								accounttransactions = AccountTransaction.objects.create(
+									account = account,
+									transactiondate = timezone.now(),
+									transactiontype = 'DEBIT', transactionrealted= "MANUAL-JOURNAL",
+									transactiondetails = transactiondetails,previousprtransactiontype="CREDIT",
+									transactionid = referenceno,
+									transactionamount = debit,
+									previousamount = round(account.openingbalance, 2),
+									remainingamount = round(( round(account.openingbalance,2) - round(debit,2)),2)
+								)
+								account.openingbalance = round((currentopeningbalance - float(debit)),2)
+								account.save()
+								
+					if credit:
+						credit=float(credit)
+
+						total_credit += float(credit)
+						AccountEntry.objects.create(
+							manualjournalvoucher=manualjournalvoucher, transactiontype=transactiontype,
+							totalcredit=float(credit), account=account,updatedby=request.user
+						)
+						if account.transctiontype=="DEBIT":
+							currentopeningbalance=account.openingbalance
+							if currentopeningbalance < credit :
+								if description:
+									transactiondetails=description
+								else:
+									transactiondetails=f'Amount has been credit Rs.{credit}/-'
+								accounttransactions = AccountTransaction.objects.create(
+									account = account,
+									transactiondate = timezone.now(),
+									transactiontype = 'CREDIT', transactionrealted= "MANUAL-JOURNAL",
+									transactiondetails = transactiondetails,previousprtransactiontype="CREDIT",
+									transactionid = referenceno,
+									transactionamount = credit,
+									previousamount = round(account.openingbalance, 2),
+									remainingamount = round((round(credit,2) - round(account.openingbalance,2)),2)
+								)						
+        
+								account.openingbalance = round((float(credit - currentopeningbalance)),2)
+								account.transctiontype="CREDIT"
+								account.save()
+							
+							else:
+								if description:
+									transactiondetails=description
+								else:
+									transactiondetails=f'Amount has been credit Rs.{credit}/-'
+								accounttransactions = AccountTransaction.objects.create(
+									account = account,
+									transactiondate = timezone.now(),
+									transactiontype = 'CREDIT', transactionrealted= "MANUAL-JOURNAL",
+									transactiondetails = transactiondetails,previousprtransactiontype="DEBIT",
+									transactionid = referenceno,
+									transactionamount = credit,
+									previousamount = round(account.openingbalance, 2),
+									remainingamount = round(( round(account.openingbalance,2)- round(credit,2)),2)
+								)	
+								account.openingbalance = round((currentopeningbalance - float(credit)),2)
+								account.save()
+								
+						else:
+							currentopeningbalance=account.openingbalance
+							if description:
+								transactiondetails=description
+							else:
+								transactiondetails=f'Amount has been credit Rs.{credit}/-'
+							accounttransactions = AccountTransaction.objects.create(
+								account = account,
+								transactiondate = timezone.now(),
+								transactiontype = 'CREDIT', transactionrealted= "MANUAL-JOURNAL",
+								transactiondetails = transactiondetails,previousprtransactiontype="CREDIT",
+								transactionid = referenceno,
+								transactionamount = credit,
+								previousamount = round(account.openingbalance, 2),
+								remainingamount =  round((round(account.openingbalance,2) + round(credit,2)),2)
+							)
+							account.openingbalance = round((currentopeningbalance + float(credit)),2)
+							account.save()
+							
+
+				except Account.DoesNotExist:
+					continue  # Skip this iteration if account does not exist
+
+			manualjournalvoucher.totalcredit = total_credit
+			manualjournalvoucher.totaldebit = total_debit
+			manualjournalvoucher.amount = total_amount
+			manualjournalvoucher.updatedby=request.user
+			manualjournalvoucher.save()
+
+		return redirect("/vendor/manual-journal")
 	else:
 		return render(request, '403.html')
 
