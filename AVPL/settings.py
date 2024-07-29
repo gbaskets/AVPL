@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'mlm_app',
     'delivery_app',
     'django_cleanup',
-    
+     'import_export',
     'purchase_app',
     'accountant_app',
 

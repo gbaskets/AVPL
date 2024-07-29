@@ -1,12 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser
 # Create your models here.
+
+
 class AccountTypeGroup(models.Model):
 	name  = models.CharField(max_length=255, null=True, blank=True)
 
 	def __str__(self):
 		return self.name
 
+        
 class AccountType(models.Model):
 	accounttypegroup = models.ForeignKey(AccountTypeGroup, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypegroups")
 	name=models.CharField(max_length=255, null=True, blank=True)
@@ -14,10 +17,19 @@ class AccountType(models.Model):
 	def __str__(self):
 		return self.name
 
+class AccountTypeList(models.Model):
+	accounttype = models.ForeignKey(AccountType, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypes")
+	name=models.CharField(max_length=255, null=True, blank=True)
+
+	def __str__(self):
+		return self.name        
+
+####
+
 class Account(models.Model):
     store = models.ForeignKey("store_app.Store", on_delete = models.CASCADE, null = True, blank = True)
     admin = models.ForeignKey(User, on_delete = models.CASCADE, null = True, blank = True,related_name="admins")
-    accounttype = models.ForeignKey(AccountType, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypes")
+    accounttypelist = models.ForeignKey(AccountTypeList, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypelists")
     accountname = models.CharField(max_length = 255)
     accountcode = models.CharField(max_length = 255, null = True, blank = True)
     openingbalance = models.FloatField(default =0.00)
@@ -192,7 +204,6 @@ class AccountEntry(models.Model):
 
 # 	def __str__(self):
 # 		return str(self.id)
-
 
 
 
