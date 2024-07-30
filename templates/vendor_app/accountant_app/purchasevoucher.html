@@ -123,15 +123,15 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
-        <form method="POST" action="/vendor/add-manual-journal" id="manual_journal_form" enctype="multipart/form-data">
+        <form method="POST" action="/vendor/add-purchase-voucher" id="purchase_vouchor_form" enctype="multipart/form-data">
           {% csrf_token %}
-          <input type="hidden" name="hidden" value="2" id="itemValue">
+          <input type="hidden" name="hidden" value="1" id="itemValue">
           <input type="hidden" name="lead_id1" value="{{lead}}">
           <div class="row">
             <div class="col-lg-3 col-sm-12">
                <div class="form-group">
-                 <label for="journal_date">Date</label>
-                 <input type="date" class="form-control" name="journal_date" id="journal_date" required>
+                 <label for="purchase_date">Date</label>
+                 <input type="date" class="form-control" name="purchase_date" id="purchase_date" required>
                </div>
              </div>
             <div class="col-lg-3 col-sm-12">
@@ -142,7 +142,7 @@
              </div>
             <div class="col-lg-3 col-sm-12">
                <div class="form-group">
-                 <label for="journal_date">Seller Ledger Account</label>
+                 <label for="sellerledgeraccount">Seller Ledger Account</label>
                  <select class="form-control account-class" name="sellerledgeraccount" data-width="100%" id="sellerledgeraccount" >
                   <option style="font-size:16px;" value="">----Select Seller Ledger Account----</option>
                     {% for sell in sellerledgerlist %}
@@ -154,8 +154,8 @@
           
             <div class="col-lg-3 col-sm-12">
                <div class="form-group">
-                 <label for="journal_date">Purchase Ledger Account</label>
-                 <select class="form-control account-class" name="sellerledgeraccount" data-width="100%" id="sellerledgeraccount" >
+                 <label for="purchaseledgeraccount">Purchase Ledger Account</label>
+                 <select class="form-control" name="purchaseledgeraccount" data-width="100%" id="purchaseledgeraccount" >
          
                   <option style="font-size:16px;" selected value="{{purchaseledger.id}}">{{purchaseledger.accountname}} | Rs.({{purchaseledger.openingbalance}}) DR</option>
                 
@@ -175,7 +175,7 @@
               <div class="estimate-button-div">
                 <div>
                   <strong style="font-size: 18px;">Items/Services Description</strong>
-                  <span id="journal_message" style="color: red; position: relative; left: 20px;"></span>
+                  <span id="purchase_message" style="color: red; position: relative; left: 20px;"></span>
                 </div>
                 <div>
                   <button type="button" class="estimate-button" onclick="addAccount();">
@@ -202,10 +202,10 @@
                     <tr>
                       <td>
                         
-                          <select class="form-control account-class" name="itemproduct0" data-width="100%" id="itemproduct0" onchange="itemcalculation(0);">
+                          <select class="form-control account-item" name="itemproduct0" data-width="100%" id="itemproduct0" onchange="itemcalculation(0);">
                             <option style="font-size:16px;" value="">----Select Item / Service----</option>
                             {% for item in itemlist %}
-                            <option style="font-size:16px;" value="item.id">{{item.productvariantname}}</option>
+                            <option style="font-size:16px;" value="{{item.id}}">{{item.productvariantname}}</option>
 
                             {% endfor %}
 
@@ -213,12 +213,12 @@
                         
                       </td>
 
-                      <td><input name="price0"  class="form-control input-price" style="width: 115px;" type="number" id="price0" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)"></td>
+                      <td><input name="price0"  class="form-control input-price" style="width: 115px;" type="number" id="price0" min="0"  onchange="itemcalculation(0);" onkeypress="return validateInput(event)"></td>
          
       
-                     <td><input name="quantity0" value="1" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity0" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="totalDebit();" ></td>
-                      <td><input name="tax0" class="form-control input-tax" style="width: 115px;" type="number" id="tax0" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)"></td>
-                      <td><input name="total0" class="form-control input-total" style="width: 115px;" type="number" id="total0" min="0" onchange="totalCredit();" onkeypress="return validateInput(event)"></td>
+                     <td><input name="quantity0" value="1" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity0" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="itemcalculation(0);"></td>
+                      <td><input name="tax0" class="form-control input-tax" style="width: 115px;" type="number" id="tax0" min="0" onchange="totalTax();" onkeypress="return validateInput(event)"></td>
+                      <td><input name="total0" class="form-control input-total" style="width: 115px;" type="number" id="total0" min="0" onchange="totalAmount();" onkeypress="return validateInput(event)"></td>
                     </tr>
                    
                   </tbody>
@@ -227,15 +227,17 @@
             </div>
           </div>
           <div class="row" style="margin-bottom: 20px;">
-            <div style="height: 114px;width: 861px; position: relative;left: 250px;">
-              <div style="padding: 46px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
-                <span style="position: relative;left: 56px;"><strong>Total&nbsp;(₹)</strong></span>
-                <span style="position: relative;left: 88px;"><strong id="tDebit">₹0.00</strong></span>
-                <span style="position: relative;left: -5px;"><strong id="tCredit">₹0.00</strong></span>
+            <div style="height: 114px;width: 861px; position: relative;left: 244px;">
+              <div style="padding: 17px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
+               
+                <span style="position: relative;left: 459px;"><strong id="tTax">Total Tax&nbsp;₹0.00</strong></span>
+                <input type="hidden" name="totaltax" id="totaltax" >
+                <span style="position: relative;left: -94px;"><strong id="tTotal">Total Amount&nbsp;₹0.00</strong></span>
+                <input type="hidden" name="totalamount" id="totalamount" >
               </div>
             </div>
           </div>
-          <button class="btn btn-primary" type="button" name="button" form="manual_journal_form" onclick="submitForm();">Add Journal</button>
+          <button class="btn btn-primary" type="button" name="button" form="purchase_vouchor_form" onclick="submitForm();">Add Purchase Voucher</button>
         </form>
       </div>
     </div>
@@ -243,6 +245,7 @@
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
 <script type="text/javascript">
   function validateInput(event) {
@@ -277,7 +280,7 @@
     let total = row.insertCell(4);
 
     itemproduct.innerHTML = `
-      <select class="form-control account-class" name="itemproduct${item}" data-width="100%" id="itemproduct${item}" onchange="itemcalculation(0);">
+      <select class="form-control account-item" name="itemproduct${item}" data-width="100%" id="itemproduct${item}"  onchange="itemcalculation(${item});">
       <option style="font-size:16px;" value="">----Select Item / Service----</option>
       {% for item in itemlist %}
       <option style="font-size:16px;" value="{{item.id}}">{{item.productvariantname}}</option>
@@ -287,10 +290,10 @@
    </select>`;
   
    
-   price.innerHTML = `<input name="price0"  class="form-control input-price" style="width: 115px;" type="number" id="price0" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)">`;
-   quantity.innerHTML = `<input name="quantity${item}" value="1" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity${item}" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="totalDebit();" >`;
-   tax.innerHTML = `<input name="tax${item}" class="form-control input-tax" style="width: 115px;" type="number" id="tax${item}" min="0" onchange="totalDebit();" onkeypress="return validateInput(event)">`;
-   total.innerHTML = `<input name="total${item}" class="form-control input-total" style="width: 115px;" type="number" id="total${item}" min="0" onchange="totalCredit();" onkeypress="return validateInput(event)">`;
+   price.innerHTML = `<input name="price${item}"  class="form-control input-price" style="width: 115px;" type="number" id="price${item}" min="0" onchange="itemcalculation(${item});" onkeypress="return validateInput(event)">`;
+   quantity.innerHTML = `<input name="quantity${item}" value="1" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity${item}" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="itemcalculation(${item});">`;
+   tax.innerHTML = `<input name="tax${item}" class="form-control input-tax" style="width: 115px;" type="number" id="tax${item}" min="0" onchange="totalTax();" onkeypress="return validateInput(event)">`;
+   total.innerHTML = `<input name="total${item}" class="form-control input-total" style="width: 115px;" type="number" id="total${item}" min="0" onchange="totalAmount();" onkeypress="return validateInput(event)">`;
    document.getElementById('remove_account').disabled = false;
   }
   
@@ -304,95 +307,77 @@
     if (itemValue.value == 1) {
       document.getElementById('remove_account').disabled = true;
     }
-    autoFillAmounts();
-    totalDebit();
-    totalCredit();
+   
+    totalTax();
+    totalAmount();
   }
   
   function itemcalculation(id) {
-    let transactionType = document.getElementById(`transaction${id}`).value;
-    let debitField = document.getElementById(`deb${id}`);
-    let creditField = document.getElementById(`cre${id}`);
-    if (transactionType == 'DEBIT') {
-      creditField.disabled = true;
-      creditField.value = '';
-      debitField.disabled = false;
-      if (id == 0) {
-        debitField.value = '';
-      }
-    } else if (transactionType == 'CREDIT') {
-      debitField.disabled = true;
-      debitField.value = '';
-      creditField.disabled = false;
-      if (id == 0) {
-        creditField.value = '';
-      }
-    } else {
-      debitField.disabled = false;
-      creditField.disabled = false;
+    {
+    var itemproductid = document.getElementById(`itemproduct${id}`).value;
+    var quantity = document.getElementById(`quantity${id}`).value;
+    var price = document.getElementById(`price${id}`).value;
+    fetchRelatedData(itemproductid,price,quantity,id);
     }
-    autoFillAmounts();
-    totalDebit();
-    totalCredit();
+    
+      function fetchRelatedData(itemproductid,price,quantity,id) {
+        
+        $.ajax({
+          url: '/vendor/fetch_productvaraints_related_data',  // Replace with your actual URL
+          data: { 'itemproductid': itemproductid,'price':price,'quantity':quantity },
+          dataType: 'json',
+          success: function (data) {
+          console.log(data,'data')
+          document.getElementById(`price${id}`).value = data.purchaseprice;
+          document.getElementById(`tax${id}`).value = data.tax;
+          document.getElementById(`total${id}`).value = data.total;
+    
+          totalTax();
+          totalAmount();
+          }
+        });
+      }
+ 
+
+    totalTax();
+    totalAmount();
+  
   }
 
-  function autoFillAmounts() {
-    let rows = document.getElementById('accountTable').rows;
-    let totalDebit = 0;
-    let totalCredit = 0;
-
-    for (let i = 0; i < rows.length; i++) {
-      let transactionType = document.getElementById(`transaction${i}`).value;
-      let debitField = document.getElementById(`deb${i}`);
-      let creditField = document.getElementById(`cre${i}`);
-      if (transactionType == 'DEBIT') {
-        totalDebit += Number(debitField.value || 0);
-      } else if (transactionType == 'CREDIT') {
-        totalCredit += Number(creditField.value || 0);
-      }
-    }
-
-    let lastRow = rows[rows.length - 1];
-    if (lastRow) {
-      let lastTransactionType = document.getElementById(`transaction${rows.length - 1}`).value;
-      if (lastTransactionType == 'CREDIT') {
-        document.getElementById(`cre${rows.length - 1}`).value = totalDebit;
-      } else if (lastTransactionType == 'DEBIT') {
-        document.getElementById(`deb${rows.length - 1}`).value = totalCredit;
-      }
-    }
-  }
-
-  function totalDebit() {
-    let totalDebit = Array.from(document.getElementsByClassName('input-debit'))
+  
+  function totalTax() {
+    let totaltax = Array.from(document.getElementsByClassName('input-tax'))
       .reduce((sum, input) => sum + Number(input.value || 0), 0);
-    document.getElementById('tDebit').innerHTML = `₹${totalDebit.toFixed(2)}`;
+    document.getElementById('tTax').innerHTML = `Total Tax&nbsp;₹${totaltax.toFixed(2)}`;
+    document.getElementById('totaltax').value = totaltax.toFixed(2);
+    
   }
 
-  function totalCredit() {
-    let totalCredit = Array.from(document.getElementsByClassName('input-credit'))
+  function totalAmount() {
+    let totalamount = Array.from(document.getElementsByClassName('input-total'))
       .reduce((sum, input) => sum + Number(input.value || 0), 0);
-    document.getElementById('tCredit').innerHTML = `₹${totalCredit.toFixed(2)}`;
+    document.getElementById('tTotal').innerHTML = `Total Amount&nbsp;₹${totalamount.toFixed(2)}`;
+    document.getElementById('totalamount').value = totalamount.toFixed(2);
   }
 
   function submitForm() {
-    let debit = document.getElementById('tDebit').innerHTML;
-    let credit = document.getElementById('tCredit').innerHTML;
-    let manual_form = document.forms['manual_journal_form'];
+   
+    let manual_form = document.forms['purchase_vouchor_form'];
     let account_class = document.getElementsByClassName('account-class');
+    let account_item = document.getElementsByClassName('account-item');
 
-    let account_counter = Array.from(account_class).filter(acc => !acc.value).length;
+    let account_counter = Array.from(account_item).filter(acc => !acc.value).length;
 
     if (account_counter > 0) {
-      document.getElementById('journal_message').innerHTML = 'Please select all accounts';
-    } else if (!manual_form['journal_date'].value) {
-      document.getElementById('journal_message').innerHTML = 'Please select a date';
-    } else if ((Number(debit.substr(1)) === Number(credit.substr(1))) && Number(debit.substr(1)) > 0) {
-      document.getElementById('journal_message').innerHTML = '';
-      manual_form.submit();
+      document.getElementById('purchase_message').innerHTML = 'Please select all Items/Services';
+    } else if (!manual_form['purchase_date'].value) {
+      document.getElementById('purchase_message').innerHTML = 'Please select a date';
+    } else if (!manual_form['sellerledgeraccount'].value) {
+      document.getElementById('purchase_message').innerHTML = 'Please select a seller ledger account';
     } else {
-      document.getElementById('journal_message').innerHTML = 'Please ensure debits and credits are equal and greater than zero.';
-    }
+      document.getElementById('purchase_message').innerHTML = '';
+      manual_form.submit();
+      }
   }
 </script>
 

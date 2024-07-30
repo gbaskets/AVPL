@@ -1,6 +1,7 @@
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
+from accountant_app.models import Account
 from customer_app.models import *
 from inventory_app.models import *
 from store_app.models import Store
@@ -22,10 +23,12 @@ def generate_order_number(id):
 class PurchasesOrder(models.Model):
     store = models.ForeignKey(Store,on_delete=models.CASCADE,null=True, blank=True)
     orderno=models.CharField(max_length=250, null=True, blank=True)
+    supplierinvoiceno=models.CharField(max_length=250, null=True, blank=True)
+    selleraccount = models.ForeignKey(Account, on_delete=models.CASCADE,  null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE,  null=True, blank=True)
     vendor = models.ForeignKey('vendor_app.Vendor', on_delete=models.CASCADE, null=True, blank=True)
     paymenttransaction = models.ForeignKey("main_app.PaymentTransaction",on_delete=models.CASCADE, null=True, blank=True)
-    address = models.ForeignKey(Address,on_delete=models.CASCADE)
+    address = models.ForeignKey(Address,on_delete=models.CASCADE,null=True,blank=True)
     shippingcharges = models.FloatField(default=0.00,null=True,blank=True)
     subtotal = models.FloatField(default=0.00,null=True,blank=True)
     tax = models.FloatField(default=0.00,null=True,blank=True)

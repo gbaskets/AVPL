@@ -76,6 +76,8 @@ urlpatterns = [
     path('purchase-vouchers', Purchase_Vouchers),
     path('add-purchase-voucher', Add_Purchase_Vouchers),
     
+    path('fetch_productvaraints_related_data', fetch_productvaraints_related_data),
+    
     
     path('report/trial-balance', viewtrialBalance),
     path('report/balance-sheet', viewbalancesheet),

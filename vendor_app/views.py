@@ -2412,7 +2412,7 @@ def Purchase_Vouchers(request):
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
-		return render(request, 'vendor_app/accountant_app/inventoryvouchers.html', dic)
+		return render(request, 'vendor_app/accountant_app/purchasevoucher.html', dic)
 	else:
 		return render(request, '403.html')
 
@@ -2424,190 +2424,144 @@ def Add_Purchase_Vouchers(request):
 			vendorobj = Vendor.objects.filter(user=request.user).first()
 			storeobj = Store.objects.filter(vendor=vendorobj).first()
 			value = request.POST.get('hidden')
+			purchase_date = request.POST.get('purchase_date')
+			supplierinvoiceno = request.POST.get('supplierinvoiceno')
+			sellerledgeraccount = request.POST.get('sellerledgeraccount')
+			purchaseledgeraccount = request.POST.get('purchaseledgeraccount')
 			description = request.POST.get('description')
-			date = request.POST.get('journal_date')
+			totaltax = request.POST.get('totaltax')
+			totaltax=float(totaltax)
+			totalamount = request.POST.get('totalamount')
+			totalamount=float(totalamount)
 
+            
+   
+			selleraccount=Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Seller",id=sellerledgeraccount).first()
+			purchaseledger=Account.objects.filter(store__vendor=vendorobj,accountname="Purchase Entery").first()
 			ref_no = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(timezone.now()) + 'JOURNAL'))
 			ref_no = ref_no.upper()
 			referenceno = ref_no[0:8]
 
-			manualjournalvoucher = ManualJournalVoucher.objects.create(
-				store=storeobj, referenceno=referenceno, createddate=date, description=description
+			purchasevoucher = PurchasesOrder.objects.create(
+       
+				store=storeobj, orderno=referenceno, createdat=purchase_date, supplierinvoiceno=supplierinvoiceno,selleraccount=selleraccount
 			)
 
-			total_amount = 0.0
-			total_debit = 0.0
-			total_credit = 0.0
+			
 
 			for i in range(int(value)):
-				t = 'transaction' + str(i)
-				a = 'account' + str(i)
-				deb = 'deb' + str(i)
-				cre = 'cre' + str(i)
-				account_name = request.POST.get(a)
-				transactiontype = request.POST.get(t)
-				debit = request.POST.get(deb)
-				credit = request.POST.get(cre)
+				itemproduct = 'itemproduct' + str(i)
+				price = 'price' + str(i)
+				quantity = 'quantity' + str(i)
+				tax = 'tax' + str(i)
+				total = 'total' + str(i)
+				productvariantid = request.POST.get(itemproduct)
+				productprice = request.POST.get(price)
+				productquantity = request.POST.get(quantity)
+				producttax = request.POST.get(tax)
+				producttotal = request.POST.get(total)
+                
+				print(productprice,productquantity,producttotal,'price')
 
 				try:
-					if account_name.isnumeric():
-						account = Account.objects.get(id=account_name)
+					if productvariantid.isnumeric():
+						productvariants = ProductVariants.objects.get(id=productvariantid)
 					else:
-						account = Account.objects.filter(accountname=account_name).first()
+						productvariants = ProductVariants.objects.filter(productvariantname=productvariantid).first()
 					
-					if not account:
+					if not productvariants:
 						continue  # Skip this iteration if account is not found
 
-					if debit:
-						debit=float(debit)
-						total_debit += float(debit)
-						total_amount += float(debit)
-						AccountEntry.objects.create(
-							manualjournalvoucher=manualjournalvoucher, transactiontype=transactiontype,
-							totaldebit=float(debit), account=account,updatedby=request.user,
+					if productvariants:
+						PurchasesOrderItems.objects.create(store=storeobj,
+							purchasesorder=purchasevoucher, productvariants=productvariants,price=float(productprice),
+							tax=float(producttax),total=float(producttotal), quantity=int(productquantity),updatedby=request.user,
 						)
-      
-      
-						if account.transctiontype=="DEBIT":
-							currentopeningbalance=account.openingbalance
-							if description:
-								transactiondetails=description
-							else:
-								transactiondetails=f'Amount has been debit Rs.{debit}/-'
-							accounttransactions = AccountTransaction.objects.create(
-								account = account,previousprtransactiontype="DEBIT",
-								transactiondate = timezone.now(),
-								transactiontype = 'DEBIT', transactionrealted= "MANUAL-JOURNAL",
-								transactiondetails = transactiondetails,
-								transactionid = referenceno,
-								transactionamount = debit,
-								previousamount = round(account.openingbalance, 2),
-								remainingamount =round(( round(account.openingbalance,2) + round(debit,2)),2)
-							)
-							account.openingbalance = round((currentopeningbalance + float(debit)),2)
-							account.save()
-						else:
-							currentopeningbalance=account.openingbalance
-							if currentopeningbalance < debit :
-								if description:
-									transactiondetails=description
-								else:
-									transactiondetails=f'Amount has been debit Rs.{debit}/-'
-								accounttransactions = AccountTransaction.objects.create(
-									account = account,
-									transactiondate = timezone.now(),
-									transactiontype = 'DEBIT', transactionrealted= "MANUAL-JOURNAL",
-									transactiondetails = transactiondetails,
-									transactionid = referenceno,previousprtransactiontype="DEBIT",
-									transactionamount = debit,
-									previousamount = round(account.openingbalance, 2),
-									remainingamount = round(( round(debit,2)- round(account.openingbalance,2)),2)
-								)
-								account.openingbalance = round((float(debit - currentopeningbalance)),2)
-								account.transctiontype="DEBIT"
-								account.save()
-								
-							else:
-								if description:
-									transactiondetails=description
-								else:
-									transactiondetails=f'Amount has been debit Rs.{debit}/-'
-								accounttransactions = AccountTransaction.objects.create(
-									account = account,
-									transactiondate = timezone.now(),
-									transactiontype = 'DEBIT', transactionrealted= "MANUAL-JOURNAL",
-									transactiondetails = transactiondetails,previousprtransactiontype="CREDIT",
-									transactionid = referenceno,
-									transactionamount = debit,
-									previousamount = round(account.openingbalance, 2),
-									remainingamount = round(( round(account.openingbalance,2) - round(debit,2)),2)
-								)
-								account.openingbalance = round((currentopeningbalance - float(debit)),2)
-								account.save()
-								
-					if credit:
-						credit=float(credit)
-
-						total_credit += float(credit)
-						AccountEntry.objects.create(
-							manualjournalvoucher=manualjournalvoucher, transactiontype=transactiontype,
-							totalcredit=float(credit), account=account,updatedby=request.user
-						)
-						if account.transctiontype=="DEBIT":
-							currentopeningbalance=account.openingbalance
-							if currentopeningbalance < credit :
-								if description:
-									transactiondetails=description
-								else:
-									transactiondetails=f'Amount has been credit Rs.{credit}/-'
-								accounttransactions = AccountTransaction.objects.create(
-									account = account,
-									transactiondate = timezone.now(),
-									transactiontype = 'CREDIT', transactionrealted= "MANUAL-JOURNAL",
-									transactiondetails = transactiondetails,previousprtransactiontype="CREDIT",
-									transactionid = referenceno,
-									transactionamount = credit,
-									previousamount = round(account.openingbalance, 2),
-									remainingamount = round((round(credit,2) - round(account.openingbalance,2)),2)
-								)						
-        
-								account.openingbalance = round((float(credit - currentopeningbalance)),2)
-								account.transctiontype="CREDIT"
-								account.save()
-							
-							else:
-								if description:
-									transactiondetails=description
-								else:
-									transactiondetails=f'Amount has been credit Rs.{credit}/-'
-								accounttransactions = AccountTransaction.objects.create(
-									account = account,
-									transactiondate = timezone.now(),
-									transactiontype = 'CREDIT', transactionrealted= "MANUAL-JOURNAL",
-									transactiondetails = transactiondetails,previousprtransactiontype="DEBIT",
-									transactionid = referenceno,
-									transactionamount = credit,
-									previousamount = round(account.openingbalance, 2),
-									remainingamount = round(( round(account.openingbalance,2)- round(credit,2)),2)
-								)	
-								account.openingbalance = round((currentopeningbalance - float(credit)),2)
-								account.save()
-								
-						else:
-							currentopeningbalance=account.openingbalance
-							if description:
-								transactiondetails=description
-							else:
-								transactiondetails=f'Amount has been credit Rs.{credit}/-'
-							accounttransactions = AccountTransaction.objects.create(
-								account = account,
-								transactiondate = timezone.now(),
-								transactiontype = 'CREDIT', transactionrealted= "MANUAL-JOURNAL",
-								transactiondetails = transactiondetails,previousprtransactiontype="CREDIT",
-								transactionid = referenceno,
-								transactionamount = credit,
-								previousamount = round(account.openingbalance, 2),
-								remainingamount =  round((round(account.openingbalance,2) + round(credit,2)),2)
-							)
-							account.openingbalance = round((currentopeningbalance + float(credit)),2)
-							account.save()
-							
-
-				except Account.DoesNotExist:
+						curentquantity=productvariants.quantity
+						curentpurchaseprice=productvariants.purchaseprice
+						totalquantity=curentquantity + int(productquantity)
+						totalpurchase=curentpurchaseprice + float(productprice)
+						averageprice=round((totalpurchase / totalquantity),2)
+						productvariants.purchaseprice=averageprice
+						productvariants.quantity=totalquantity
+						productvariants.save()
+						
+     						
+				except ProductVariants.DoesNotExist:
 					continue  # Skip this iteration if account does not exist
+            
+			selleraccountcurrentopeningbalance=selleraccount.openingbalance
+			purchaseledgercurrentopeningbalance=purchaseledger.openingbalance
+		
+			accounttransactions = AccountTransaction.objects.create(
+				account = purchaseledger,previousprtransactiontype="DEBIT",
+				transactiondate = timezone.now(),
+				transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
+				transactiondetails = f'Amount {totalamount} has been debit for item purchase',
+				transactionid = referenceno,
+				transactionamount = totalamount,
+				previousamount = round(purchaseledger.openingbalance, 2),
+				remainingamount = round((purchaseledger.openingbalance + totalamount),2)
+			)
+			purchaseledger.openingbalance = round((purchaseledgercurrentopeningbalance + float(totalamount)),2)
+			purchaseledger.save()	
+			accounttransactions = AccountTransaction.objects.create(
+				account = selleraccount,previousprtransactiontype="CREDIT",
+				transactiondate = timezone.now(),
+				transactiontype = 'CREDIT', transactionrealted= "PURCHASE-VOUCHER",
+				transactiondetails = f'Amount {totalamount} has been credit for item purchase',
+				transactionid = referenceno,
+				transactionamount = totalamount,
+				previousamount = round(selleraccount.openingbalance, 2),
+				remainingamount =round((selleraccount.openingbalance + totalamount),2)
+			)
+			selleraccount.openingbalance = round((selleraccountcurrentopeningbalance + float(totalamount)),2)
+			selleraccount.save()
 
-			manualjournalvoucher.totalcredit = total_credit
-			manualjournalvoucher.totaldebit = total_debit
-			manualjournalvoucher.amount = total_amount
-			manualjournalvoucher.updatedby=request.user
-			manualjournalvoucher.save()
+			purchasevoucher.total = totalamount
+			purchasevoucher.tax = totaltax
+			purchasevoucher.subtotal = totalamount-totaltax
+			purchasevoucher.updatedby=request.user
+			purchasevoucher.save()
 
-		return redirect("/vendor/manual-journal")
+		return redirect("/vendor/purchase-vouchers")
 	else:
 		return render(request, '403.html')
 
 
+from django.http import JsonResponse
 
+def fetch_productvaraints_related_data(request):
+	itemproductid = request.GET.get('itemproductid', '')
+	quantity = request.GET.get('quantity', '')
+	price = request.GET.get('price', '')
+	print(itemproductid,quantity,price,'itemproductid')
+
+	try:
+		item = ProductVariants.objects.get(id=itemproductid)
+		quantity=float(quantity)
+		if price :
+			vendorprice = float(price)
+		else:
+			vendorprice = item.purchaseprice
+		
+		vendorperproducttax= round( (vendorprice) * ((item.product.tax/100) / (1 + (item.product.tax/100))),2)
+		vendortax = round((vendorperproducttax * quantity),2)
+		vendortotal = round((vendorprice * quantity),2)
+
+		productvariantname=item.productvariantname
+		
+		purchaseprice=round((vendorprice - vendorperproducttax),2)
+		print(purchaseprice,item.purchaseprice,vendorperproducttax,'vendorperproducttax')
+		
+		data = {'productvariantname': productvariantname, "purchaseprice":purchaseprice,
+					'tax': vendortax, 'total': vendortotal,
+     
+     }
+	except ProductVariants.DoesNotExist:
+		data = {'productvariantname': '', 'purchaseprice': ''}
+
+	return JsonResponse(data)
 
 
 @csrf_exempt
