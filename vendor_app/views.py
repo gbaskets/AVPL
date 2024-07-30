@@ -2408,6 +2408,7 @@ def Purchase_Vouchers(request):
                 "purchaseledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Purchase Entery").first(),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
                'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
+                 'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendorobj),
 		
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
