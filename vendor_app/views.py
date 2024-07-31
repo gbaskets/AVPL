@@ -2870,307 +2870,73 @@ def viewbalancesheet(request):
 
 
 
+def Trial_Balance(request):
+    if not check_user_authentication(request, 'VENDOR'):
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
 
+    vendorobj = Vendor.objects.filter(user=request.user).first()
+    store = Store.objects.filter(vendor=vendorobj).first()
 
-def newTrial(request):
-	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		store = Store.objects.filter(vendor=vendorobj).first()
-  
-		data = {}
-		accounttypegroup = AccountTypeGroup.objects.all()
-		for i in accounttypegroup:
-			accounttypelist = []
-			datalist = {}
-			accounttypes = AccountType.objects.filter(accounttypegroup__name=i.name)
-			for account_type in accounttypes:
-            
-				accounttypelist.append(account_type.name)
-				accounttypegrouplist = []
-				accounttypesgroupl = AccountTypeList.objects.filter(accounttype__name=account_type.name)
-				for account_typelist in accounttypesgroupl:
-					accounttypegrouplist.append(account_typelist.name)
-				datalist[f"{i.name}"] = accounttypegrouplist
-				
-			data[f"{i.name}"] = accounttypelist
+    if not store:
+        return JsonResponse({'error': 'Store not found'}, status=404)
 
-   
+    trail_data = {}
 
-		trail_data = {}
-		asset = []
-		liability = []
-		equity = []
-		income = []
-		expense = []
+    accounttypegroups = AccountTypeGroup.objects.all()
 
-		manual_j = Mannual_Journal.objects.filter(store=store)
-		for i in manual_j:
-			journal = Mannual_Journal.objects.get(store=store, id=i.id)
-			account_entry = Account_Entry.objects.filter(manual_journal=journal)
-			# for a in account_entry:
-			#     a.store_id=request.user.store.store.id
-			#     a.save()
-			for j in account_entry:
-				if j.account is not None:
-					if j.account.account_type in data.get("Assets"):
-						asset.append(j.account.id)
-						# print(Account.objects.get(id=j.account.id),'dddddddddd5555555555555ddddd')
-						print(j.account.id, type(j.account.id), "tttttttttttttt")
-					if j.account.account_type in data.get("Liability"):
-						liability.append(j.account.id)
-					if j.account.account_type in data.get("Equity"):
-						equity.append(j.account.id)
-					if j.account.account_type in data.get("Income"):
-						income.append(j.account.id)
-					if j.account.account_type in data.get("Expense"):
-						expense.append(j.account.id)
-				if j.default_account is not None:
-					if j.default_account.account_type in data.get("Assets"):
-						asset.append(j.default_account.id)
-					if j.default_account.account_type in data.get("Liability"):
-						liability.append(j.default_account.id)
-					if j.default_account.account_type in data.get("Equity"):
-						equity.append(j.default_account.id)
-					if j.default_account.account_type in data.get("Income"):
-						income.append(j.default_account.id)
-					if j.default_account.account_type in data.get("Expense"):
-						expense.append(j.default_account.id)
+    for group in accounttypegroups:
+        group_total_debit = 0
+        group_total_credit = 0
+        group_data = {"types": [], "total_debit": 0, "total_credit": 0}
 
-		asset_dic = {}
-		for i in asset:
-			asset_dic[i] = asset.count(i)
-		liability_dic = {}
-		for i in liability:
-			liability_dic[i] = liability.count(i)
-		equity_dic = {}
-		for i in equity:
-			equity_dic[i] = equity.count(i)
-		income_dic = {}
-		for i in income:
-			income_dic[i] = income.count(i)
-		expense_dic = {}
-		for i in expense:
-			expense_dic[i] = expense.count(i)
+        accounttypes = AccountType.objects.filter(accounttypegroup=group)
 
-		asset_list = []
-		liability_list = []
-		equity_list = []
-		income_list = []
-		expense_list = []
+        for account_type in accounttypes:
+            type_total_debit = 0
+            type_total_credit = 0
+            type_data = {"lists": [], "total_debit": 0, "total_credit": 0}
 
-		for j in asset_dic:
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, account_id=j
-			).exists():
-				# asset_entry=list(Account_Entry.objects.filter(account_id=j).values())
-				debit_sum = Account_Entry.objects.filter(store_id=request.user.store.store.id, account_id=j).exclude(expense_id__isnull=False).aggregate(Sum("total_debit"))["total_debit__sum"]
-				credit_sum = Account_Entry.objects.filter(store_id=request.user.store.store.id, account_id=j).exclude(expense_id__isnull=False).aggregate(Sum("total_credit"))["total_credit__sum"]
+            accounttypelists = AccountTypeList.objects.filter(accounttype=account_type)
 
-				asset_account_balance = (debit_sum or 0) - (credit_sum or 0)
+            for account_typelist in accounttypelists:
+                list_total_debit = 0
+                list_total_credit = 0
+                list_data = {"accounts": [], "total_debit": 0, "total_credit": 0}
 
+                accounts = Account.objects.filter(accounttypelist=account_typelist, store=store)
 
+                for account in accounts:
+                    balance = account.openingbalance  # Assume balance is stored here
+                    account_data = {
+                        "accountname": account.accountname,
+                        "accountcode": account.accountcode,
+                        "balance": balance,
+                        "transctiontype": account.transctiontype
+                    }
+                    if account.transctiontype == 'DEBIT':  # Debit balance
+                        list_total_debit += balance
+                    else:  # Credit balance
+                        list_total_credit += balance
+                    
+                    list_data["accounts"].append(account_data)
 
-				asset_entry = Account.objects.filter(
-					store=request.user.store.store, id=j
-				).values()
-				for i in asset_entry:
-					i["balance"] = asset_account_balance
-				asset_list.append(list(asset_entry))
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, default_account_id=j
-			).exists():
-				# asset_default_account_balance = (Account_Entry.objects.filter(store_id=request.user.store.store.id, default_account_id=j).exclude(expense_id__isnull=False).aggregate(Sum("total_debit"))["total_debit__sum"] or 0 - Account_Entry.objects.filter(store_id=request.user.store.store.id, default_account_id=j).exclude(expense_id__isnull=False).aggregate(Sum("total_credit"))["total_credit__sum"]) or 0
-				debit_sum = Account_Entry.objects.filter(store_id=request.user.store.store.id, default_account_id=j).exclude(expense_id__isnull=False).aggregate(Sum("total_debit"))["total_debit__sum"]
-				credit_sum = Account_Entry.objects.filter(store_id=request.user.store.store.id, default_account_id=j).exclude(expense_id__isnull=False).aggregate(Sum("total_credit"))["total_credit__sum"]
+                list_data["total_debit"] = list_total_debit
+                list_data["total_credit"] = list_total_credit
 
-				asset_default_account_balance = (debit_sum or 0) - (credit_sum or 0)
-				
-				
-				
-				
-				asset_default_entry = Default_Account.objects.filter(id=j).values()
-				for i in asset_default_entry:
-					i["balance"] = asset_default_account_balance
-				asset_list.append(list(asset_default_entry))
-		for j in liability_dic:
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, account_id=j
-			).exists():
-				liability_account_balance = (
-					Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_credit"))["total_credit__sum"]
-					- Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_debit"))["total_debit__sum"]
-				)
-				liability_entry = Account.objects.filter(
-					store=request.user.store.store, id=j
-				).values()
-				for i in liability_entry:
-					i["balance"] = liability_account_balance
+                type_total_debit += list_total_debit
+                type_total_credit += list_total_credit
+                type_data["lists"].append({"name": account_typelist.name, "data": list_data})
 
-				liability_list.append(list(liability_entry))
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, default_account_id=j
-			).exists():
-				liability_default_account_balance = (
-					Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, default_account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_credit"))["total_credit__sum"]
-					- Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, default_account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_debit"))["total_debit__sum"]
-				)
-				liability_default_entry = Default_Account.objects.filter(id=j).values()
-				for i in liability_default_entry:
-					i["balance"] = liability_default_account_balance
-				liability_list.append(list(liability_default_entry))
-		for j in equity_dic:
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, account_id=j
-			).exists():
-				equity_account_balance = (
-					Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_credit"))["total_credit__sum"]
-					- Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_debit"))["total_debit__sum"]
-				)
-				equity_entry = Account.objects.filter(
-					store=request.user.store.store, id=j
-				).values()
-				for i in equity_entry:
-					i["balance"] = equity_account_balance
+            type_data["total_debit"] = type_total_debit
+            type_data["total_credit"] = type_total_credit
 
-				equity_list.append(list(equity_entry))
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, default_account_id=j
-			).exists():
-				equity_default_account_balance = (
-					Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, default_account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_credit"))["total_credit__sum"]
-					- Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, default_account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_debit"))["total_debit__sum"]
-				)
-				equity_default_entry = Default_Account.objects.filter(id=j).values()
-				for i in equity_default_entry:
-					i["balance"] = equity_default_account_balance
-				equity_list.append(list(equity_default_entry))
-		for j in income_dic:
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, account_id=j
-			).exists():
-				income_account_balance = (
-					Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_credit"))["total_credit__sum"]
-					- Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_debit"))["total_debit__sum"]
-				)
-				income_entry_new = Account.objects.filter(
-					store=request.user.store.store, id=j
-				)
-				if len(income_entry_new) > 0:
-					income_entry = Account.objects.filter(
-						store=request.user.store.store, id=j
-					).values()
-					for i in income_entry:
-						i["balance"] = income_account_balance
-					income_list.append(list(income_entry))
+            group_total_debit += type_total_debit
+            group_total_credit += type_total_credit
+            group_data["types"].append({"name": account_type.name, "data": type_data})
 
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, default_account_id=j
-			).exists():
-				income_default_account_balance = (
-					Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, default_account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_credit"))["total_credit__sum"]
-					- Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, default_account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_debit"))["total_debit__sum"]
-				)
-				income_default_entry = Default_Account.objects.filter(id=j).values()
+        group_data["total_debit"] = group_total_debit
+        group_data["total_credit"] = group_total_credit
 
-				for i in income_default_entry:
-					i["balance"] = income_default_account_balance
-				income_list.append(list(income_default_entry))
-		for j in expense_dic:
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, account_id=j
-			).exists():
-				expense_account_balance = (
-					Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_debit"))["total_debit__sum"]
-					- Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_credit"))["total_credit__sum"]
-				)
-				expense_entry = Account.objects.filter(
-					store=request.user.store.store, id=j
-				).values()
-				for i in expense_entry:
-					i["balance"] = expense_account_balance
-				expense_list.append(list(expense_entry))
-			if Account_Entry.objects.filter(
-				store_id=request.user.store.store.id, default_account_id=j
-			).exists():
-				expense_default_account_balance = (
-					Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, default_account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_debit"))["total_debit__sum"]
-					- Account_Entry.objects.filter(
-						store_id=request.user.store.store.id, default_account_id=j
-					)
-					.exclude(expense_id__isnull=False)
-					.aggregate(Sum("total_credit"))["total_credit__sum"]
-				)
-				expense_default_entry = Default_Account.objects.filter(id=j).values()
-				for i in expense_default_entry:
-					i["balance"] = expense_default_account_balance
-				expense_list.append(list(expense_default_entry))
+        trail_data[group.name] = group_data
 
-		trail_data["Assets"] = asset_list
-		trail_data["Liability"] = liability_list
-		trail_data["Equity"] = equity_list
-		trail_data["Income"] = income_list
-		trail_data["Expense"] = expense_list
-		# return render(request, "report/trial_balance.html")
-
-		return JsonResponse(trail_data)
-
+    return JsonResponse(trail_data)

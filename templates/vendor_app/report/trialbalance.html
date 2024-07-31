@@ -47,7 +47,7 @@
         border-radius: 8px 8px 0px 0px;
         font-weight: bold;
         color: black;
-        font-size: 20px;
+        font-size: 16px;
 
       }
       
@@ -55,7 +55,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 8px;
+        padding: 10px;
         border: 1px solid #e1e1e1;
         margin-top: -1px;
         color: #535353;
@@ -86,6 +86,28 @@
         
       }
       .sub-head{
+        font-weight: bold;
+        color: coral;
+        font-size: 18px; 
+        background-color: #f3f3f3;
+      }
+
+      .sub-sub-head{
+       
+        color:black;
+        font-size: 16px; 
+        background-color: #f3f3f3;
+      }
+
+      .sub-sub-sub-head{
+      
+        color: black;
+        font-size: 14px; 
+        background-color: #f3f3f3;
+      }
+
+
+      .head{
         font-weight: bold;
         color: black;
         font-size: 18px; 
@@ -121,101 +143,140 @@
 
                   </div>
                   <div class="card-body">
-
-                <div class="separator"></div>
-                <div class="receipt-content">
-                    <div class="container bootstrap snippets bootdey">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="invoice-wrapper">
-                                    <div class="line-items">
-                                        <div class="headers clearfix">
-
-                                            <table id="general_ledger">
-                                                <thead>
-                                                  <tr>
-                                                      <th class="second">Account</th>
-                                                      <th class="third">Account Code</th>
-                                                      <th class="fourth">Debit</th>
-                                                      <th class="fifth">Credit</th>
-                                                  </tr>
-                                                </thead>
-                                                <tbody id="trail_head">
-                                                </tbody>
-                                          </table>     
-                                        </div>
-                                        <!-- <div class="items" id="trail_head"></div> -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-               </div>
+                    <table id="general_ledger">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Account Code</th>
+                                <th>NET DEBIT</th>
+                                <th>NET CREDIT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trail_head">
+                        </tbody>
+                        <tfoot id="trail_foot">
+                        </tfoot>
+                    </table>   
+                </div>  
+                                  
             </div>
             </section>
             
             </div>
             
-
-<script>
-    (function(){
-        console.log('Here, anonymous function Call...');
-        var response =  fetch('/vendor/newTrial/', {
-          method: 'GET',
-        //   body: mul
-        })
-        .then(function(res){return res.json(); })
-        .then(function(data){
-            console.log(data);
-            let html='';
-            let entryName={}
-            for(let i in data){
-                html+=` <tr class="sub-head">
-                    <td class="second">${i}</td>
-                    <td class="third">&nbsp;</td>
-                    <td class="fourth"><strong>&nbsp;</strong></td>
-                    <td class="fifth"><strong>&nbsp;</strong></td>
-                </tr>`;
-                
-                for(let j=0;j<data[i].length;j++){
-                    if (((Number(data[i][j][0].balance)>0)&&(i=='Assets')) || ((Number(data[i][j][0].balance)>0)&&(i=='Expense'))) {
-                        html+=`<tr>
-                            <td class="second">${data[i][j][0].account_name}</td>
-                            <td class="third">${data[i][j][0].account_code}</td>
-                            <td class="fourth">₹&nbsp;${data[i][j][0].balance}</td>
-                            <td class="fifth">₹&nbsp;0.00</td>
-                            </tr>`;
-                    }else if(((Number(data[i][j][0].balance)<0)&&(i=='Assets')) || ((Number(data[i][j][0].balance)<0)&&(i=='Expense'))) {
-                        html+=`<tr>
-                            <td class="second">${data[i][j][0].account_name}</td>
-                            <td class="third">${data[i][j][0].account_code}</td>
-                            <td class="fourth">₹&nbsp;0.00</td>
-                            <td class="fifth">₹&nbsp;${Math.abs(data[i][j][0].balance)}</td>
-                        </tr>`;
-                    }else if(((Number(data[i][j][0].balance)>0)&&(i=='Equity')) ||((Number(data[i][j][0].balance)>0)&&(i=='Income')) ||((Number(data[i][j][0].balance)>0)&&(i=='Liability'))){
-                        html+=`<tr>
-                            <td class="second">${data[i][j][0].account_name}</td>
-                            <td class="third">${data[i][j][0].account_code}</td>
-                            <td class="fourth">₹&nbsp;0.00</td>
-                            <td class="fifth">₹&nbsp;${data[i][j][0].balance}</td>
-                        </tr>`;
-                    }
-                    else{
-                        html+=`<tr>
-                            <td class="second">${data[i][j][0].account_name}</td>
-                            <td class="third">${data[i][j][0].account_code}</td>
-                            <td class="fourth">₹&nbsp;${Math.abs(data[i][j][0].balance)}</td>
-                            <td class="fifth">₹&nbsp;0.00</td>
-                        </tr>`;
-                    }   
-                }
-            }
-            document.getElementById('trail_head').innerHTML=html;
-            console.log(entryName)
-        });
-    })();
-    
-</script>
+          
+          <script>
+          (function(){
+              console.log('Here, anonymous function Call...');
+              fetch('/vendor/Trial_Balance/', {
+                  method: 'GET',
+              })
+              .then(function(res) {
+                  return res.json();
+              })
+              .then(function(data) {
+                  console.log(data);
+                  let html = '';
+                  let total_debit = 0;
+                  let total_credit = 0;
+     
+                  for (let group in data) {
+                      let group_data = data[group];
+                      html += `<tr class="group sub-head" data-group="${group}">
+                          <td>${group}</td>
+                          <td></td>
+                          <td>${group_data.total_debit.toFixed(2) == 0 ? '--' : `₹${group_data.total_debit.toFixed(2)} DR`}</td>
+                          <td>${group_data.total_credit.toFixed(2) == 0 ? '--' : `₹${group_data.total_credit.toFixed(2)} CR`}</td>
+                      </tr>`;
+          
+                      total_debit += group_data.total_debit;
+                      total_credit += group_data.total_credit;
+          
+                      for (let type of group_data.types) {
+                          let type_data = type.data;
+                          html += `<tr class="type sub-sub-head" data-group="${group}" data-type="${type.name}" style="display:none;">
+                              <td style="padding-left: 20px;">${type.name}</td>
+                              <td></td>
+                              <td>${type_data.total_debit.toFixed(2) == 0 ? '--' : `₹${type_data.total_debit.toFixed(2)} DR`}</td>
+                              <td>${type_data.total_credit.toFixed(2) == 0 ? '--' : `₹${type_data.total_credit.toFixed(2)} CR`}</td>
+                          </tr>`;
+          
+                          for (let list of type_data.lists) {
+                              let list_data = list.data;
+                              html += `<tr class="list sub-sub-sub-head" data-group="${group}" data-type="${type.name}" data-list="${list.name}" style="display:none;">
+                                  <td style="padding-left: 40px;">${list.name}</td>
+                                  <td></td>
+                                  <td>${list_data.total_debit.toFixed(2) == 0 ? '--' : `₹${list_data.total_debit.toFixed(2)} DR`}</td>
+                                  <td>${list_data.total_credit.toFixed(2) == 0 ? '--' : `₹${list_data.total_credit.toFixed(2)} CR`}</td>
+                              </tr>`;
+          
+                              for (let account of list_data.accounts) {
+                                  let balance = account.balance;
+                                  let debit = account.transctiontype == 'DEBIT' ? balance : 0;
+                                  let credit = account.transctiontype == 'CREDIT' ? balance : 0;
+          
+                                  html += `<tr class="account" data-group="${group}" data-type="${type.name}" data-list="${list.name}" style="display:none;">
+                                      <td style="padding-left: 60px;">${account.accountname}</td>
+                                      <td>${account.accountcode}</td>
+                                      <td>${debit == 0 ? '--' : `₹${debit.toFixed(2)} DR`}</td>
+                                      <td>${credit == 0 ? '--' : `₹${credit.toFixed(2)} CR`}</td>
+                                  </tr>`;
+                              }
+                          }
+                      }
+                  }
+          
+                  document.getElementById('trail_head').innerHTML = html;
+          
+                  let footerHtml = `
+                      <tr class="head">
+                          <td><strong>Total</strong></td>
+                          <td></td>
+                          <td><strong> <b>₹${total_debit.toFixed(2)} DR</b></strong></td>
+                          <td><strong> <b>₹${total_credit.toFixed(2)} CR </b></strong></td>
+                      </tr>
+                  `;
+                  document.getElementById('trail_foot').innerHTML = footerHtml;
+          
+                  document.querySelectorAll('.group').forEach(groupRow => {
+                      groupRow.addEventListener('click', function() {
+                          let group = this.dataset.group;
+                          document.querySelectorAll(`.type[data-group="${group}"]`).forEach(typeRow => {
+                              typeRow.style.display = typeRow.style.display === 'none' ? '' : 'none';
+                          });
+                      });
+                  });
+          
+                  document.querySelectorAll('.type').forEach(typeRow => {
+                      typeRow.addEventListener('click', function() {
+                          let group = this.dataset.group;
+                          let type = this.dataset.type;
+                          document.querySelectorAll(`.list[data-group="${group}"][data-type="${type}"]`).forEach(listRow => {
+                              listRow.style.display = listRow.style.display === 'none' ? '' : 'none';
+                          });
+                      });
+                  });
+          
+                  document.querySelectorAll('.list').forEach(listRow => {
+                      listRow.addEventListener('click', function() {
+                          let group = this.dataset.group;
+                          let type = this.dataset.type;
+                          let list = this.dataset.list;
+                          document.querySelectorAll(`.account[data-group="${group}"][data-type="${type}"][data-list="${list}"]`).forEach(accountRow => {
+                              accountRow.style.display = accountRow.style.display === 'none' ? '' : 'none';
+                          });
+                      });
+                  });
+              });
+          })();
+          </script>
+          
+          <style>
+          .hidden {
+              display: none;
+          }
+          </style>
+          
+          
 
 {% endblock %}
