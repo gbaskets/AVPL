@@ -854,7 +854,9 @@ def edit_product_variants(request,id):
 			mrp=request.POST.get('mrp') 
 			purchaseprice=request.POST.get('purchaseprice') 
 			price=request.POST.get('price') 
-	
+			isactive=request.POST.get('isactive')
+			print(isactive,'isactive')
+
 			if ProductVariants.objects.filter(store=store,id=id).exists():
 				productvariantsobj=ProductVariants.objects.filter(store=store,id=id).first()
 	
@@ -880,8 +882,16 @@ def edit_product_variants(request,id):
 					productvariantsobj.purchaseprice= float(purchaseprice)
 				if price:
 					productvariantsobj.price =float(price)
+				productobj=Product.objects.filter(id=productvariantsobj.product.id).first()
+				if isactive :
+					productvariantsobj.isactive=True
+					productobj.isactive=True
+				else:
+					productvariantsobj.isactive=False
+					productobj.isactive=False
 				
 				productvariantsobj.updatedby= request.user
+				productobj.save()
 				productvariantsobj.save()
 				messages.success(request,f'Product Variants {productvariantname} is updated Successfully')
 				return redirect(f'/vendor/product-variants-list/{productvariantsobj.product.id}')
@@ -2009,12 +2019,61 @@ def account_type_details(request):
     return JsonResponse(response_data)
 
 
+
+def account_code_by_store(store):
+	storeobj=Store.objects.filter(id=store.id).first()
+	if len(Account.objects.all()) != 0 :
+		tds=Account.objects.filter().last()
+		transid=tds.id
+	else:
+		transid=1
+	start=0000+transid
+	ref_no = str(str(timezone.now()))
+	ref_no = ref_no.upper()
+	ref_no = ref_no[0:4]
+	transactionid=f"{storeobj.id}{ref_no}{start}"
+	return transactionid
+
+
+
 @csrf_exempt
 def chartofaccounts(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendorobj=Vendor.objects.filter(user=request.user).first()
-       
-         
+		storeobj=Store.objects.filter(vendor=vendorobj).first()
+        
+        
+		if not Account.objects.filter(store=storeobj,accountname='Cash').exists():
+			accounttypelist =AccountTypeList.objects.filter(name="Cash In Hand").first()
+			Account.objects.create(store=storeobj,
+				accountname='Cash',accounttypelist=accounttypelist,
+				accountcode = account_code_by_store(storeobj),
+				openingbalance = 0,
+				transctiontype  =  'DEBIT')
+		if not Account.objects.filter(store=storeobj,accountname='Purchase Entery').exists():
+			accounttypelist =AccountTypeList.objects.filter(name="Purchase").first()
+			Account.objects.create(store=storeobj,
+				accountname='Purchase Entery',accounttypelist=accounttypelist,
+				accountcode = account_code_by_store(storeobj),
+				openingbalance = 0,
+				transctiontype  =  'DEBIT')
+   
+		if not Account.objects.filter(store=storeobj,accountname='Sales Entery').exists():
+			accounttypelist =AccountTypeList.objects.filter(name="Sales").first()
+			Account.objects.create(store=storeobj,
+				accountname='Sales Entery',accounttypelist=accounttypelist,
+				accountcode = account_code_by_store(storeobj),
+				openingbalance = 0,
+				transctiontype  =  'CREDIT')
+   
+		if not Account.objects.filter(store=storeobj,accountname='Profit & Loss').exists():
+			Account.objects.create(store=storeobj,
+				accountname='Profit & Loss',
+				accountcode = account_code_by_store(storeobj),
+				openingbalance = 0,
+				transctiontype  =  'CREDIT')
+			
+			
 		dic = {"vendorobj":vendorobj,
                 "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
@@ -2053,23 +2112,6 @@ def  accountledgertransactionshistory(request,id):
 
 
 
-
-def account_code_by_store(store):
-	storeobj=Store.objects.filter(id=store.id).first()
-	if len(Account.objects.all()) != 0 :
-		tds=Account.objects.filter().last()
-		transid=tds.id
-	else:
-		transid=1
-	start=0000+transid
-	ref_no = str(str(timezone.now()))
-	ref_no = ref_no.upper()
-	ref_no = ref_no[0:4]
-	transactionid=f"{storeobj.id}{ref_no}{start}"
-	return transactionid
-
-
-
 @csrf_exempt
 def addchartofaccounts(request):
 	if check_user_authentication(request, 'VENDOR'):    
@@ -2081,7 +2123,7 @@ def addchartofaccounts(request):
 			transctiontype = request.POST.get('transctiontype')
 			print(accountname,'accountname')
      
-			if not Account.objects.filter(accountname=accountname,accountcode = account_code_by_store(storeobj)).exists():
+			if not Account.objects.filter(accountname=accountname,store = storeobj).exists():
 				accountobj=Account()
 				accountobj.store = storeobj
 				accountobj.accounttypelist =AccountTypeList.objects.filter(id=accountypelist).first()

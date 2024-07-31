@@ -1666,7 +1666,9 @@ def admin_edit_product_variants(request,id):
 			purchaseprice=request.POST.get('purchaseprice') 
 			price=request.POST.get('price') 
 			admincommission=request.POST.get('admincommission') 
-            
+			isactive=request.POST.get('isactive')
+			print(isactive,'isactive')
+			
 	
 			if ProductVariants.objects.filter(id=id).exists():
 				productvariantsobj=ProductVariants.objects.filter(id=id).first()
@@ -1697,7 +1699,15 @@ def admin_edit_product_variants(request,id):
 					productvariantsobj.purchaseprice= float(purchaseprice)
 				if price:
 					productvariantsobj.price =float(price)
-				
+				productobj=Product.objects.filter(id=productvariantsobj.product.id).first()
+				if isactive :
+					productvariantsobj.isactive=True
+					productobj.isactive=True
+				else:
+					productvariantsobj.isactive=False
+					productobj.isactive=False
+					
+				productobj.save()
 				productvariantsobj.save()
 				messages.success(request,f'Product Variants {productvariantname} is updated Successfully')
 				return redirect(f'/admins/product-variants-list/{productvariantsobj.product.id}')
