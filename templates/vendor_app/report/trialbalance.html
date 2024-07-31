@@ -2,24 +2,108 @@
 {% load static %}
 {% block title %}Trial Balance{% endblock %}
 {% block main %}
-<!-- Main Content -->
 <style>
-   .hiddenRow {
-      padding: 0 !important;
-   }
+    .tooltip-1 {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+    }
+
+    .tooltip-1 .tooltiptext-1 {
+        visibility: hidden;
+        width: 160px;
+        background-color: black;
+        color: white;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+
+        /* Position the tooltip */
+        position: absolute;
+        top: -78px;
+        z-index: 1;
+    }
+
+    .tooltip-1:hover .tooltiptext-1 {
+        visibility: visible;
+    }
+
+
+    
+    table {
+        grid-column: 2 / 3;
+        display: flex;
+        flex-direction: column;
+        margin: 20px;
+        text-align: left;
+      }
+      
+      thead {
+        background-color:#e1e1e1;
+        border-radius: 8px 8px 0px 0px;
+      }
+      
+      thead > tr {
+        border-radius: 8px 8px 0px 0px;
+        font-weight: bold;
+        color: black;
+        font-size: 20px;
+
+      }
+      
+      tr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px;
+        border: 1px solid #e1e1e1;
+        margin-top: -1px;
+        color: #535353;
+      }
+      
+      tbody tr:hover {
+        background-color: #f6f6f6;
+      }
+      
+      
+      .second {
+        min-width: 18%;
+        align-items: left;
+      }
+      
+      .third {
+        width: 19%;
+        margin-left: 227px;
+      }
+      
+      .fourth {
+        width: 120px;
+      }
+      
+      .fifth {
+        width: 120px;
+        text-align: right;
+        
+      }
+      .sub-head{
+        font-weight: bold;
+        color: black;
+        font-size: 18px; 
+        background-color: #f3f3f3;
+      }
 </style>
+
 
 <div class="main-content">
    <section class="section">
       <div class="section-header">
          <div class="row">
             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-               <div class="section-header-breadcrumb-conteBalance Sheetnt">
+               <div class="section-header-breadcrumb-content">
                   <h1>Trial Balance</h1>
                   <div class="section-header-breadcrumb">
                      <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
                      <div class="breadcrumb-item"><a href="#">Trial Balance</a></div>
-
                   </div>
                </div>
             </div>
@@ -37,137 +121,101 @@
 
                   </div>
                   <div class="card-body">
-                     <div class="container">
 
-                        <table class="table table-condensed table">
-                           <thead>
-                              <tr>
-                                 <th></th>
-                                 <th>Account Group</th>
-                                 <th>Account Code</th>
-                                 <th>NET DEBIT</th>
-                                 <th>NET CREDIT</th>
+                <div class="separator"></div>
+                <div class="receipt-content">
+                    <div class="container bootstrap snippets bootdey">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="invoice-wrapper">
+                                    <div class="line-items">
+                                        <div class="headers clearfix">
 
-                              </tr>
-                           </thead>
-
-                           <tbody>
-                              {% for list in accounttypegroups %}
-                              <tr data-toggle="collapse" data-target="#demo{{list.id}}" class="accordion-toggle">
-                                 <td><button class="btn btn-default btn-xs"><span
-                                          class="glyphicon glyphicon-eye-open"><i
-                                             class="far fa-eye"></i></span></button></td>
-
-                                 <td style="font-size:16px;">{{list.name}}</td>
-
-
-                              <tr>
-                                 <td colspan="12" class="hiddenRow">
-                                    <div class="accordian-body collapse" id="demo{{list.id}}">
-                                       <table class="table table-striped">
-                                          <thead>
-
-
-                                          </thead>
-
-                                          <tbody>
-
-                                             {% for first in list.accounttypegroups.all %}
-
-
-                                             <tr data-toggle="collapse" class="accordion-toggle"
-                                                data-target="#demo2{{first.id}}">
-                                                <td> <a href="#"></a></td>
-                                                <td style="font-size:14px;">{{first.name}}</td>
-
-                                             <tr>
-                                                <td colspan="12" class="hiddenRow">
-                                                   <div class="accordian-body collapse" id="demo2{{first.id}}">
-                                                      <table class="table table-striped">
-                                                         <thead>
-
-                                                         </thead>
-                                                         <tbody>
-                                                            {% for fir in first.accounttypes.all %}
-
-                                                            <tr>
-                                                               <td></td>
-                                                               <td></td>
-                                                               <td>{{fir.accountname}}</td>
-                                                               <td></td>
-                                                               <td>{{fir.accountcode}}</td>
-                                                               {% if fir.transctiontype == "DEBIT" %}
-                                                               <td>{{fir.openingbalance}}</td>
-                                                               <td>0.0</td>
-                                                               {% else %}
-                                                               <td>0.0</td>
-                                                               <td>{{fir.openingbalance}}</td>
-                                                               {% endif %}
-                                                            </tr>
-                                                            {% endfor %}
-                                                         </tbody>
-
-                                          </tbody>
-                                       </table>
-                              </tr>
-
-
-
-                              {% endfor %}
-
-
-                        </table>
-
-                     </div>
-                     </td>
-                     </tr>
-
-
-
-
-
-                  </div>
-                  </td>
-                  </tr>
-
-
-                  </tr>
-                  {% endfor %}
-
-
-
-
-
-                  </tbody>
-                  </table>
+                                            <table id="general_ledger">
+                                                <thead>
+                                                  <tr>
+                                                      <th class="second">Account</th>
+                                                      <th class="third">Account Code</th>
+                                                      <th class="fourth">Debit</th>
+                                                      <th class="fifth">Credit</th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody id="trail_head">
+                                                </tbody>
+                                          </table>     
+                                        </div>
+                                        <!-- <div class="items" id="trail_head"></div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                </div>
-
             </div>
+            </section>
+            
+            </div>
+            
 
-         </div>
-      </div>
-
-
-
-
-
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-
-</div>
-
-
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-
-
-
-
+<script>
+    (function(){
+        console.log('Here, anonymous function Call...');
+        var response =  fetch('/vendor/newTrial/', {
+          method: 'GET',
+        //   body: mul
+        })
+        .then(function(res){return res.json(); })
+        .then(function(data){
+            console.log(data);
+            let html='';
+            let entryName={}
+            for(let i in data){
+                html+=` <tr class="sub-head">
+                    <td class="second">${i}</td>
+                    <td class="third">&nbsp;</td>
+                    <td class="fourth"><strong>&nbsp;</strong></td>
+                    <td class="fifth"><strong>&nbsp;</strong></td>
+                </tr>`;
+                
+                for(let j=0;j<data[i].length;j++){
+                    if (((Number(data[i][j][0].balance)>0)&&(i=='Assets')) || ((Number(data[i][j][0].balance)>0)&&(i=='Expense'))) {
+                        html+=`<tr>
+                            <td class="second">${data[i][j][0].account_name}</td>
+                            <td class="third">${data[i][j][0].account_code}</td>
+                            <td class="fourth">₹&nbsp;${data[i][j][0].balance}</td>
+                            <td class="fifth">₹&nbsp;0.00</td>
+                            </tr>`;
+                    }else if(((Number(data[i][j][0].balance)<0)&&(i=='Assets')) || ((Number(data[i][j][0].balance)<0)&&(i=='Expense'))) {
+                        html+=`<tr>
+                            <td class="second">${data[i][j][0].account_name}</td>
+                            <td class="third">${data[i][j][0].account_code}</td>
+                            <td class="fourth">₹&nbsp;0.00</td>
+                            <td class="fifth">₹&nbsp;${Math.abs(data[i][j][0].balance)}</td>
+                        </tr>`;
+                    }else if(((Number(data[i][j][0].balance)>0)&&(i=='Equity')) ||((Number(data[i][j][0].balance)>0)&&(i=='Income')) ||((Number(data[i][j][0].balance)>0)&&(i=='Liability'))){
+                        html+=`<tr>
+                            <td class="second">${data[i][j][0].account_name}</td>
+                            <td class="third">${data[i][j][0].account_code}</td>
+                            <td class="fourth">₹&nbsp;0.00</td>
+                            <td class="fifth">₹&nbsp;${data[i][j][0].balance}</td>
+                        </tr>`;
+                    }
+                    else{
+                        html+=`<tr>
+                            <td class="second">${data[i][j][0].account_name}</td>
+                            <td class="third">${data[i][j][0].account_code}</td>
+                            <td class="fourth">₹&nbsp;${Math.abs(data[i][j][0].balance)}</td>
+                            <td class="fifth">₹&nbsp;0.00</td>
+                        </tr>`;
+                    }   
+                }
+            }
+            document.getElementById('trail_head').innerHTML=html;
+            console.log(entryName)
+        });
+    })();
+    
+</script>
 
 {% endblock %}

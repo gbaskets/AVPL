@@ -1,0 +1,175 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Trial Balance{% endblock %}
+{% block main %}
+<!-- Main Content -->
+<style>
+   .hiddenRow {
+      padding: 0 !important;
+   }
+</style>
+
+<div class="main-content">
+   <section class="section">
+      <div class="section-header">
+         <div class="row">
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+               <div class="section-header-breadcrumb-content">
+                  <h1>Trial Balance</h1>
+                  <div class="section-header-breadcrumb">
+                     <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
+                     <div class="breadcrumb-item"><a href="#">Trial Balance</a></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="section-body">
+         <div class="row">
+
+            <div class="col-12">
+               <div class="card">
+                  <div class="card-header">
+                     <div class="col-8">
+                        <h4>Trial Balance List</h4>
+                     </div>
+
+                  </div>
+                  <div class="card-body">
+                     <div class="container">
+
+                        <table class="table table-condensed table">
+                           <thead>
+                              <tr>
+                                 <th></th>
+                                 <th>Account Group</th>
+                                 <th>Account Code</th>
+                                 <th>NET DEBIT</th>
+                                 <th>NET CREDIT</th>
+
+                              </tr>
+                           </thead>
+
+                           <tbody>
+                              {% for list in accounttypegroups %}
+                              <tr data-toggle="collapse" data-target="#demo{{list.id}}" class="accordion-toggle">
+                                 <td><button class="btn btn-default btn-xs"><span
+                                          class="glyphicon glyphicon-eye-open"><i
+                                             class="far fa-eye"></i></span></button></td>
+
+                                 <td style="font-size:16px;">{{list.name}}</td>
+
+
+                              <tr>
+                                 <td colspan="12" class="hiddenRow">
+                                    <div class="accordian-body collapse" id="demo{{list.id}}">
+                                       <table class="table table-striped">
+                                          <thead>
+
+
+                                          </thead>
+
+                                          <tbody>
+
+                                             {% for first in list.accounttypegroups.all %}
+
+
+                                             <tr data-toggle="collapse" class="accordion-toggle"
+                                                data-target="#demo2{{first.id}}">
+                                                <td> <a href="#"></a></td>
+                                                <td style="font-size:14px;">{{first.name}}</td>
+
+                                             <tr>
+                                                <td colspan="12" class="hiddenRow">
+                                                   <div class="accordian-body collapse" id="demo2{{first.id}}">
+                                                      <table class="table table-striped">
+                                                         <thead>
+
+                                                         </thead>
+                                                         <tbody>
+                                                            {% for last in first.accounttypes.all %}
+
+                                                            {% for fir in last.accounttypelists.filter %}
+
+                                                            <tr>
+                                                               <td></td>
+                                                               <td></td>
+                                                               <td>{{fir.accountname}}</td>
+                                                               <td></td>
+                                                               <td>{{fir.accountcode}}</td>
+                                                               {% if fir.transctiontype == "DEBIT" %}
+                                                               <td>{{fir.openingbalance}}</td>
+                                                               <td>0.0</td>
+                                                               {% else %}
+                                                               <td>0.0</td>
+                                                               <td>{{fir.openingbalance}}</td>
+                                                               {% endif %}
+                                                            </tr>
+                                                            {% endfor %}
+                                                            {% endfor %}
+                                                         </tbody>
+
+                                          </tbody>
+                                       </table>
+                              </tr>
+
+
+
+                              {% endfor %}
+
+
+                        </table>
+
+                     </div>
+                     </td>
+                     </tr>
+
+
+
+
+
+                  </div>
+                  </td>
+                  </tr>
+
+
+                  </tr>
+                  {% endfor %}
+
+
+
+
+
+                  </tbody>
+                  </table>
+               </div>
+
+            </div>
+
+         </div>
+      </div>
+
+
+
+
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+</div>
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+
+
+
+
+{% endblock %}

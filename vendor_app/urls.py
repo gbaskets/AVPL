@@ -88,7 +88,7 @@ urlpatterns = [
     
     
     
-    
+    path('newTrial/',newTrial),
     
     path('report/trial-balance', viewtrialBalance),
     path('report/balance-sheet', viewbalancesheet),
