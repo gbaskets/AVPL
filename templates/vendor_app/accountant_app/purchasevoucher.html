@@ -77,7 +77,8 @@
                                           <tr>
                                             <th>Sr.</th>
                                             <th>Date</th>
-                                            <th>Reference No</th>
+                                            <th>Order No</th>
+                                            <th>Supplier Invoiceno No</th>
                                             <th>Description</th>
                                             <th>Amount</th>
                                             <th>Created By</th>
@@ -88,13 +89,14 @@
                                           {% for list in purchasesorder %}
                                           <tr>
                                              <td>{{ list.id|safe }}</td>
-                                             <td>{{ list.createddate|safe }}</td>
-                                             <td>{{ list.referenceno|safe }}</td>
+                                             <td>{{ list.createdat|date:'Y-m-d'|default:''|safe }}</td>
+                                             <td>{{ list.orderno|safe }}</td>
+                                             <td>{{ list.supplierinvoiceno|safe }}</td>
                                              <td>{{ list.description|safe }}</td>
-                                             <td>{{ list.amount|safe }}</td>
+                                             <td>{{ list.total|safe }}</td>
                                              <td>{{ list.updatedby|safe }}</td>
                                             
-                                             <td ><a href="/vendor/view-manual-journal/{{list.id}}" class="btn btn-success btn-icon icon-left"><i class="far fa-eye"></i>View</a>
+                                             <td ><a href="/vendor/purchase-vouchers/{{list.id}}" class="btn btn-success btn-icon icon-left"><i class="far fa-eye"></i>View</a>
                                              </td>
                                           </tr>
                                           {% endfor %}

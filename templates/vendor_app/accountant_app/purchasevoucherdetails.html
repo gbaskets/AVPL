@@ -1,0 +1,345 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Purchase Voucher{% endblock %}
+{% block main %}
+
+<style>
+
+   .separator{
+     display:flex;
+     align-items: center; 
+     border-bottom: none;
+   }
+   
+   .separator .line{
+     height: 1px;
+     flex: 1;
+     background-color: rgba(0, 0, 0, 0.295);
+     border-bottom: none;
+   }
+   
+   .separator h2{
+     padding: 0 2rem;
+     border-bottom: none;
+     font-size: 12px;
+   }
+   .estimate-button{
+      background-color:#00365a;
+      color: white; 
+      border: none;
+   }
+   .estimate-button-div{
+      display: flex ;
+      justify-content:space-between; 
+      border: 1px solid; border-style:ridge; 
+      padding: 7px;
+   }
+  
+   
+   </style>
+   
+
+            <!-- Main Content -->
+            <div class="main-content">
+               <section class="section">
+                  <div class="section-header">
+                     <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                           <div class="section-header-breadcrumb-content">
+                              <h1>Purchase Voucher</h1>
+                              <div class="section-header-breadcrumb">
+                                 <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
+                                 <div class="breadcrumb-item"><a href="#">Purchase Voucher</a></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="section-body">
+                     <div class="row">
+                      
+                        <div class="col-12">
+                           <div class="card">
+                              <div class="card-header">
+                                 <div class="col-8">
+                                    <h4>Purchase Voucher Details</h4>
+                                 </div>
+                                   
+                              
+                                     
+                              </div>
+                              <div class="card-body">
+                                <div class="modal-body">
+                                  <form id="purchase_vouchor_form" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="hidden" value="1" id="itemValue">
+                                    <input type="hidden" name="lead_id1" value="{{lead}}">
+                                    <div class="row">
+                                      <div class="col-lg-3 col-sm-12">
+                                         <div class="form-group">
+                                           <label for="purchase_date">Date</label>
+                                           <input type="date" class="form-control" name="purchase_date" id="purchase_date" value="{{purchasesorder.createdat|date:'Y-m-d'|default:''}}" required>
+                                         </div>
+                                       </div>
+                                      <div class="col-lg-3 col-sm-12">
+                                         <div class="form-group">
+                                           <label for="supplierinvoiceno">Supplier Invoice No</label>
+                                           <input type="text" class="form-control" name="supplierinvoiceno" value="{{purchasesorder.supplierinvoiceno}}" id="supplierinvoiceno" required>
+                                         </div>
+                                       </div>
+                                      <div class="col-lg-3 col-sm-12">
+                                         <div class="form-group">
+                                           <label for="sellerledgeraccount">Seller Ledger Account</label>
+                                           <select class="form-control account-class" name="sellerledgeraccount" data-width="100%" id="sellerledgeraccount" >
+                                            <option style="font-size:16px;" value="">----Select Seller Ledger Account----</option>
+                                              {% for sell in sellerledgerlist %}
+                                            <option style="font-size:16px;" {% if sell.id == purchasesorder.selleraccount.id %} selected  {% else %}  {% endif %} value="{{sell.id}}">{{sell.accountname}} | Rs.({{sell.openingbalance}}) CR</option>
+                                              {% endfor %}
+                                          </select>
+                                         </div>
+                                      </div>
+                                    
+                                      <div class="col-lg-3 col-sm-12">
+                                         <div class="form-group">
+                                           <label for="purchaseledgeraccount">Purchase Ledger Account</label>
+                                           <select class="form-control" name="purchaseledgeraccount" data-width="100%" id="purchaseledgeraccount" >
+                                   
+                                            <option style="font-size:16px;" selected value="{{purchaseledger.id}}">{{purchaseledger.accountname}} | Rs.({{purchaseledger.openingbalance}}) DR</option>
+                                          
+                                          </select>
+                                         </div>
+                                      </div>
+                                    
+                                      <div class="col-lg-5 col-sm-12">
+                                        <div class="form-group">
+                                          <label for="description">Description</label>
+                                          <input type="text" class="form-control" value="{{purchasesorder.description|default_if_none:""}}" name="description" id="description">
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                      <div class="col-sm-12 col-lg-12">
+                                        <div class="estimate-button-div">
+                                          <div>
+                                            <strong style="font-size: 18px;">Items/Services Description</strong>
+                                            <span id="purchase_message" style="color: red; position: relative; left: 20px;"></span>
+                                          </div>
+                                          <div>
+                                            <button type="button" disabled class="estimate-button" onclick="addAccount();">
+                                              <i class="fa fa-plus-circle"></i>
+                                            </button>
+                                            <button type="button" disabled class="estimate-button" onclick="removeAccount();" id="remove_account">
+                                              <i class="fa fa-minus-circle"></i>
+                                            </button>
+                                          </div>
+                                        </div>
+                                        <div class="table-responsive" style="background-color: #f0f0f0;">
+                                          <span class="badge badge-success" id="serviePriceUpdateMgs"></span>
+                                          <table class="table table-hover data-table responsive nowrap" style="text-align: center;">
+                                            <thead>
+                                              <tr>
+                                                <th>Items/Services</th>
+                                                <th>Rate</th>
+                                                <th>Quantity</th>
+                                                <th>Tax</th>
+                                                <th>Amount</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody id="accountTable">
+                                              {% for pitem in purchasesorder.purchasesorders.all %}
+                                              <tr>
+                                                <td>
+                                                  
+                                                    <select class="form-control account-item" name="itemproduct0" data-width="100%" id="itemproduct0" onchange="itemcalculation(0);">
+                                                      <option style="font-size:16px;" value="">----Select Item / Service----</option>
+                                                      {% for item in itemlist %}
+                                                      <option style="font-size:16px;" value="{{item.id}}" {% if item.id == pitem.productvariants.id %} selected  {% else %}  {% endif %}>{{item.productvariantname}}</option>
+                          
+                                                      {% endfor %}
+                          
+                                                    </select>
+                                                  
+                                                </td>
+                          
+                                                <td><input name="price0" value="{{pitem.price}}"  class="form-control input-price" style="width: 115px;" type="number" id="price0" min="0"  onchange="itemcalculation(0);" onkeypress="return validateInput(event)"></td>
+                                   
+                                
+                                               <td><input name="quantity0" value="{{pitem.quantity}}" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity0" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="itemcalculation(0);"></td>
+                                                <td><input name="tax0" value="{{pitem.tax}}" class="form-control input-tax" style="width: 115px;" type="number" id="tax0" min="0" onchange="totalTax();" onkeypress="return validateInput(event)"></td>
+                                                <td><input name="total0" value="{{pitem.total}}" class="form-control input-total" style="width: 115px;" type="number" id="total0" min="0" onchange="totalAmount();" onkeypress="return validateInput(event)"></td>
+                                              </tr>
+                                              {% endfor %}
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="row" style="margin-bottom: 20px;">
+                                      <div style="height: 114px;width: 861px; position: relative;left: 91px;">
+                                        <div style="padding: 17px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
+                                         
+                                          <span style="position: relative;left: 459px;"><strong id="tTax">Total Tax&nbsp;₹{{purchasesorder.tax}}</strong></span>
+                                          <input type="hidden" name="totaltax" id="totaltax" >
+                                          <span style="position: relative;left: -94px;"><strong id="tTotal">Total Amount&nbsp;₹{{purchasesorder.total}}</strong></span>
+                                          <input type="hidden" name="totalamount" id="totalamount" >
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {% comment %} <button class="btn btn-primary" type="button" name="button" form="purchase_vouchor_form" onclick="submitForm();">Add Purchase Voucher</button> {% endcomment %}
+                                  </form>
+                                </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+              
+            </div>
+
+          
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script type="text/javascript">
+  function validateInput(event) {
+    let charCode = (event.which) ? event.which : event.keyCode;
+    
+    // Allow backspace (8), delete (46), and the decimal point (46)
+    if (charCode == 8 || charCode == 46 || charCode == 110 || charCode == 190) {
+      return true;
+    }
+    
+    // Ensure the entered value is a number
+    if (charCode < 48 || charCode > 57) {
+      return false;
+    }
+
+    return true;
+  }
+
+
+  document.getElementById('remove_account').disabled = true;
+  
+  function addAccount() {
+    let table = document.getElementById('accountTable');
+    let itemValue = document.getElementById('itemValue');
+    let item = itemValue.value;
+    itemValue.value = Number(item) + 1;
+    let row = table.insertRow();
+    let itemproduct = row.insertCell(0);
+    let price = row.insertCell(1);
+    let quantity = row.insertCell(2);
+    let tax = row.insertCell(3);
+    let total = row.insertCell(4);
+
+    itemproduct.innerHTML = `
+      <select class="form-control account-item" name="itemproduct${item}" data-width="100%" id="itemproduct${item}"  onchange="itemcalculation(${item});">
+      <option style="font-size:16px;" value="">----Select Item / Service----</option>
+      {% for item in itemlist %}
+      <option style="font-size:16px;" value="{{item.id}}">{{item.productvariantname}}</option>
+
+      {% endfor %}
+
+   </select>`;
+  
+   
+   price.innerHTML = `<input name="price${item}"  class="form-control input-price" style="width: 115px;" type="number" id="price${item}" min="0" onchange="itemcalculation(${item});" onkeypress="return validateInput(event)">`;
+   quantity.innerHTML = `<input name="quantity${item}" value="1" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity${item}" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="itemcalculation(${item});">`;
+   tax.innerHTML = `<input name="tax${item}" class="form-control input-tax" style="width: 115px;" type="number" id="tax${item}" min="0" onchange="totalTax();" onkeypress="return validateInput(event)">`;
+   total.innerHTML = `<input name="total${item}" class="form-control input-total" style="width: 115px;" type="number" id="total${item}" min="0" onchange="totalAmount();" onkeypress="return validateInput(event)">`;
+   document.getElementById('remove_account').disabled = false;
+  }
+  
+  function removeAccount() {
+    let table = document.getElementById('accountTable');
+    let itemValue = document.getElementById('itemValue');
+    if (itemValue.value > 1) {
+      table.deleteRow(-1);
+      itemValue.value = Number(itemValue.value) - 1;
+    }
+    if (itemValue.value == 1) {
+      document.getElementById('remove_account').disabled = true;
+    }
+   
+    totalTax();
+    totalAmount();
+  }
+  
+  function itemcalculation(id) {
+    {
+    var itemproductid = document.getElementById(`itemproduct${id}`).value;
+    var quantity = document.getElementById(`quantity${id}`).value;
+    var price = document.getElementById(`price${id}`).value;
+    fetchRelatedData(itemproductid,price,quantity,id);
+    }
+    
+      function fetchRelatedData(itemproductid,price,quantity,id) {
+        
+        $.ajax({
+          url: '/vendor/fetch_productvaraints_related_data',  // Replace with your actual URL
+          data: { 'itemproductid': itemproductid,'price':price,'quantity':quantity },
+          dataType: 'json',
+          success: function (data) {
+          console.log(data,'data')
+          document.getElementById(`price${id}`).value = data.purchaseprice;
+          document.getElementById(`tax${id}`).value = data.tax;
+          document.getElementById(`total${id}`).value = data.total;
+    
+          totalTax();
+          totalAmount();
+          }
+        });
+      }
+ 
+
+    totalTax();
+    totalAmount();
+  
+  }
+
+  
+  function totalTax() {
+    let totaltax = Array.from(document.getElementsByClassName('input-tax'))
+      .reduce((sum, input) => sum + Number(input.value || 0), 0);
+    document.getElementById('tTax').innerHTML = `Total Tax&nbsp;₹${totaltax.toFixed(2)}`;
+    document.getElementById('totaltax').value = totaltax.toFixed(2);
+    
+  }
+
+  function totalAmount() {
+    let totalamount = Array.from(document.getElementsByClassName('input-total'))
+      .reduce((sum, input) => sum + Number(input.value || 0), 0);
+    document.getElementById('tTotal').innerHTML = `Total Amount&nbsp;₹${totalamount.toFixed(2)}`;
+    document.getElementById('totalamount').value = totalamount.toFixed(2);
+  }
+
+  function submitForm() {
+   
+    let manual_form = document.forms['purchase_vouchor_form'];
+    let account_class = document.getElementsByClassName('account-class');
+    let account_item = document.getElementsByClassName('account-item');
+
+    let account_counter = Array.from(account_item).filter(acc => !acc.value).length;
+
+    if (account_counter > 0) {
+      document.getElementById('purchase_message').innerHTML = 'Please select all Items/Services';
+    } else if (!manual_form['purchase_date'].value) {
+      document.getElementById('purchase_message').innerHTML = 'Please select a date';
+    } else if (!manual_form['sellerledgeraccount'].value) {
+      document.getElementById('purchase_message').innerHTML = 'Please select a seller ledger account';
+    } else {
+      document.getElementById('purchase_message').innerHTML = '';
+      manual_form.submit();
+      }
+  }
+</script>
+
+  
+
+
+
+
+{% endblock %}

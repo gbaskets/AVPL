@@ -21,6 +21,7 @@ def generate_order_number(id):
     return f"{prefix}{random_part}"
 
 class PurchasesOrder(models.Model):
+    type=models.CharField(max_length=250, null=True, blank=True)
     store = models.ForeignKey(Store,on_delete=models.CASCADE,null=True, blank=True)
     orderno=models.CharField(max_length=250, null=True, blank=True)
     supplierinvoiceno=models.CharField(max_length=250, null=True, blank=True)
@@ -34,6 +35,7 @@ class PurchasesOrder(models.Model):
     tax = models.FloatField(default=0.00,null=True,blank=True)
     total = models.FloatField(default=0.00,null=True,blank=True)
     totaladmincommission = models.FloatField(default=0.00,null=True,blank=True)
+    description=models.CharField(max_length=250, null=True, blank=True)
     pv = models.FloatField(default=0.00)
     selfpickup = models.BooleanField(default=False)
     ispaymentpaid = models.BooleanField(default=False)

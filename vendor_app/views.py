@@ -2408,7 +2408,7 @@ def Purchase_Vouchers(request):
                 "purchaseledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Purchase Entery").first(),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
                'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
-                 'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendorobj),
+                'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendorobj, type = "PURCHASE-VOUCHER"),
 		
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2416,6 +2416,27 @@ def Purchase_Vouchers(request):
 		return render(request, 'vendor_app/accountant_app/purchasevoucher.html', dic)
 	else:
 		return render(request, '403.html')
+
+
+
+@csrf_exempt
+def Purchase_Vouchers_Details(request,id):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+                "sellerledgerlist" :Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Seller"),
+                "purchaseledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Purchase Entery").first(),
+               "accounttypegroups" :AccountTypeGroup.objects.all(),
+               'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
+                'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendorobj, type = "PURCHASE-VOUCHER",id=id).first(),
+		
+           	# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/accountant_app/purchasevoucherdetails.html', dic)
+	else:
+		return render(request, '403.html')
+
 
 
 @csrf_exempt
@@ -2444,7 +2465,7 @@ def Add_Purchase_Vouchers(request):
 			referenceno = ref_no[0:8]
 
 			purchasevoucher = PurchasesOrder.objects.create(
-       
+                type = "PURCHASE-VOUCHER",description=description,
 				store=storeobj, orderno=referenceno, createdat=purchase_date, supplierinvoiceno=supplierinvoiceno,selleraccount=selleraccount
 			)
 
