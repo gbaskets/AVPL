@@ -258,6 +258,26 @@ class ProductVariants(models.Model):
         else:
             saleprices=self.price 
         return saleprices
+    
+    def purchasepricewithouttax(self):
+        if self.purchaseprice:
+            purchaseprice=self.purchaseprice
+            producttax= round( (purchaseprice) * ((self.product.tax/100) / (1 + (self.product.tax/100))),2)
+            lpurchaseprice=round((purchaseprice - producttax),2)
+        else:
+            lpurchaseprice=self.purchaseprice 
+        return lpurchaseprice
+    
+    def salespricewithouttax(self):
+        if self.price:
+            salesprice=self.price
+            producttax= round( (salesprice) * ((self.product.tax/100) / (1 + (self.product.tax/100))),2)
+            lsalesprice=round((salesprice - producttax),2)
+        else:
+            lsalesprice=self.price 
+        return lsalesprice
+
+
 
 
 class ProductImages(models.Model):

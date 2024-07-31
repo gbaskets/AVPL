@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from accountant_app.models import Account
 from customer_app.models import *
 from inventory_app.models import *
 from store_app.models import Store
@@ -19,12 +20,15 @@ def generate_order_number(id):
     return f"{prefix}{random_part}"
 
 class SalesOrder(models.Model):
+    type=models.CharField(max_length=250, null=True, blank=True)
     store = models.ForeignKey(Store,on_delete=models.CASCADE,null=True, blank=True)
     orderno=models.CharField(max_length=250, null=True, blank=True)
+    invoiceno=models.CharField(max_length=250, null=True, blank=True)
+    buyeraccount = models.ForeignKey(Account, on_delete=models.CASCADE,  null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE,  null=True, blank=True)
     vendor = models.ForeignKey('vendor_app.Vendor', on_delete=models.CASCADE, null=True, blank=True)
     paymenttransaction = models.ForeignKey("main_app.PaymentTransaction",on_delete=models.CASCADE, null=True, blank=True)
-    address = models.ForeignKey(Address,on_delete=models.CASCADE)
+    address = models.ForeignKey(Address,on_delete=models.CASCADE,null=True,blank=True)
     shippingcharges = models.FloatField(default=0.00,null=True,blank=True)
     subtotal = models.FloatField(default=0.00,null=True,blank=True)
     vendorsubtotal = models.FloatField(default=0.00,null=True,blank=True)
@@ -33,6 +37,7 @@ class SalesOrder(models.Model):
     total = models.FloatField(default=0.00,null=True,blank=True)
     vendortotal= models.FloatField(default=0.00,null=True,blank=True)
     totaladmincommission = models.FloatField(default=0.00,null=True,blank=True)
+    description=models.CharField(max_length=250, null=True, blank=True)
     pv = models.FloatField(default=0.00)
     selfpickup = models.BooleanField(default=False)
     ispaymentpaid = models.BooleanField(default=False)
@@ -53,14 +58,6 @@ class SalesOrder(models.Model):
             taxtype='IGST'
         return taxtype
     
-    # def vendortotal(self):
-    #     return round((self.total - self.totaladmincommission),2)
-    # def vendorsubtotal(self):
-    #     perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
-    #     return round((self.total - self.totaladmincommission),2) - perproducttax
-    # def vendortax(self):    
-    #     perproducttax= round( (self.total-self.totaladmincommission) * ((5/100) / (1 + (5/100))),2)
-    #     return perproducttax
     
     def taxgst(self):    
         perproducttax= round((self.tax /2),2)
@@ -107,18 +104,7 @@ class SalesOrderItems(models.Model):
             taxtype='IGST'
         return taxtype
         
-    # def vendorprice(self):
-    #     return round((self.price - self.admincommission),2)
-    
-    # def vendortotal(self):
-    #     return round((self.total - self.admincommission),2)
-    # def vendorsubtotal(self):
-    #     perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
-    #     return round((self.total - self.admincommission),2) - perproducttax
-    # def vendortax(self):    
-    #     perproducttax= round( (self.total-self.admincommission) * ((5/100) / (1 + (5/100))),2)
-    #     return perproducttax
-    
+  
     def taxgst(self):    
         perproducttax= round((self.tax /2),2)
         return perproducttax

@@ -1,0 +1,198 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Sales Voucher{% endblock %}
+{% block main %}
+
+<style>
+
+   .separator{
+     display:flex;
+     align-items: center; 
+     border-bottom: none;
+   }
+   
+   .separator .line{
+     height: 1px;
+     flex: 1;
+     background-color: rgba(0, 0, 0, 0.295);
+     border-bottom: none;
+   }
+   
+   .separator h2{
+     padding: 0 2rem;
+     border-bottom: none;
+     font-size: 12px;
+   }
+   .estimate-button{
+      background-color:#00365a;
+      color: white; 
+      border: none;
+   }
+   .estimate-button-div{
+      display: flex ;
+      justify-content:space-between; 
+      border: 1px solid; border-style:ridge; 
+      padding: 7px;
+   }
+  
+   
+   </style>
+   
+
+            <!-- Main Content -->
+            <div class="main-content">
+               <section class="section">
+                  <div class="section-header">
+                     <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                           <div class="section-header-breadcrumb-content">
+                              <h1>Sales Voucher</h1>
+                              <div class="section-header-breadcrumb">
+                                 <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
+                                 <div class="breadcrumb-item"><a href="#">Sales Voucher</a></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="section-body">
+                     <div class="row">
+                      
+                        <div class="col-12">
+                           <div class="card">
+                              <div class="card-header">
+                                 <div class="col-8">
+                                    <h4>Sales Voucher Details</h4>
+                                 </div>
+                                   
+                              
+                                     
+                              </div>
+                              <div class="card-body">
+                               
+                                  <div class="row">
+                                    <div class="col-lg-3 col-sm-12">
+                                       <div class="form-group">
+                                         <label for="sales_date">Date</label>
+                                         <input type="date" class="form-control" name="sales_date" id="sales_date" value="{{salesorder.createdat|date:'Y-m-d'|default:''}}" required>
+                                       </div>
+                                     </div>
+                                    <div class="col-lg-3 col-sm-12">
+                                       <div class="form-group">
+                                         <label for="invoiceno">Invoice No</label>
+                                         <input type="text" class="form-control" name="invoiceno" id="invoiceno" value="{{salesorder.invoiceno}}">
+                                       </div>
+                                     </div>
+                                    <div class="col-lg-3 col-sm-12">
+                                       <div class="form-group">
+                                         <label for="buyerledgeraccount">Buyer Ledger Account</label>
+                                         <select class="form-control account-class" name="buyerledgeraccount" data-width="100%" id="buyerledgeraccount" required>
+                                          <option style="font-size:16px;" value="">----Select Buyer Ledger Account----</option>
+                                            {% for buy in buyerledgerlist %}
+                                          <option style="font-size:16px;" {% if buy.id == salesorder.buyeraccount.id %} selected  {% else %}  {% endif %} value="{{buy.id}}">{{buy.accountname}} | Rs.({{buy.openingbalance}}) DR</option>
+                                            {% endfor %}
+                                        </select>
+                                       </div>
+                                    </div>
+                                  
+                                    <div class="col-lg-3 col-sm-12">
+                                       <div class="form-group">
+                                         <label for="salesledgeraccount">Sales Ledger Account</label>
+                                         <select class="form-control" name="salesledgeraccount" data-width="100%" id="salesledgeraccount" >
+                                 
+                                          <option style="font-size:16px;" selected value="{{salesledger.id}}">{{salesledger.accountname}} | Rs.({{salesledger.openingbalance}}) CR</option>
+                                        
+                                        </select>
+                                       </div>
+                                    </div>
+                                  
+                                    <div class="col-lg-5 col-sm-12">
+                                      <div class="form-group">
+                                        <label for="description">Description</label>
+                                        <input type="text" class="form-control" name="description" id="description" value="{{salesorder.description|default_if_none:""}}">
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="row mt-4">
+                                    <div class="col-sm-12 col-lg-12">
+                                      <div class="estimate-button-div">
+                                        <div>
+                                          <strong style="font-size: 18px;">Items/Services Description</strong>
+                                          <span id="sales_message" style="color: red; position: relative; left: 20px;"></span>
+                                        </div>
+                                        <div>
+                                          <button type="button" class="estimate-button" onclick="addAccount();" disabled>
+                                            <i class="fa fa-plus-circle"></i>
+                                          </button>
+                                          <button type="button" class="estimate-button" onclick="removeAccount();" id="remove_account" disabled>
+                                            <i class="fa fa-minus-circle"></i>
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <div class="table-responsive" style="background-color: #f0f0f0;">
+                                        <span class="badge badge-success" id="serviePriceUpdateMgs"></span>
+                                        <table class="table table-hover data-table responsive nowrap" style="text-align: center;">
+                                          <thead>
+                                            <tr>
+                                              <th>Items/Services</th>
+                                              <th>Rate</th>
+                                              <th>Quantity</th>
+                                              <th>Tax</th>
+                                              <th>Amount</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody id="accountTable">
+
+                                            {% for pitem in salesorder.salesorders.all %}
+                                            <tr>
+                                              <td>
+                                                
+                                                  <select class="form-control account-item" name="itemproduct0" data-width="100%" id="itemproduct0" onchange="itemcalculationnew(0);">
+                                                    <option style="font-size:16px;" value="">----Select Item / Service----</option>
+                                                    {% for item in itemlist %}
+                                                    <option style="font-size:16px;" {% if item.id == pitem.productvariants.id %} selected  {% else %}  {% endif %} value="{{item.id}}">{{item.productvariantname}}</option>
+                        
+                                                    {% endfor %}
+                        
+                                                  </select>
+                                                
+                                              </td>
+                        
+                                              <td><input name="price0" value="{{pitem.vendorprice}}"   class="form-control input-price" style="width: 115px;" type="number" id="price0" min="0"  onchange="itemcalculation(0);" onkeypress="return validateInput(event)"></td>
+                                 
+                              
+                                             <td><input name="quantity0" value="{{pitem.quantity}}" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity0" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="itemcalculation(0);"></td>
+                                              <td><input name="tax0" value="{{pitem.vendortax}}" class="form-control input-tax" style="width: 115px;" type="number" id="tax0" min="0" onchange="totalTax();" onkeypress="return validateInput(event)"></td>
+                                              <td><input name="total0" value="{{pitem.vendortotal}}"  class="form-control input-total" style="width: 115px;" type="number" id="total0" min="0" onchange="totalAmount();" onkeypress="return validateInput(event)"></td>
+                                            </tr>
+                                            {% endfor %}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="row" style="margin-bottom: 20px;">
+                                    <div style="height: 114px;width: 861px; position: relative;left: 375px;">
+                                      <div style="padding: 17px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
+                                       
+                                        <span style="position: relative;left: 429px;"><strong id="tTax">Total Tax&nbsp;₹{{salesorder.vendortax}}</strong></span>
+                                        <input type="hidden" name="totaltax" id="totaltax" >
+                                        <span style="position: relative;left: -94px;"><strong id="tTotal">Total Amount&nbsp;₹{{salesorder.vendortotal}}</strong></span>
+                                        <input type="hidden" name="totalamount" id="totalamount" >
+                                      </div>
+                                    </div>
+                                  </div>
+                                
+                               
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+              
+            </div>
+
+          
+
+{% endblock %}

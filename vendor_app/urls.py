@@ -77,7 +77,17 @@ urlpatterns = [
     path('purchase-vouchers/<int:id>', Purchase_Vouchers_Details),
     path('add-purchase-voucher', Add_Purchase_Vouchers),
     
+    path('sales-vouchers', Sales_Vouchers),
+    path('sales-vouchers/<int:id>', Sales_Vouchers_Details),
+    path('add-sales-voucher', Add_Sales_Vouchers),
+    
+    
     path('fetch_productvaraints_related_data', fetch_productvaraints_related_data),
+    
+    path('fetch_productvaraints_sales_related_data', fetch_productvaraints_sales_related_data),
+    
+    
+    
     
     
     path('report/trial-balance', viewtrialBalance),

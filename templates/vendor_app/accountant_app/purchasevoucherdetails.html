@@ -70,10 +70,7 @@
                               </div>
                               <div class="card-body">
                                 <div class="modal-body">
-                                  <form id="purchase_vouchor_form" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="hidden" value="1" id="itemValue">
-                                    <input type="hidden" name="lead_id1" value="{{lead}}">
+                               
                                     <div class="row">
                                       <div class="col-lg-3 col-sm-12">
                                          <div class="form-group">
@@ -175,18 +172,17 @@
                                       </div>
                                     </div>
                                     <div class="row" style="margin-bottom: 20px;">
-                                      <div style="height: 114px;width: 861px; position: relative;left: 91px;">
+                                      <div style="height: 114px;width: 861px; position: relative;left: 325px;">
                                         <div style="padding: 17px;display: flex;justify-content: space-between; background-color: #f0f0f0;">
                                          
-                                          <span style="position: relative;left: 459px;"><strong id="tTax">Total Tax&nbsp;₹{{purchasesorder.tax}}</strong></span>
+                                          <span style="position: relative;left: 429px;"><strong id="tTax">Total Tax&nbsp;₹{{purchasesorder.tax}}</strong></span>
                                           <input type="hidden" name="totaltax" id="totaltax" >
                                           <span style="position: relative;left: -94px;"><strong id="tTotal">Total Amount&nbsp;₹{{purchasesorder.total}}</strong></span>
                                           <input type="hidden" name="totalamount" id="totalamount" >
                                         </div>
                                       </div>
                                     </div>
-                                    {% comment %} <button class="btn btn-primary" type="button" name="button" form="purchase_vouchor_form" onclick="submitForm();">Add Purchase Voucher</button> {% endcomment %}
-                                  </form>
+                                   
                                 </div>
                               </div>
                            </div>
@@ -198,146 +194,6 @@
             </div>
 
           
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-
-<script type="text/javascript">
-  function validateInput(event) {
-    let charCode = (event.which) ? event.which : event.keyCode;
-    
-    // Allow backspace (8), delete (46), and the decimal point (46)
-    if (charCode == 8 || charCode == 46 || charCode == 110 || charCode == 190) {
-      return true;
-    }
-    
-    // Ensure the entered value is a number
-    if (charCode < 48 || charCode > 57) {
-      return false;
-    }
-
-    return true;
-  }
-
-
-  document.getElementById('remove_account').disabled = true;
-  
-  function addAccount() {
-    let table = document.getElementById('accountTable');
-    let itemValue = document.getElementById('itemValue');
-    let item = itemValue.value;
-    itemValue.value = Number(item) + 1;
-    let row = table.insertRow();
-    let itemproduct = row.insertCell(0);
-    let price = row.insertCell(1);
-    let quantity = row.insertCell(2);
-    let tax = row.insertCell(3);
-    let total = row.insertCell(4);
-
-    itemproduct.innerHTML = `
-      <select class="form-control account-item" name="itemproduct${item}" data-width="100%" id="itemproduct${item}"  onchange="itemcalculation(${item});">
-      <option style="font-size:16px;" value="">----Select Item / Service----</option>
-      {% for item in itemlist %}
-      <option style="font-size:16px;" value="{{item.id}}">{{item.productvariantname}}</option>
-
-      {% endfor %}
-
-   </select>`;
-  
-   
-   price.innerHTML = `<input name="price${item}"  class="form-control input-price" style="width: 115px;" type="number" id="price${item}" min="0" onchange="itemcalculation(${item});" onkeypress="return validateInput(event)">`;
-   quantity.innerHTML = `<input name="quantity${item}" value="1" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity${item}" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="itemcalculation(${item});">`;
-   tax.innerHTML = `<input name="tax${item}" class="form-control input-tax" style="width: 115px;" type="number" id="tax${item}" min="0" onchange="totalTax();" onkeypress="return validateInput(event)">`;
-   total.innerHTML = `<input name="total${item}" class="form-control input-total" style="width: 115px;" type="number" id="total${item}" min="0" onchange="totalAmount();" onkeypress="return validateInput(event)">`;
-   document.getElementById('remove_account').disabled = false;
-  }
-  
-  function removeAccount() {
-    let table = document.getElementById('accountTable');
-    let itemValue = document.getElementById('itemValue');
-    if (itemValue.value > 1) {
-      table.deleteRow(-1);
-      itemValue.value = Number(itemValue.value) - 1;
-    }
-    if (itemValue.value == 1) {
-      document.getElementById('remove_account').disabled = true;
-    }
-   
-    totalTax();
-    totalAmount();
-  }
-  
-  function itemcalculation(id) {
-    {
-    var itemproductid = document.getElementById(`itemproduct${id}`).value;
-    var quantity = document.getElementById(`quantity${id}`).value;
-    var price = document.getElementById(`price${id}`).value;
-    fetchRelatedData(itemproductid,price,quantity,id);
-    }
-    
-      function fetchRelatedData(itemproductid,price,quantity,id) {
-        
-        $.ajax({
-          url: '/vendor/fetch_productvaraints_related_data',  // Replace with your actual URL
-          data: { 'itemproductid': itemproductid,'price':price,'quantity':quantity },
-          dataType: 'json',
-          success: function (data) {
-          console.log(data,'data')
-          document.getElementById(`price${id}`).value = data.purchaseprice;
-          document.getElementById(`tax${id}`).value = data.tax;
-          document.getElementById(`total${id}`).value = data.total;
-    
-          totalTax();
-          totalAmount();
-          }
-        });
-      }
- 
-
-    totalTax();
-    totalAmount();
-  
-  }
-
-  
-  function totalTax() {
-    let totaltax = Array.from(document.getElementsByClassName('input-tax'))
-      .reduce((sum, input) => sum + Number(input.value || 0), 0);
-    document.getElementById('tTax').innerHTML = `Total Tax&nbsp;₹${totaltax.toFixed(2)}`;
-    document.getElementById('totaltax').value = totaltax.toFixed(2);
-    
-  }
-
-  function totalAmount() {
-    let totalamount = Array.from(document.getElementsByClassName('input-total'))
-      .reduce((sum, input) => sum + Number(input.value || 0), 0);
-    document.getElementById('tTotal').innerHTML = `Total Amount&nbsp;₹${totalamount.toFixed(2)}`;
-    document.getElementById('totalamount').value = totalamount.toFixed(2);
-  }
-
-  function submitForm() {
-   
-    let manual_form = document.forms['purchase_vouchor_form'];
-    let account_class = document.getElementsByClassName('account-class');
-    let account_item = document.getElementsByClassName('account-item');
-
-    let account_counter = Array.from(account_item).filter(acc => !acc.value).length;
-
-    if (account_counter > 0) {
-      document.getElementById('purchase_message').innerHTML = 'Please select all Items/Services';
-    } else if (!manual_form['purchase_date'].value) {
-      document.getElementById('purchase_message').innerHTML = 'Please select a date';
-    } else if (!manual_form['sellerledgeraccount'].value) {
-      document.getElementById('purchase_message').innerHTML = 'Please select a seller ledger account';
-    } else {
-      document.getElementById('purchase_message').innerHTML = '';
-      manual_form.submit();
-      }
-  }
-</script>
-
-  
 
 
 

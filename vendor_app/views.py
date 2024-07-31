@@ -2130,10 +2130,14 @@ def editchartofaccounts(request,id):
 			if Account.objects.filter(id=id).exists():
 				accountobj=Account.objects.filter(id=id).first()
 				accountobj.store = storeobj
-				accountobj.accounttypelist =AccountTypeList.objects.filter(id=accountypelist).first()
-				accountobj.accountname = accountname
-				accountobj.openingbalance = openingbalance
-				accountobj.transctiontype=transctiontype
+				if accountypelist:
+					accountobj.accounttypelist =AccountTypeList.objects.filter(id=accountypelist).first()
+				if accountname:
+					accountobj.accountname = accountname
+				if openingbalance:
+					accountobj.openingbalance = openingbalance
+				if transctiontype:
+					accountobj.transctiontype=transctiontype
 				accountobj.updatedby= request.user
 				if streetaddress:
 					accountobj.streetaddress =  streetaddress
@@ -2465,7 +2469,7 @@ def Add_Purchase_Vouchers(request):
 			referenceno = ref_no[0:8]
 
 			purchasevoucher = PurchasesOrder.objects.create(
-                type = "PURCHASE-VOUCHER",description=description,
+                type = "PURCHASE-VOUCHER",
 				store=storeobj, orderno=referenceno, createdat=purchase_date, supplierinvoiceno=supplierinvoiceno,selleraccount=selleraccount
 			)
 
@@ -2539,7 +2543,8 @@ def Add_Purchase_Vouchers(request):
 			)
 			selleraccount.openingbalance = round((selleraccountcurrentopeningbalance + float(totalamount)),2)
 			selleraccount.save()
-
+   
+			purchasevoucher.description=description
 			purchasevoucher.total = totalamount
 			purchasevoucher.tax = totaltax
 			purchasevoucher.subtotal = totalamount-totaltax
@@ -2549,6 +2554,166 @@ def Add_Purchase_Vouchers(request):
 		return redirect("/vendor/purchase-vouchers")
 	else:
 		return render(request, '403.html')
+
+
+
+
+
+@csrf_exempt
+def Sales_Vouchers(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+                "buyerledgerlist" :Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Buyer"),
+                "salesledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Sales Entery").first(),
+               "accounttypegroups" :AccountTypeGroup.objects.all(),
+               'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
+               'salessorder': SalesOrder.objects.filter(store__vendor=vendorobj, type = "SALES-VOUCHER"),
+		
+           	# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/accountant_app/salesvoucher.html', dic)
+	else:
+		return render(request, '403.html')
+
+
+
+@csrf_exempt
+def Sales_Vouchers_Details(request,id):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+                "buyerledgerlist" :Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Buyer"),
+                "salesledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Sales Entery").first(),
+               "accounttypegroups" :AccountTypeGroup.objects.all(),
+               'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
+            	'salesorder': SalesOrder.objects.filter(store__vendor=vendorobj, type = "SALES-VOUCHER",id=id).first(),
+		
+           	# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/accountant_app/salesvoucherdetails.html', dic)
+	else:
+		return render(request, '403.html')
+
+
+
+@csrf_exempt
+def Add_Sales_Vouchers(request):
+	if check_user_authentication(request, 'VENDOR'):
+		if request.method == "POST":
+			vendorobj = Vendor.objects.filter(user=request.user).first()
+			storeobj = Store.objects.filter(vendor=vendorobj).first()
+			value = request.POST.get('hidden')
+			sales_date = request.POST.get('sales_date')
+			invoiceno = request.POST.get('invoiceno')
+			buyerledgeraccount = request.POST.get('buyerledgeraccount')
+			salesledgeraccount = request.POST.get('salesledgeraccount')
+			description = request.POST.get('description')
+			totaltax = request.POST.get('totaltax')
+			totaltax=float(totaltax)
+			totalamount = request.POST.get('totalamount')
+			totalamount=float(totalamount)
+
+            
+   
+			buyeraccount=Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Buyer",id=buyerledgeraccount).first()
+			salesledger=Account.objects.filter(store__vendor=vendorobj,accountname="Sales Entery").first()
+			ref_no = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(timezone.now()) + 'JOURNAL'))
+			ref_no = ref_no.upper()
+			referenceno = ref_no[0:8]
+
+			purchasevoucher = SalesOrder.objects.create(
+                type = "SALES-VOUCHER",
+				store=storeobj, orderno=referenceno, createdat=sales_date,buyeraccount=buyeraccount
+			)
+
+			
+
+			for i in range(int(value)):
+				itemproduct = 'itemproduct' + str(i)
+				price = 'price' + str(i)
+				quantity = 'quantity' + str(i)
+				tax = 'tax' + str(i)
+				total = 'total' + str(i)
+				productvariantid = request.POST.get(itemproduct)
+				productprice = request.POST.get(price)
+				productquantity = request.POST.get(quantity)
+				producttax = request.POST.get(tax)
+				producttotal = request.POST.get(total)
+                
+				print(productprice,productquantity,producttotal,'price')
+
+				try:
+					if productvariantid.isnumeric():
+						productvariants = ProductVariants.objects.get(id=productvariantid)
+					else:
+						productvariants = ProductVariants.objects.filter(productvariantname=productvariantid).first()
+					
+					if not productvariants:
+						continue  # Skip this iteration if account is not found
+
+					if productvariants:
+						SalesOrderItems.objects.create(store=storeobj,
+							salesorder=purchasevoucher, productvariants=productvariants,vendorprice=float(productprice),
+							vendortax=float(producttax),vendortotal=float(producttotal), quantity=int(productquantity),updatedby=request.user,
+						)
+						curentquantity=productvariants.quantity
+						curentprice=productvariants.price
+						totalquantity=curentquantity - int(productquantity)
+						totalpurchase=curentprice + float(productprice)
+						averageprice=round((totalpurchase / totalquantity),2)
+						productvariants.price=averageprice
+						productvariants.quantity=totalquantity
+						productvariants.save()
+						
+     						
+				except ProductVariants.DoesNotExist:
+					continue  # Skip this iteration if account does not exist
+            
+			buyeraccountcurrentopeningbalance=buyeraccount.openingbalance
+			salesledgercurrentopeningbalance=salesledger.openingbalance
+		
+			accounttransactions = AccountTransaction.objects.create(
+				account = salesledger,previousprtransactiontype="CREDIT",
+				transactiondate = timezone.now(),
+				transactiontype = 'CREDIT', transactionrealted= "SALES-VOUCHER",
+				transactiondetails = f'Amount {totalamount} has been credit for item sales',
+				transactionid = referenceno,
+				transactionamount = totalamount,
+				previousamount = round(salesledger.openingbalance, 2),
+				remainingamount = round((salesledger.openingbalance + totalamount),2)
+			)
+			salesledger.openingbalance = round((salesledgercurrentopeningbalance + float(totalamount)),2)
+			salesledger.save()	
+			accounttransactions = AccountTransaction.objects.create(
+				account = buyeraccount,previousprtransactiontype="DEBIT",
+				transactiondate = timezone.now(),
+				transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
+				transactiondetails = f'Amount {totalamount} has been debit for item sales',
+				transactionid = referenceno,
+				transactionamount = totalamount,
+				previousamount = round(buyeraccount.openingbalance, 2),
+				remainingamount =round((buyeraccount.openingbalance + totalamount),2)
+			)
+			buyeraccount.openingbalance = round((buyeraccountcurrentopeningbalance + float(totalamount)),2)
+			buyeraccount.save()
+             
+			purchasevoucher.description=description
+			purchasevoucher.invoiceno=invoiceno
+			purchasevoucher.vendortotal = totalamount
+			purchasevoucher.vendortax = totaltax
+			purchasevoucher.vendorsubtotal = totalamount-totaltax
+			purchasevoucher.updatedby=request.user
+			purchasevoucher.save()
+
+		return redirect("/vendor/sales-vouchers")
+	else:
+		return render(request, '403.html')
+
+
+
 
 
 from django.http import JsonResponse
@@ -2565,18 +2730,20 @@ def fetch_productvaraints_related_data(request):
 		if price :
 			vendorprice = float(price)
 		else:
-			vendorprice = item.purchaseprice
-		
-		vendorperproducttax= round( (vendorprice) * ((item.product.tax/100) / (1 + (item.product.tax/100))),2)
+			vendorprice = item.purchasepricewithouttax()
+		taxrate=item.product.tax
+		vendorperproducttax= round( (vendorprice) * ((item.product.tax/100)),2)
 		vendortax = round((vendorperproducttax * quantity),2)
-		vendortotal = round((vendorprice * quantity),2)
+		totalprice=round((vendorprice + vendorperproducttax),2)
+		vendortotal = round((totalprice * quantity),2)
+		
 
 		productvariantname=item.productvariantname
 		
-		purchaseprice=round((vendorprice - vendorperproducttax),2)
+		purchaseprice=vendorprice
 		print(purchaseprice,item.purchaseprice,vendorperproducttax,'vendorperproducttax')
 		
-		data = {'productvariantname': productvariantname, "purchaseprice":purchaseprice,
+		data = {'productvariantname': productvariantname,'taxrate':taxrate, "purchaseprice":purchaseprice,
 					'tax': vendortax, 'total': vendortotal,
      
      }
@@ -2584,6 +2751,42 @@ def fetch_productvaraints_related_data(request):
 		data = {'productvariantname': '', 'purchaseprice': ''}
 
 	return JsonResponse(data)
+
+
+
+def fetch_productvaraints_sales_related_data(request):
+	itemproductid = request.GET.get('itemproductid', '')
+	quantity = request.GET.get('quantity', '')
+	price = request.GET.get('price', '')
+	print(itemproductid,quantity,price,'itemproductid')
+
+	try:
+		item = ProductVariants.objects.get(id=itemproductid)
+		quantity=float(quantity)
+		if price :
+			vendorprice = float(price)
+		else:
+			vendorprice = item.salespricewithouttax()
+		taxrate=item.product.tax
+		vendorperproducttax= round( (vendorprice) * ((item.product.tax/100)),2)
+		vendortax = round((vendorperproducttax * quantity),2)
+		totalprice=round((vendorprice + vendorperproducttax),2)
+		vendortotal = round((totalprice * quantity),2)
+
+		productvariantname=item.productvariantname
+		
+		salesprice=vendorprice
+		print(salesprice,item.purchaseprice,vendorperproducttax,'vendorperproducttax')
+		
+		data = {'productvariantname': productvariantname,'taxrate':taxrate, "salesprice":salesprice,
+					'tax': vendortax, 'total': vendortotal,
+     
+     }
+	except ProductVariants.DoesNotExist:
+		data = {'productvariantname': '', 'salesprice': ''}
+
+	return JsonResponse(data)
+
 
 
 @csrf_exempt

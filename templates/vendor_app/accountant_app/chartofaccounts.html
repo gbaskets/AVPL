@@ -102,7 +102,7 @@
                <div class="form-group">
                   <label>Select Accoun Type List</label>
 
-                  <select class="form-control" name="accountypelist">
+                  <select class="form-control" name="accountypelist" disabled>
                      <option value="">----Select Account Type List----</option>
             
                      {% for accountype  in accounttypegroups %}
@@ -138,7 +138,7 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Select Transction Type</label>
-                  <select class="form-control" name="transctiontype">
+                  <select class="form-control" name="transctiontype" disabled="disabled">
                      <option value="">----Select Transction Type----</option>
                      <option value="DEBIT" {% if list.transctiontype == "DEBIT" %} selected {% else%} {%endif%}>DEBIT</option>
                      <option value="CREDIT"  {% if list.transctiontype == "CREDIT" %} selected {% else%} {%endif%} >CREDIT</option>
@@ -151,7 +151,7 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
                   <label>Opening Balance</label>
-                  <input type="text" class="form-control" name="openingbalance" value="{{list.openingbalance}}" required>
+                  <input type="text" class="form-control" name="openingbalance" value="{{list.openingbalance}}" disabled="disabled" required>
                </div>
             </div>
           
@@ -450,6 +450,6 @@
              google.maps.event.addDomListener(window, 'load', initialize);
          </script>
          
-       {% comment %}  {% endcomment %}
+   
 
 {% endblock %}
