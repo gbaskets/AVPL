@@ -2859,12 +2859,12 @@ def viewbalancesheet(request):
 		dic = {"vendorobj":vendorobj,
 				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
 				"accounttypegroups" :AccountTypeGroup.objects.all(),
-					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj,id=id),
+				"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
 				
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
-		return render(request, 'vendor_app/report/trialbalance.html', dic)
+		return render(request, 'vendor_app/report/balancesheet.html', dic)
 	else:
 		return render(request, '403.html')
 
