@@ -143,21 +143,20 @@
 
                   </div>
                   <div class="card-body">
-                    <table id="general_ledger">
+                    <table id="balance_sheet">
                         <thead>
                             <tr>
-                                <th>Account</th>
-                                <th>Account Code</th>
-                                <th>NET DEBIT</th>
-                                <th>NET CREDIT</th>
+                                <th>Particulars</th>
+                                <th>Amount</th>
+                                <th>Particulars</th>
+                                <th>Amount</th>
                             </tr>
                         </thead>
-                        <tbody id="trail_head">
-                        </tbody>
-                        <tfoot id="trail_foot">
-                        </tfoot>
-                    </table>   
-                </div>  
+                        <tbody id="balance_head"></tbody>
+                        <tfoot id="balance_foot"></tfoot>
+                    </table>
+                </div>
+                
                                   
             </div>
             </section>
@@ -165,118 +164,85 @@
             </div>
             
           
-          <script>
-          (function(){
-              console.log('Here, anonymous function Call...');
-              fetch('/vendor/Trial_Balance/', {
-                  method: 'GET',
-              })
-              .then(function(res) {
-                  return res.json();
-              })
-              .then(function(data) {
-                  console.log(data);
-                  let html = '';
-                  let total_debit = 0;
-                  let total_credit = 0;
-     
-                  for (let group in data) {
-                      let group_data = data[group];
-                      html += `<tr class="group sub-head" data-group="${group}">
-                          <td>${group}</td>
-                          <td></td>
-                          <td>${group_data.total_debit.toFixed(2) == 0 ? '--' : `₹${group_data.total_debit.toFixed(2)} DR`}</td>
-                          <td>${group_data.total_credit.toFixed(2) == 0 ? '--' : `₹${group_data.total_credit.toFixed(2)} CR`}</td>
-                      </tr>`;
-          
-                      total_debit += group_data.total_debit;
-                      total_credit += group_data.total_credit;
-          
-                      for (let type of group_data.types) {
-                          let type_data = type.data;
-                          html += `<tr class="type sub-sub-head" data-group="${group}" data-type="${type.name}" style="display:none;">
-                              <td style="padding-left: 20px;">${type.name}</td>
-                              <td></td>
-                              <td>${type_data.total_debit.toFixed(2) == 0 ? '--' : `₹${type_data.total_debit.toFixed(2)} DR`}</td>
-                              <td>${type_data.total_credit.toFixed(2) == 0 ? '--' : `₹${type_data.total_credit.toFixed(2)} CR`}</td>
-                          </tr>`;
-          
-                          for (let list of type_data.lists) {
-                              let list_data = list.data;
-                              html += `<tr class="list sub-sub-sub-head" data-group="${group}" data-type="${type.name}" data-list="${list.name}" style="display:none;">
-                                  <td style="padding-left: 40px;">${list.name}</td>
-                                  <td></td>
-                                  <td>${list_data.total_debit.toFixed(2) == 0 ? '--' : `₹${list_data.total_debit.toFixed(2)} DR`}</td>
-                                  <td>${list_data.total_credit.toFixed(2) == 0 ? '--' : `₹${list_data.total_credit.toFixed(2)} CR`}</td>
-                              </tr>`;
-          
-                              for (let account of list_data.accounts) {
-                                  let balance = account.balance;
-                                  let debit = account.transctiontype == 'DEBIT' ? balance : 0;
-                                  let credit = account.transctiontype == 'CREDIT' ? balance : 0;
-          
-                                  html += `<tr class="account" data-group="${group}" data-type="${type.name}" data-list="${list.name}" style="display:none;">
-                                      <td style="padding-left: 60px;">${account.accountname}</td>
-                                      <td>${account.accountcode}</td>
-                                      <td>${debit == 0 ? '--' : `₹${debit.toFixed(2)} DR`}</td>
-                                      <td>${credit == 0 ? '--' : `₹${credit.toFixed(2)} CR`}</td>
-                                  </tr>`;
-                              }
-                          }
-                      }
-                  }
-          
-                  document.getElementById('trail_head').innerHTML = html;
-          
-                  let footerHtml = `
-                      <tr class="head">
-                          <td><strong>Total</strong></td>
-                          <td></td>
-                          <td><strong> <b>₹${total_debit.toFixed(2)} DR</b></strong></td>
-                          <td><strong> <b>₹${total_credit.toFixed(2)} CR </b></strong></td>
-                      </tr>
-                  `;
-                  document.getElementById('trail_foot').innerHTML = footerHtml;
-          
-                  document.querySelectorAll('.group').forEach(groupRow => {
-                      groupRow.addEventListener('click', function() {
-                          let group = this.dataset.group;
-                          document.querySelectorAll(`.type[data-group="${group}"]`).forEach(typeRow => {
-                              typeRow.style.display = typeRow.style.display === 'none' ? '' : 'none';
-                          });
-                      });
-                  });
-          
-                  document.querySelectorAll('.type').forEach(typeRow => {
-                      typeRow.addEventListener('click', function() {
-                          let group = this.dataset.group;
-                          let type = this.dataset.type;
-                          document.querySelectorAll(`.list[data-group="${group}"][data-type="${type}"]`).forEach(listRow => {
-                              listRow.style.display = listRow.style.display === 'none' ? '' : 'none';
-                          });
-                      });
-                  });
-          
-                  document.querySelectorAll('.list').forEach(listRow => {
-                      listRow.addEventListener('click', function() {
-                          let group = this.dataset.group;
-                          let type = this.dataset.type;
-                          let list = this.dataset.list;
-                          document.querySelectorAll(`.account[data-group="${group}"][data-type="${type}"][data-list="${list}"]`).forEach(accountRow => {
-                              accountRow.style.display = accountRow.style.display === 'none' ? '' : 'none';
-                          });
-                      });
-                  });
-              });
-          })();
-          </script>
-          
-          <style>
-          .hidden {
-              display: none;
-          }
-          </style>
-          
+            <script>
+                (function(){
+                    console.log('Fetching balance sheet data...');
+                    fetch('/vendor/Balance_Sheet/', {
+                        method: 'GET',
+                    })
+                    .then(function(res) {
+                        return res.json();
+                    })
+                    .then(function(data) {
+                        console.log(data);
+                        let assetHtml = '';
+                        let liabilityHtml = '';
+                        let total_assets = 0;
+                        let total_liabilities = 0;
+                
+                        function appendRow(id, className, asset_name, asset_amount, liability_name, liability_amount) {
+                            return `<tr id="${id}" class="${className}" style="display:none;">
+                                <td>${asset_name ? asset_name : ''}</td>
+                                <td>${asset_amount ? '₹' + asset_amount.toFixed(2) : ''}</td>
+                                <td>${liability_name ? liability_name : ''}</td>
+                                <td>${liability_amount ? '₹' + liability_amount.toFixed(2) : ''}</td>
+                            </tr>`;
+                        }
+                
+                        function appendHeaderRow(id, className, name, amount, isAsset = true) {
+                            return `<tr id="${id}" class="${className}" style="cursor:pointer;">
+                                <td>${isAsset ? name : ''}</td>
+                                <td>${isAsset ? '₹' + amount.toFixed(2) : ''}</td>
+                                <td>${!isAsset ? name : ''}</td>
+                                <td>${!isAsset ? '₹' + amount.toFixed(2) : ''}</td>
+                            </tr>`;
+                        }
+                
+                        // Assets
+                        let assetId = 'asset';
+                        assetHtml += appendHeaderRow(assetId, 'header', 'Assets', data.Assets.total);
+                        total_assets += data.Assets.total;
+                        data.Assets.details.forEach(account => {
+                            assetHtml += appendRow(`${assetId}-${account.accountcode}`, 'detail', account.accountname, account.balance, null, null);
+                        });
+                
+                        // Liabilities
+                        let liabilityId = 'liability';
+                        liabilityHtml += appendHeaderRow(liabilityId, 'header', 'Liabilities', data.Liabilities.total, false);
+                        total_liabilities += data.Liabilities.total;
+                        data.Liabilities.details.forEach(account => {
+                            liabilityHtml += appendRow(`${liabilityId}-${account.accountcode}`, 'detail', null, null, account.accountname, account.balance);
+                        });
+                
+                        // Combine both sides into one table
+                        let combinedHtml = `<tr><td colspan="2"><table>${assetHtml}</table></td><td colspan="2"><table>${liabilityHtml}</table></td></tr>`;
+                
+                        document.getElementById('balance_head').innerHTML = combinedHtml;
+                
+                        let footerHtml = `
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong>₹${total_assets.toFixed(2)}</strong></td>
+                                <td><strong>Total</strong></td>
+                                <td><strong>₹${total_liabilities.toFixed(2)}</strong></td>
+                            </tr>
+                        `;
+                        document.getElementById('balance_foot').innerHTML = footerHtml;
+                
+                        // Adding click events to headers to show/hide details
+                        document.querySelectorAll('.header').forEach(headerRow => {
+                            headerRow.addEventListener('click', function() {
+                                let id = this.id;
+                                document.querySelectorAll(`.detail[id^="${id}"]`).forEach(detailRow => {
+                                    detailRow.style.display = detailRow.style.display === 'none' ? '' : 'none';
+                                });
+                            });
+                        });
+                
+                    });
+                })();
+                </script>
+                
           
 
 {% endblock %}

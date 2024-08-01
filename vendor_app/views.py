@@ -2850,6 +2850,25 @@ def viewtrialBalance(request):
 
 
 
+@csrf_exempt
+def viewtradingaccount(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendorobj=Vendor.objects.filter(user=request.user).first()
+		dic = {"vendorobj":vendorobj,
+                
+				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+				"accounttypegroups" :AccountTypeGroup.objects.all(),
+					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
+				
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/report/tradingaccount.html', dic)
+	else:
+		return render(request, '403.html')
+
+
+
 
 
 @csrf_exempt
@@ -2940,3 +2959,89 @@ def Trial_Balance(request):
         trail_data[group.name] = group_data
 
     return JsonResponse(trail_data)
+
+
+
+
+def Trading_Account(request):
+    if not check_user_authentication(request, 'VENDOR'):
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    vendor = Vendor.objects.filter(user=request.user).first()
+    store = Store.objects.filter(vendor=vendor).first()
+
+    if not store:
+        return JsonResponse({'error': 'Store not found'}, status=404)
+
+    trading_data = {
+        "Sales": {"credit": 0, "details": []},
+        "Purchases": {"debit": 0, "details": []},
+        "Direct Expenses": {"debit": 0, "details": []},
+        "Gross Profit": {"debit": 0},
+        "Gross Loss": {"credit": 0},
+    }
+
+    accounts = Account.objects.filter(store=store).exclude(accountname="Profit & Loss")
+
+    for account in accounts:
+        account_data = {
+            "accountname": account.accountname,
+            "accountcode": account.accountcode,
+            "balance": account.openingbalance,
+            "transctiontype": account.transctiontype,
+        }
+
+        if account.accounttypelist.name == 'Sales':
+            trading_data["Sales"]["credit"] += account.openingbalance
+            trading_data["Sales"]["details"].append(account_data)
+
+        elif account.accounttypelist.name == 'Purchases':
+            trading_data["Purchases"]["debit"] += account.openingbalance
+            trading_data["Purchases"]["details"].append(account_data)
+
+        elif account.accounttypelist.accounttype.name == 'Direct Expenses':
+            trading_data["Direct Expenses"]["debit"] += account.openingbalance
+            trading_data["Direct Expenses"]["details"].append(account_data)
+
+    gross_profit = trading_data["Sales"]["credit"] - (trading_data["Purchases"]["debit"] + trading_data["Direct Expenses"]["debit"])
+    if gross_profit > 0:
+        trading_data["Gross Profit"]["debit"] = gross_profit
+    else:
+        trading_data["Gross Loss"]["credit"] = -gross_profit
+
+    return JsonResponse(trading_data)
+
+
+
+def Balance_Sheet(request):
+    if not check_user_authentication(request, 'VENDOR'):
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    vendor = Vendor.objects.filter(user=request.user).first()
+    store = Store.objects.filter(vendor=vendor).first()
+
+    if not store:
+        return JsonResponse({'error': 'Store not found'}, status=404)
+
+    balance_sheet_data = {
+        "Assets": {"total": 0, "details": []},
+        "Liabilities": {"total": 0, "details": []},
+    }
+
+    accounts = Account.objects.filter(store=store).exclude(accountname="Profit & Loss")
+
+    for account in accounts:
+        account_data = {
+            "accountname": account.accountname,
+            "accountcode": account.accountcode,
+            "balance": account.openingbalance,
+        }
+
+        if account.accounttypelist.accounttype.accounttypegroup.name == 'Assets':
+            balance_sheet_data["Assets"]["total"] += account.openingbalance
+            balance_sheet_data["Assets"]["details"].append(account_data)
+        elif account.accounttypelist.accounttype.accounttypegroup.name == 'Liability':
+            balance_sheet_data["Liabilities"]["total"] += account.openingbalance
+            balance_sheet_data["Liabilities"]["details"].append(account_data)
+
+    return JsonResponse(balance_sheet_data)

@@ -1,0 +1,279 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Trading Account{% endblock %}
+{% block main %}
+<style>
+    .tooltip-1 {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+    }
+
+    .tooltip-1 .tooltiptext-1 {
+        visibility: hidden;
+        width: 160px;
+        background-color: black;
+        color: white;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+
+        /* Position the tooltip */
+        position: absolute;
+        top: -78px;
+        z-index: 1;
+    }
+
+    .tooltip-1:hover .tooltiptext-1 {
+        visibility: visible;
+    }
+
+
+    
+    table {
+        grid-column: 2 / 3;
+        display: flex;
+        flex-direction: column;
+        margin: 20px;
+        text-align: left;
+      }
+      
+      thead {
+        background-color:#e1e1e1;
+        border-radius: 8px 8px 0px 0px;
+      }
+      
+      thead > tr {
+        border-radius: 8px 8px 0px 0px;
+        font-weight: bold;
+        color: black;
+        font-size: 16px;
+
+      }
+      
+      tr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        border: 1px solid #e1e1e1;
+        margin-top: -1px;
+        color: #535353;
+      }
+      
+      tbody tr:hover {
+        background-color: #f6f6f6;
+      }
+      
+      
+      .second {
+        min-width: 18%;
+        align-items: left;
+      }
+      
+      .third {
+        width: 19%;
+        margin-left: 227px;
+      }
+      
+      .fourth {
+        width: 120px;
+      }
+      
+      .fifth {
+        width: 120px;
+        text-align: right;
+        
+      }
+      .sub-head{
+        font-weight: bold;
+        color: coral;
+        font-size: 18px; 
+        background-color: #f3f3f3;
+      }
+
+      .sub-sub-head{
+       
+        color:black;
+        font-size: 16px; 
+        background-color: #f3f3f3;
+      }
+
+      .sub-sub-sub-head{
+      
+        color: black;
+        font-size: 14px; 
+        background-color: #f3f3f3;
+      }
+
+
+      .head{
+        font-weight: bold;
+        color: black;
+        font-size: 18px; 
+        background-color: #f3f3f3;
+      }
+</style>
+
+
+<div class="main-content">
+   <section class="section">
+      <div class="section-header">
+         <div class="row">
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+               <div class="section-header-breadcrumb-content">
+                  <h1>Trading Account</h1>
+                  <div class="section-header-breadcrumb">
+                     <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
+                     <div class="breadcrumb-item"><a href="#">Trading Account</a></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="section-body">
+         <div class="row">
+
+            <div class="col-12">
+               <div class="card">
+                  <div class="card-header">
+                     <div class="col-8">
+                        <h4>Trading Account</h4>
+                     </div>
+
+                  </div>
+
+
+                  <div class="card-body">
+                    <table id="trading_account">
+                        <thead>
+                            <tr>
+                                <th>Particulars</th>
+                                <th>Amount (DEBIT)</th>
+                                
+                                <th>Particulars</th>
+                                <th>Amount (CREDIT)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trading_head"></tbody>
+                        <tfoot id="trading_foot"></tfoot>
+                    </table>
+                </div>
+                
+
+
+                  <script>
+                    (function(){
+                        console.log('Fetching trading account data...');
+                        fetch('/vendor/Trading_Account/', {
+                            method: 'GET',
+                        })
+                        .then(function(res) {
+                            return res.json();
+                        })
+                        .then(function(data) {
+                            console.log(data);
+                            let debitHtml = '';
+                            let creditHtml = '';
+                            let total_debit = 0;
+                            let total_credit = 0;
+                    
+                            function appendRow(id, className, debit_name, debit_amount, credit_name, credit_amount) {
+                                return `<tr id="${id}" class="${className}" style="display:none;">
+                                    <td>${debit_name ? debit_name : ''}</td>
+                                    <td>${debit_amount ? '₹' + debit_amount.toFixed(2) : ''}</td>
+                                    <td>${credit_name ? credit_name : ''}</td>
+                                    <td>${credit_amount ? '₹' + credit_amount.toFixed(2) : ''}</td>
+                                </tr>`;
+                            }
+                    
+                            function appendHeaderRow(id, className, name, amount, isDebit = true) {
+                                return `<tr id="${id}" class="${className}" style="cursor:pointer;">
+                                    <td>${isDebit ? name : ''}</td>
+                                    <td>${isDebit ? '₹' + amount.toFixed(2) : ''}</td>
+                                    <td>${!isDebit ? name : ''}</td>
+                                    <td>${!isDebit ? '₹' + amount.toFixed(2) : ''}</td>
+                                </tr>`;
+                            }
+                    
+                            // Purchases
+                            let purchaseId = 'purchase';
+                            debitHtml += appendHeaderRow(purchaseId, 'header', 'Purchases', data.Purchases.debit);
+                            total_debit += data.Purchases.debit;
+                            data.Purchases.details.forEach(account => {
+                                debitHtml += appendRow(`${purchaseId}-${account.accountcode}`, 'detail', account.accountname, account.balance, null, null);
+                            });
+                    
+                            // Direct Expenses
+                            let directExpenseId = 'direct-expense';
+                            debitHtml += appendHeaderRow(directExpenseId, 'header', 'Direct Expenses', data["Direct Expenses"].debit);
+                            total_debit += data["Direct Expenses"].debit;
+                            data["Direct Expenses"].details.forEach(account => {
+                                debitHtml += appendRow(`${directExpenseId}-${account.accountcode}`, 'detail', account.accountname, account.balance, null, null);
+                            });
+                    
+                            // Sales
+                            let salesId = 'sales';
+                            creditHtml += appendHeaderRow(salesId, 'header', 'Sales', data.Sales.credit, false);
+                            total_credit += data.Sales.credit;
+                            data.Sales.details.forEach(account => {
+                                creditHtml += appendRow(`${salesId}-${account.accountcode}`, 'detail', null, null, account.accountname, account.balance);
+                            });
+                    
+                            // Gross Profit or Loss
+                            if (data["Gross Profit"].debit > 0) {
+                                debitHtml += appendHeaderRow('gross-profit', 'header', 'Gross Profit', data["Gross Profit"].debit);
+                                total_debit += data["Gross Profit"].debit;
+                            } else if (data["Gross Loss"].credit > 0) {
+                                creditHtml += appendHeaderRow('gross-loss', 'header', 'Gross Loss', data["Gross Loss"].credit, false);
+                                total_credit += data["Gross Loss"].credit;
+                            }
+                    
+                            // Combine both sides into one table
+                            let combinedHtml = `<tr><td><table>${debitHtml}</table></td><td><table>${creditHtml}</table></td></tr>`;
+                    
+                            document.getElementById('trading_head').innerHTML = combinedHtml;
+                    
+                            let footerHtml = `
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    <td><strong>₹${total_debit.toFixed(2)}</strong></td>
+                                    <td><strong>Total</strong></td>
+                                    <td><strong>₹${total_credit.toFixed(2)}</strong></td>
+                                </tr>
+                            `;
+                            document.getElementById('trading_foot').innerHTML = footerHtml;
+                    
+                            // Adding click events to headers to show/hide details
+                            document.querySelectorAll('.header').forEach(headerRow => {
+                                headerRow.addEventListener('click', function() {
+                                    let id = this.id;
+                                    document.querySelectorAll(`.detail[id^="${id}"]`).forEach(detailRow => {
+                                        detailRow.style.display = detailRow.style.display === 'none' ? '' : 'none';
+                                    });
+                                });
+                            });
+                    
+                        });
+                    })();
+                    </script>
+                       
+
+                                  
+            
+            
+            
+            
+            
+                </div>
+            </section>
+            
+            </div>
+            
+       
+          
+            
+            
+          
+
+{% endblock %}
