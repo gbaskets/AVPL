@@ -11,7 +11,9 @@ admin.site.register(AccountTypeGroup,AccountTypeGroupAdmin)
 class AccountTypeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 	...
 admin.site.register(AccountType,AccountTypeAdmin)
-admin.site.register(AccountTypeList)
+class AccountTypeListAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+	...
+admin.site.register(AccountTypeList,AccountTypeListAdmin)
 admin.site.register(Account)
 admin.site.register(ManualJournalVoucher)
 admin.site.register(AccountEntry)

@@ -3,25 +3,30 @@ from django.contrib.auth.models import User, AbstractUser
 # Create your models here.
 
 class AccountTypeGroup(models.Model):
-	name  = models.CharField(max_length=255, null=True, blank=True)
-
-	def __str__(self):
-		return self.name
+    name  = models.CharField(max_length=255, null=True, blank=True)
+    class Meta:
+        verbose_name = 'Nature of Account'
+    def __str__(self):
+        return self.name
 
         
 class AccountType(models.Model):
-	accounttypegroup = models.ForeignKey(AccountTypeGroup, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypegroups")
-	name=models.CharField(max_length=255, null=True, blank=True)
+    accounttypegroup = models.ForeignKey(AccountTypeGroup, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypegroups")
+    name=models.CharField(max_length=255, null=True, blank=True)
+    class Meta:
+        verbose_name = 'Account Group'
 
-	def __str__(self):
-		return self.name
+    def __str__(self):
+        return f'{self.name} > {self.accounttypegroup}' 
 
 class AccountTypeList(models.Model):
-	accounttype = models.ForeignKey(AccountType, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypes")
-	name=models.CharField(max_length=255, null=True, blank=True)
+    accounttype = models.ForeignKey(AccountType, on_delete=models.CASCADE, null=True, blank=True,related_name="accounttypes")
+    name=models.CharField(max_length=255, null=True, blank=True)
+    class Meta:
+        verbose_name = 'Account Sub-Group'
 
-	def __str__(self):
-		return self.name        
+    def __str__(self):
+         return f'{self.name} > {self.accounttype}'       
 
 class Account(models.Model):
     store = models.ForeignKey("store_app.Store", on_delete = models.CASCADE, null = True, blank = True)
@@ -44,11 +49,13 @@ class Account(models.Model):
     createdat = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
-  
-    def __str__(self):
-
-        return self.accountname + " " + str(self.id)
     
+    class Meta:
+        verbose_name = 'Account Ledger'
+
+    def __str__(self):
+        return f'{self.store} : {self.accountname} - {self.accountcode} > {self.accounttypelist}'    
+
 
 class AccountTransaction(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE,related_name="accountstransaction")

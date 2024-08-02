@@ -2051,7 +2051,7 @@ def chartofaccounts(request):
 				openingbalance = 0,
 				transctiontype  =  'DEBIT')
 		if not Account.objects.filter(store=storeobj,accountname='Purchase Entery').exists():
-			accounttypelist =AccountTypeList.objects.filter(name="Purchase").first()
+			accounttypelist =AccountTypeList.objects.filter(name="Purchase Accounts").first()
 			Account.objects.create(store=storeobj,
 				accountname='Purchase Entery',accounttypelist=accounttypelist,
 				accountcode = account_code_by_store(storeobj),
@@ -2059,7 +2059,7 @@ def chartofaccounts(request):
 				transctiontype  =  'DEBIT')
    
 		if not Account.objects.filter(store=storeobj,accountname='Sales Entery').exists():
-			accounttypelist =AccountTypeList.objects.filter(name="Sales").first()
+			accounttypelist =AccountTypeList.objects.filter(name="Sales Accounts").first()
 			Account.objects.create(store=storeobj,
 				accountname='Sales Entery',accounttypelist=accounttypelist,
 				accountcode = account_code_by_store(storeobj),
@@ -2218,7 +2218,8 @@ def manualjournal(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendorobj=Vendor.objects.filter(user=request.user).first()
 		dic = {"vendorobj":vendorobj,
-                "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+                "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj).exclude(accountname__in=["Profit & Loss", "Purchase Entery", "Sales Entery"]
+),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
                   "manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
                
@@ -2432,7 +2433,7 @@ def view_manualjournal(request,id):
 	if check_user_authentication(request, 'VENDOR'):
 		vendorobj=Vendor.objects.filter(user=request.user).first()
 		dic = {"vendorobj":vendorobj,
-				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj).exclude(accountname="Profit & Loss"),
 				"accounttypegroups" :AccountTypeGroup.objects.all(),
 					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj,id=id),
 				
@@ -2560,32 +2561,92 @@ def Add_Purchase_Vouchers(request):
             
 			selleraccountcurrentopeningbalance=selleraccount.openingbalance
 			purchaseledgercurrentopeningbalance=purchaseledger.openingbalance
-		
-			accounttransactions = AccountTransaction.objects.create(
-				account = purchaseledger,previousprtransactiontype="DEBIT",
-				transactiondate = timezone.now(),
-				transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
-				transactiondetails = f'Amount {totalamount} has been debit for item purchase',
-				transactionid = referenceno,
-				transactionamount = totalamount,
-				previousamount = round(purchaseledger.openingbalance, 2),
-				remainingamount = round((purchaseledger.openingbalance + totalamount),2)
-			)
-			purchaseledger.openingbalance = round((purchaseledgercurrentopeningbalance + float(totalamount)),2)
-			purchaseledger.save()	
-			accounttransactions = AccountTransaction.objects.create(
-				account = selleraccount,previousprtransactiontype="CREDIT",
-				transactiondate = timezone.now(),
-				transactiontype = 'CREDIT', transactionrealted= "PURCHASE-VOUCHER",
-				transactiondetails = f'Amount {totalamount} has been credit for item purchase',
-				transactionid = referenceno,
-				transactionamount = totalamount,
-				previousamount = round(selleraccount.openingbalance, 2),
-				remainingamount =round((selleraccount.openingbalance + totalamount),2)
-			)
-			selleraccount.openingbalance = round((selleraccountcurrentopeningbalance + float(totalamount)),2)
-			selleraccount.save()
    
+			if purchaseledger.transctiontype=="DEBIT":
+				accounttransactions = AccountTransaction.objects.create(
+					account = purchaseledger,previousprtransactiontype="DEBIT",
+					transactiondate = timezone.now(),
+					transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
+					transactiondetails = f'Amount {totalamount} has been debit for item purchase',
+					transactionid = referenceno,
+					transactionamount = totalamount,
+					previousamount = round(purchaseledger.openingbalance, 2),
+					remainingamount = round((purchaseledger.openingbalance + totalamount),2)
+				)
+				purchaseledger.openingbalance = round((purchaseledgercurrentopeningbalance + float(totalamount)),2)
+				purchaseledger.save()
+			else:
+				if purchaseledgercurrentopeningbalance < totalamount :	
+					accounttransactions = AccountTransaction.objects.create(
+						account = purchaseledger,previousprtransactiontype="DEBIT",
+						transactiondate = timezone.now(),
+						transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
+						transactiondetails = f'Amount {totalamount} has been debit for item purchase',
+						transactionid = referenceno,
+						transactionamount = totalamount,
+						previousamount = round(purchaseledger.openingbalance, 2),
+						remainingamount = round((totalamount - purchaseledger.openingbalance),2)
+					)
+					purchaseledger.openingbalance = round((float(totalamount) - purchaseledgercurrentopeningbalance ),2)
+					purchaseledger.transctiontype="DEBIT"
+					purchaseledger.save()
+				else:
+					accounttransactions = AccountTransaction.objects.create(
+						account = purchaseledger,previousprtransactiontype="DEBIT",
+						transactiondate = timezone.now(),
+						transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
+						transactiondetails = f'Amount {totalamount} has been debit for item purchase',
+						transactionid = referenceno,
+						transactionamount = totalamount,
+						previousamount = round(purchaseledger.openingbalance, 2),
+						remainingamount = round((purchaseledger.openingbalance - totalamount),2)
+					)
+					purchaseledger.openingbalance = round((purchaseledgercurrentopeningbalance - float(totalamount)),2)
+					purchaseledger.save()
+				
+			if selleraccount.transctiontype=="CREDIT":	
+				accounttransactions = AccountTransaction.objects.create(
+					account = selleraccount,previousprtransactiontype="CREDIT",
+					transactiondate = timezone.now(),
+					transactiontype = 'CREDIT', transactionrealted= "PURCHASE-VOUCHER",
+					transactiondetails = f'Amount {totalamount} has been credit for item purchase',
+					transactionid = referenceno,
+					transactionamount = totalamount,
+					previousamount = round(selleraccount.openingbalance, 2),
+					remainingamount =round((selleraccount.openingbalance + totalamount),2)
+				)
+				selleraccount.openingbalance = round((selleraccountcurrentopeningbalance + float(totalamount)),2)
+				selleraccount.save()
+			else:
+				if selleraccountcurrentopeningbalance < totalamount :
+					accounttransactions = AccountTransaction.objects.create(
+						account = selleraccount,previousprtransactiontype="CREDIT",
+						transactiondate = timezone.now(),
+						transactiontype = 'CREDIT', transactionrealted= "PURCHASE-VOUCHER",
+						transactiondetails = f'Amount {totalamount} has been credit for item purchase',
+						transactionid = referenceno,
+						transactionamount = totalamount,
+						previousamount = round(selleraccount.openingbalance, 2),
+						remainingamount =round(( totalamount - selleraccount.openingbalance),2)
+					)
+					selleraccount.openingbalance = round((selleraccountcurrentopeningbalance + float(totalamount)),2)
+					selleraccount.transctiontype="DEBIT"
+					selleraccount.save()
+				else:
+					accounttransactions = AccountTransaction.objects.create(
+							account = selleraccount,previousprtransactiontype="CREDIT",
+							transactiondate = timezone.now(),
+							transactiontype = 'CREDIT', transactionrealted= "PURCHASE-VOUCHER",
+							transactiondetails = f'Amount {totalamount} has been credit for item purchase',
+							transactionid = referenceno,
+							transactionamount = totalamount,
+							previousamount = round(selleraccount.openingbalance, 2),
+							remainingamount =round((selleraccount.openingbalance - totalamount),2)
+						)
+					selleraccount.openingbalance = round((selleraccountcurrentopeningbalance - float(totalamount)),2)
+					selleraccount.save()
+						
+				
 			purchasevoucher.description=description
 			purchasevoucher.total = totalamount
 			purchasevoucher.tax = totaltax
@@ -2716,20 +2777,52 @@ def Add_Sales_Vouchers(request):
             
 			buyeraccountcurrentopeningbalance=buyeraccount.openingbalance
 			salesledgercurrentopeningbalance=salesledger.openingbalance
+          
+			if salesledger.transctiontype=="CREDIT":	
 		
-			accounttransactions = AccountTransaction.objects.create(
-				account = salesledger,previousprtransactiontype="CREDIT",
-				transactiondate = timezone.now(),
-				transactiontype = 'CREDIT', transactionrealted= "SALES-VOUCHER",
-				transactiondetails = f'Amount {totalamount} has been credit for item sales',
-				transactionid = referenceno,
-				transactionamount = totalamount,
-				previousamount = round(salesledger.openingbalance, 2),
-				remainingamount = round((salesledger.openingbalance + totalamount),2)
-			)
-			salesledger.openingbalance = round((salesledgercurrentopeningbalance + float(totalamount)),2)
-			salesledger.save()	
-			accounttransactions = AccountTransaction.objects.create(
+				accounttransactions = AccountTransaction.objects.create(
+					account = salesledger,previousprtransactiontype="CREDIT",
+					transactiondate = timezone.now(),
+					transactiontype = 'CREDIT', transactionrealted= "SALES-VOUCHER",
+					transactiondetails = f'Amount {totalamount} has been credit for item sales',
+					transactionid = referenceno,
+					transactionamount = totalamount,
+					previousamount = round(salesledger.openingbalance, 2),
+					remainingamount = round((salesledger.openingbalance + totalamount),2)
+				)
+				salesledger.openingbalance = round((salesledgercurrentopeningbalance + float(totalamount)),2)
+				salesledger.save()	
+			else:
+				if salesledgercurrentopeningbalance < totalamount :
+					accounttransactions = AccountTransaction.objects.create(
+					account = salesledger,previousprtransactiontype="CREDIT",
+					transactiondate = timezone.now(),
+					transactiontype = 'CREDIT', transactionrealted= "SALES-VOUCHER",
+					transactiondetails = f'Amount {totalamount} has been credit for item sales',
+					transactionid = referenceno,
+					transactionamount = totalamount,
+					previousamount = round(salesledger.openingbalance, 2),
+					remainingamount = round((totalamount - salesledger.openingbalance),2)
+					)
+					salesledger.openingbalance = round(( float(totalamount) - salesledgercurrentopeningbalance ),2)
+					salesledger.transctiontype="DEBIT"				
+					salesledger.save()	
+				else:
+					accounttransactions = AccountTransaction.objects.create(
+							account = salesledger,previousprtransactiontype="CREDIT",
+							transactiondate = timezone.now(),
+							transactiontype = 'CREDIT', transactionrealted= "SALES-VOUCHER",
+							transactiondetails = f'Amount {totalamount} has been credit for item sales',
+							transactionid = referenceno,
+							transactionamount = totalamount,
+							previousamount = round(salesledger.openingbalance, 2),
+							remainingamount = round((salesledger.openingbalance - totalamount),2)
+						)
+					salesledger.openingbalance = round((salesledgercurrentopeningbalance - float(totalamount)),2)
+					salesledger.save()
+					
+			if buyeraccount.transctiontype=="DEBIT":	
+				accounttransactions = AccountTransaction.objects.create(
 				account = buyeraccount,previousprtransactiontype="DEBIT",
 				transactiondate = timezone.now(),
 				transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
@@ -2738,10 +2831,39 @@ def Add_Sales_Vouchers(request):
 				transactionamount = totalamount,
 				previousamount = round(buyeraccount.openingbalance, 2),
 				remainingamount =round((buyeraccount.openingbalance + totalamount),2)
-			)
-			buyeraccount.openingbalance = round((buyeraccountcurrentopeningbalance + float(totalamount)),2)
-			buyeraccount.save()
-             
+				)
+				buyeraccount.openingbalance = round((buyeraccountcurrentopeningbalance + float(totalamount)),2)
+				buyeraccount.save()
+			else:
+				if buyeraccountcurrentopeningbalance < totalamount :
+					accounttransactions = AccountTransaction.objects.create(
+					account = buyeraccount,previousprtransactiontype="DEBIT",
+					transactiondate = timezone.now(),
+					transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
+					transactiondetails = f'Amount {totalamount} has been debit for item sales',
+					transactionid = referenceno,
+					transactionamount = totalamount,
+					previousamount = round(buyeraccount.openingbalance, 2),
+					remainingamount =round((totalamount - buyeraccount.openingbalance ),2)
+					)
+					buyeraccount.openingbalance = round((float(totalamount- buyeraccountcurrentopeningbalance )),2)
+					buyeraccount.transctiontype="DEBIT"			
+					buyeraccount.save()
+				else:
+					accounttransactions = AccountTransaction.objects.create(
+					account = buyeraccount,previousprtransactiontype="DEBIT",
+					transactiondate = timezone.now(),
+					transactiontype = 'DEBIT', transactionrealted= "PURCHASE-VOUCHER",
+					transactiondetails = f'Amount {totalamount} has been debit for item sales',
+					transactionid = referenceno,
+					transactionamount = totalamount,
+					previousamount = round(buyeraccount.openingbalance, 2),
+					remainingamount =round((buyeraccount.openingbalance - totalamount),2)
+					)
+					buyeraccount.openingbalance = round((buyeraccountcurrentopeningbalance - float(totalamount)),2)
+					buyeraccount.save()	
+			
+					
 			purchasevoucher.description=description
 			purchasevoucher.invoiceno=invoiceno
 			purchasevoucher.vendortotal = totalamount
@@ -2991,11 +3113,11 @@ def Trading_Account(request):
             "transctiontype": account.transctiontype,
         }
 
-        if account.accounttypelist.name == 'Sales':
+        if account.accounttypelist.accounttype.name == 'Sales':
             trading_data["Sales"]["credit"] += account.openingbalance
             trading_data["Sales"]["details"].append(account_data)
 
-        elif account.accounttypelist.name == 'Purchases':
+        elif account.accounttypelist.accounttype.name == 'Purchases':
             trading_data["Purchases"]["debit"] += account.openingbalance
             trading_data["Purchases"]["details"].append(account_data)
 
