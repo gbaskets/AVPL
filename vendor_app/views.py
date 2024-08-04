@@ -2039,8 +2039,10 @@ def chartofaccounts(request):
 				accountcode = account_code_by_store(storeobj),
 				openingbalance = 0,
 				transctiontype  =  'CREDIT')
-			
-			
+		try:
+			Trading_Account_Profit_and_Loss(storeobj)
+		except:
+			pass
 		dic = {"vendorobj":vendor,"storeobj":storeobj,
                 "accountledgerlist" :Account.objects.filter(store=storeobj),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
