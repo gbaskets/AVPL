@@ -120,8 +120,8 @@
                                              <th>Sales Price</th>
                                              <th>Admin Commission</th>                           
 
-                                             <th>Status</th>
-                              
+                                             <th>Published Status</th>
+                                             <th>Approval Status</th>
                                              <th>Options</th>
                                           </tr>
                                        </thead>
@@ -151,10 +151,23 @@
                                              <td>{{ pro.price|safe }} </td>                                             
                                              <td>{{ pro.product.admincommission|safe }} %</td>                                        
 
+                                             {% if pro.ispublished == True %}
+                                             <td><span class="badge badge-success">Published</span></td>
+                                             {% else %}
+                                             <td><span class="badge badge-danger">Unpublished</span></td>
+                                             
+                                             {% endif %}                                            
+
+
                                              {% if pro.isactive %}
                                              <td><span class="badge badge-success">Approved</span></td>
                                              {% elif pro.product.productrejection %}
                                              <td><span class="badge badge-danger">Rejected</span></td>
+
+                                             {% elif  pro.ispublished == False and pro.isactive == False %}
+                                          
+                                             <td><span class="badge badge-warning">Pending</span></td>
+                                         
                                              {%else%}
                                              <td><span class="badge badge-warning">Under Process</span></td>
                                              {% endif %}

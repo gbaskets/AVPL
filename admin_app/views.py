@@ -1563,7 +1563,7 @@ def admin_product_list(request):
 	if check_user_authentication(request, 'ADMIN'):
 		
 		dic = {
-			'products':Product.objects.all(),
+			'products':Product.objects.filter(ispublished=True),
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 		}
