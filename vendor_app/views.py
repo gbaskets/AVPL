@@ -762,13 +762,14 @@ def add_product(request):
       
 					if hsn:
 						pro.hsn= hsn
-					if hsn:
+					if tax:
 						pro.tax= tax
-					if hsn:
+					if pv:
 						pro.pv =pv
-					if hsn:
+					if admincommission:
 						pro.admincommission =admincommission
-
+                    
+				
 					pro.updatedby= request.user
 					pro.save()
 					messages.success(request,f'Product {productname} is Added Successfully')
@@ -819,11 +820,11 @@ def edit_product(request,id):
 					pro.unit = Unit.objects.get(id=unit_id)
 				if hsn:
 					pro.hsn= hsn
-				if hsn:
+				if tax:
 					pro.tax= tax
-				if hsn:
+				if pv:
 					pro.pv =pv
-				if hsn:
+				if admincommission:
 					pro.admincommission =admincommission
 
 				pro.updatedby= request.user
