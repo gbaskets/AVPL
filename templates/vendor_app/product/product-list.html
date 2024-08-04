@@ -51,7 +51,9 @@
                                              <th>Subcategory</th>
                                              <th>Brand</th>
                                              <th>Product-Variants</th>
-                                             <th>Status</th>
+                                             <th>Published Status</th>
+                                             <th>Approval Status</th>
+                              
                               
                                              <th>Options</th>
                                           </tr>
@@ -72,13 +74,26 @@
                                              </td>
                                              
 
+                                             {% if product.ispublished == True %}
+                                             <td><span class="badge badge-success">Published</span></td>
+                                             {% else %}
+                                             <td><span class="badge badge-danger">Unpublished</span></td>
+                                             
+                                             {% endif %}                                            
+
                                              {% if product.isactive %}
                                              <td><span class="badge badge-success">Approved</span></td>
                                              {% elif product.productrejection %}
                                              <td><span class="badge badge-danger">Rejected</span></td>
+
+                                             {% elif  product.ispublished == False and product.isactive == False %}
+                                          
+                                             <td><span class="badge badge-warning">Pending</span></td>
+                                         
                                              {%else%}
                                              <td><span class="badge badge-warning">Under Process</span></td>
                                              {% endif %}
+
 
                                              <td ><a class="btn btn-success btn-icon icon-left" data-toggle="modal" data-target="#EditProductModal{{product.id}}"><i class="far fa-edit"></i>Edit Product</a></td>
                                        

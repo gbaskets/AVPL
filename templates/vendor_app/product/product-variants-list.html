@@ -120,7 +120,9 @@
                                              <th>MRP</th>
                                              <th>Sales Price</th>
  
-                                             <th>Status</th>
+                                             <th>Published Status</th>
+                                             <th>Approval Status</th>
+                              
                               
                                              <th>Options</th>
                                           </tr>
@@ -148,12 +150,25 @@
                                              <td>{{ pro.product|safe }} </td>
                                              <td>{{ pro.quantity|safe }} </td>
                                              <td>{{ pro.mrp|safe }} </td>
-                                             <td>{{ pro.price|safe }} </td>                                             
+                                             <td>{{ pro.price|safe }} </td>   
+                                             
+                                             {% if pro.ispublished == True %}
+                                             <td><span class="badge badge-success">Published</span></td>
+                                             {% else %}
+                                             <td><span class="badge badge-danger">Unpublished</span></td>
+                                             
+                                             {% endif %}                                            
+
 
                                              {% if pro.isactive %}
                                              <td><span class="badge badge-success">Approved</span></td>
                                              {% elif pro.product.productrejection %}
                                              <td><span class="badge badge-danger">Rejected</span></td>
+
+                                             {% elif  pro.ispublished == False and pro.isactive == False %}
+                                          
+                                             <td><span class="badge badge-warning">Pending</span></td>
+                                         
                                              {%else%}
                                              <td><span class="badge badge-warning">Under Process</span></td>
                                              {% endif %}
@@ -296,10 +311,10 @@
 
             <div class="col-lg-4 col-md-12 col-sm-12">
                <div class="form-group">
-                  <label>Status</label>
+                  <label>Published Status</label>
 
                   <label class="switch">
-                     <input type="checkbox" name="isactive" value="True" {% if pro.isactive == True %} checked {% else %} {% endif %}>
+                     <input type="checkbox" name="ispublished" value="True" {% if pro.ispublished == True %} checked {% else %} {% endif %}>
                      <span class="slider round"></span>
                    </label> 
                   

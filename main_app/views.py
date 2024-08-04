@@ -618,14 +618,14 @@ def home(request):
         current_month = datetime.datetime.now().strftime("%m")
 
         # Fetch products created in the current month
-        latest_product = Product.objects.filter(isactive=True,createdat__month=current_month)
+        latest_product = Product.objects.filter(isactive=True,ispublished=True,createdat__month=current_month)
         # If you also need to filter by year, you can add this:
         current_year = datetime.datetime.now().strftime("%Y")
         latest_product = latest_product.filter(createdat__year=current_year)
        
-        special_offer = Product.objects.filter(isactive=True,isspecialoffer=True)
-        featured = Product.objects.filter(isactive=True,isfeatured=True)
-        product=Product.objects.filter(isactive=True)
+        special_offer = Product.objects.filter(isactive=True,ispublished=True,isspecialoffer=True)
+        featured = Product.objects.filter(isactive=True,ispublished=True,isfeatured=True)
+        product=Product.objects.filter(isactive=True,ispublished=True)
         footer_banner = HomeBanner.objects.all()
         categories = ProductCategory.objects.all()
         if request.session.get('store_ids'):
@@ -655,7 +655,7 @@ def home(request):
 def store_page(request):
     store = Store.objects.get(id=request.GET.get('22'))
     products = []
-    for x in Product.objects.filter(store=store)[0:50]:
+    for x in Product.objects.filter(store=store,ispublished=True)[0:50]:
         products.append(get_product_thumb(x))
     dic = {
             'store':store,'contact_us':CompanyContactUs.objects.filter().first(),
@@ -685,8 +685,8 @@ def all_stores(request):
 def store_details(request, id):
     store = Store.objects.get(id=id)
     all_store = Store.objects.all()
-    product = Product.objects.filter(store=store,isactive=True)
-    product_num = Product.objects.filter(store=store,isactive=True).count()
+    product = Product.objects.filter(store=store,isactive=True,ispublished=True)
+    product_num = Product.objects.filter(store=store,isactive=True,ispublished=True).count()
    
     dic={
             'store':store,

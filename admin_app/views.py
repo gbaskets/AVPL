@@ -1546,7 +1546,7 @@ def admin_product_approval(request):
 			messages.success(request, 'New Vendor Commission has been set. ! ')
 			return redirect('/admins/product-approval')
 		
-		dic = {'data':ProductVariants.objects.filter(isactive=False, product__isproductrejected=False),
+		dic = {'data':ProductVariants.objects.filter(isactive=False,ispublished=True, product__isproductrejected=False),
 			'rejected_product':ProductVariants.objects.filter(isactive=False, product__isproductrejected=True),
 			'notification':get_notifications(request.user,'ADMIN'),'categories':ProductCategory.objects.all(),
 			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),

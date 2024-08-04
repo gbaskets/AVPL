@@ -962,8 +962,8 @@ def edit_product_variants(request,id):
 			mrp=request.POST.get('mrp') 
 			purchaseprice=request.POST.get('purchaseprice') 
 			price=request.POST.get('price') 
-			isactive=request.POST.get('isactive')
-			print(isactive,'isactive')
+			ispublished=request.POST.get('ispublished')
+			print(ispublished,'ispublished')
 
 			if ProductVariants.objects.filter(store=storeobj,id=id).exists():
 				productvariantsobj=ProductVariants.objects.filter(store=storeobj,id=id).first()
@@ -991,12 +991,12 @@ def edit_product_variants(request,id):
 				if price:
 					productvariantsobj.price =float(price)
 				productobj=Product.objects.filter(id=productvariantsobj.product.id).first()
-				if isactive :
-					productvariantsobj.isactive=True
-					productobj.isactive=True
+				if ispublished :
+					productvariantsobj.ispublished=True
+					productobj.ispublished=True
 				else:
-					productvariantsobj.isactive=False
-					productobj.isactive=False
+					productvariantsobj.ispublished=False
+					productobj.ispublished=False
 				
 				productvariantsobj.updatedby= request.user
 				productobj.save()
