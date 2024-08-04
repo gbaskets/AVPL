@@ -51,9 +51,12 @@ class Store(models.Model):
 	createdat = models.DateTimeField(auto_now_add=True)
 	updatedon = models.DateTimeField(auto_now=True)
 	isbestseller = models.BooleanField(default=False)
+	isselectedcurrentstore = models.BooleanField(default=False)
 	isactive = models.BooleanField(default=True)
+	updatedby= models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+    
 
 	def __str__(self):
-		return str(self.storename)
+		return f'{self.storename} - {self.vendor}'
 
 

@@ -53,9 +53,8 @@ def vendor_dashboard(request):
 			vendor = Vendor.objects.get(user=request.user)
 			if vendor.verified and vendor.storecreated :
                 
-				storeobj=Store.objects.filter(vendor=vendor).first()
-       
-
+				storeobj=Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+    
 				if not Wallet.objects.filter(vendor=vendor).exists():
 					Wallet.objects.create(vendor=vendor)
 				wallet = Wallet.objects.get(vendor=vendor)
@@ -71,7 +70,7 @@ def vendor_dashboard(request):
 				wallet_commission = CommissionWallet.objects.filter(vendor=vendor,isactive=True).first()
 				
 							
-				dic = {'vendor':vendor, 'storeobj':storeobj,
+				dic = {'vendor':vendor, 'storeobj':Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first(),
 				'allorder_status':ORDER_STATUS_UPDATE,'wallet':wallet,
                 'business_limit':business_limit,
                 'wallet_commission':wallet_commission,
@@ -102,8 +101,9 @@ def vendor_dashboard(request):
 
 @csrf_exempt
 def order_status_update(request):
-
-	vendor = Vendor.objects.filter(user=request.user)
+    
+	vendor = Vendor.objects.filter(user=request.user).first()
+	storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		
 	if request.method == "POST":
 		order_id = request.POST.get('order_id')
@@ -165,69 +165,56 @@ def order_status_update(request):
 		
 	return redirect('/vendor')
 
+
+
 @csrf_exempt
-def order_status_updates(request):
-
-	vendor = Vendor.objects.filter(user=request.user)
-	if request.method == "POST":
-		order_id = request.POST.get('order_id')
-		order = Orders.objects.filter(id=order_id).first()
-		delivery_status=request.POST.get('delivery_status')
+def Store_list(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.get(user=request.user)
+		businessmaincategory_obj=BusinessMainCategory.objects.filter(isactive=True)
+		businesscategory_obj=BusinessCategory.objects.filter(isactive=True)
 		
-		order.delivery_status = delivery_status
-		order.save()
-		
-		messages.success(
-			request, f"The order status of order_id ORD{order_id} has been updated ! ")
-		vendor = Vendor.objects.filter(user=request.user)
-		if delivery_status == 'Delivered':
-			OrderItems.objects.filter(order=order_id).update(delivery_status=delivery_status, delivered_on=timezone.now())
-			users = OrderItems.objects.filter(order=order_id).first()
-			user=users.order.user
-			print(user)
-			order=users.order
-			print(order)
-			order_item = OrderItems.objects.filter(order=order_id)
-			print(order_item)
-			for x in order_item:
-				print(x.plan,'LLLLLLLLLLLLLLLLLLLLLLLLLLLL')
-				save_pv_transaction(user, x.product, x.subtotal, x.plan)
-			if not order.paid:
-				orderitems = OrderItems.objects.filter(order=order_id).first()
-				admin_commission = (orderitems.total/100)*orderitems.product.category.commission
-				print("admin commission percentage")
-				print(orderitems.product.category.commission)
-				print(admin_commission,'KKKKKKKKKKKKKK')
-				gst = (admin_commission/100)*18   #GST of 18 per on admin charge deduct from businesslimit
-				print(gst)
-				admin_commission_plus_gst = admin_commission + gst
-				print("printing total_detection_amt")
-
-				TaxLog.objects.create(transactiondate=timezone.now(),salesorderitems = orderitems, taxamount=gst)
-				trans_name = 'Transaction for ORD'+str(order.id)+str(orderitems.id)
-				#make_business_limit_transaction(vendor, admin_commission, 'DEBIT', trans_name)
-				print(trans_name,'TTTTTTT')
-				make_business_limit_transaction(vendor, admin_commission_plus_gst, 'DEBIT', trans_name)
-				make_commission_transaction(vendor.user, admin_commission_plus_gst, 'CREDIT')
-				user_c = 0.0
-				if UserVendorRelation.objects.filter(vendor=vendor).exists():
-					print('hhhhhhhhhhhhhhhh')
-					user = UserVendorRelation.objects.get(vendor=vendor)
-					percentage = float(str(UserVendorCommission.objects.get()))
-					user_c = (orderitems.total/100) * percentage
-					make_commission_transaction(user, admin_commission_plus_gst, 'CREDIT')
-					make_wallet_transaction(vendor.user, user_c, 'DEBIT')
+		if Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).exists():
+			storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		else:
-			OrderItems.objects.filter(order=order_id).update(delivery_status=delivery_status)
-			notification(vendor.user, 'Order '+delivery_status)
+			storeobj=""
+		dic={"businessmaincategory_obj":businessmaincategory_obj,
+				"businesscategory_obj":businesscategory_obj,
+				"storeobj":storeobj,
+                'store_list':Store.objects.filter(vendor=vendor)
+				}	
 
-			# orderitem= OrderItems.objects.filter(order=order_id)
-			# print(orderitem,'oitem')
-			# for item in orderitem:  
-			# 	item.delivery_status = delivery_status 
-			# 	item.save()
-		
-	return redirect('/vendor/orders')
+		return render(request, 'vendor_app/store/store-list.html',dic )
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
+@csrf_exempt
+def Store_Selected_List(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.get(user=request.user)	
+		if request.method == 'POST':
+			vendor = Vendor.objects.get(user=request.user)
+			storeid = request.POST.get('storeid')
+			isselectedcurrentstore = request.POST.get('isselectedcurrentstore')
+			print(isselectedcurrentstore,storeid,'isselectedcurrentstore')
+			if storeid and isselectedcurrentstore :
+				Store.objects.filter(vendor=vendor).update(isselectedcurrentstore=False)
+				Store.objects.filter(vendor=vendor,id=storeid).update(isselectedcurrentstore=True)
+			else:
+				pass
+		else:
+			pass
+  
+		return redirect("/vendor/store")
+	else:
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+
 
 @csrf_exempt
 def store_info(request):
@@ -271,7 +258,7 @@ def store_info(request):
 
 			
 			if not Store.objects.filter(vendor = vendor,storename=storename).exists():
-				storeobj=Store.objects.create(vendor = vendor,storename=storename)
+				storeobj=Store.objects.create(vendor = vendor,storename=storename,isselectedcurrentstore=True)
                 # Generate a random registration number
 				registration_number = f'{storeobj.vendor.mobile}{storeobj.storename.replace(" ", "")}'
 
@@ -299,9 +286,10 @@ def store_info(request):
 				# Update storeobj with registration number and QR code path
 				storeobj.registrationno = registration_number 
 				storeobj.registrationqrcode = qr_image_path
+				storeobj.isselectedcurrentstore=True
 				storeobj.save()
 			else:
-				storeobj=Store.objects.filter(vendor = vendor,storename=storename).first()
+				storeobj=Store.objects.filter(vendor = vendor,storename=storename,isselectedcurrentstore=True).first()
 			    
 				# Generate a random registration number
 				registration_number = f'{storeobj.vendor.mobile}{storeobj.storename.replace(" ", "")}'
@@ -397,8 +385,8 @@ def store_info(request):
 				storeobj.closingtime = closing_time
 			if returnandrefundpolicy:
 				storeobj.openingtime = opening_time
+			storeobj.isselectedcurrentstore=True
 			storeobj.save()
-
 			
 			Vendor.objects.filter(id=vendor.id).update(storecreated=True,docsubmitted=True)
 			messages.info(request, 'Store Created Successfully !!!!')
@@ -406,8 +394,8 @@ def store_info(request):
 		businessmaincategory_obj=BusinessMainCategory.objects.filter(isactive=True)
 		businesscategory_obj=BusinessCategory.objects.filter(isactive=True)
         
-		if Store.objects.filter(vendor=vendor).exists():
-			storeobj = Store.objects.get(vendor=vendor)
+		if Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).exists():
+			storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		else:
 			storeobj=""
 		dic={"businessmaincategory_obj":businessmaincategory_obj,
@@ -417,6 +405,158 @@ def store_info(request):
 		return render(request, 'vendor_app/store/store-register.html',dic )
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
+
+@csrf_exempt
+def add_new_store(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.get(user=request.user)	
+		if request.method == 'POST':
+			vendor = Vendor.objects.get(user=request.user)
+			storename = request.POST.get('storename')
+			description = request.POST.get('description')
+			streetaddress =  request.POST.get('streetaddress')
+			nearbyaddress =  request.POST.get('nearbyaddress')
+			pincode = request.POST.get('pincode')
+			city= request.POST.get('city')
+			state= request.POST.get('state')
+			country= request.POST.get('country')
+			latitude =  request.POST.get('latitude')
+			longitude =  request.POST.get('longitude')
+			
+			
+			logo = request.FILES.get('logo')
+			banner = request.FILES.get('banner')
+			closing_day = request.POST.get('closing_day')
+			closing_time = request.POST.get('closing_time')
+			opening_time = request.POST.get('opening_time')
+   
+            #Doc
+			storeregistrationtype=request.POST.get('storeregistrationtype')
+			msmeno=request.POST.get('msmeno')
+			msmedoc = request.FILES.get('msmedoc')
+			pancardno=request.POST.get('pancardno')
+			pancarddoc = request.FILES.get('pancarddoc')
+			gstno=request.POST.get('gstno')
+			gstnodoc = request.FILES.get('gstnodoc')
+
+			#policy
+			shippingpolicy =request.POST.get('shippingpolicy')
+			replacementpolicy = request.POST.get('replacementpolicy')
+			returnandrefundpolicy = request.POST.get('returnandrefundpolicy')
+			businessmaincategory =request.POST.get('businessmaincategory')
+			businesscategory =request.POST.getlist('businesscategory')
+
+			
+			if not Store.objects.filter(vendor = vendor,storename=storename).exists():
+				storeobj=Store.objects.create(vendor = vendor,storename=storename)
+                # Generate a random registration number
+				registration_number = f'{storeobj.vendor.mobile}{storeobj.storename.replace(" ", "")}'
+
+				# Generate QR code
+				qr = qrcode.QRCode(
+					version=1,
+					error_correction=qrcode.constants.ERROR_CORRECT_L,
+					box_size=10,
+					border=4,
+				)
+				qr.add_data(str(registration_number))
+				qr.make(fit=True)
+				qr_image = qr.make_image(fill_color="black", back_color="white")
+
+				# Define the directory to save the QR code image
+				qr_image_directory = os.path.join('store', 'qrcode')  # Relative to MEDIA_ROOT
+				os.makedirs(os.path.join(settings.MEDIA_ROOT, qr_image_directory), exist_ok=True)  # Ensure directory exists
+
+				# Save QR code image
+				qr_image_path = os.path.join(qr_image_directory, f"{registration_number}.png")
+				qr_image_full_path = os.path.join(settings.MEDIA_ROOT, qr_image_path)
+				qr_image.save(qr_image_full_path)
+
+
+				# Update storeobj with registration number and QR code path
+				storeobj.registrationno = registration_number 
+				storeobj.registrationqrcode = qr_image_path
+				storeobj.save()
+		
+				if businessmaincategory:
+					businessmaincategory_obj=BusinessMainCategory.objects.filter(id=businessmaincategory).first()
+					storeobj.businessmaincategory=businessmaincategory_obj
+				
+				if businesscategory:
+			
+					for category_id in businesscategory:
+						businesscategory_obj=BusinessCategory.objects.filter(id=category_id).first()
+						storeobj.businesscategory.add(businesscategory_obj)
+						storeobj.save()
+				if storeregistrationtype:
+					storeobj.storeregistrationtype=storeregistrationtype	
+			
+				if description:
+					storeobj.description = description
+		
+				if streetaddress:
+					storeobj.streetaddress = streetaddress
+				if nearbyaddress:	
+					storeobj.nearbyaddress =nearbyaddress
+				if pincode:
+					storeobj.pincode = pincode
+				if city:
+					storeobj.city=city
+				if state:
+					storeobj.state=state
+				if country:
+					storeobj.country=country
+				if latitude:
+					storeobj.latitude = latitude
+				if longitude:
+					storeobj.longitude = longitude
+				if logo:
+					storeobj.logo = logo
+				if banner:
+					storeobj.banner = banner
+
+				#Doc
+				if msmeno:
+					storeobj.msmeno=msmeno
+				if msmedoc:
+					storeobj.msmedoc = msmedoc
+				if pancardno:
+					storeobj.pancardno=pancardno
+				if pancarddoc:
+					storeobj.pancarddoc = pancarddoc
+				if gstno:
+					storeobj.gstno=gstno
+				if gstnodoc:
+					storeobj.gstnodoc = gstnodoc
+
+					#policy
+				if shippingpolicy:
+					storeobj.shippingpolicy =shippingpolicy
+				if replacementpolicy:
+					storeobj.replacementpolicy = replacementpolicy
+				if returnandrefundpolicy:
+					storeobj.returnandrefundpolicy = returnandrefundpolicy
+		
+				if returnandrefundpolicy:
+					storeobj.closingday = closing_day
+				if returnandrefundpolicy:
+					storeobj.closingtime = closing_time
+				if returnandrefundpolicy:
+					storeobj.openingtime = opening_time
+				storeobj.save()
+
+				Vendor.objects.filter(id=vendor.id).update(storecreated=True,docsubmitted=True)
+				messages.info(request, 'Store Created Successfully !!!!')
+				return redirect('/vendor/store')
+			else:
+				messages.info(request, 'Already storename is exits !!!')
+				return redirect('/vendor/store')
+	else: 
+		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 
 @csrf_exempt
 def vendor_doc(request):
@@ -566,14 +706,15 @@ def get_businesscategory(request):
 def vendor_product_list(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,'storeobj':storeobj,
 			'categories':ProductCategory.objects.all(),
 			'subcategories':ProductSubCategory.objects.all(),
 			'subsubcategories':ProductSubSubCategory.objects.all(),
             'units':Unit.objects.all(),
 			'brands':Brand.objects.all(),
-			'products':Product.objects.filter(store__vendor__user=request.user),
+			'products':Product.objects.filter(store=storeobj),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -586,10 +727,10 @@ def vendor_product_list(request):
 @csrf_exempt
 def add_product(request):
 	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if request.method == 'POST':
-
-			vendor = Vendor.objects.filter(user=request.user).first()
-			store = Store.objects.filter(vendor=vendor).first()
+		
 			unit_id=request.POST.get('unit_id') 
 			category_id=request.POST.get('category_id') 
 			subcategory_id=request.POST.get('subcategory_id') 
@@ -602,12 +743,12 @@ def add_product(request):
 			pv=request.POST.get('pv') 
 			admincommission=request.POST.get('admincommission') 
 	
-			if Product.objects.filter(store=store, productname=productname).exists():
+			if Product.objects.filter(store=storeobj, productname=productname).exists():
 				messages.info(request, f'Product: {productname} is already exits !')
 				return redirect('/vendor/product-list')
 			else:
 				if productname and category_id :				
-					pro = Product.objects.create(store = store,productname = productname,description = description)
+					pro = Product.objects.create(store = storeobj,productname = productname,description = description)
 					if category_id:
 						pro.category = ProductCategory.objects.get(id=category_id)
 					if subcategory_id:
@@ -635,16 +776,6 @@ def add_product(request):
 				else:
 					messages.info(request, f'Please fill all detials such as productname and category !')
 					return redirect('/vendor/product-list')
-		dic = {
-			'categories':ProductCategory.objects.all(),
-			'subcategories':ProductSubCategory.objects.all(),
-			'subsubcategories':ProductSubSubCategory.objects.all(),
-			'brands':Brand.objects.all(),
-			'products':Product.objects.filter(store__vendor__user=request.user),
-			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-		}
-		return render(request, 'vendor_app/product/product-list.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -652,10 +783,10 @@ def add_product(request):
 @csrf_exempt
 def edit_product(request,id):
 	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if request.method == 'POST':
 
-			vendor = Vendor.objects.filter(user=request.user).first()
-			store = Store.objects.filter(vendor=vendor).first()
 			category_id=request.POST.get('category_id') 
 			subcategory_id=request.POST.get('subcategory_id') 
 			subsubcategory_id=request.POST.get('subsubcategory_id') 
@@ -702,16 +833,6 @@ def edit_product(request,id):
 			else:
 				messages.info(request, f'Please fill all detials such as productname and category !')
 				return redirect('/vendor/product-list')
-		dic = {
-			'categories':ProductCategory.objects.all(),
-			'subcategories':ProductSubCategory.objects.all(),
-			'subsubcategories':ProductSubSubCategory.objects.all(),
-			'brands':Brand.objects.all(),
-			'products':Product.objects.filter(store__vendor__user=request.user),
-			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-		}
-		return render(request, 'vendor_app/product/product-list.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -721,14 +842,15 @@ def edit_product(request,id):
 def vendor_product_variants_all_list(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj=Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,'storeobj':storeobj,
 			'categories':ProductCategory.objects.filter(),
 			'subcategories':ProductSubCategory.objects.filter(),
 			'subsubcategories':ProductSubSubCategory.objects.filter(),
             'units':Unit.objects.filter(),
 			'brands':Brand.objects.filter(),
-            'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user),
+            'product_variants':ProductVariants.objects.filter(store=storeobj),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -743,9 +865,10 @@ def vendor_product_variants_all_list(request):
 def vendor_product_variants_list(request,id):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
-		productobj=Product.objects.filter(store__vendor__user=request.user,id=id).first()
+		storeobj=Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		productobj=Product.objects.filter(store=storeobj,id=id).first()
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,'storeobj':storeobj,
 			'categories':ProductCategory.objects.filter(),
 			'subcategories':ProductSubCategory.objects.filter(),
 			'subsubcategories':ProductSubSubCategory.objects.filter(),
@@ -754,8 +877,8 @@ def vendor_product_variants_list(request,id):
 			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=productobj.category.id),
 			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=productobj.category.id),
 			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=productobj.category.id),
-			'products':Product.objects.filter(store__vendor__user=request.user,id=id).first(),
-            'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user,product__id=id),
+			'products':Product.objects.filter(store=storeobj,id=id).first(),
+            'product_variants':ProductVariants.objects.filter(store=storeobj,product__id=id),
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -771,7 +894,7 @@ def add_product_variants(request,id):
 	if check_user_authentication(request, 'VENDOR'):
 		if request.method == 'POST':
 			vendor = Vendor.objects.filter(user=request.user).first()
-			store = Store.objects.filter(vendor=vendor).first()
+			storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 			product_id=id 
 			firstvariantvalue_id=request.POST.get('firstvariantvalue_id') 
 			secondvariantvalue_id=request.POST.get('secondvariantvalue_id') 
@@ -783,13 +906,13 @@ def add_product_variants(request,id):
 			purchaseprice=request.POST.get('purchaseprice') 
 			price=request.POST.get('price') 
 	
-			if ProductVariants.objects.filter(store=store, productvariantname=productvariantname).exists():
+			if ProductVariants.objects.filter(store=storeobj, productvariantname=productvariantname).exists():
 				messages.info(request, f'Product Variant: {productvariantname} is already exits !')
 				return redirect(f'/vendor/product-variants-list/{product_id}')
 			else:
 				if product_id  and productvariantname and productimage:
-					product = Product.objects.filter(store=store, id=id).first()
-					productvariantsobj=ProductVariants.objects.create(store=store,product=product, productvariantname=productvariantname,productimage=productimage)        
+					product = Product.objects.filter(store=storeobj, id=id).first()
+					productvariantsobj=ProductVariants.objects.create(store=storeobj,product=product, productvariantname=productvariantname,productimage=productimage)        
 					productvariantsobj.sku=generate_code(productvariantsobj.id,[product.productname,product.category.name,product.brand.name])
 					productvariantsobj.upc=generate_bracode("")[1]
 					productvariantsobj.barcodeimage.save(f'{productvariantname}.png',generate_bracode("")[0])
@@ -818,23 +941,6 @@ def add_product_variants(request,id):
 				else:
 					messages.info(request, f'Please fill all detials such as productvariantname and price !')
 					return redirect(f'/vendor/product-variants-list/{product_id}')
-          
-		dic = {
-			'vendor':vendor,
-			'categories':ProductCategory.objects.filter(),
-			'subcategories':ProductSubCategory.objects.filter(),
-			'subsubcategories':ProductSubSubCategory.objects.filter(),
-			'units':Unit.objects.filter(),
-			'brands':Brand.objects.filter(),
-			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=id),
-			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=id),
-			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=id),
-			'products':Product.objects.filter(store__vendor__user=request.user,id=id).first(),
-			'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user,product__id=id),
-			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-		}
-		return render(request, 'vendor_app/product/product-variants-list.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
@@ -842,9 +948,10 @@ def add_product_variants(request,id):
 @csrf_exempt
 def edit_product_variants(request,id):
 	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if request.method == 'POST':
-			vendor = Vendor.objects.filter(user=request.user).first()
-			store = Store.objects.filter(vendor=vendor).first()
+
 			firstvariantvalue_id=request.POST.get('firstvariantvalue_id') 
 			secondvariantvalue_id=request.POST.get('secondvariantvalue_id') 
 			thirdvariantvalue_id=request.POST.get('thirdvariantvalue_id') 
@@ -857,8 +964,8 @@ def edit_product_variants(request,id):
 			isactive=request.POST.get('isactive')
 			print(isactive,'isactive')
 
-			if ProductVariants.objects.filter(store=store,id=id).exists():
-				productvariantsobj=ProductVariants.objects.filter(store=store,id=id).first()
+			if ProductVariants.objects.filter(store=storeobj,id=id).exists():
+				productvariantsobj=ProductVariants.objects.filter(store=storeobj,id=id).first()
 	
 				if productvariantname :
 					productvariantsobj.productvariantname=productvariantname
@@ -899,7 +1006,7 @@ def edit_product_variants(request,id):
 				pass
 		
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,'storeobj':storeobj,
 			'categories':ProductCategory.objects.filter(),
 			'subcategories':ProductSubCategory.objects.filter(),
 			'subsubcategories':ProductSubSubCategory.objects.filter(),
@@ -908,9 +1015,9 @@ def edit_product_variants(request,id):
 			'firstvariantvalue':FirstVariantValue.objects.filter(firstvariant__category__id=id),
 			'secondvariantvalue':SecondVariantValue.objects.filter(secondvariant__category__id=id),
 			'thirdvariantvalue':ThirdVariantValue.objects.filter(thirdvariant__category__id=id),
-			'products':Product.objects.filter(store__vendor__user=request.user,id=id).first(),
-			'product_variants':ProductVariants.objects.filter(store__vendor__user=request.user,product__id=id),
-			# 'notification':get_notifications(request.user),
+			'products':Product.objects.filter(store=storeobj,id=id).first(),
+			'product_variants':ProductVariants.objects.filter(store=storeobj,product__id=id),
+			# 'notification':get_notifications(request.user)
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
 		return render(request, 'vendor_app/product/product-variants-list.html', dic)
@@ -924,7 +1031,8 @@ def edit_product_variants(request,id):
 def delete_product_variants(request,pk,id):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
-		productvariantsobj=ProductVariants.objects.filter(store__vendor__user=request.user,id=id).delete()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		productvariantsobj=ProductVariants.objects.filter(store=storeobj,id=id).delete()
 		messages.success(request,f'Product Variants is deleted Successfully')
 		return redirect(f'/vendor/product-variants-list/{pk}')
 	else:
@@ -938,14 +1046,14 @@ def delete_product_variants(request,pk,id):
 def vendor_profile(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
-		store = Store.objects.filter(vendor=vendor).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		businessmaincategory_obj=BusinessMainCategory.objects.filter(isactive=True)
 		businesscategory_obj=BusinessCategory.objects.filter(isactive=True)
 		
 		
 	
 		dic = {
-			'storeobj':store,
+			'storeobj':storeobj,
 			'vendor':vendor,
             "businessmaincategory_obj":businessmaincategory_obj,
 			"businesscategory_obj":businesscategory_obj,
@@ -1095,7 +1203,7 @@ def edit_vendor_profile(request):
 
 			
 			
-			storeobj=Store.objects.filter(vendor = vendor_obj).first()
+			storeobj=Store.objects.filter(vendor=vendor_obj,isselectedcurrentstore=True).first()
 			if storename:
 				storeobj.storename=storename
 				storeobj.save()
@@ -1202,85 +1310,7 @@ def edit_vendor_profile(request):
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
-@csrf_exempt
-def vendor_product(request):
-	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
-		product = Product.objects.get(id=request.GET.get('id'))
-		dic = {
-			'vendor':vendor,
-			'product':product,
-			
 
-			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-		}
-		return render(request,'vendor_app/product/product.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def vendor_update_product_quantity(request,id):
-	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
-		product = Product.objects.get(id=id)
-
-		if request.method == 'POST':
-			vendor = Vendor.objects.filter(user=request.user)
-			store = request.user.vendor.store
-			stock = request.POST.get('stock')
-			
-			Product.objects.filter(id=id).update(
-				stock = stock,
-			
-			)
-			messages.success(request, 'Product quantity Updated Successfully')
-			return redirect('/vendor/productlist')
-
-
-		dic = {
-			'vendor':vendor,
-			'product':product,
-			'images':ProductImages.objects.filter(productvariants__product=product),
-			'variants':ProductVariants.objects.filter(product=product),
-			# 'notification':get_notifications(request.user),
-			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-		}
-		return render(request,'vendor_app/update-product-quantity.html', dic)
-
-		
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-
-@csrf_exempt
-def vendor_product_basic_edit(request):
-	if check_user_authentication(request, 'VENDOR'):
-		if request.method == 'POST':
-			vendor = Vendor.objects.filter(user=request.user)
-			store = request.user.vendor.store
-			name = request.POST.get('name')
-			des = request.POST.get('des')
-			price = request.POST.get('price')
-			mrp = request.POST.get('mrp')
-			stock = request.POST.get('stock')
-			weight = request.POST.get('weight')
-			offer = request.POST.get('offer')
-			discount = request.POST.get('discount')
-
-			Product.objects.filter(id=request.POST.get('id')).update(
-				name = name,
-				description = des,
-				price = price,
-				mrp = mrp,
-				stock = stock,
-				weight = weight,
-				offer = offer,
-				discount= discount,
-				is_active= False
-			)
-			messages.success(request, 'Product Updated Successfully')
-			return redirect('/vendor/product?id='+request.POST.get('id'))
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_delete_product_image(request):
 	if check_user_authentication(request, 'VENDOR'):
@@ -1289,14 +1319,8 @@ def vendor_delete_product_image(request):
 			return JsonResponse({'response':'Success'})
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
-@csrf_exempt
-def vendor_delete_product_variant(request):
-	if check_user_authentication(request, 'VENDOR'):
-		if request.method == 'GET':
-			ProductVariant.objects.filter(id=request.GET.get('i')).delete()
-			return JsonResponse({'response':'Success'})
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
+
 @csrf_exempt
 def vendor_product_out_of_stock(request):
 	if check_user_authentication(request, 'VENDOR'):
@@ -1305,17 +1329,18 @@ def vendor_product_out_of_stock(request):
 			return JsonResponse({'response':'Success'})
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 @csrf_exempt
 def vendor_orders(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
-		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		business_limit = BusinessLimitWallet.objects.get(vendor__user=request.user)
 		dic = {
-			'salesorder': SalesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'salesorder': SalesOrder.objects.filter(store=storeobj).order_by("-id"),
 			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
-			'business_limit':business_limit,
-			'salesorder': SalesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'business_limit':business_limit,'storeobj':storeobj,
+			'salesorder': SalesOrder.objects.filter(store=storeobj).order_by("-id"),
 			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
 			'business_limit':business_limit,
 			'allorder_status':ORDER_STATUS_UPDATE,
@@ -1330,12 +1355,13 @@ def vendor_orders(request):
 def vendor_purchases(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		business_limit = BusinessLimitWallet.objects.get(vendor__user=request.user)
 		dic = {
-			'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'purchasesorder': PurchasesOrder.objects.filter(store=storeobj).order_by("-id"),
 			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
-			'business_limit':business_limit,
-			'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendor).order_by("-id"),
+			'business_limit':business_limit,'storeobj':storeobj,
+			'purchasesorder': PurchasesOrder.objects.filter(store=storeobj).order_by("-id"),
 			'notification_len':len(Notification.objects.filter(vendor=vendor, isread=False)),
 			'business_limit':business_limit,
 			'allorder_status':ORDER_STATUS_UPDATE,
@@ -1350,10 +1376,11 @@ def vendor_purchases(request):
 @csrf_exempt
 def vendor_order_detail(request):	
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		order_id = request.GET.get('i')
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,'storeobj':storeobj,
             "salesorder":SalesOrder.objects.filter(id=order_id).first()
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -1363,66 +1390,14 @@ def vendor_order_detail(request):
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
-#changes for COD 
-@csrf_exempt
-def vendor_change_order_status(request):
-	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
-		# admin = User.objects.get(is_superuser = True)
-		# print('admin',admin)
-		# print(admin.id)
-		order_id = request.GET.get('i')
-		print(order_id)
-		status = request.GET.get('s')
-		return_status = request.GET.get('return')
-		print(return_status)
-		if status == 'Delivered':
-			OrderItems.objects.filter(id=order_id).update(delivery_status=status, delivered_on=timezone.now())
-			user = OrderItems.objects.get(id=order_id).order.user
-			print(user)
-			order = OrderItems.objects.get(id=order_id).order
-			order_item = OrderItems.objects.filter(id=order_id)
-			print(order_item)
-			for x in order_item:
-				print(x.plan,'LLLLLLLLLLLLLLLLLLLLLLLLLLLL')
-				save_pv_transaction(user, x.product, x.subtotal, x.plan)
-			if not order.paid:
-				orderitems = OrderItems.objects.get(id=order_id)
-				admin_commission = (orderitems.total/100)*orderitems.product.category.commission
-				print("admin commission percentage")
-				print(orderitems.product.category.commission)
-				print(admin_commission,'KKKKKKKKKKKKKK')
-				gst = (admin_commission/100)*18   #GST of 18 per on admin charge deduct from businesslimit
-				print(gst)
-				admin_commission_plus_gst = admin_commission + gst
-				print("printing total_detection_amt")
-				print(admin_commission_plus_gst)
-				TaxLog.objects.create(transactiondate=timezone.now(),salesorderitems = orderitems, taxamount=gst)
-				trans_name = 'Transaction for ORD'+str(order.id)+str(orderitems.id)
-				#make_business_limit_transaction(vendor, admin_commission, 'DEBIT', trans_name)
-				make_business_limit_transaction(vendor, admin_commission_plus_gst, 'DEBIT', trans_name)
-				make_commission_transaction(vendor.user, admin_commission_plus_gst, 'CREDIT')
-				user_c = 0.0
-				if UserVendorRelation.objects.filter(vendor=vendor).exists():
-					print('hhhhhhhhhhhhhhhh')
-					user = UserVendorRelation.objects.get(vendor=vendor)
-					percentage = float(str(UserVendorCommission.objects.get()))
-					user_c = (orderitems.total/100) * percentage
-					make_commission_transaction(user, admin_commission_plus_gst, 'CREDIT')
-					make_wallet_transaction(vendor.user, user_c, 'DEBIT')
-		else:
-			OrderItems.objects.filter(id=order_id).update(delivery_status=status)
-			notification(vendor.user, 'Order '+status)
-		return redirect('/vendor/orderdetail?i='+order_id)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 @csrf_exempt
 def vendor_return_details(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		dic = {
-			'orders':SalesOrderItems.objects.filter(store__vendor__user=request.user),
-			'vendor':vendor,
+			'orders':SalesOrderItems.objects.filter(store=storeobj),
+			'vendor':vendor,'storeobj':storeobj,
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -1432,7 +1407,8 @@ def vendor_return_details(request):
 @csrf_exempt		
 def vendor_change_return_status(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		admin = User.objects.get(is_superuser = True)
 		order_id = request.GET.get('i')
 		return_status = request.GET.get('return')
@@ -1452,35 +1428,14 @@ def vendor_change_return_status(request):
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
 
-@csrf_exempt
-def vendor_brand(request):
-	if check_user_authentication(request, 'VENDOR'):
-		if request.method == 'POST':
-			category = ProductCategory.objects.get(id=request.POST.get('category'))
-			name = request.POST.get('name')
-			if Brand.objects.filter(category=category, name=name).exists():
-				messages.info(request, 'Brand Already Exists')
-				return redirect('/vendor/brand')
-			else:
-				Brand.objects.create(category=category, name=name)
-				messages.success(request, 'Brand Added Successfully !!!!')
-				return redirect('/vendor/brand')
-		else:
-			vendor = Vendor.objects.filter(user=request.user)
-			dic = {'vendor':vendor, 'categories':ProductCategory.objects.all(),
-				'brands':Brand.objects.all(),
-				# 'notification':get_notifications(request.user),
-				# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
-			}
-			return render(request, 'vendor_app/product/brand.html', dic)
-	else:
-		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
+
 @csrf_exempt
 def vendor_payment_transactions(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.filter(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,'storeobj':storeobj,
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -1490,14 +1445,15 @@ def vendor_payment_transactions(request):
 @csrf_exempt
 def vendor_wallet_dash(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if not Wallet.objects.filter(vendor=vendor).exists():
 			Wallet.objects.create(vendor=vendor)
 		
 		wallet = Wallet.objects.get(vendor=vendor)
 		transactions = WalletTransaction.objects.filter(wallet=wallet).order_by("-transactiondate")
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,"storeobj":storeobj,
 			'wallet':wallet,
 			'transactions':transactions,
 			# 'notification':get_notifications(request.user),
@@ -1512,13 +1468,14 @@ def vendor_wallet_dash(request):
 def vendor_wallet_commission_dash(request):
 	if check_user_authentication(request, 'VENDOR'):
 		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if not CommissionWallet.objects.filter(vendor=vendor).exists():
 			CommissionWallet.objects.create(vendor=vendor,isactive=True)
 		wallet_commission = CommissionWallet.objects.filter(vendor=vendor,isactive=True).first()
 		
 		transactions = CommissionWalletTransaction.objects.filter(commissionwallet=wallet_commission)
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,'storeobj':storeobj,
 			'wallet':wallet_commission,
 			'transactions':transactions,
 			# 'notification':get_notifications(request.user),
@@ -1532,14 +1489,15 @@ def vendor_wallet_commission_dash(request):
 @csrf_exempt
 def vendor_Business_limit_dash(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor = Vendor.objects.get(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if not BusinessLimitWallet.objects.filter(vendor=vendor).exists():
 			BusinessLimitWallet.objects.create(vendor=vendor)
 		
 		business_limit = BusinessLimitWallet.objects.get(vendor=vendor)
 		business_limit_transactions = BusinessLimitWalletTransaction.objects.filter(businesslimitwallet=business_limit)
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,"storeobj":storeobj,
 			'business_limit':business_limit,
 			'business_limit_transactions':business_limit_transactions,
 			# 'notification':get_notifications(request.user),
@@ -1552,7 +1510,8 @@ def vendor_Business_limit_dash(request):
 @csrf_exempt
 def vendor_withdraw(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj = Vendor.objects.filter(user=request.user).first()
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if request.method == 'POST':
 			amount = request.POST.get('amount')
 			if float(amount) < 500:
@@ -1563,14 +1522,14 @@ def vendor_withdraw(request):
 				return redirect('/vendor/withdraw')
                 
 			flag = True
-			for x in WithdrawRequest.objects.filter(vendor=vendorobj):
+			for x in WithdrawRequest.objects.filter(vendor=vendor):
 				if x.isactive == 0 or x.isactive == 1:
 					flag = False
 					break
         
 			if flag:
 				WithdrawRequest.objects.create(
-					vendor=vendorobj,
+					vendor=vendor,
 					requestdate = timezone.now(),
 					amount = amount
 				)
@@ -1579,11 +1538,12 @@ def vendor_withdraw(request):
 			else:
 				messages.success(request, 'You already have a withdrawl request pending, please wait for it to credit.')
 				return redirect('/vendor/withdraw')
-		vendor = Vendor.objects.filter(user=request.user)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if not Wallet.objects.filter(vendor__user=request.user).exists():
 			Wallet.objects.create(vendor__user=request.user,)
 		dic = {
-			'vendor':vendor,
+			'vendor':vendor,"storeobj":storeobj,
 			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),
 			'business_limit_wallet':BusinessLimitWallet.objects.filter(vendor__user=request.user).first(),
 			'commission_wallet':CommissionWallet.objects.filter(vendor__user=request.user).first(),
@@ -1626,7 +1586,8 @@ from main_app.razor import *
 @csrf_exempt
 def vendor_recharge(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendor=Vendor.objects.filter(user=request.user).first()
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if request.method == 'POST':
 			amount = request.POST.get('amount')
 			payment_type = request.POST.get('payment_type')
@@ -1683,7 +1644,8 @@ def vendor_recharge(request):
 		
 		else:
 			dic = {'business_limit':BusinessLimitWallet.objects.get(vendor__user=request.user),
-			'bal':Wallet.objects.filter(vendor__user=request.user).first(),}
+			'bal':Wallet.objects.filter(vendor__user=request.user).first(),
+              "storeobj":storeobj}
 			return render(request, 'vendor_app/businesslimittransaction.html', dic)
 	else:
 		return HttpResponse('<h1>Error 403 : Unauthorized User <user not allowed to browse this url></h1>')
@@ -1768,7 +1730,7 @@ Team Online Aap Ki Apni Dukaan'''
 @csrf_exempt
 def vendor_billing_requests(request):
 	if check_user_authentication(request, 'VENDOR'):
-		dic = {'requests':Billing_Request.objects.filter(store=request.user.vendor.store, is_active=False)}
+		dic = {'requests':BillingRequest.objects.filter(store=request.user.vendor.store, is_active=False)}
 		return render(request, 'vendor_app/billing-requests.html', dic)
 	return HttpResponse('404 Not Found')
 @csrf_exempt
@@ -1834,10 +1796,12 @@ import datetime
 login_required('/')
 @csrf_exempt
 def vendorbalanacetransfer(request):
+	vendor = Vendor.objects.filter(user=request.user).first()
+	storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 	bal = Wallet.objects.get(vendor__user=request.user).currentbalance
 	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
 	context = {
-			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),
+			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),"storeobj":storeobj,
 			'business_limit_wallet':BusinessLimitWallet.objects.filter(vendor__user=request.user).first(),
 			'commission_wallet':CommissionWallet.objects.filter(vendor__user=request.user).first(),
 			'transectiodetails':transectiondata,'userlist':User.objects.filter(is_active=True).exclude(id=request.user.id),
@@ -1876,10 +1840,12 @@ Thanks!'''
 login_required('/')
 @csrf_exempt
 def vendorselfbalanacetransfer(request):
+	vendor = Vendor.objects.filter(user=request.user).first()
+	storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 	bal = Wallet.objects.get(vendor__user=request.user).currentbalance
 	transectiondata = WalletBalanceTransfer.objects.filter(sender=request.user.username).order_by('-id')
 	context = {
-			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),
+			'wallet':Wallet.objects.filter(vendor__user=request.user).first(),"storeobj":storeobj,
 			'business_limit_wallet':BusinessLimitWallet.objects.filter(vendor__user=request.user).first(),
 			'commission_wallet':CommissionWallet.objects.filter(vendor__user=request.user).first(),
 			'transectiodetails':transectiondata,'userlist':User.objects.filter(is_active=True).exclude(id=request.user.id),
@@ -1989,12 +1955,13 @@ def transfer_amount_vendor(request):
 @csrf_exempt
 def creditedmoney_user_wallet(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		if not WithdrawMoneyWallet.objects.filter(vendor=vendorobj).exists():
-			WithdrawMoneyWallet.objects.create(vendor=vendorobj)
-		withdrawmoneywallet=WithdrawMoneyWallet.objects.filter(vendor=vendorobj).first()
-		dic = {"vendorobj":vendorobj,'withdrawmoneywallet':withdrawmoneywallet,
-             "withdrawmoneywallettransaction":WithdrawMoneyWalletTransaction.objects.filter(withdrawmoneywallet__vendor=vendorobj)
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		if not WithdrawMoneyWallet.objects.filter(vendor=vendor).exists():
+			WithdrawMoneyWallet.objects.create(vendor=vendor)
+		withdrawmoneywallet=WithdrawMoneyWallet.objects.filter(vendor=vendor).first()
+		dic = {"vendorobj":vendor,'withdrawmoneywallet':withdrawmoneywallet,"storeobj":storeobj,
+             "withdrawmoneywallettransaction":WithdrawMoneyWalletTransaction.objects.filter(withdrawmoneywallet__vendor=vendor)
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
 		}
@@ -2039,8 +2006,8 @@ def account_code_by_store(store):
 @csrf_exempt
 def chartofaccounts(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		storeobj=Store.objects.filter(vendor=vendorobj).first()
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
         
         
 		if not Account.objects.filter(store=storeobj,accountname='Cash').exists():
@@ -2074,8 +2041,8 @@ def chartofaccounts(request):
 				transctiontype  =  'CREDIT')
 			
 			
-		dic = {"vendorobj":vendorobj,
-                "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+		dic = {"vendorobj":vendor,"storeobj":storeobj,
+                "accountledgerlist" :Account.objects.filter(store=storeobj),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
 		
            	# 'notification':get_notifications(request.user),
@@ -2092,13 +2059,14 @@ def chartofaccounts(request):
 @csrf_exempt
 def  accountledgertransactionshistory(request,id):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()  
 		if AccountTransaction.objects.filter(account__id=id).exists():
 			accounttransaction=AccountTransaction.objects.filter(account__id=id) 
 		else:
 			accounttransaction=None
             
-		dic = {"vendorobj":vendorobj,
+		dic = {"vendorobj":vendor,'storeobj':storeobj,
 				"accountledger" :Account.objects.filter(id=id).first(),
 				"accounttypegroups" :AccountTypeGroup.objects.all(),
 				'accounttransaction':accounttransaction
@@ -2115,8 +2083,10 @@ def  accountledgertransactionshistory(request,id):
 @csrf_exempt
 def addchartofaccounts(request):
 	if check_user_authentication(request, 'VENDOR'):    
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()  
 		if request.method == 'POST':
-			storeobj=Store.objects.filter(vendor__user=request.user).first()
+		
 			accountypelist = request.POST.get('accountypelist')
 			accountname = request.POST.get('accountname')
 			openingbalance = request.POST.get('openingbalance')
@@ -2147,9 +2117,11 @@ def addchartofaccounts(request):
 
 @csrf_exempt
 def editchartofaccounts(request,id):
-	if check_user_authentication(request, 'VENDOR'):    
+	if check_user_authentication(request, 'VENDOR'):  
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()  
 		if request.method == 'POST':
-			storeobj=Store.objects.filter(vendor__user=request.user).first()
+			
 			accountypelist = request.POST.get('accountypelist')
 			accountname = request.POST.get('accountname')
 			openingbalance = request.POST.get('openingbalance')
@@ -2176,10 +2148,7 @@ def editchartofaccounts(request,id):
 					accountobj.accounttypelist =AccountTypeList.objects.filter(id=accountypelist).first()
 				if accountname:
 					accountobj.accountname = accountname
-				if openingbalance:
-					accountobj.openingbalance = openingbalance
-				if transctiontype:
-					accountobj.transctiontype=transctiontype
+				
 				accountobj.updatedby= request.user
 				if streetaddress:
 					accountobj.streetaddress =  streetaddress
@@ -2216,12 +2185,13 @@ def editchartofaccounts(request,id):
 @csrf_exempt
 def manualjournal(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
-                "accountledgerlist" :Account.objects.filter(store__vendor=vendorobj).exclude(accountname__in=["Profit & Loss", "Purchase Entery", "Sales Entery"]
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,'storeobj':storeobj,
+                "accountledgerlist" :Account.objects.filter(store=storeobj).exclude(accountname__in=["Profit & Loss", "Purchase Entery", "Sales Entery"]
 ),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
-                  "manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
+                  "manualjournalvoucher" :ManualJournalVoucher.objects.filter(store=storeobj),
                
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2239,9 +2209,10 @@ import uuid
 @csrf_exempt
 def add_manualjournal(request):
 	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if request.method == "POST":
-			vendorobj = Vendor.objects.filter(user=request.user).first()
-			storeobj = Store.objects.filter(vendor=vendorobj).first()
+			
 			value = request.POST.get('hidden')
 			description = request.POST.get('description')
 			date = request.POST.get('journal_date')
@@ -2431,11 +2402,12 @@ def add_manualjournal(request):
 @csrf_exempt
 def view_manualjournal(request,id):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
-				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj).exclude(accountname="Profit & Loss"),
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,'storeobj':storeobj,
+				"accountledgerlist" :Account.objects.filter(store=storeobj).exclude(accountname="Profit & Loss"),
 				"accounttypegroups" :AccountTypeGroup.objects.all(),
-					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj,id=id),
+					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store=storeobj,id=id),
 				
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2449,13 +2421,14 @@ def view_manualjournal(request,id):
 @csrf_exempt
 def Purchase_Vouchers(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
-                "sellerledgerlist" :Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Seller"),
-                "purchaseledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Purchase Entery").first(),
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,'storeobj':storeobj,
+                "sellerledgerlist" :Account.objects.filter(store=storeobj,accounttypelist__name="Seller"),
+                "purchaseledger" :Account.objects.filter(store=storeobj,accountname="Purchase Entery").first(),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
-               'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
-                'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendorobj, type = "PURCHASE-VOUCHER"),
+               'itemlist': ProductVariants.objects.filter(store=storeobj),
+                'purchasesorder': PurchasesOrder.objects.filter(store=storeobj, type = "PURCHASE-VOUCHER"),
 		
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2469,13 +2442,14 @@ def Purchase_Vouchers(request):
 @csrf_exempt
 def Purchase_Vouchers_Details(request,id):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
-                "sellerledgerlist" :Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Seller"),
-                "purchaseledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Purchase Entery").first(),
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,'storeobj':storeobj,
+                "sellerledgerlist" :Account.objects.filter(store=storeobj,accounttypelist__name="Seller"),
+                "purchaseledger" :Account.objects.filter(store=storeobj,accountname="Purchase Entery").first(),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
-               'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
-                'purchasesorder': PurchasesOrder.objects.filter(store__vendor=vendorobj, type = "PURCHASE-VOUCHER",id=id).first(),
+               'itemlist': ProductVariants.objects.filter(store=storeobj),
+                'purchasesorder': PurchasesOrder.objects.filter(store=storeobj, type = "PURCHASE-VOUCHER",id=id).first(),
 		
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2489,9 +2463,10 @@ def Purchase_Vouchers_Details(request,id):
 @csrf_exempt
 def Add_Purchase_Vouchers(request):
 	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 		if request.method == "POST":
-			vendorobj = Vendor.objects.filter(user=request.user).first()
-			storeobj = Store.objects.filter(vendor=vendorobj).first()
+			
 			value = request.POST.get('hidden')
 			purchase_date = request.POST.get('purchase_date')
 			supplierinvoiceno = request.POST.get('supplierinvoiceno')
@@ -2505,8 +2480,8 @@ def Add_Purchase_Vouchers(request):
 
             
    
-			selleraccount=Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Seller",id=sellerledgeraccount).first()
-			purchaseledger=Account.objects.filter(store__vendor=vendorobj,accountname="Purchase Entery").first()
+			selleraccount=Account.objects.filter(store=storeobj,accounttypelist__name="Seller",id=sellerledgeraccount).first()
+			purchaseledger=Account.objects.filter(store=storeobj,accountname="Purchase Entery").first()
 			ref_no = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(timezone.now()) + 'JOURNAL'))
 			ref_no = ref_no.upper()
 			referenceno = ref_no[0:8]
@@ -2665,13 +2640,14 @@ def Add_Purchase_Vouchers(request):
 @csrf_exempt
 def Sales_Vouchers(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
-                "buyerledgerlist" :Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Buyer"),
-                "salesledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Sales Entery").first(),
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,'storeobj':storeobj,
+                "buyerledgerlist" :Account.objects.filter(store=storeobj,accounttypelist__name="Buyer"),
+                "salesledger" :Account.objects.filter(store=storeobj,accountname="Sales Entery").first(),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
-               'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
-               'salessorder': SalesOrder.objects.filter(store__vendor=vendorobj, type = "SALES-VOUCHER"),
+               'itemlist': ProductVariants.objects.filter(store=storeobj),
+               'salessorder': SalesOrder.objects.filter(store=storeobj, type = "SALES-VOUCHER"),
 		
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2685,13 +2661,14 @@ def Sales_Vouchers(request):
 @csrf_exempt
 def Sales_Vouchers_Details(request,id):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
-                "buyerledgerlist" :Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Buyer"),
-                "salesledger" :Account.objects.filter(store__vendor=vendorobj,accountname="Sales Entery").first(),
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,
+                "buyerledgerlist" :Account.objects.filter(store=storeobj,accounttypelist__name="Buyer"),
+                "salesledger" :Account.objects.filter(store=storeobj,accountname="Sales Entery").first(),
                "accounttypegroups" :AccountTypeGroup.objects.all(),
-               'itemlist': ProductVariants.objects.filter(store__vendor=vendorobj),
-            	'salesorder': SalesOrder.objects.filter(store__vendor=vendorobj, type = "SALES-VOUCHER",id=id).first(),
+               'itemlist': ProductVariants.objects.filter(store=storeobj),
+            	'salesorder': SalesOrder.objects.filter(store=storeobj, type = "SALES-VOUCHER",id=id).first(),
 		
            	# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2705,9 +2682,11 @@ def Sales_Vouchers_Details(request,id):
 @csrf_exempt
 def Add_Sales_Vouchers(request):
 	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+  
 		if request.method == "POST":
-			vendorobj = Vendor.objects.filter(user=request.user).first()
-			storeobj = Store.objects.filter(vendor=vendorobj).first()
+			
 			value = request.POST.get('hidden')
 			sales_date = request.POST.get('sales_date')
 			invoiceno = request.POST.get('invoiceno')
@@ -2721,8 +2700,8 @@ def Add_Sales_Vouchers(request):
 
             
    
-			buyeraccount=Account.objects.filter(store__vendor=vendorobj,accounttypelist__name="Buyer",id=buyerledgeraccount).first()
-			salesledger=Account.objects.filter(store__vendor=vendorobj,accountname="Sales Entery").first()
+			buyeraccount=Account.objects.filter(store=storeobj,accounttypelist__name="Buyer",id=buyerledgeraccount).first()
+			salesledger=Account.objects.filter(store=storeobj,accountname="Sales Entery").first()
 			ref_no = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(timezone.now()) + 'JOURNAL'))
 			ref_no = ref_no.upper()
 			referenceno = ref_no[0:8]
@@ -2956,12 +2935,13 @@ def fetch_productvaraints_sales_related_data(request):
 @csrf_exempt
 def viewtrialBalance(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,'storeobj':storeobj,
                 
-				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+				"accountledgerlist" :Account.objects.filter(store=storeobj),
 				"accounttypegroups" :AccountTypeGroup.objects.all(),
-					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
+					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store=storeobj),
 				
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2975,12 +2955,13 @@ def viewtrialBalance(request):
 @csrf_exempt
 def viewtradingaccount(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,"storeobj":storeobj,
                 
-				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+				"accountledgerlist" :Account.objects.filter(store=storeobj),
 				"accounttypegroups" :AccountTypeGroup.objects.all(),
-					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
+					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store=storeobj),
 				
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -2996,11 +2977,12 @@ def viewtradingaccount(request):
 @csrf_exempt
 def viewbalancesheet(request):
 	if check_user_authentication(request, 'VENDOR'):
-		vendorobj=Vendor.objects.filter(user=request.user).first()
-		dic = {"vendorobj":vendorobj,
-				"accountledgerlist" :Account.objects.filter(store__vendor=vendorobj),
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,'storeobj':storeobj,
+				"accountledgerlist" :Account.objects.filter(store=storeobj),
 				"accounttypegroups" :AccountTypeGroup.objects.all(),
-				"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store__vendor=vendorobj),
+				"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store=storeobj),
 				
 			# 'notification':get_notifications(request.user),
 			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
@@ -3012,126 +2994,120 @@ def viewbalancesheet(request):
 
 
 def Trial_Balance(request):
-    if not check_user_authentication(request, 'VENDOR'):
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
+	if not check_user_authentication(request, 'VENDOR'):
+		return JsonResponse({'error': 'Unauthorized'}, status=401)
 
-    vendorobj = Vendor.objects.filter(user=request.user).first()
-    store = Store.objects.filter(vendor=vendorobj).first()
+	vendor = Vendor.objects.filter(user=request.user).first()
+	storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 
-    if not store:
-        return JsonResponse({'error': 'Store not found'}, status=404)
+	trail_data = {}
 
-    trail_data = {}
+	accounttypegroups = AccountTypeGroup.objects.all()
 
-    accounttypegroups = AccountTypeGroup.objects.all()
+	for group in accounttypegroups:
+		group_total_debit = 0
+		group_total_credit = 0
+		group_data = {"types": [], "total_debit": 0, "total_credit": 0}
 
-    for group in accounttypegroups:
-        group_total_debit = 0
-        group_total_credit = 0
-        group_data = {"types": [], "total_debit": 0, "total_credit": 0}
+		accounttypes = AccountType.objects.filter(accounttypegroup=group)
 
-        accounttypes = AccountType.objects.filter(accounttypegroup=group)
+		for account_type in accounttypes:
+			type_total_debit = 0
+			type_total_credit = 0
+			type_data = {"lists": [], "total_debit": 0, "total_credit": 0}
 
-        for account_type in accounttypes:
-            type_total_debit = 0
-            type_total_credit = 0
-            type_data = {"lists": [], "total_debit": 0, "total_credit": 0}
+			accounttypelists = AccountTypeList.objects.filter(accounttype=account_type)
 
-            accounttypelists = AccountTypeList.objects.filter(accounttype=account_type)
+			for account_typelist in accounttypelists:
+				list_total_debit = 0
+				list_total_credit = 0
+				list_data = {"accounts": [], "total_debit": 0, "total_credit": 0}
 
-            for account_typelist in accounttypelists:
-                list_total_debit = 0
-                list_total_credit = 0
-                list_data = {"accounts": [], "total_debit": 0, "total_credit": 0}
+				accounts = Account.objects.filter(accounttypelist=account_typelist, store=storeobj)
 
-                accounts = Account.objects.filter(accounttypelist=account_typelist, store=store)
+				for account in accounts:
+					balance = account.openingbalance  # Assume balance is stored here
+					account_data = {
+						"accountname": account.accountname,
+						"accountcode": account.accountcode,
+						"balance": balance,
+						"transctiontype": account.transctiontype
+					}
+					if account.transctiontype == 'DEBIT':  # Debit balance
+						list_total_debit += balance
+					else:  # Credit balance
+						list_total_credit += balance
+					
+					list_data["accounts"].append(account_data)
 
-                for account in accounts:
-                    balance = account.openingbalance  # Assume balance is stored here
-                    account_data = {
-                        "accountname": account.accountname,
-                        "accountcode": account.accountcode,
-                        "balance": balance,
-                        "transctiontype": account.transctiontype
-                    }
-                    if account.transctiontype == 'DEBIT':  # Debit balance
-                        list_total_debit += balance
-                    else:  # Credit balance
-                        list_total_credit += balance
-                    
-                    list_data["accounts"].append(account_data)
+				list_data["total_debit"] = list_total_debit
+				list_data["total_credit"] = list_total_credit
 
-                list_data["total_debit"] = list_total_debit
-                list_data["total_credit"] = list_total_credit
+				type_total_debit += list_total_debit
+				type_total_credit += list_total_credit
+				type_data["lists"].append({"name": account_typelist.name, "data": list_data})
 
-                type_total_debit += list_total_debit
-                type_total_credit += list_total_credit
-                type_data["lists"].append({"name": account_typelist.name, "data": list_data})
+			type_data["total_debit"] = type_total_debit
+			type_data["total_credit"] = type_total_credit
 
-            type_data["total_debit"] = type_total_debit
-            type_data["total_credit"] = type_total_credit
+			group_total_debit += type_total_debit
+			group_total_credit += type_total_credit
+			group_data["types"].append({"name": account_type.name, "data": type_data})
 
-            group_total_debit += type_total_debit
-            group_total_credit += type_total_credit
-            group_data["types"].append({"name": account_type.name, "data": type_data})
+		group_data["total_debit"] = group_total_debit
+		group_data["total_credit"] = group_total_credit
 
-        group_data["total_debit"] = group_total_debit
-        group_data["total_credit"] = group_total_credit
+		trail_data[group.name] = group_data
 
-        trail_data[group.name] = group_data
-
-    return JsonResponse(trail_data)
+	return JsonResponse(trail_data)
 
 
 
 
 def Trading_Account(request):
-    if not check_user_authentication(request, 'VENDOR'):
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
+	if not check_user_authentication(request, 'VENDOR'):
+		return JsonResponse({'error': 'Unauthorized'}, status=401)
 
-    vendor = Vendor.objects.filter(user=request.user).first()
-    store = Store.objects.filter(vendor=vendor).first()
+	vendor = Vendor.objects.filter(user=request.user).first()
+	storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 
-    if not store:
-        return JsonResponse({'error': 'Store not found'}, status=404)
+	trading_data = {
+		"Sales": {"credit": 0, "details": []},
+		"Purchases": {"debit": 0, "details": []},
+		"Direct Expenses": {"debit": 0, "details": []},
+		"Gross Profit": {"debit": 0},
+		"Gross Loss": {"credit": 0},
+	}
 
-    trading_data = {
-        "Sales": {"credit": 0, "details": []},
-        "Purchases": {"debit": 0, "details": []},
-        "Direct Expenses": {"debit": 0, "details": []},
-        "Gross Profit": {"debit": 0},
-        "Gross Loss": {"credit": 0},
-    }
+	accounts = Account.objects.filter(store=storeobj).exclude(accountname="Profit & Loss")
 
-    accounts = Account.objects.filter(store=store).exclude(accountname="Profit & Loss")
+	for account in accounts:
+		account_data = {
+			"accountname": account.accountname,
+			"accountcode": account.accountcode,
+			"balance": account.openingbalance,
+			"transctiontype": account.transctiontype,
+		}
 
-    for account in accounts:
-        account_data = {
-            "accountname": account.accountname,
-            "accountcode": account.accountcode,
-            "balance": account.openingbalance,
-            "transctiontype": account.transctiontype,
-        }
+		if account.accounttypelist.accounttype.name == 'Sales':
+			trading_data["Sales"]["credit"] += account.openingbalance
+			trading_data["Sales"]["details"].append(account_data)
 
-        if account.accounttypelist.accounttype.name == 'Sales':
-            trading_data["Sales"]["credit"] += account.openingbalance
-            trading_data["Sales"]["details"].append(account_data)
+		elif account.accounttypelist.accounttype.name == 'Purchases':
+			trading_data["Purchases"]["debit"] += account.openingbalance
+			trading_data["Purchases"]["details"].append(account_data)
 
-        elif account.accounttypelist.accounttype.name == 'Purchases':
-            trading_data["Purchases"]["debit"] += account.openingbalance
-            trading_data["Purchases"]["details"].append(account_data)
+		elif account.accounttypelist.accounttype.name == 'Direct Expenses':
+			trading_data["Direct Expenses"]["debit"] += account.openingbalance
+			trading_data["Direct Expenses"]["details"].append(account_data)
 
-        elif account.accounttypelist.accounttype.name == 'Direct Expenses':
-            trading_data["Direct Expenses"]["debit"] += account.openingbalance
-            trading_data["Direct Expenses"]["details"].append(account_data)
+	gross_profit = trading_data["Sales"]["credit"] - (trading_data["Purchases"]["debit"] + trading_data["Direct Expenses"]["debit"])
+	if gross_profit > 0:
+		trading_data["Gross Profit"]["debit"] = gross_profit
+	else:
+		trading_data["Gross Loss"]["credit"] = -gross_profit
 
-    gross_profit = trading_data["Sales"]["credit"] - (trading_data["Purchases"]["debit"] + trading_data["Direct Expenses"]["debit"])
-    if gross_profit > 0:
-        trading_data["Gross Profit"]["debit"] = gross_profit
-    else:
-        trading_data["Gross Loss"]["credit"] = -gross_profit
-
-    return JsonResponse(trading_data)
+	return JsonResponse(trading_data)
 
 
 
@@ -3140,17 +3116,15 @@ def Balance_Sheet(request):
         return JsonResponse({'error': 'Unauthorized'}, status=401)
 
     vendor = Vendor.objects.filter(user=request.user).first()
-    store = Store.objects.filter(vendor=vendor).first()
+    storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 
-    if not store:
-        return JsonResponse({'error': 'Store not found'}, status=404)
-
+    
     balance_sheet_data = {
         "Assets": {"total": 0, "details": []},
         "Liabilities": {"total": 0, "details": []},
     }
 
-    accounts = Account.objects.filter(store=store).exclude(accountname="Profit & Loss")
+    accounts = Account.objects.filter(store=storeobj).exclude(accountname="Profit & Loss")
 
     for account in accounts:
         account_data = {
@@ -3162,7 +3136,7 @@ def Balance_Sheet(request):
         if account.accounttypelist.accounttype.accounttypegroup.name == 'Assets':
             balance_sheet_data["Assets"]["total"] += account.openingbalance
             balance_sheet_data["Assets"]["details"].append(account_data)
-        elif account.accounttypelist.accounttype.accounttypegroup.name == 'Liability':
+        elif account.accounttypelist.accounttype.accounttypegroup.name == 'Liabilities':
             balance_sheet_data["Liabilities"]["total"] += account.openingbalance
             balance_sheet_data["Liabilities"]["details"].append(account_data)
 

@@ -1,0 +1,538 @@
+{% extends 'vendor_app/base.html' %}
+{% load static %}
+{% block title %}Store List{% endblock %}
+{% block main %}
+
+{% csrf_token %} 
+
+
+
+<style>
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+    
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+    
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+    
+    .slider.round:before {
+      border-radius: 50%;
+    }
+ </style>
+
+            <!-- Main Content -->
+            <div class="main-content">
+               <section class="section">
+                  <div class="section-header">
+                     <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                           <div class="section-header-breadcrumb-content">
+                              <h1>Stores</h1>
+                              <div class="section-header-breadcrumb">
+                                 <div class="breadcrumb-item active"><a href="/vendor/"><i class="fas fa-home"></i></a></div>
+                                 <div class="breadcrumb-item"><a href="#">Stores</a></div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="section-body">
+                     <div class="row">
+                        <div class="col-12">
+                           <div class="card">
+                              <ul style="margin-bottom:20px;">
+                                 {% for message in messages %}
+                                 <li><span style="font-weight:bold;font-size:15px;color:red;">{{message}}</span></li>
+                                 {% endfor %}
+                              </ul>
+                              <div class="card-header">
+                     
+                                 <div class="col-8">
+                                    <h4>Store List</h4>
+                                 </div>
+                                    <div class="col-6">
+                                       <a  class="btn btn-primary" data-toggle="modal" data-target="#AddStoreModal">Add New Store</a>
+                                    </div>
+                                    
+                              </div>
+                              <div class="card-body">
+                                 <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="tableExport" style="width:100%;">
+                                       <thead>
+                                          <tr>
+                                             <th>Store Id</th>
+                                             <th>Store Name</th>
+                                             <th>Business Category</th>
+                                             <th>Sub-Business Category</th>
+                                             <th>Current Selected Store</th>
+                                           
+                                             <th>Status</th>
+                              
+                                            
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          {% for store in store_list %}
+                                          <tr>
+                                             <td><a  data-toggle="modal" data-target="#EditStoreModal{{store.id}}">{{store.id}}</a></td>
+                              
+                                             <td> <a data-toggle="modal" data-target="#EditStoreModal{{store.id}}">{{store.storename|safe }}</a> </td>
+                                             <td>{{ store.businessmaincategory.title|safe }} </td>
+                                             <td>
+                                             {% for sub in  store.businesscategory.all %}
+                                             {{ sub.title|safe }} ,
+                                             {% endfor %}
+                                            </td>
+                                            
+                                         
+                                            <td>
+                                                <form id="activeForm{{ store.id }}" action="/vendor/store-selected" enctype="multipart/form-data" method="POST">
+                                                    <input type="hidden" name="storeid" value="{{ store.id }}" > 
+                                                    <label class="switch">
+                                                        <input type="checkbox" name="isselectedcurrentstore" value="True" {% if store.isselectedcurrentstore == True %} checked {% endif %} onchange="submitForm({{ store.id }})">
+                                                        <span class="slider round"></span>
+                                                    </label> 
+                                                </form>
+                                            </td>
+                                            
+                                            <script>
+                                                function submitForm(storeId) {
+                                                    document.getElementById('activeForm' + storeId).submit();
+                                                }
+                                            </script>
+                                            
+                                            
+                                         
+
+                                             {% if store.isactive %}
+                                             <td><span class="badge badge-success">Active</span></td>
+                                          
+                                             {%else%}
+                                             <td><span class="badge badge-warning">In-Active</span></td>
+                                             {% endif %}
+
+                              
+                                             
+                                          </tr>
+                                          {% endfor %}
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+              
+            </div>
+
+
+
+
+
+ <!-- Modal -->
+ <div class="modal fade" id="AddStoreModal" tabindex="-1" role="dialog" aria-labelledby="AddStoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+       <form action="/vendor/add-new-store" enctype="multipart/form-data"
+       method="POST">
+       {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="AddStoreModalLabel">Add New Store </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+      
+          <div class="row">
+            <div class="col-md-12 register-right">
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    
+                        <form action="/vendor/storeinfo" method="POST" enctype="multipart/form-data">
+                            <div class="row register-form">
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Store Name *</label>
+                                        <input type="text" class="form-control" placeholder="Store Name *" required name="storename" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="businessmaincategory">Business Main Category *</label>
+                                        <select class="form-control" id="businessmaincategory" name="businessmaincategory" required>
+                                          
+                                            <option value="" disable>-- Select Business Main Category --</option>
+                                            {% for b in businessmaincategory_obj %}
+                                            <option value="{{b.id}}">{{b.title}}</option>
+                                            {% endfor %}
+                                           
+                                           
+                                        </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="businesscategory">Business Category *</label>
+                                            <select class="form-control" name="businesscategory" id="businesscategory_id" multiple size="2">
+                                                
+                                              
+                                                <option value="" disabled>Select Business Category</option>
+                        
+                                               
+                                            </select>
+                                            
+                                          
+                                            </div>
+                                    
+                                 
+                                    <div class="form-group">
+                                        <label>Store Description *</label>
+                                        <textarea type="text" class="form-control" placeholder="Description *" required name="description" ></textarea>
+                                    </div>
+                                    
+                                  
+                                    
+                                    <div class="form-group">
+                                        
+                                        <input type="file" class="form-control" accept="image/png, image/jpeg" name="logo" />
+                                    </div>
+                                    <div class="form-group">
+                                        
+                                        <input type="file" class="form-control" accept="image/png, image/jpeg" name="banner" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="storeregistrationtype">Store Registration Type *</label>
+                                        <select class="form-control" name="storeregistrationtype">
+                                            {% if storeobj.storeregistrationtype %}
+                                            <option selected value="{{storeobj.storeregistrationtype}}"> {{storeobj.storeregistrationtype}}</option>
+                                            {% else %}
+                                            {% endif %}
+                                            <option  disabled>----select storeregistrationtype----</option>
+                                            <option value="Proprietorship">Proprietorship</option>
+                                            <option value="Partnerships">Partnerships</option>
+                                            <option value="Private Limited">Private Limited</option>
+                                           
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>MSM No *</label>
+                                        <input type="text" placeholder="Enter MSM No *"  id='msmeno' class="form-control"  name="msmeno"  value="{{storeobj.msmeno|default:''}}"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>MSM Doc *</label>
+                                        {% if storeobj.msmedoc %}
+                                        <a href="{{storeobj.msmedoc.url}}"> <img alt="image" src="{{storeobj.msmedoc.url}}"  height="50" weight="50" /></a>
+                                        {% else %}
+                                        {% endif %}
+                                        <input type="file"  class="form-control" accept="image/png, image/jpeg"   id='msmedoc' class="form-control"  name="msmedoc"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+
+                                    <div class="form-group">
+                                        <label>Street Address *</label>
+                                        <input type="text" class="form-control" placeholder="Enter Street Address *" id="address" title="Only (a-z) letters are allowed." required name="streetaddress" value="{{storeobj.streetaddress|default:''}}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Near by Address *</label>
+                                        <input type="text" class="form-control" placeholder="Enter Near by Address *"  id='nearbyaddress' title="Only (a-z) letters are allowed." required name="nearbyaddress" value="{{storeobj.nearbyaddress|default:''}}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>City *</label>
+                                        <input type="text" class="form-control" placeholder="Enter City *"  id='city' title="Only (a-z) letters are allowed." required name="city" value="{{storeobj.city|default:''}}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>State *</label>
+                                        <input type="text" class="form-control" placeholder="Enter State *"  id='state' title="Only (a-z) letters are allowed." required name="state" value="{{storeobj.state|default:''}}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Country *</label>
+                                        <input type="text" class="form-control" placeholder="Enter Country *"  id='country' title="Only (a-z) letters are allowed." required name="country" value="{{storeobj.country|default:''}}" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Pincode *</label>
+                                        <input type="text" placeholder="Enter Pincode *"  id='pincode' class="form-control" minlength="6" maxlength="6" name="pincode"  value="{{storeobj.pincode|default:''}}"/>
+                                    </div>
+                                  
+                                    <input type="hidden" placeholder="latitude *"  id='latitude' class="form-control"  name="latitude"  value="{{storeobj.latitude|default:''}}"/>
+                                    <input type="hidden" placeholder="longitude *"  id='longitude' class="form-control" name="longitude" value="{{storeobj.longitude|default:''}}"/>
+
+                                    
+                                    <div class="form-group">
+                                        <label>PAN Card No *</label>
+                                        <input type="text" class="form-control" placeholder="PAN Number *" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" title="Please enter the correct PAN number."  name="pancardno" value="{{storeobj.pancardno|default:''}}" />
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>PAN Card Image *</label>
+                                        {% if storeobj.pancarddoc %}
+                                        <a href="{{storeobj.pancarddoc.url}}"> <img alt="image" src="{{storeobj.pancarddoc.url}}"  height="50" weight="50" /></a>
+                                        {% else %}
+                                        {% endif %}
+                                        <input type="file" class="form-control" accept="application/pdf, image/*" name="pancarddoc" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>GST No *</label>
+                                        <input type="text" class="form-control" placeholder="GST NO *"  title="Please enter the correct gstno number."  name="gstno" value="{{storeobj.gstno|default:''}}" />
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>GST Image *</label>
+                                        {% if storeobj.gstnodoc %}
+                                        <a href="{{storeobj.gstnodoc.url}}"> <img alt="image" src="{{storeobj.gstnodoc.url}}"  height="50" weight="50" /></a>
+                                        {% else %}
+                                        {% endif %}
+                                        <input type="file" class="form-control" accept="application/pdf, image/*" name="gstnodoc" />
+                                    </div>
+
+
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Store Opening Time *</label>
+                                        <input type="time" class="form-control" placeholder="Closing Time *" name="opening_time" required value="{{storeobj.openingtime|time:'H:i' }}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Store Closing Time *</label>
+                                        <input type="time" class="form-control" placeholder="Closing Time *" name="closing_time" required value="{{ storeobj.closingtime|time:'H:i' }}" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="closing_day">Closing Day *</label>
+                                        <select class="form-control" name="closing_day">
+                                            {% if storeobj.closingday %}
+                                            <option selected value="{{storeobj.closingday}}">{{storeobj.closingday}}</option>
+                                            {% else %}
+                                            {% endif %}
+                                            <option disabled>----select closing day----</option>
+                                            <option value="Monday">Monday</option>
+                                            <option value="Tuesday">Tuesday</option>
+                                            <option value="Wednesday">Wednesday</option>
+                                            <option value="Thursday">Thursday</option>
+                                            <option value="Friday">Friday</option>
+                                            <option value="Saturday">Saturday</option>
+                                            <option value="Sunday">Sunday</option>
+                                        </select>
+                                    </div>
+                                  
+                                    
+                                    <div class="form-group">
+                                        <label>Store Shipping Policy *</label>
+                                        <textarea type="text" class="form-control" placeholder="shippingpolicy *"  name="shippingpolicy" ></textarea>
+                                    </div>
+                                    
+
+                                    <div class="form-group">
+                                        <label>Store Replacement Policy *</label>
+                                        <textarea type="text" class="form-control" placeholder="replacementpolicy *"  name="replacementpolicy"></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Store Returnand Refund Policy *</label>
+                                        <textarea type="text" class="form-control" placeholder="returnandrefundpolicy *" name="returnandrefundpolicy" ></textarea>
+                                    </div>
+
+
+                                    
+                                   
+                                </div>
+                           </div>
+                       
+                    </div>
+
+                </div>
+            </div>                      
+ 
+
+
+
+
+          </div>
+    
+                     
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+       </form>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+            <script>
+                $(document).ready(function(){
+                    $('#businessmaincategory').change(function(){
+                        var category_id = $(this).val();
+                        $.ajax({
+                            url: '/vendor/get_businesscategory',
+                            data: { 'category_id': category_id},
+                            success:function(res){
+                                //console.log(res)
+                                let html='<option  value="" disabled>Select Business Category</option>';
+                                for(i of res.data){
+                                    html +=`<option value="${i.id}">${i.title}</option>`;
+                                }
+                                document.getElementById('businesscategory_id').innerHTML=html;
+                            }
+                           
+                        });
+                    });
+                });
+            </script>
+
+
+
+
+
+
+            <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqBF76cMbvE_LREvm1S43LzZGxTsRQ0wA&libraries=places&callback=initialize"></script>
+ 
+ 
+            <script>
+              function initialize() {
+                var input = document.getElementById('address');
+                var autocomplete = new google.maps.places.Autocomplete(input);
+          
+                autocomplete.addListener('place_changed', function () {
+                  var place = autocomplete.getPlace();
+          
+                  // Extract address components
+                  var addressComponents = place.address_components;
+          
+                  // Initialize variables for pin code, state, city, country, and nearby places
+                  var pincode = "";
+                  var state = "";
+                  var city = "";
+                  var country = "";
+                  var nearbyPlace = "";
+                  var latitude = "";
+                  var longitude = "";
+          
+                  // Iterate through address components to find specific details
+                  for (var i = 0; i < addressComponents.length; i++) {
+                    var component = addressComponents[i];
+                    var types = component.types;
+          
+                    // Fill in pin code
+                    if (types.includes('postal_code')) {
+                      pincode = component.long_name;
+                    }
+          
+                    // Fill in state
+                    if (types.includes('administrative_area_level_1')) {
+                      state = component.long_name;
+                    }
+          
+                    // Fill in city
+                    if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+                      // Remove the word "Division" from the city
+                      city = component.long_name.replace(/ Division$/, '');
+                    }
+          
+                    // Fill in country
+                    if (types.includes('country')) {
+                      country = component.long_name;
+                    }
+                  }
+          
+                    // Get latitude and longitude
+                    if (place.geometry && place.geometry.location) {
+                      latitude = place.geometry.location.lat();
+                      longitude = place.geometry.location.lng();
+                    }
+            
+          
+                   // Get nearby place
+                   if (place.geometry && place.geometry.location) {
+                      var service = new google.maps.places.PlacesService(document.createElement('div'));
+                      service.nearbySearch({
+                        location: place.geometry.location,
+                        radius: 5000, // You can adjust the radius as needed
+                        type: 'point_of_interest' // You can adjust the type as needed
+                      }, function (results, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+                          nearbyPlace = results[0].name;
+                        }
+          
+                      
+          
+                      // Update input fields
+                      document.getElementById('pincode').value = pincode;
+                      document.getElementById('state').value = state;
+                      document.getElementById('city').value = city;
+                      document.getElementById('country').value = country;
+                      document.getElementById('nearbyaddress').value = nearbyPlace;
+                      document.getElementById('latitude').value = latitude;
+                      document.getElementById('longitude').value = longitude;
+                    });
+                  }
+                });
+              }
+          
+              google.maps.event.addDomListener(window, 'load', initialize);
+            </script>
+
+       
+{% endblock %}
