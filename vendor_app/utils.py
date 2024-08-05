@@ -17,6 +17,7 @@ def Trading_Account_Profit_and_Loss(storeobj):
     
     trading_data = {
         "Sales": {"credit": 0, "details": []},
+        "Closing Inventory Stock": {"credit": 0, "details": []},
         "Purchases": {"debit": 0, "details": []},
         "Direct Expenses": {"debit": 0, "details": []},
         "Gross Profit": {"debit": 0},
@@ -36,6 +37,11 @@ def Trading_Account_Profit_and_Loss(storeobj):
         if account.accounttypelist.accounttype.name == 'Sales':
             trading_data["Sales"]["credit"] += account.openingbalance
             trading_data["Sales"]["details"].append(account_data)
+            
+        elif account.accounttypelist.name == 'Stock In Hand':
+            trading_data["Closing Inventory Stock"]["credit"] += account.openingbalance
+            trading_data["Closing Inventory Stock"]["details"].append(account_data)
+
 
         elif account.accounttypelist.accounttype.name == 'Purchases':
             trading_data["Purchases"]["debit"] += account.openingbalance
@@ -45,7 +51,7 @@ def Trading_Account_Profit_and_Loss(storeobj):
             trading_data["Direct Expenses"]["debit"] += account.openingbalance
             trading_data["Direct Expenses"]["details"].append(account_data)
 
-    gross_profit = trading_data["Sales"]["credit"] - (trading_data["Purchases"]["debit"] + trading_data["Direct Expenses"]["debit"])
+    gross_profit = (trading_data["Sales"]["credit"] + trading_data["Closing Inventory Stock"]["credit"]) - (trading_data["Purchases"]["debit"] + trading_data["Direct Expenses"]["debit"])
     if gross_profit > 0:
             
         trading_data["Gross Profit"]["debit"] = gross_profit
@@ -53,7 +59,7 @@ def Trading_Account_Profit_and_Loss(storeobj):
     else:
         trading_data["Gross Loss"]["credit"] = -gross_profit
         Account.objects.filter(store=storeobj,accountname="Profit & Loss").update(openingbalance=-(gross_profit),transctiontype='DEBIT')
-   
+
     return JsonResponse(trading_data)
 
 

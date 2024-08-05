@@ -219,6 +219,14 @@
                             data.Sales.details.forEach(account => {
                                 creditHtml += appendRow(`${salesId}-${account.accountcode}`, 'detail', null, null, account.accountname, account.balance);
                             });
+
+                              // Closing Inventory Stock
+                              let closinginventorystockId = 'closing-inventory-stock';
+                              creditHtml += appendHeaderRow(closinginventorystockId, 'header', 'Closing Inventory Stock', data["Closing Inventory Stock"].credit);
+                              total_credit += data["Closing Inventory Stock"].credit;
+                              data["Closing Inventory Stock"].details.forEach(account => {
+                                creditHtml += appendRow(`${closinginventorystockId}-${account.accountcode}`, 'detail', account.accountname, account.balance, null, null);
+                              });
                     
                             // Gross Profit or Loss
                             if (data["Gross Profit"].debit > 0) {

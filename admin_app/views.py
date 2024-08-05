@@ -1205,8 +1205,8 @@ def admin_product_categories(request):
 	if check_user_authentication(request, 'ADMIN'):
 		dic = {
 			'data':ProductCategory.objects.all(),
-			'notification':get_notifications(request.user,'ADMIN'),
-			'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
+			# 'notification':get_notifications(request.user,'ADMIN'),
+			# 'notification_len':len(Notification.objects.filter(admin=request.user, isread=False)),
 			}
 		return render(request, 'admin_app/product/product-category.html', dic)
 	else:

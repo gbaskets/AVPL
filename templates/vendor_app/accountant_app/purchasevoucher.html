@@ -200,7 +200,9 @@
                       <th>Items/Services</th>
                       <th>Rate</th>
                       <th>Quantity</th>
-                      <th>Tax</th>
+                      <th>Taxable Amount</th>
+                      <th>Tax Rate %</th>
+                      <th>Tax Amount</th>
                       <th>Amount</th>
                     </tr>
                   </thead>
@@ -223,7 +225,8 @@
                       
       
                      <td><input name="quantity0" value="1" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity0" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="itemcalculation(0);"></td>
-                      
+                     <td><input name="subtotal0"  class="form-control input-subtotal" style="width: 115px;" type="number" id="subtotal0" min="0"  onchange="itemcalculation(0);" onkeypress="return validateInput(event)"></td>
+                     <td><input name="taxrate0"  class="form-control input-taxrate" style="width: 115px;" type="number" id="taxrate0" min="0"  onchange="itemcalculation(0);"></td>
                      <td><input  name="tax0" class="form-control input-tax" style="width: 115px;" type="number" id="tax0" min="0" onchange="totalTax();" onkeypress="return validateInput(event)"></td>
                       <td><input  name="total0" class="form-control input-total" style="width: 115px;" type="number" id="total0" min="0" onchange="totalAmount();" onkeypress="return validateInput(event)"></td>
                     </tr>
@@ -283,8 +286,10 @@
     let itemproduct = row.insertCell(0);
     let price = row.insertCell(1);
     let quantity = row.insertCell(2);
-    let tax = row.insertCell(3);
-    let total = row.insertCell(4);
+    let subtotal = row.insertCell(3);
+    let taxrate = row.insertCell(4);
+    let tax = row.insertCell(5);
+    let total = row.insertCell(6);
 
     itemproduct.innerHTML = `
       <select class="form-control account-item" name="itemproduct${item}" data-width="100%" id="itemproduct${item}"  onchange="itemcalculationnew(${item});">
@@ -299,6 +304,8 @@
    
    price.innerHTML = `<input name="price${item}"  class="form-control input-price" style="width: 115px;" type="number" id="price${item}" min="0" onchange="itemcalculation(${item});" onkeypress="return validateInput(event)">`;
    quantity.innerHTML = `<input name="quantity${item}" value="1" class="form-control input-quantity" style="width: 115px;" type="number" id="quantity${item}" min="1" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57" onchange="itemcalculation(${item});">`;
+   subtotal.innerHTML = `<input name="subtotal${item}"  class="form-control input-subtotal" style="width: 115px;" type="number" id="subtotal${item}" min="0" onchange="itemcalculation(${item});" onkeypress="return validateInput(event)">`; 
+   taxrate.innerHTML = `<input name="taxrate${item}"  class="form-control input-taxrate" style="width: 115px;" type="number" id="taxrate${item}" min="0" onchange="itemcalculation(${item});">`;       
    tax.innerHTML = `<input name="tax${item}" class="form-control input-tax" style="width: 115px;" type="number" id="tax${item}" min="0" onchange="totalTax();" onkeypress="return validateInput(event)">`;
    total.innerHTML = `<input name="total${item}" class="form-control input-total" style="width: 115px;" type="number" id="total${item}" min="0" onchange="totalAmount();" onkeypress="return validateInput(event)">`;
    document.getElementById('remove_account').disabled = false;
@@ -338,6 +345,8 @@
           
           
           document.getElementById(`price${id}`).value = data.purchaseprice;
+          document.getElementById(`subtotal${id}`).value = data.subtotal;
+          document.getElementById(`taxrate${id}`).value = data.taxrate;
           document.getElementById(`tax${id}`).value = data.tax;
           document.getElementById(`total${id}`).value = data.total;
     
@@ -371,8 +380,9 @@
           success: function (data) {
           console.log(data,'data')
           
-          
           document.getElementById(`price${id}`).value = data.purchaseprice;
+          document.getElementById(`subtotal${id}`).value = data.subtotal;
+          document.getElementById(`taxrate${id}`).value = data.taxrate;
           document.getElementById(`tax${id}`).value = data.tax;
           document.getElementById(`total${id}`).value = data.total;
     
