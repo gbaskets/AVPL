@@ -214,6 +214,14 @@
                             liabilityHtml += appendRow(`${liabilityId}-${account.accountcode}`, 'detail', null, null, account.accountname, account.balance);
                         });
                 
+                        // Net Profit or Loss
+                        if (data["Net Profit"].total > 0) {
+                          liabilityHtml += appendHeaderRow('net-gross-profit', 'header', 'Net Profit', data["Net Profit"].total);
+                          total_liabilities += data["Net Profit"].total;
+                        } else if (data["Net Loss"].total > 0) {
+                          assetHtml += appendHeaderRow('net-gross-loss', 'header', 'Net Loss', data["Net Loss"].total, false);
+                          total_assets += data["Net Loss"].total;
+                         }
                         // Combine both sides into one table
                         let combinedHtml = `<tr><td colspan="2"><table>${assetHtml}</table></td><td colspan="2"><table>${liabilityHtml}</table></td></tr>`;
                 

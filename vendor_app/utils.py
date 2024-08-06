@@ -65,6 +65,61 @@ def Trading_Account_Profit_and_Loss(storeobj):
 
 
 
+def Net_Profit_and_Loss_Account(storeobj):
+	
+	trading_data = {
+		"By Gross Profit": {"credit": 0},
+        "By Indirect Income": {"credit": 0, "details": []},
+        "Net Loss": {"credit": 0},
+
+
+        "To Gross Loss": {"debit": 0},
+		"To Indirect Expenses": {"debit": 0, "details": []},
+        "Net Profit": {"debit": 0},
+		
+	}
+
+	accounts = Account.objects.filter(store=storeobj).exclude(accountname="Profit & Loss")
+
+	for account in accounts:
+		account_data = {
+			"accountname": account.accountname,
+			"accountcode": account.accountcode,
+			"balance": account.openingbalance,
+			"transctiontype": account.transctiontype,
+		}
+
+		if account.accounttypelist.accounttype.name == 'Indirect Income':
+			trading_data["By Indirect Income"]["credit"] += account.openingbalance
+			trading_data["By Indirect Income"]["details"].append(account_data)
+
+		elif account.accounttypelist.accounttype.name == 'Indirect Expenses':
+			trading_data["To Indirect Expenses"]["debit"] += account.openingbalance
+			trading_data["To Indirect Expenses"]["details"].append(account_data)
+        
+	accountsobj = Account.objects.filter(store=storeobj,accountname="Profit & Loss").first()
+
+	if accountsobj.transctiontype == 'CREDIT':
+		trading_data["By Gross Profit"]["credit"] = accountsobj.openingbalance
+		net_profit = (trading_data["By Gross Profit"]["credit"] + trading_data["By Indirect Income"]["credit"]) - (trading_data["To Indirect Expenses"]["debit"])
+
+	else:
+		trading_data["To Gross Loss"]["debit"] = accountsobj.openingbalance
+		net_profit = (trading_data["To Gross Loss"]["debit"] + trading_data["To Indirect Expenses"]["debit"]) - (trading_data["By Indirect Income"]["credit"])
+
+		
+	if net_profit > 0:
+		trading_data["Net Profit"]["debit"] = net_profit
+	else:
+		trading_data["Net Loss"]["credit"] = -net_profit
+
+	return net_profit
+
+
+
+
+
+
 def generate_bracode(unique_barcode):
     EAN = barcode.get_barcode_class('ean13')
     if unique_barcode == "":

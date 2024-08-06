@@ -2033,6 +2033,34 @@ def chartofaccounts(request):
 				accountcode = account_code_by_store(storeobj),
 				openingbalance = 0,
 				transctiontype  =  'CREDIT')
+        
+		if not Account.objects.filter(store=storeobj,accountname='Salary').exists():
+			accounttypelist =AccountTypeList.objects.filter(name="Misslen.Exp Indirect").first()
+			Account.objects.create(store=storeobj,
+				accountname='Salary',accounttypelist=accounttypelist,
+				accountcode = account_code_by_store(storeobj),
+				openingbalance = 0,
+				transctiontype  =  'DEBIT')
+       
+		if not Account.objects.filter(store=storeobj,accountname='Other Income').exists():
+			accounttypelist =AccountTypeList.objects.filter(name="Outsource Income").first()
+			Account.objects.create(store=storeobj,
+				accountname='Other Income',accounttypelist=accounttypelist,
+				accountcode = account_code_by_store(storeobj),
+				openingbalance = 0,
+				transctiontype  =  'CREDIT')
+   
+   
+		if not Account.objects.filter(store=storeobj,accountname='Owner Account').exists():
+			accounttypelist =AccountTypeList.objects.filter(name="Owners Investment").first()
+			Account.objects.create(store=storeobj,
+				accountname='Owner Account',accounttypelist=accounttypelist,
+				accountcode = account_code_by_store(storeobj),
+				openingbalance = 0,
+				transctiontype  =  'CREDIT')
+
+  
+	
    
 		if not Account.objects.filter(store=storeobj,accountname='Inventory Stock').exists():
 			accounttypelist =AccountTypeList.objects.filter(name="Stock In Hand").first()
@@ -3282,13 +3310,14 @@ def Profit_and_Loss_Account(request):
 			trading_data["To Indirect Expenses"]["debit"] += account.openingbalance
 			trading_data["To Indirect Expenses"]["details"].append(account_data)
         
-	accounts = Account.objects.filter(store=storeobj,accountname="Profit & Loss").first()
-	if account.transctiontype == 'CREDIT':
-		trading_data["By Gross Profit"]["credit"] = account.openingbalance
+	accountsobj = Account.objects.filter(store=storeobj,accountname="Profit & Loss").first()
+	print(accountsobj.openingbalance,'account.openingbalance')
+	if accountsobj.transctiontype == 'CREDIT':
+		trading_data["By Gross Profit"]["credit"] = accountsobj.openingbalance
 		net_profit = (trading_data["By Gross Profit"]["credit"] + trading_data["By Indirect Income"]["credit"]) - (trading_data["To Indirect Expenses"]["debit"])
 
 	else:
-		trading_data["To Gross Loss"]["debit"] = account.openingbalance
+		trading_data["To Gross Loss"]["debit"] = accountsobj.openingbalance
 		net_profit = (trading_data["To Gross Loss"]["debit"] + trading_data["To Indirect Expenses"]["debit"]) - (trading_data["By Indirect Income"]["credit"])
 
 		
@@ -3305,33 +3334,44 @@ def Profit_and_Loss_Account(request):
 
 
 def Balance_Sheet(request):
-    if not check_user_authentication(request, 'VENDOR'):
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
+	if not check_user_authentication(request, 'VENDOR'):
+		return JsonResponse({'error': 'Unauthorized'}, status=401)
 
-    vendor = Vendor.objects.filter(user=request.user).first()
-    storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+	vendor = Vendor.objects.filter(user=request.user).first()
+	storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
 
-    
-    balance_sheet_data = {
-        "Assets": {"total": 0, "details": []},
-        "Liabilities": {"total": 0, "details": []},
-    }
 
-    accounts = Account.objects.filter(store=storeobj).exclude(accountname="Profit & Loss")
+		
+	balance_sheet_data = {
+		"Assets": {"total": 0, "details": []},
+        "Net Loss": {"total": 0},
+        "Net Profit": {"total": 0},
+		"Liabilities": {"total": 0, "details": []},
+	}
 
-    for account in accounts:
-        account_data = {
-            "accountname": account.accountname,
-            "accountcode": account.accountcode,
-            "balance": account.openingbalance,
-            "transctiontype": account.transctiontype,
-        }
+	accounts = Account.objects.filter(store=storeobj).exclude(accountname="Profit & Loss")
 
-        if account.accounttypelist.accounttype.accounttypegroup.name == 'Assets':
-            balance_sheet_data["Assets"]["total"] += account.openingbalance
-            balance_sheet_data["Assets"]["details"].append(account_data)
-        elif account.accounttypelist.accounttype.accounttypegroup.name == 'Liabilities':
-            balance_sheet_data["Liabilities"]["total"] += account.openingbalance
-            balance_sheet_data["Liabilities"]["details"].append(account_data)
+	for account in accounts:
+		account_data = {
+			"accountname": account.accountname,
+			"accountcode": account.accountcode,
+			"balance": account.openingbalance,
+			"transctiontype": account.transctiontype,
+		}
 
-    return JsonResponse(balance_sheet_data)
+		if account.accounttypelist.accounttype.accounttypegroup.name == 'Assets':
+			balance_sheet_data["Assets"]["total"] += account.openingbalance
+			balance_sheet_data["Assets"]["details"].append(account_data)
+		elif account.accounttypelist.accounttype.accounttypegroup.name == 'Liabilities':
+			balance_sheet_data["Liabilities"]["total"] += account.openingbalance
+			balance_sheet_data["Liabilities"]["details"].append(account_data)
+			
+	net_profit=Net_Profit_and_Loss_Account(storeobj)
+	print(net_profit,'net_profit')
+
+	if net_profit > 0:
+		balance_sheet_data["Net Profit"]["total"] = net_profit
+	else:
+		balance_sheet_data["Net Loss"]["total"] = -net_profit
+
+	return JsonResponse(balance_sheet_data)
