@@ -3079,6 +3079,26 @@ def viewtradingaccount(request):
 
 
 
+@csrf_exempt
+def viewprofitandlossaccount(request):
+	if check_user_authentication(request, 'VENDOR'):
+		vendor = Vendor.objects.filter(user=request.user).first()
+		storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+		dic = {"vendorobj":vendor,"storeobj":storeobj,
+                
+				"accountledgerlist" :Account.objects.filter(store=storeobj),
+				"accounttypegroups" :AccountTypeGroup.objects.all(),
+					"manualjournalvoucher" :ManualJournalVoucher.objects.filter(store=storeobj),
+				
+			# 'notification':get_notifications(request.user),
+			# 'notification_len':len(Notification.objects.filter(user=request.user, read=False)),
+		}
+		return render(request, 'vendor_app/report/profitandloss.html', dic)
+	else:
+		return render(request, '403.html')
+
+
+
 
 
 @csrf_exempt
@@ -3130,7 +3150,7 @@ def Trial_Balance(request):
 				list_total_credit = 0
 				list_data = {"accounts": [], "total_debit": 0, "total_credit": 0}
 
-				accounts = Account.objects.filter(accounttypelist=account_typelist, store=storeobj)
+				accounts = Account.objects.filter(accounttypelist=account_typelist, store=storeobj).exclude(accounttypelist__name = 'Stock In Hand')
 
 				for account in accounts:
 					balance = account.openingbalance  # Assume balance is stored here
@@ -3221,6 +3241,66 @@ def Trading_Account(request):
 		trading_data["Gross Loss"]["credit"] = -gross_profit
 
 	return JsonResponse(trading_data)
+
+
+
+
+def Profit_and_Loss_Account(request):
+	if not check_user_authentication(request, 'VENDOR'):
+		return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+	vendor = Vendor.objects.filter(user=request.user).first()
+	storeobj = Store.objects.filter(vendor=vendor,isselectedcurrentstore=True).first()
+
+	trading_data = {
+		"By Gross Profit": {"credit": 0},
+        "By Indirect Income": {"credit": 0, "details": []},
+        "Net Loss": {"credit": 0},
+
+
+        "To Gross Loss": {"debit": 0},
+		"To Indirect Expenses": {"debit": 0, "details": []},
+        "Net Profit": {"debit": 0},
+		
+	}
+
+	accounts = Account.objects.filter(store=storeobj).exclude(accountname="Profit & Loss")
+
+	for account in accounts:
+		account_data = {
+			"accountname": account.accountname,
+			"accountcode": account.accountcode,
+			"balance": account.openingbalance,
+			"transctiontype": account.transctiontype,
+		}
+
+		if account.accounttypelist.accounttype.name == 'Indirect Income':
+			trading_data["By Indirect Income"]["credit"] += account.openingbalance
+			trading_data["By Indirect Income"]["details"].append(account_data)
+
+		elif account.accounttypelist.accounttype.name == 'Indirect Expenses':
+			trading_data["To Indirect Expenses"]["debit"] += account.openingbalance
+			trading_data["To Indirect Expenses"]["details"].append(account_data)
+        
+	accounts = Account.objects.filter(store=storeobj,accountname="Profit & Loss").first()
+	if account.transctiontype == 'CREDIT':
+		trading_data["By Gross Profit"]["credit"] = account.openingbalance
+		net_profit = (trading_data["By Gross Profit"]["credit"] + trading_data["By Indirect Income"]["credit"]) - (trading_data["To Indirect Expenses"]["debit"])
+
+	else:
+		trading_data["To Gross Loss"]["debit"] = account.openingbalance
+		net_profit = (trading_data["To Gross Loss"]["debit"] + trading_data["To Indirect Expenses"]["debit"]) - (trading_data["By Indirect Income"]["credit"])
+
+		
+	if net_profit > 0:
+		trading_data["Net Profit"]["debit"] = net_profit
+	else:
+		trading_data["Net Loss"]["credit"] = -net_profit
+
+	return JsonResponse(trading_data)
+
+
+
 
 
 
